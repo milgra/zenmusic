@@ -34,7 +34,7 @@
   ;; store rect
   (swap! state assoc-in [:rects id] rect)
   ;; add bitmap to texture
-  (bm/insert bmp (:texture @state) (int x) (int y)))
+  (bm/insert (:texture @state) bmp (int x) (int y)))
 
 
 (defn delete-rect

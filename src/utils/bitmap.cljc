@@ -26,9 +26,9 @@
 
 (defn insert
   "insert bitmap into a larger bitmap"
-  [src tgt x y]
-  (let [{ds :data ws :width hs :height} src
-        {dt :data wt :width ht :height} tgt
+  [bitmap source x y]
+  (let [{ds :data ws :width hs :height} source
+        {dt :data wt :width ht :height} bitmap
         wcnt (min ws (- wt x))  ;; maximum horizontal pixels
         hcnt (min hs (- ht y))] ;; maximum vertical pixels
     (dotimes [row hcnt]
@@ -42,5 +42,6 @@
         (.position ds sind) ;; set target buffer position to index
 
         (.put dt ds) ;; copy source
-        ))))
+        ))
+    bitmap))
 

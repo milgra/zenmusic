@@ -66,7 +66,7 @@
     (if is-full?
       (assoc texmap :is-full? true)
       (-> texmap
-          (update :bitmap bm/insert bitmap ncx ncy)
+          (assoc :bitmap (bm/insert tex-bitmap bitmap ncx ncy))
           (assoc-in [:coords id] [ncx ncy rbx rby])
           (assoc :cursor [rbx ncy nch])
           (assoc :did-change? true)))))
