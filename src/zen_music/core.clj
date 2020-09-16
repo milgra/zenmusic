@@ -43,7 +43,7 @@
   "generates fixed length alfanumeric hash"
   (let [chars (map char (concat (range 48 57) (range 65 90) (range 97 122)))
         id (take length (repeatedly #(rand-nth chars)))]
-    (reduce str id)))
+    (keyword (reduce str id))))
 
 
 (defn main-loop
@@ -56,7 +56,7 @@
                       :h 50.0
                       :d 1
                       :bmp (-> (bitmap/create 50 50)
-                               (bitmap/fill 0xFF00FFFF))}) (range 5))]
+                               (bitmap/fill (bit-or 0xFF000000 (rand-int 0xFFFFFF))))}) (range 5))]
 
     (doseq [rect rects]
       (co/create-rect rect))

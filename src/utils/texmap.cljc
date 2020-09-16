@@ -6,7 +6,9 @@
 (defn create
   [width height]
   "create texture map"
-  {:bitmap (bm/create width height)
+  {:bitmap (->
+             (bm/create width height)
+             (bm/fill 0x2200FFFF))
    :coords {}
    :cursor [0 0 0]
    :is-full? false
@@ -27,7 +29,10 @@
 (defn get-coords
   "returns coords for given bitmap id"
   [texmap id]
-  (id (:coords texmap)))
+  (let [w (:width (:bitmap texmap))
+        h (:height (:bitmap texmap))
+        [tlx tly brx bry] (id (:coords texmap))]
+    [(/ tlx w) (/ tly h) (/ brx w) (/ bry h)]))
 
 
 (defn add-bitmap
@@ -69,4 +74,15 @@
           (assoc :bitmap (bm/insert tex-bitmap bitmap ncx ncy))
           (assoc-in [:coords id] [ncx ncy rbx rby])
           (assoc :cursor [rbx ncy nch])
+          (assoc :did-change? true)))))
+
+
+(defn update-bitmap
+  [texmap id bitmap]
+  (let [[ocx ocy _ _ :as coords] (get-coords texmap id)
+        tex-bitmap (:bitmap texmap)]
+    (if coords
+      ;; update bitmap at position
+      (-> texmap
+          (assoc :bitmap (bm/insert tex-bitmap bitmap ocx ocy))
           (assoc :did-change? true)))))

@@ -18,7 +18,9 @@
          :texes {}
          :texmap (tm/create 1024 1024)
          :texture (-> (bm/create 1024 1024)
-                      (bm/fill 0xFFFF00FF))}))
+                      (bm/fill 0xFFFF00FF))
+         :did-change? false
+         :vertexes (BufferUtils/createFloatBuffer 5000)}))
 
 
 (defn init!
@@ -30,11 +32,13 @@
 (defn create-rect
   "creates new rectangle"
   [{:keys [id bmp x y w h d] :as rect}]
-  (println "create rect" id)
-  ;; store rect
-  (swap! state assoc-in [:rects id] rect)
-  ;; add bitmap to texture
-  (bm/insert (:texture @state) bmp (int x) (int y)))
+
+  (let [newtexmap (tm/add-bitmap (:texmap @state) id bmp)
+        newcoords (tm/get-coords newtexmap id)
+        newrect (assoc rect :coords newcoords)]
+    (swap! state assoc-in [:rects id] newrect)
+    (swap! state assoc :texmap newtexmap)
+    (swap! state assoc :did-change? true)))
 
 
 (defn delete-rect
@@ -60,21 +64,29 @@
 (defn render
   "render rectangles"
   [w h]
-  (let [vertices (float-array
-                   [500.0  0.0   1.0 0.0 0.0
-                    0.0    0.0   0.0 0.0 0.0
-                    0.0    500.0 0.0 1.0 0.0
-                    0.0    500.0 0.0 1.0 0.0
-                    500.0  500.0 1.0 1.0 0.0
-                    500.0  0.0   1.0 0.0 0.0])
-        vertices-buffer (-> (BufferUtils/createFloatBuffer (count vertices))
-                            (.put vertices)
-                            (.flip))]
-    (gl/draw1 w h vertices-buffer (:texture @state))
+  (.clear (:vertexes @state))
 
+  (doseq [rect (vals (:rects @state))]
+    (let [{:keys [x y w h coords]} rect
+          [tlx tly brx bry] coords
+          vertexes
+          [x       y       tlx tly 0.0
+           (+ x w) y       brx tly 0.0
+           x       (+ y h) tlx bry 0.0
 
-  ;; iterate through all rectangles
-  ;; build up vertex bytebuffer
-  ;; update texture maps
-  ;; draw
-    ))
+           (+ x w) y       brx tly 0.0
+           (+ x w) (+ y h) brx bry 0.0
+           x       (+ y h) tlx bry 0.0]
+
+          vertexes1 [500.0  0.0   1.0 0.0 0.0
+                     0.0    0.0   0.0 0.0 0.0
+                     0.0    500.0 0.0 1.0 0.0
+                     0.0    500.0 0.0 1.0 0.0
+                     500.0  500.0 1.0 1.0 0.0
+                     500.0  0.0   1.0 0.0 0.0]
+
+          float-vertexes (float-array vertexes)]
+
+      (.put (:vertexes @state) float-vertexes)))
+
+  (gl/draw1 w h (:vertexes @state) (:bitmap (:texmap @state))))
