@@ -1,0 +1,19 @@
+clang \
+    -v \
+    -I/usr/local/include/SDL2 \
+    -I/usr/local/include/GL \
+    -I/usr/local/include \
+    -L/usr/local/lib \
+    -lSDL2 \
+    -lGL \
+    -lGLEW \
+    -lm \
+    modules/gl_connector.c \
+    modules/wm_connector.c \
+    math2.c \
+    math3.c \
+    math4.c \
+    mtmem.c \
+    mtbmp.c \
+    zenmusic.c \
+    -o zenmusic
