@@ -1,3 +1,7 @@
+/*
+  OpenGL Connector Module for Zen Multimedia Desktop System
+ */
+
 #ifndef gl_connector_h
 #define gl_connector_h
 
@@ -5,23 +9,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-GLuint
-ogl_shader_create(const char* vertex_source,
-                  const char* fragment_source,
-                  const char** uniform_structure,
-                  const char** attribute_structure,
-                  GLint* uniform_locations);
+void
+gl_init();
+void
+gl_render();
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "../math2.c"
+#include "../math4.c"
+#include "../mtbmp.c"
 #include <GL/glew.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 void
-ogl_errors(const char* place)
+gl_errors(const char* place)
 {
   GLenum error = 0;
   do {
@@ -34,7 +39,7 @@ ogl_errors(const char* place)
 /* internal : compile shader */
 
 GLuint
-ogl_shader_compile(GLenum type, const GLchar* source)
+gl_shader_compile(GLenum type, const GLchar* source)
 {
   GLint status, logLength, realLength;
   GLuint shader = 0;
@@ -68,7 +73,7 @@ ogl_shader_compile(GLenum type, const GLchar* source)
 /* internal : link shaders together in gpu */
 
 int
-ogl_shader_link(GLuint program)
+gl_shader_link(GLuint program)
 {
   GLint status, logLength, realLength;
 
@@ -88,11 +93,11 @@ ogl_shader_link(GLuint program)
 }
 
 GLuint
-ogl_shader_create(const char* vertex_source,
-                  const char* fragment_source,
-                  const char** uniform_structure,
-                  const char** attribute_structure,
-                  GLint* uniform_locations)
+gl_shader_create(const char* vertex_source,
+                 const char* fragment_source,
+                 const char** uniform_structure,
+                 const char** attribute_structure,
+                 GLint* uniform_locations)
 {
 
   printf("create shader");
@@ -102,12 +107,12 @@ ogl_shader_create(const char* vertex_source,
 
   GLuint program = glCreateProgram();
 
-  GLuint vertex_shader = ogl_shader_compile(GL_VERTEX_SHADER, vertex_source);
+  GLuint vertex_shader = gl_shader_compile(GL_VERTEX_SHADER, vertex_source);
   if (vertex_shader == 0)
     printf("Failed to compile vertex shader : %s\n", vertex_source);
 
   GLuint fragment_shader =
-    ogl_shader_compile(GL_FRAGMENT_SHADER, fragment_source);
+    gl_shader_compile(GL_FRAGMENT_SHADER, fragment_source);
   if (fragment_shader == 0)
     printf("Failed to compile fragment shader : %s\n", fragment_source);
 
@@ -119,7 +124,7 @@ ogl_shader_create(const char* vertex_source,
     glBindAttribLocation(program, index, name);
   }
 
-  int success = ogl_shader_link(program);
+  int success = gl_shader_link(program);
 
   if (success == 1) {
     for (int index = 0; index < uniform_locations_length; index++) {
@@ -141,10 +146,106 @@ ogl_shader_create(const char* vertex_source,
   }
 
 #ifdef DEBUG
-  ogl_errors("after ogl_shader_create\n");
+  gl_errors("after gl_shader_create\n");
 #endif
 
   return program;
+}
+
+char* blend_vsh =
+#include "shaders/blend.vsh"
+  ;
+char* blend_fsh =
+#include "shaders/blend.fsh"
+  ;
+
+void gl_init(width, height)
+{
+
+  const char* uniforms_blend[] = { "2", "projection", "texture" };
+  const char* attributes_blend[] = { "2", "position", "texcoord" };
+
+  glewInit();
+
+  GLint uniform_name_a[2];
+
+  GLuint shader_name_i = gl_shader_create(
+    blend_vsh, blend_fsh, uniforms_blend, attributes_blend, uniform_name_a);
+
+  glUseProgram(shader_name_i);
+
+  printf("shader created %i", shader_name_i);
+
+  m4_t matrix = m4_defaultortho(0.0, width, -height, 0.0, 0.0, 1.0);
+
+  matrix4array_t projection;
+  projection.matrix = matrix;
+
+  glUniformMatrix4fv(uniform_name_a[0], 1, 0, projection.array);
+
+  // create vertex buffer
+  GLuint vbuffer_name_u;
+
+  glGenBuffers(1, &vbuffer_name_u);
+  glBindBuffer(GL_ARRAY_BUFFER, vbuffer_name_u);
+
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 20, 0);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 20, (const GLvoid*)12);
+
+  GLuint texture_name_u;
+
+  glGenTextures(1, &texture_name_u);
+  glBindTexture(GL_TEXTURE_2D, texture_name_u);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexImage2D(
+    GL_TEXTURE_2D, 0, GL_RGBA, 1024, 1024, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, texture_name_u);
+  glUniform1i(uniform_name_a[1], 0);
+
+  glClearColor(0.5, 0.5, 0.5, 1.0);
+
+  mtbmp_t* texture_bmp = mtbmp_alloc(1024, 1024);
+  mtbmp_fill_with_color(texture_bmp, 0, 0, 1024, 1023, 0xFF0000FF);
+
+  glTexSubImage2D(GL_TEXTURE_2D,
+                  0,
+                  0,
+                  0,
+                  1024,
+                  1024,
+                  GL_RGBA,
+                  GL_UNSIGNED_BYTE,
+                  texture_bmp->bytes);
+
+  // create and upload rectangle
+
+  GLfloat vertexes[] = {
+
+    0.0,    0.0,     0.0, 0.0f, 0.0f, 1024.0, 0.0,     0.0, 1.0f, 0.0f,
+    0.0,    -1024.0, 0.0, 0.0f, 1.0f, 1024.0, 0.0,     0.0, 1.0f, 0.0f,
+    1024.0, -1024.0, 0.0, 1.0f, 1.0f, 0.0,    -1024.0, 0.0, 0.0f, 1.0f
+
+  };
+
+  glBufferData(
+    GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 5, vertexes, GL_DYNAMIC_DRAW);
+}
+
+void
+gl_render()
+{
+  glClearColor(0.4, 0.4, 0.4, 1.0);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 #endif

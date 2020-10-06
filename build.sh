@@ -1,5 +1,4 @@
 clang \
-    -v \
     -I/usr/local/include/SDL2 \
     -I/usr/local/include/GL \
     -I/usr/local/include \
@@ -8,12 +7,15 @@ clang \
     -lGL \
     -lGLEW \
     -lm \
+    -lpthread \
     modules/gl_connector.c \
     modules/wm_connector.c \
+    modules/ui_connector.c \
     math2.c \
     math3.c \
     math4.c \
     mtmem.c \
     mtbmp.c \
+    mtpipe.c \
     zenmusic.c \
     -o zenmusic
