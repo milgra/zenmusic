@@ -9,15 +9,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void
-gl_init();
-void
-gl_render();
+void gl_init();
+void gl_render();
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "../floatbuffer.c"
 #include "../math2.c"
 #include "../math4.c"
 #include "../mtbmp.c"
@@ -25,11 +24,11 @@ gl_render();
 #include <stdio.h>
 #include <stdlib.h>
 
-void
-gl_errors(const char* place)
+void gl_errors(const char* place)
 {
   GLenum error = 0;
-  do {
+  do
+  {
     GLenum error = glGetError();
     if (error > GL_NO_ERROR)
       printf("GL Error at %s : %i\n", place, error);
@@ -38,8 +37,7 @@ gl_errors(const char* place)
 
 /* internal : compile shader */
 
-GLuint
-gl_shader_compile(GLenum type, const GLchar* source)
+GLuint gl_shader_compile(GLenum type, const GLchar* source)
 {
   GLint status, logLength, realLength;
   GLuint shader = 0;
@@ -47,12 +45,14 @@ gl_shader_compile(GLenum type, const GLchar* source)
   status = 0;
   shader = glCreateShader(type);
 
-  if (shader > 0) {
+  if (shader > 0)
+  {
     glShaderSource(shader, 1, &source, NULL);
     glCompileShader(shader);
     glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
 
-    if (logLength > 0) {
+    if (logLength > 0)
+    {
       GLchar log[logLength];
       glGetShaderInfoLog(shader, logLength, &realLength, log);
       printf("Shader compile log: %s\n", log);
@@ -64,7 +64,8 @@ gl_shader_compile(GLenum type, const GLchar* source)
 
     if (status != GL_TRUE)
       return 0;
-  } else
+  }
+  else
     printf("Cannot create shader\n");
 
   return shader;
@@ -72,15 +73,15 @@ gl_shader_compile(GLenum type, const GLchar* source)
 
 /* internal : link shaders together in gpu */
 
-int
-gl_shader_link(GLuint program)
+int gl_shader_link(GLuint program)
 {
   GLint status, logLength, realLength;
 
   glLinkProgram(program);
   glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
 
-  if (logLength > 0) {
+  if (logLength > 0)
+  {
     GLchar log[logLength];
     glGetProgramInfoLog(program, logLength, &realLength, log);
     printf("Program link log : %i %s\n", realLength, log);
@@ -92,15 +93,12 @@ gl_shader_link(GLuint program)
   return 0;
 }
 
-GLuint
-gl_shader_create(const char* vertex_source,
-                 const char* fragment_source,
-                 const char** uniform_structure,
-                 const char** attribute_structure,
-                 GLint* uniform_locations)
+GLuint gl_shader_create(const char* vertex_source,
+                        const char* fragment_source,
+                        const char** uniform_structure,
+                        const char** attribute_structure,
+                        GLint* uniform_locations)
 {
-
-  printf("create shader");
 
   int uniform_locations_length = atoi(uniform_structure[0]);
   int attribute_locations_length = atoi(attribute_structure[0]);
@@ -108,39 +106,44 @@ gl_shader_create(const char* vertex_source,
   GLuint program = glCreateProgram();
 
   GLuint vertex_shader = gl_shader_compile(GL_VERTEX_SHADER, vertex_source);
-  if (vertex_shader == 0)
-    printf("Failed to compile vertex shader : %s\n", vertex_source);
 
-  GLuint fragment_shader =
-    gl_shader_compile(GL_FRAGMENT_SHADER, fragment_source);
-  if (fragment_shader == 0)
-    printf("Failed to compile fragment shader : %s\n", fragment_source);
+  if (vertex_shader == 0) printf("Failed to compile vertex shader : %s\n", vertex_source);
+
+  GLuint fragment_shader = gl_shader_compile(GL_FRAGMENT_SHADER, fragment_source);
+
+  if (fragment_shader == 0) printf("Failed to compile fragment shader : %s\n", fragment_source);
 
   glAttachShader(program, vertex_shader);
   glAttachShader(program, fragment_shader);
 
-  for (int index = 0; index < attribute_locations_length; index++) {
+  for (int index = 0; index < attribute_locations_length; index++)
+  {
     const GLchar* name = attribute_structure[index + 1];
     glBindAttribLocation(program, index, name);
   }
 
   int success = gl_shader_link(program);
 
-  if (success == 1) {
-    for (int index = 0; index < uniform_locations_length; index++) {
+  if (success == 1)
+  {
+    for (int index = 0; index < uniform_locations_length; index++)
+    {
       const GLchar* name = uniform_structure[index + 1];
       GLint location = glGetUniformLocation(program, name);
       uniform_locations[index] = location;
     }
-  } else
+  }
+  else
     printf("Failed to link shader program\n");
 
-  if (vertex_shader > 0) {
+  if (vertex_shader > 0)
+  {
     glDetachShader(program, vertex_shader);
     glDeleteShader(vertex_shader);
   }
 
-  if (fragment_shader > 0) {
+  if (fragment_shader > 0)
+  {
     glDetachShader(program, fragment_shader);
     glDeleteShader(fragment_shader);
   }
@@ -154,27 +157,27 @@ gl_shader_create(const char* vertex_source,
 
 char* blend_vsh =
 #include "shaders/blend.vsh"
-  ;
+    ;
 char* blend_fsh =
 #include "shaders/blend.fsh"
-  ;
+    ;
 
 void gl_init(width, height)
 {
 
-  const char* uniforms_blend[] = { "2", "projection", "texture" };
-  const char* attributes_blend[] = { "2", "position", "texcoord" };
+  const char* uniforms_blend[] = {"2", "projection", "texture"};
+  const char* attributes_blend[] = {"2", "position", "texcoord"};
 
   glewInit();
 
   GLint uniform_name_a[2];
 
-  GLuint shader_name_i = gl_shader_create(
-    blend_vsh, blend_fsh, uniforms_blend, attributes_blend, uniform_name_a);
+  GLuint shader_name_i = gl_shader_create(blend_vsh, blend_fsh,
+                                          uniforms_blend,
+                                          attributes_blend,
+                                          uniform_name_a);
 
   glUseProgram(shader_name_i);
-
-  printf("shader created %i", shader_name_i);
 
   m4_t matrix = m4_defaultortho(0.0, width, -height, 0.0, 0.0, 1.0);
 
@@ -188,7 +191,6 @@ void gl_init(width, height)
 
   glGenBuffers(1, &vbuffer_name_u);
   glBindBuffer(GL_ARRAY_BUFFER, vbuffer_name_u);
-
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 20, 0);
@@ -202,50 +204,20 @@ void gl_init(width, height)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexImage2D(
-    GL_TEXTURE_2D, 0, GL_RGBA, 1024, 1024, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 1024, 1024, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
   glBindTexture(GL_TEXTURE_2D, 0);
-
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, texture_name_u);
   glUniform1i(uniform_name_a[1], 0);
-
   glClearColor(0.5, 0.5, 0.5, 1.0);
-
-  mtbmp_t* texture_bmp = mtbmp_alloc(1024, 1024);
-  mtbmp_fill_with_color(texture_bmp, 0, 0, 1024, 1023, 0xFF0000FF);
-
-  glTexSubImage2D(GL_TEXTURE_2D,
-                  0,
-                  0,
-                  0,
-                  1024,
-                  1024,
-                  GL_RGBA,
-                  GL_UNSIGNED_BYTE,
-                  texture_bmp->bytes);
-
-  // create and upload rectangle
-
-  GLfloat vertexes[] = {
-
-    0.0,    0.0,     0.0, 0.0f, 0.0f, 1024.0, 0.0,     0.0, 1.0f, 0.0f,
-    0.0,    -1024.0, 0.0, 0.0f, 1.0f, 1024.0, 0.0,     0.0, 1.0f, 0.0f,
-    1024.0, -1024.0, 0.0, 1.0f, 1.0f, 0.0,    -1024.0, 0.0, 0.0f, 1.0f
-
-  };
-
-  glBufferData(
-    GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 5, vertexes, GL_DYNAMIC_DRAW);
 }
 
-void
-gl_render()
+void gl_render(fb_t* fb, mtbmp_t* bmp)
 {
-  glClearColor(0.4, 0.4, 0.4, 1.0);
+  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, bmp->width, bmp->height, GL_RGBA, GL_UNSIGNED_BYTE, bmp->bytes);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * fb->pos, fb->data, GL_DYNAMIC_DRAW);
   glClear(GL_COLOR_BUFFER_BIT);
-
-  glDrawArrays(GL_TRIANGLES, 0, 6);
+  glDrawArrays(GL_TRIANGLES, 0, fb->pos / 5);
 }
 
 #endif

@@ -17,5 +17,6 @@ clang \
     mtmem.c \
     mtbmp.c \
     mtpipe.c \
+    floatbuffer.c \
     zenmusic.c \
     -o zenmusic
