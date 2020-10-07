@@ -109,11 +109,9 @@ GLuint gl_shader_create(const char* vertex_source,
   GLuint program = glCreateProgram();
 
   GLuint vertex_shader = gl_shader_compile(GL_VERTEX_SHADER, vertex_source);
-
   if (vertex_shader == 0) printf("Failed to compile vertex shader : %s\n", vertex_source);
 
   GLuint fragment_shader = gl_shader_compile(GL_FRAGMENT_SHADER, fragment_source);
-
   if (fragment_shader == 0) printf("Failed to compile fragment shader : %s\n", fragment_source);
 
   glAttachShader(program, vertex_shader);

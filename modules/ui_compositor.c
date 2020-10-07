@@ -12,7 +12,6 @@
 
 void ui_compositor_init(int, int);
 void ui_compositor_render();
-void ui_compositor_update(int x, int y);
 void ui_compositor_add(char* id, int x, int y, int w, int h, bm_t* bmp);
 void ui_compositor_upd(char* id, int x, int y, int w, int h, bm_t* bmp);
 void ui_compositor_rem(char* id);
@@ -50,26 +49,22 @@ void ui_compositor_init(int width, int height)
 {
   gl_init(width, height);
 
-  flt_buf = fb_alloc();
+  flt_buf = fb_new();
   tex_map = tm_new();
   rectvec = mtvec_alloc();
   rectmap = mtmap_alloc();
 }
 
-void ui_compositor_update(int x, int y)
-{
-}
-
 void ui_compositor_render()
 {
+  crect_t* rect;
+
   fb_reset(flt_buf);
 
-  for (int index = 0;
-       index < rectvec->length;
-       index++)
+  for (int index = 0; index < rectvec->length; index++)
   {
-    crect_t* rect = rectvec->data[index];
-    fb_app_arr(flt_buf, rect->data, 24);
+    rect = rectvec->data[index];
+    fb_add(flt_buf, rect->data, 24);
   }
 
   gl_render(flt_buf, tex_map->bm);
@@ -77,24 +72,31 @@ void ui_compositor_render()
 
 void ui_compositor_add(char* id, int x, int y, int w, int h, bm_t* bmp)
 {
+  v4_t texc;
+  crect_t* rect;
+
   tm_put(tex_map, id, bmp);
-  v4_t texc = tm_get(tex_map, id);
-  crect_t* rect = crect_new(id,
-                            x, y, w, h,
-                            texc.x, texc.y, texc.z, texc.w);
+
+  texc = tm_get(tex_map, id);
+  rect = crect_new(id, x, y, w, h, texc.x, texc.y, texc.z, texc.w);
+
   mtvec_add(rectvec, rect);
   mtmap_put(rectmap, id, rect);
 }
 
 void ui_compositor_upd(char* id, int x, int y, int w, int h, bm_t* bmp)
 {
-  crect_t* rect = mtmap_get(rectmap, id);
+  crect_t* rect;
+
+  rect = mtmap_get(rectmap, id);
   if (rect) crect_set_dim(rect, x, y, w, h);
 }
 
 void ui_compositor_rem(char* id)
 {
-  crect_t* rect = mtmap_get(rectmap, id);
+  crect_t* rect;
+
+  rect = mtmap_get(rectmap, id);
   mtmap_del(rectmap, id);
   mtvec_remove(rectvec, rect);
 }

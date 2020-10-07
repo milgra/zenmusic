@@ -15,19 +15,18 @@ struct fb_t
   char changed;
 };
 
-fb_t* fb_alloc(void);
-void fb_dealloc(void* fb);
+fb_t* fb_new(void);
+void fb_del(void* fb);
 void fb_reset(fb_t* fb);
-void fb_app(fb_t* fb, GLfloat data);
-void fb_app_arr(fb_t* fb, GLfloat* data, size_t count);
+void fb_add(fb_t* fb, GLfloat* data, size_t count);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-fb_t* fb_alloc()
+fb_t* fb_new()
 {
-  fb_t* fb = mtmem_calloc(sizeof(fb_t), fb_dealloc);
+  fb_t* fb = mtmem_calloc(sizeof(fb_t), fb_del);
   fb->data = mtmem_calloc(sizeof(GLfloat) * 10, NULL);
   fb->pos = 0;
   fb->cap = 10;
@@ -35,7 +34,7 @@ fb_t* fb_alloc()
   return fb;
 }
 
-void fb_dealloc(void* pointer)
+void fb_del(void* pointer)
 {
   fb_t* fb = pointer;
   mtmem_release(fb->data);
@@ -53,15 +52,7 @@ void fb_expand(fb_t* fb)
   fb->data = mtmem_realloc(fb->data, sizeof(void*) * fb->cap);
 }
 
-void fb_app(fb_t* fb, GLfloat value)
-{
-  if (fb->pos == fb->cap) fb_expand(fb);
-  fb->data[fb->pos] = value;
-  fb->pos += 1;
-  fb->changed = 1;
-}
-
-void fb_app_arr(fb_t* fb, GLfloat* data, size_t count)
+void fb_add(fb_t* fb, GLfloat* data, size_t count)
 {
   while (fb->pos + count >= fb->cap)
     fb_expand(fb);
