@@ -1,6 +1,6 @@
-#include "modules/ui_connector.c"
-#include "modules/wm_connector.c"
 #include "mtpipe.c"
+#include "ui_connector.c"
+#include "wm_connector.c"
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,19 +9,18 @@
 
 mtpipe_t* zenpipe;
 
-void*
-brender(void* mypointer)
+void* brender(void* mypointer)
 {
   mtpipe_t* mypipe = (mtpipe_t*)mypointer;
-  while (1) {
+  while (1)
+  {
 
     mtpipe_send(mypipe, "anyad");
     sleep(5);
   }
 }
 
-void
-init(int width, int height)
+void init(int width, int height)
 {
   printf("zenmusic init %i %i", width, height);
 
@@ -41,8 +40,7 @@ init(int width, int height)
   printf("thread created: %i", success);
 }
 
-void
-render()
+void render()
 {
 
   char* data = (char*)mtpipe_recv(zenpipe);
@@ -52,14 +50,12 @@ render()
   ui_render();
 }
 
-void
-destroy()
+void destroy()
 {
   printf("zenmusic destroy\n");
 }
 
-int
-main(int argc, char* args[])
+int main(int argc, char* args[])
 {
 
   wm_init(init, render, destroy);

@@ -16,10 +16,10 @@ void gl_render();
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "../floatbuffer.c"
-#include "../math2.c"
-#include "../math4.c"
-#include "../mtbmp.c"
+#include "math2.c"
+#include "math4.c"
+#include "mtbm.c"
+#include "mtfb.c"
 #include <GL/glew.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -193,8 +193,8 @@ void gl_init(width, height)
   glBindBuffer(GL_ARRAY_BUFFER, vbuffer_name_u);
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 20, 0);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 20, (const GLvoid*)12);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 16, 0);
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 16, (const GLvoid*)8);
 
   GLuint texture_name_u;
 
@@ -212,12 +212,12 @@ void gl_init(width, height)
   glClearColor(0.5, 0.5, 0.5, 1.0);
 }
 
-void gl_render(fb_t* fb, mtbmp_t* bmp)
+void gl_render(fb_t* fb, bm_t* bmp)
 {
-  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, bmp->width, bmp->height, GL_RGBA, GL_UNSIGNED_BYTE, bmp->bytes);
+  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, bmp->w, bmp->h, GL_RGBA, GL_UNSIGNED_BYTE, bmp->data);
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * fb->pos, fb->data, GL_DYNAMIC_DRAW);
   glClear(GL_COLOR_BUFFER_BIT);
-  glDrawArrays(GL_TRIANGLES, 0, fb->pos / 5);
+  glDrawArrays(GL_TRIANGLES, 0, fb->pos / 4);
 }
 
 #endif

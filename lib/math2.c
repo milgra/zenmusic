@@ -20,69 +20,45 @@ struct _segment2_t
   v2_t basis;
 };
 
-v2_t
-v2_init(float x, float y);
-v2_t
-v2_add(v2_t a, v2_t b);
-v2_t
-v2_sub(v2_t a, v2_t b);
-v2_t
-v2_scale(v2_t vector, float ratio);
-v2_t
-v2_resize(v2_t a, float size);
-v2_t
-v2_rotate(v2_t vector, float newangle);
-v2_t
-v2_rotate_90_left(v2_t vector);
-v2_t
-v2_rotate_90_right(v2_t vector);
-v2_t
-v2_mirror(v2_t axis, v2_t vector);
-v2_t
-v2_midpoints(v2_t pointa, v2_t pointb);
-float
-v2_length(v2_t a);
-float
-v2_angle_x(v2_t a);
-float
-v2_circular_angle_between(v2_t a, v2_t b);
-char
-v2_equals(v2_t a, v2_t b);
-void
-v2_describe(v2_t vector);
-float
-v2_longside(v2_t a);
-v2_t
-v2_intersect_lines(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb);
-char
-v2_point_inside_vector(v2_t transa, v2_t basisa, v2_t point);
-v2_t
-v2_intersect_vectors(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb);
-char
-v2_box_intersect(v2_t basisa,
-                 v2_t transa,
-                 v2_t basisb,
-                 v2_t transb,
-                 float extra_distance);
-float
-v2_endpoint_proximity(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb);
-v2_t
-v2_intersect_with_proximity(v2_t trans_a,
-                            v2_t basis_a,
-                            v2_t trans_b,
-                            v2_t basis_b,
-                            float proximity);
-v2_t
-v2_intersect_with_nearby(v2_t trans_a,
-                         v2_t basis_a,
-                         v2_t trans_b,
-                         v2_t basis_b,
-                         float proximity);
-v2_t
-v2_triangle_with_bases(v2_t point_a,
-                       v2_t point_b,
-                       float segmentlength,
-                       int8_t direction);
+v2_t v2_init(float x, float y);
+v2_t v2_add(v2_t a, v2_t b);
+v2_t v2_sub(v2_t a, v2_t b);
+v2_t v2_scale(v2_t vector, float ratio);
+v2_t v2_resize(v2_t a, float size);
+v2_t v2_rotate(v2_t vector, float newangle);
+v2_t v2_rotate_90_left(v2_t vector);
+v2_t v2_rotate_90_right(v2_t vector);
+v2_t v2_mirror(v2_t axis, v2_t vector);
+v2_t v2_midpoints(v2_t pointa, v2_t pointb);
+float v2_length(v2_t a);
+float v2_angle_x(v2_t a);
+float v2_circular_angle_between(v2_t a, v2_t b);
+char v2_equals(v2_t a, v2_t b);
+void v2_describe(v2_t vector);
+float v2_longside(v2_t a);
+v2_t v2_intersect_lines(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb);
+char v2_point_inside_vector(v2_t transa, v2_t basisa, v2_t point);
+v2_t v2_intersect_vectors(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb);
+char v2_box_intersect(v2_t basisa,
+                      v2_t transa,
+                      v2_t basisb,
+                      v2_t transb,
+                      float extra_distance);
+float v2_endpoint_proximity(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb);
+v2_t v2_intersect_with_proximity(v2_t trans_a,
+                                 v2_t basis_a,
+                                 v2_t trans_b,
+                                 v2_t basis_b,
+                                 float proximity);
+v2_t v2_intersect_with_nearby(v2_t trans_a,
+                              v2_t basis_a,
+                              v2_t trans_b,
+                              v2_t basis_b,
+                              float proximity);
+v2_t v2_triangle_with_bases(v2_t point_a,
+                            v2_t point_b,
+                            float segmentlength,
+                            int8_t direction);
 segment2_t
 v2_collide_and_fragment(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb);
 
@@ -126,8 +102,7 @@ square_checkoverlapping(square2_t squarea, square2_t squareb);
 
 /* creates vector2 */
 
-v2_t
-v2_init(float x, float y)
+v2_t v2_init(float x, float y)
 {
   v2_t result;
 
@@ -139,8 +114,7 @@ v2_init(float x, float y)
 
 /* adds two vectors */
 
-v2_t
-v2_add(v2_t a, v2_t b)
+v2_t v2_add(v2_t a, v2_t b)
 {
   v2_t result;
 
@@ -152,8 +126,7 @@ v2_add(v2_t a, v2_t b)
 
 /* substracts b from a */
 
-v2_t
-v2_sub(v2_t a, v2_t b)
+v2_t v2_sub(v2_t a, v2_t b)
 {
   v2_t result;
 
@@ -165,8 +138,7 @@ v2_sub(v2_t a, v2_t b)
 
 /* multiplies vector with ratio */
 
-v2_t
-v2_scale(v2_t vector, float ratio)
+v2_t v2_scale(v2_t vector, float ratio)
 {
   v2_t result;
 
@@ -178,8 +150,7 @@ v2_scale(v2_t vector, float ratio)
 
 /* resizes vector */
 
-v2_t
-v2_resize(v2_t a, float size)
+v2_t v2_resize(v2_t a, float size)
 {
   float length = sqrtf(a.x * a.x + a.y * a.y);
   float ratio = size / length;
@@ -190,8 +161,7 @@ v2_resize(v2_t a, float size)
 
 /* rotates vector with given radians */
 
-v2_t
-v2_rotate(v2_t vector, float newangle)
+v2_t v2_rotate(v2_t vector, float newangle)
 {
   float angle = v2_angle_x(vector);
   float length = v2_length(vector);
@@ -201,27 +171,24 @@ v2_rotate(v2_t vector, float newangle)
 
 /* rotates vector to left with 90 degrees */
 
-v2_t
-v2_rotate_90_left(v2_t vector)
+v2_t v2_rotate_90_left(v2_t vector)
 {
   return v2_init(-vector.y, vector.x);
 }
 
 /* rotates vector to right with 90 degrees */
 
-v2_t
-v2_rotate_90_right(v2_t vector)
+v2_t v2_rotate_90_right(v2_t vector)
 {
   return v2_init(vector.y, -vector.x);
 }
 
 /* mirrors vector on axis */
 
-v2_t
-v2_mirror(v2_t axis, v2_t vector)
+v2_t v2_mirror(v2_t axis, v2_t vector)
 {
   v2_t projected_point = v2_intersect_lines(
-    v2_init(0.0, 0.0), axis, vector, v2_rotate_90_right(axis));
+      v2_init(0.0, 0.0), axis, vector, v2_rotate_90_right(axis));
 
   v2_t projected_vector = v2_sub(projected_point, vector);
   return v2_add(projected_point, projected_vector);
@@ -229,8 +196,7 @@ v2_mirror(v2_t axis, v2_t vector)
 
 /* returns middle point */
 
-v2_t
-v2_midpoints(v2_t pointa, v2_t pointb)
+v2_t v2_midpoints(v2_t pointa, v2_t pointb)
 {
   v2_t pointc = v2_sub(pointb, pointa);
 
@@ -242,16 +208,14 @@ v2_midpoints(v2_t pointa, v2_t pointb)
 
 /* returns vector length */
 
-float
-v2_length(v2_t a)
+float v2_length(v2_t a)
 {
   return sqrtf(a.x * a.x + a.y * a.y);
 }
 
 /* returns vector angel on x axis */
 
-float
-v2_angle_x(v2_t a)
+float v2_angle_x(v2_t a)
 {
   return atan2(a.y, a.x);
 }
@@ -259,8 +223,7 @@ v2_angle_x(v2_t a)
 /* returns angle between two vector as a circular CCW angle where angle 0 is
  * vector a */
 
-float
-v2_circular_angle_between(v2_t a, v2_t b)
+float v2_circular_angle_between(v2_t a, v2_t b)
 {
   float anglea = v2_angle_x(a);
   float angleb = v2_angle_x(b);
@@ -273,24 +236,21 @@ v2_circular_angle_between(v2_t a, v2_t b)
 
 /* compares two vectors */
 
-char
-v2_equals(v2_t a, v2_t b)
+char v2_equals(v2_t a, v2_t b)
 {
   return a.x == b.x && a.y == b.y;
 }
 
 /* describes vector */
 
-void
-v2_describe(v2_t vector)
+void v2_describe(v2_t vector)
 {
   printf("%f %f ", vector.x, vector.y);
 }
 
 /* returns longer side projected to x */
 
-float
-v2_longside(v2_t a)
+float v2_longside(v2_t a)
 {
   float x = fabs(a.x);
   float y = fabs(a.y);
@@ -303,8 +263,7 @@ v2_longside(v2_t a)
    B = x1 - x2
    C = A * x1 + B * y1 */
 
-v2_t
-v2_intersect_lines(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb)
+v2_t v2_intersect_lines(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb)
 {
   if (!(fabs(basisa.x) > 0.0 || fabs(basisa.y) > 0.0))
     return v2_init(FLT_MAX, FLT_MAX);
@@ -319,7 +278,8 @@ v2_intersect_lines(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb)
 
   float determinant = bA * aB - bB * aA;
 
-  if (determinant != 0) {
+  if (determinant != 0)
+  {
     float aC = aA * transa.x + aB * transa.y;
     float bC = bA * transb.x + bB * transb.y;
 
@@ -337,8 +297,7 @@ v2_intersect_lines(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb)
 /* checking if point is inside a vector, the point must be on the line defined
  * by the vector */
 
-char
-v2_point_inside_vector(v2_t transa, v2_t basisa, v2_t point)
+char v2_point_inside_vector(v2_t transa, v2_t basisa, v2_t point)
 {
   float dx = point.x - transa.x;
   float dy = point.y - transa.y;
@@ -361,16 +320,20 @@ v2_point_inside_vector(v2_t transa, v2_t basisa, v2_t point)
 
   // check length
 
-  if (absbx == 0.0) {
+  if (absbx == 0.0)
+  {
     if (absdx > 0.001)
       return 0;
-  } else if (absbx < absdx + 0.001)
+  }
+  else if (absbx < absdx + 0.001)
     return 0;
 
-  if (absby == 0.0) {
+  if (absby == 0.0)
+  {
     if (absdy > 0.001)
       return 0;
-  } else if (absby < absdy + 0.001)
+  }
+  else if (absby < absdy + 0.001)
     return 0;
 
   return 1;
@@ -378,16 +341,17 @@ v2_point_inside_vector(v2_t transa, v2_t basisa, v2_t point)
 
 /* intersect vectors */
 
-v2_t
-v2_intersect_vectors(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb)
+v2_t v2_intersect_vectors(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb)
 {
   v2_t isp_inertia_segment = v2_intersect_lines(transa, basisa, transb, basisb);
 
   /* lines are not parallel */
 
-  if (isp_inertia_segment.x != FLT_MAX && isp_inertia_segment.y != FLT_MAX) {
+  if (isp_inertia_segment.x != FLT_MAX && isp_inertia_segment.y != FLT_MAX)
+  {
     if (v2_point_inside_vector(transa, basisa, isp_inertia_segment) == 1 &&
-        v2_point_inside_vector(transb, basisb, isp_inertia_segment) == 1) {
+        v2_point_inside_vector(transb, basisb, isp_inertia_segment) == 1)
+    {
       return isp_inertia_segment;
     }
   }
@@ -396,12 +360,11 @@ v2_intersect_vectors(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb)
 
 // checking collosion of vector bounding boxes
 
-char
-v2_box_intersect(v2_t basisa,
-                 v2_t transa,
-                 v2_t basisb,
-                 v2_t transb,
-                 float extra_distance)
+char v2_box_intersect(v2_t basisa,
+                      v2_t transa,
+                      v2_t basisb,
+                      v2_t transb,
+                      float extra_distance)
 {
   // bounding box checking
   float dcx = fabs((transa.x + basisa.x / 2.0) - (transb.x + basisb.x / 2.0));
@@ -417,14 +380,14 @@ v2_box_intersect(v2_t basisa,
 
 /* !!! TODO CLEANUP, MERGE */
 
-float
-v2_endpoint_proximity(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb)
+float v2_endpoint_proximity(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb)
 {
   // line intersection point
   v2_t isp_inertia_segment = v2_intersect_lines(transa, basisa, transb, basisb);
 
   // lines are not parallel
-  if (isp_inertia_segment.x != FLT_MAX && isp_inertia_segment.y != FLT_MAX) {
+  if (isp_inertia_segment.x != FLT_MAX && isp_inertia_segment.y != FLT_MAX)
+  {
     v2_t halfa = v2_add(transa, v2_scale(basisa, 0.5));
     v2_t halfb = v2_add(transb, v2_scale(basisb, 0.5));
 
@@ -445,23 +408,25 @@ v2_endpoint_proximity(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb)
       blength = 0.0;
 
     return alength > blength ? alength : blength;
-  } else {
+  }
+  else
+  {
     float dx = fabs(transa.x - transb.x);
     float dy = fabs(transa.y - transb.y);
     return dx > dy ? dx : dy;
   }
 }
 
-v2_t
-v2_intersect_with_proximity(v2_t trans_a,
-                            v2_t basis_a,
-                            v2_t trans_b,
-                            v2_t basis_b,
-                            float proximity)
+v2_t v2_intersect_with_proximity(v2_t trans_a,
+                                 v2_t basis_a,
+                                 v2_t trans_b,
+                                 v2_t basis_b,
+                                 float proximity)
 {
   v2_t isp = v2_intersect_vectors(trans_a, basis_a, trans_b, basis_b);
 
-  if (isp.x == FLT_MAX && proximity > 0.0) {
+  if (isp.x == FLT_MAX && proximity > 0.0)
+  {
     float distance = v2_endpoint_proximity(trans_a, basis_a, trans_b, basis_b);
     if (distance < proximity)
       isp = v2_intersect_lines(trans_a, basis_a, trans_b, basis_b);
@@ -470,14 +435,14 @@ v2_intersect_with_proximity(v2_t trans_a,
   return isp;
 }
 
-float
-v2_endpoint_nearby(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb)
+float v2_endpoint_nearby(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb)
 {
   // line intersection point
   v2_t isp_inertia_segment = v2_intersect_lines(transa, basisa, transb, basisb);
 
   // lines are not parallel
-  if (isp_inertia_segment.x != FLT_MAX && isp_inertia_segment.y != FLT_MAX) {
+  if (isp_inertia_segment.x != FLT_MAX && isp_inertia_segment.y != FLT_MAX)
+  {
     /* endpoint part */
 
     v2_t point_start = v2_add(transa, basisa);
@@ -497,23 +462,25 @@ v2_endpoint_nearby(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb)
       dx = 0.0;
 
     return dx > dy ? dx : dy;
-  } else {
+  }
+  else
+  {
     float dx = fabs(transa.x - transb.x);
     float dy = fabs(transa.y - transb.y);
     return dx > dy ? dx : dy;
   }
 }
 
-v2_t
-v2_intersect_with_nearby(v2_t trans_a,
-                         v2_t basis_a,
-                         v2_t trans_b,
-                         v2_t basis_b,
-                         float proximity)
+v2_t v2_intersect_with_nearby(v2_t trans_a,
+                              v2_t basis_a,
+                              v2_t trans_b,
+                              v2_t basis_b,
+                              float proximity)
 {
   v2_t isp = v2_intersect_vectors(trans_a, basis_a, trans_b, basis_b);
 
-  if (isp.x == FLT_MAX && proximity > 0.0) {
+  if (isp.x == FLT_MAX && proximity > 0.0)
+  {
     float distance = v2_endpoint_nearby(trans_a, basis_a, trans_b, basis_b);
     if (distance < proximity)
       isp = v2_intersect_lines(trans_a, basis_a, trans_b, basis_b);
@@ -522,23 +489,24 @@ v2_intersect_with_nearby(v2_t trans_a,
   return isp;
 }
 
-v2_t
-v2_triangle_with_bases(v2_t point_a,
-                       v2_t point_b,
-                       float segmentlength,
-                       int8_t direction)
+v2_t v2_triangle_with_bases(v2_t point_a,
+                            v2_t point_b,
+                            float segmentlength,
+                            int8_t direction)
 {
   v2_t vector = v2_sub(point_b, point_a);
   vector = v2_scale(vector, .5);
   float length = v2_length(vector);
-  if (length < segmentlength) {
+  if (length < segmentlength)
+  {
     float needed = sqrtf(segmentlength * segmentlength - length * length);
     v2_t distance =
-      v2_init((float)direction * -vector.y, (float)direction * vector.x);
+        v2_init((float)direction * -vector.y, (float)direction * vector.x);
     distance = v2_resize(distance, needed);
     vector = v2_add(point_a, vector);
     vector = v2_add(vector, distance);
-  } else
+  }
+  else
     vector = v2_add(point_a, vector);
   return vector;
 }
@@ -593,21 +561,25 @@ square_intersect(square2_t squarea, square2_t squareb)
   float new_left = fmin(squarea.origo.x, squareb.origo.x);
   float new_top = fmax(squarea.origo.y, squareb.origo.y);
 
-  if (squareb.origo.x < squarea.origo.x) {
+  if (squareb.origo.x < squarea.origo.x)
+  {
     new_width = squareb.origo.x + squareb.extent.x - squarea.origo.x;
     new_left = squarea.origo.x - squareb.origo.x;
   }
 
-  if (squareb.origo.y > squarea.origo.y) {
+  if (squareb.origo.y > squarea.origo.y)
+  {
     new_height = squareb.origo.y + squareb.extent.y - squarea.origo.y;
     new_top = squarea.origo.y - squareb.origo.y;
   }
 
-  if (squareb.origo.x + squareb.extent.x > squarea.origo.x + squarea.extent.x) {
+  if (squareb.origo.x + squareb.extent.x > squarea.origo.x + squarea.extent.x)
+  {
     new_width = squarea.origo.x + squarea.extent.x - squareb.origo.x;
   }
 
-  if (squareb.origo.y + squareb.extent.y < squarea.origo.y + squarea.extent.y) {
+  if (squareb.origo.y + squareb.extent.y < squarea.origo.y + squarea.extent.y)
+  {
     new_height = squarea.origo.y + squarea.extent.y - squareb.origo.y;
   }
 
@@ -634,16 +606,20 @@ square_checkoverlapping(square2_t squarea, square2_t squareb)
   if (squareb.origo.x + squareb.extent.x < squarea.origo.x ||
       squareb.origo.x > squarea.origo.x + squarea.extent.x ||
       squareb.origo.y + squareb.extent.y > squarea.origo.y ||
-      squareb.origo.y < squarea.origo.y + squarea.extent.y) {
+      squareb.origo.y < squarea.origo.y + squarea.extent.y)
+  {
     return kSquareOverlappingNone;
-  } else if (squareb.origo.x >= squarea.origo.x &&
-             squareb.origo.x + squareb.extent.x <=
+  }
+  else if (squareb.origo.x >= squarea.origo.x &&
+           squareb.origo.x + squareb.extent.x <=
                squarea.origo.x + squarea.extent.x &&
-             squareb.origo.y <= squarea.origo.y &&
-             squareb.origo.y + squareb.extent.y >=
-               squarea.origo.y + squarea.extent.y) {
+           squareb.origo.y <= squarea.origo.y &&
+           squareb.origo.y + squareb.extent.y >=
+               squarea.origo.y + squarea.extent.y)
+  {
     return kSquareOverlappingInside;
-  } else
+  }
+  else
     return kSquareOverlappingPartial;
 }
 

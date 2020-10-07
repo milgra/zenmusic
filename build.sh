@@ -8,15 +8,20 @@ clang \
     -lGLEW \
     -lm \
     -lpthread \
+    -I./lib \
+    -I./modules \
     modules/gl_connector.c \
     modules/wm_connector.c \
     modules/ui_connector.c \
-    math2.c \
-    math3.c \
-    math4.c \
-    mtmem.c \
-    mtbmp.c \
-    mtpipe.c \
-    floatbuffer.c \
+    lib/math2.c \
+    lib/math3.c \
+    lib/math4.c \
+    lib/mtmem.c \
+    lib/mtbm.c \
+    lib/mttm.c \
+    lib/mtpipe.c \
+    lib/mtfb.c \
+    lib/mtmap.c \
+    lib/mtvec.c \
     zenmusic.c \
     -o zenmusic

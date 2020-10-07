@@ -35,28 +35,18 @@ struct mtmem_head
   size_t retaincount;
 };
 
-void*
-mtmem_alloc(size_t size, void (*destructor)(void*));
-void*
-mtmem_calloc(size_t size, void (*destructor)(void*));
-void*
-mtmem_realloc(void* pointer, size_t size);
-void*
-mtmem_retain(void* pointer);
-char
-mtmem_release(void* pointer);
-char
-mtmem_releaseeach(void* first, ...);
-void
-mtmem_track(void* pointer, uint8_t force);
-size_t
-mtmem_retaincount(void* pointer);
-void
-mtmem_replace(void** address, void* data);
-void*
-mtmem_stack_to_heap(size_t size,
-                    void (*destructor)(void*),
-                    unsigned char* data);
+void* mtmem_alloc(size_t size, void (*destructor)(void*));
+void* mtmem_calloc(size_t size, void (*destructor)(void*));
+void* mtmem_realloc(void* pointer, size_t size);
+void* mtmem_retain(void* pointer);
+char mtmem_release(void* pointer);
+char mtmem_releaseeach(void* first, ...);
+void mtmem_track(void* pointer, uint8_t force);
+size_t mtmem_retaincount(void* pointer);
+void mtmem_replace(void** address, void* data);
+void* mtmem_stack_to_heap(size_t size,
+                          void (*destructor)(void*),
+                          unsigned char* data);
 
 #endif
 
@@ -69,8 +59,7 @@ static void* mtmem_tracked = NULL;
 /* allocs memory with stored destructor and retaincount at the beginning of the
  * section */
 
-void*
-mtmem_alloc(size_t size, void (*destructor)(void*))
+void* mtmem_alloc(size_t size, void (*destructor)(void*))
 {
   if (size == 0)
     return NULL;
@@ -85,8 +74,7 @@ mtmem_alloc(size_t size, void (*destructor)(void*))
   return bytes + sizeof(struct mtmem_head);
 }
 
-void*
-mtmem_stack_to_heap(size_t size, void (*destructor)(void*), unsigned char* data)
+void* mtmem_stack_to_heap(size_t size, void (*destructor)(void*), unsigned char* data)
 {
   unsigned char* bytes = mtmem_alloc(size, destructor);
   memcpy(bytes, data, size);
@@ -96,8 +84,7 @@ mtmem_stack_to_heap(size_t size, void (*destructor)(void*), unsigned char* data)
 /* callocs memory with stored destructor and retaincount at the beginning of the
  * section */
 
-void*
-mtmem_calloc(size_t size, void (*destructor)(void*))
+void* mtmem_calloc(size_t size, void (*destructor)(void*))
 {
   if (size == 0)
     return NULL;
@@ -115,8 +102,7 @@ mtmem_calloc(size_t size, void (*destructor)(void*))
 /* reallocs memory with stored destructor and retaincount at the beginning of
  * the section */
 
-void*
-mtmem_realloc(void* pointer, size_t size)
+void* mtmem_realloc(void* pointer, size_t size)
 {
   if (size == 0)
     return NULL;
@@ -132,8 +118,7 @@ mtmem_realloc(void* pointer, size_t size)
 
 /* increases retaincount of section */
 
-void*
-mtmem_retain(void* pointer)
+void* mtmem_retain(void* pointer)
 {
   if (pointer == NULL)
     return NULL;
@@ -146,7 +131,8 @@ mtmem_retain(void* pointer)
 
   head->retaincount += 1;
 
-  if (mtmem_tracked != NULL && mtmem_tracked == pointer) {
+  if (mtmem_tracked != NULL && mtmem_tracked == pointer)
+  {
     printf("mem retain, retaincount %zx\n", head->retaincount);
   }
 
@@ -156,8 +142,7 @@ mtmem_retain(void* pointer)
 /* decreases retaincount of section, calls destructor if exists, frees up
  * section */
 
-char
-mtmem_release(void* pointer)
+char mtmem_release(void* pointer)
 {
   if (pointer == NULL)
     return 0;
@@ -170,11 +155,13 @@ mtmem_release(void* pointer)
 
   head->retaincount -= 1;
 
-  if (mtmem_tracked != NULL && mtmem_tracked == pointer) {
+  if (mtmem_tracked != NULL && mtmem_tracked == pointer)
+  {
     printf("mem release, retaincount %zx\n", head->retaincount);
   }
 
-  if (head->retaincount == 0) {
+  if (head->retaincount == 0)
+  {
     if (head->destructor != NULL)
       head->destructor(bytes + sizeof(struct mtmem_head));
     free(bytes);
@@ -186,14 +173,14 @@ mtmem_release(void* pointer)
 
 /* release multiple instances */
 
-char
-mtmem_releaseeach(void* first, ...)
+char mtmem_releaseeach(void* first, ...)
 {
   va_list ap;
   void* actual;
   char released = 1;
   va_start(ap, first);
-  for (actual = first; actual != NULL; actual = va_arg(ap, void*)) {
+  for (actual = first; actual != NULL; actual = va_arg(ap, void*))
+  {
     released &= mtmem_release(actual);
   }
   va_end(ap);
@@ -216,8 +203,7 @@ mtmem_retaincount(void* pointer)
 
 /* replaces old retained data with new retained with release of old data */
 
-void
-mtmem_replace(void** address, void* data)
+void mtmem_replace(void** address, void* data)
 {
   mtmem_release(*address);
   mtmem_retain(data);
@@ -226,10 +212,10 @@ mtmem_replace(void** address, void* data)
 
 /* tracks address */
 
-void
-mtmem_track(void* pointer, uint8_t force)
+void mtmem_track(void* pointer, uint8_t force)
 {
-  if (mtmem_tracked == NULL || force == 1) {
+  if (mtmem_tracked == NULL || force == 1)
+  {
     printf("mem track address %zx\n", (size_t)pointer);
     mtmem_tracked = pointer;
   }
