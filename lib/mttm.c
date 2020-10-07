@@ -107,16 +107,18 @@ char tm_put(tm_t* tm, char* id, bm_t* bm)
 
   bm_insert(tm->bm, bm, ncx, ncy);
 
-  float* coords = HEAP(((v4_t){ncx / tm->bm->w,
-                               ncy / tm->bm->h,
-                               rbx / tm->bm->w,
-                               rby / tm->bm->h}));
+  float* coords = HEAP(((v4_t){(float)ncx / (float)tm->bm->w,
+                               (float)ncy / (float)tm->bm->h,
+                               (float)rbx / (float)tm->bm->w,
+                               (float)rby / (float)tm->bm->h}));
 
   mtmap_put(tm->coords, id, coords);
 
-  tm->cx = ncx;
+  tm->cx = rbx;
   tm->cy = ncy;
   tm->ch = nch;
+
+  printf("tmap %i %i %i\n", ncx, ncy, nch);
 
   return 0; // success
 }

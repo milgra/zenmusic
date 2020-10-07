@@ -179,7 +179,7 @@ void gl_init(width, height)
 
   glUseProgram(shader_name_i);
 
-  m4_t matrix = m4_defaultortho(0.0, width, -height, 0.0, 0.0, 1.0);
+  m4_t matrix = m4_defaultortho(0.0, width, height, 0, 0.0, 1.0);
 
   matrix4array_t projection;
   projection.matrix = matrix;

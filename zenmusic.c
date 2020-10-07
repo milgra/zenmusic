@@ -22,7 +22,7 @@ void* brender(void* mypointer)
 
 void init(int width, int height)
 {
-  printf("zenmusic init %i %i", width, height);
+  printf("zenmusic init %i %i\n", width, height);
 
   srand((unsigned int)time(NULL));
   char* respath = SDL_GetBasePath();
@@ -37,7 +37,7 @@ void init(int width, int height)
 
   int success = pthread_create(&thread, NULL, brender, zenpipe);
 
-  printf("thread created: %i", success);
+  printf("thread created: %i\n", success);
 }
 
 void render()

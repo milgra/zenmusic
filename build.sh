@@ -13,6 +13,7 @@ clang \
     modules/gl_connector.c \
     modules/wm_connector.c \
     modules/ui_connector.c \
+    modules/ui_rect.c \
     lib/math2.c \
     lib/math3.c \
     lib/math4.c \
@@ -23,5 +24,6 @@ clang \
     lib/mtfb.c \
     lib/mtmap.c \
     lib/mtvec.c \
+    lib/mtcstr.c \
     zenmusic.c \
     -o zenmusic
