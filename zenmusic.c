@@ -1,21 +1,22 @@
-#include "mtpipe.c"
+#include "mtch.c"
 #include "ui_connector.c"
 #include "wm_connector.c"
+#include <SDL.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
 
-mtpipe_t* zenpipe;
+ch_t* zench;
 
 void* brender(void* mypointer)
 {
-  mtpipe_t* mypipe = (mtpipe_t*)mypointer;
+  ch_t* mych = (ch_t*)mypointer;
   while (1)
   {
 
-    mtpipe_send(mypipe, "anyad");
+    ch_send(mych, "anyad");
     sleep(5);
   }
 }
@@ -33,17 +34,21 @@ void init(int width, int height)
 
   /* this variable is our reference to the second thread */
   pthread_t thread;
-  zenpipe = mtpipe_alloc(10);
+  zench = ch_new(10);
 
-  int success = pthread_create(&thread, NULL, brender, zenpipe);
+  int success = pthread_create(&thread, NULL, brender, zench);
 
   printf("thread created: %i\n", success);
 }
 
+void update(int x, int y)
+{
+  ui_update(x, y);
+}
+
 void render()
 {
-
-  char* data = (char*)mtpipe_recv(zenpipe);
+  char* data = (char*)ch_recv(zench);
   if (data)
     printf("render, recv data %s\n", data);
 
@@ -58,7 +63,7 @@ void destroy()
 int main(int argc, char* args[])
 {
 
-  wm_init(init, render, destroy);
+  wm_init(init, update, render, destroy);
 
   return 0;
 }

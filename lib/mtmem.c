@@ -44,9 +44,7 @@ char mtmem_releaseeach(void* first, ...);
 void mtmem_track(void* pointer, uint8_t force);
 size_t mtmem_retaincount(void* pointer);
 void mtmem_replace(void** address, void* data);
-void* mtmem_stack_to_heap(size_t size,
-                          void (*destructor)(void*),
-                          unsigned char* data);
+void* mtmem_stack_to_heap(size_t size, void (*destructor)(void*), unsigned char* data);
 
 #endif
 

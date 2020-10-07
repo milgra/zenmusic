@@ -21,16 +21,11 @@ struct _v4_t
   float x, y, z, w;
 };
 
-v4_t
-v4_init(float x, float y, float z, float w);
-v4_t
-v4_add(v4_t a, v4_t b);
-v4_t
-v4_sub(v4_t a, v4_t b);
-v4_t
-v4_scale(v4_t a, float f);
-void
-v4_describe(v4_t vector);
+v4_t v4_init(float x, float y, float z, float w);
+v4_t v4_add(v4_t a, v4_t b);
+v4_t v4_sub(v4_t a, v4_t b);
+v4_t v4_scale(v4_t a, float f);
+void v4_describe(v4_t vector);
 
 typedef struct _m4_t m4_t;
 struct _m4_t
@@ -42,68 +37,47 @@ struct _m4_t
 };
 
 typedef union _matrix4array_t matrix4array_t;
-union _matrix4array_t
-{
+union _matrix4array_t {
   m4_t matrix;
   float array[16];
 };
 
-m4_t
-m4_defaultidentity(void);
-m4_t
-m4_defaultscale(float x, float y, float z);
-m4_t
-m4_defaultrotation(float x, float y, float z);
-m4_t
-m4_defaulttranslation(float x, float y, float z);
-m4_t
-m4_defaultortho(float left,
-                float right,
-                float bottom,
-                float top,
-                float near,
-                float far);
-m4_t
-m4_defaultperspective(float fovy, float aspect, float nearz, float farz);
-m4_t
-m4_scale(m4_t matrix, float x, float y, float z);
-m4_t
-m4_rotate(m4_t matrix, float x, float y, float z);
-m4_t
-m4_translate(m4_t other, float x, float y, float z);
-m4_t
-m4_invert(m4_t source, char* success);
-m4_t
-m4_multiply(m4_t a, m4_t b);
-m4_t
-m4_transpose(m4_t matrix);
-void
-m4_describe(m4_t matrix);
-void
-m4_extractangles(m4_t matrix, float* x, float* y, float* z);
+m4_t m4_defaultidentity(void);
+m4_t m4_defaultscale(float x, float y, float z);
+m4_t m4_defaultrotation(float x, float y, float z);
+m4_t m4_defaulttranslation(float x, float y, float z);
+m4_t m4_defaultortho(float left,
+                     float right,
+                     float bottom,
+                     float top,
+                     float near,
+                     float far);
+m4_t m4_defaultperspective(float fovy, float aspect, float nearz, float farz);
+m4_t m4_scale(m4_t matrix, float x, float y, float z);
+m4_t m4_rotate(m4_t matrix, float x, float y, float z);
+m4_t m4_translate(m4_t other, float x, float y, float z);
+m4_t m4_invert(m4_t source, char* success);
+m4_t m4_multiply(m4_t a, m4_t b);
+m4_t m4_transpose(m4_t matrix);
+void m4_describe(m4_t matrix);
+void m4_extractangles(m4_t matrix, float* x, float* y, float* z);
 
-v4_t
-m4_multiply_vector4(m4_t matrix, v4_t vector);
-v4_t
-m4_world_to_screen_coords(m4_t proj_matrix,
-                          v4_t vector,
-                          float width,
-                          float height);
-v3_t
-m4_screen_to_world_coords(m4_t proj_matrix,
-                          v4_t vector,
-                          float width,
-                          float height);
-void
-m4_extract(m4_t trafo, v3_t* scale, v3_t* rotation, v3_t* translation);
-v3_t
-v4_quadrelativecoors(v4_t ulc, v4_t urc, v4_t llc, v3_t point_is);
-v3_t
-v4_quadlineintersection(v4_t pointul,
-                        v4_t pointur,
-                        v4_t pointll,
-                        v3_t linea,
-                        v3_t lineb);
+v4_t m4_multiply_vector4(m4_t matrix, v4_t vector);
+v4_t m4_world_to_screen_coords(m4_t proj_matrix,
+                               v4_t vector,
+                               float width,
+                               float height);
+v3_t m4_screen_to_world_coords(m4_t proj_matrix,
+                               v4_t vector,
+                               float width,
+                               float height);
+void m4_extract(m4_t trafo, v3_t* scale, v3_t* rotation, v3_t* translation);
+v3_t v4_quadrelativecoors(v4_t ulc, v4_t urc, v4_t llc, v3_t point_is);
+v3_t v4_quadlineintersection(v4_t pointul,
+                             v4_t pointur,
+                             v4_t pointll,
+                             v3_t linea,
+                             v3_t lineb);
 
 #endif
 #if __INCLUDE_LEVEL__ == 0
@@ -111,13 +85,11 @@ v4_quadlineintersection(v4_t pointul,
 #include <float.h>
 #include <math.h>
 
-void
-m4_multiplywithnumber(m4_t* matrix, float number);
+void m4_multiplywithnumber(m4_t* matrix, float number);
 
 /* creates vector */
 
-v4_t
-v4_init(float x, float y, float z, float w)
+v4_t v4_init(float x, float y, float z, float w)
 {
   v4_t result;
 
@@ -131,8 +103,7 @@ v4_init(float x, float y, float z, float w)
 
 /* adds two vectors */
 
-v4_t
-v4_add(v4_t a, v4_t b)
+v4_t v4_add(v4_t a, v4_t b)
 {
   v4_t result;
 
@@ -146,8 +117,7 @@ v4_add(v4_t a, v4_t b)
 
 /* substract b from a */
 
-v4_t
-v4_sub(v4_t a, v4_t b)
+v4_t v4_sub(v4_t a, v4_t b)
 {
   v4_t result;
 
@@ -161,8 +131,7 @@ v4_sub(v4_t a, v4_t b)
 
 /* scales vector */
 
-v4_t
-v4_scale(v4_t a, float f)
+v4_t v4_scale(v4_t a, float f)
 {
   v4_t result;
 
@@ -176,16 +145,14 @@ v4_scale(v4_t a, float f)
 
 /* describes vector4 */
 
-void
-v4_describe(v4_t vector)
+void v4_describe(v4_t vector)
 {
   printf("x : %f y : %f z : %f w : %f", vector.x, vector.y, vector.z, vector.w);
 }
 
 /* creates identity matrix */
 
-m4_t
-m4_defaultidentity()
+m4_t m4_defaultidentity()
 {
   m4_t matrix;
 
@@ -211,8 +178,7 @@ m4_defaultidentity()
 
 /* creates scale matrix */
 
-m4_t
-m4_defaultscale(float x, float y, float z)
+m4_t m4_defaultscale(float x, float y, float z)
 {
   m4_t matrix = m4_defaultidentity();
 
@@ -225,8 +191,7 @@ m4_defaultscale(float x, float y, float z)
 
 /* creates rotation matrix */
 
-m4_t
-m4_defaultrotation(float x, float y, float z)
+m4_t m4_defaultrotation(float x, float y, float z)
 {
   float max = fabs(x) > fabs(y) ? x : y;
   max = fabs(z) > fabs(max) ? z : max;
@@ -283,8 +248,7 @@ m4_defaultrotation(float x, float y, float z)
 
 /* creates translation matrix */
 
-m4_t
-m4_defaulttranslation(float x, float y, float z)
+m4_t m4_defaulttranslation(float x, float y, float z)
 {
   m4_t result;
 
@@ -300,13 +264,12 @@ m4_defaulttranslation(float x, float y, float z)
 
 /* creates ortographic projection */
 
-m4_t
-m4_defaultortho(float left,
-                float right,
-                float bottom,
-                float top,
-                float near,
-                float far)
+m4_t m4_defaultortho(float left,
+                     float right,
+                     float bottom,
+                     float top,
+                     float near,
+                     float far)
 {
   float rpl, rml, tpb, tmb, fpn, fmn;
   m4_t matrix;
@@ -340,8 +303,7 @@ m4_defaultortho(float left,
 
 /* create perspective projection */
 
-m4_t
-m4_defaultperspective(float fovy, float aspect, float nearz, float farz)
+m4_t m4_defaultperspective(float fovy, float aspect, float nearz, float farz)
 {
   float cotan;
   m4_t matrix;
@@ -373,8 +335,7 @@ m4_defaultperspective(float fovy, float aspect, float nearz, float farz)
 
 /* scales matrix */
 
-m4_t
-m4_scale(m4_t matrix, float x, float y, float z)
+m4_t m4_scale(m4_t matrix, float x, float y, float z)
 {
   matrix.m00 *= x;
   matrix.m11 *= y;
@@ -385,8 +346,7 @@ m4_scale(m4_t matrix, float x, float y, float z)
 
 /* rotates matrix */
 
-m4_t
-m4_rotate(m4_t matrix, float x, float y, float z)
+m4_t m4_rotate(m4_t matrix, float x, float y, float z)
 {
   m4_t rotation;
 
@@ -396,8 +356,7 @@ m4_rotate(m4_t matrix, float x, float y, float z)
 
 /* translates matrix */
 
-m4_t
-m4_translate(m4_t other, float x, float y, float z)
+m4_t m4_translate(m4_t other, float x, float y, float z)
 {
   other.m30 = other.m00 * x + other.m10 * y + other.m20 * z + other.m30;
   other.m31 = other.m01 * x + other.m11 * y + other.m21 * z + other.m31;
@@ -408,8 +367,7 @@ m4_translate(m4_t other, float x, float y, float z)
 
 /* inverts matrix */
 
-m4_t
-m4_invert(m4_t source, char* success)
+m4_t m4_invert(m4_t source, char* success)
 {
   float determinant;
   m4_t inverse;
@@ -539,8 +497,7 @@ m4_invert(m4_t source, char* success)
 
 /* multiplies matrices */
 
-m4_t
-m4_multiply(m4_t a, m4_t b)
+m4_t m4_multiply(m4_t a, m4_t b)
 {
   m4_t matrix;
 
@@ -569,8 +526,7 @@ m4_multiply(m4_t a, m4_t b)
 
 /* transposes matrix */
 
-m4_t
-m4_transpose(m4_t matrix)
+m4_t m4_transpose(m4_t matrix)
 {
   m4_t result;
 
@@ -598,8 +554,7 @@ m4_transpose(m4_t matrix)
 
 /* describes matrix */
 
-void
-m4_describe(m4_t matrix)
+void m4_describe(m4_t matrix)
 {
   printf("%.2f %.2f %.2f %.2f | %.2f %.2f %.2f %.2f | %.2f %.2f %.2f %.2f | "
          "%.2f %.2f %.2f %.2f\n",
@@ -623,25 +578,30 @@ m4_describe(m4_t matrix)
 
 /* extract rotation angles from matrix */
 
-void
-m4_extractangles(m4_t matrix, float* x, float* y, float* z)
+void m4_extractangles(m4_t matrix, float* x, float* y, float* z)
 {
   float y1, y2, x1, x2, z1, z2;
   x1 = x2 = y1 = y2 = z1 = z2 = 0.0;
 
-  if (fabs(matrix.m20) != 1) {
+  if (fabs(matrix.m20) != 1)
+  {
     y1 = -asinf(matrix.m20);
     y2 = M_PI - y1;
     x1 = atan2(matrix.m21 / cosf(y1), matrix.m22 / cos(y1));
     x2 = atan2(matrix.m21 / cosf(y2), matrix.m22 / cos(y2));
     z1 = atan2(matrix.m10 / cosf(y1), matrix.m00 / cos(y1));
     z2 = atan2(matrix.m10 / cosf(y2), matrix.m00 / cos(y2));
-  } else {
+  }
+  else
+  {
     z1 = 0;
-    if (matrix.m20 == -1.0) {
+    if (matrix.m20 == -1.0)
+    {
       y1 = M_PI / 2.0;
       x1 = z1 + atan2(matrix.m01, matrix.m02);
-    } else {
+    }
+    else
+    {
       y1 = -M_PI / 2.0;
       x1 = -z1 + atan2(-matrix.m01, -matrix.m02);
     }
@@ -655,8 +615,7 @@ m4_extractangles(m4_t matrix, float* x, float* y, float* z)
 
 /* internal : multiplies with number */
 
-void
-m4_multiplywithnumber(m4_t* matrix, float number)
+void m4_multiplywithnumber(m4_t* matrix, float number)
 {
   matrix->m00 *= number;
   matrix->m01 *= number;
@@ -678,8 +637,7 @@ m4_multiplywithnumber(m4_t* matrix, float number)
 
 /* multiplies matrix4 with vector 4 */
 
-v4_t
-m4_multiply_vector4(m4_t matrix, v4_t vector)
+v4_t m4_multiply_vector4(m4_t matrix, v4_t vector)
 {
   v4_t result;
 
@@ -697,11 +655,10 @@ m4_multiply_vector4(m4_t matrix, v4_t vector)
 
 /* projects model space vector4 to screen space */
 
-v4_t
-m4_world_to_screen_coords(m4_t matrix,
-                          v4_t srcvector,
-                          float width,
-                          float height)
+v4_t m4_world_to_screen_coords(m4_t matrix,
+                               v4_t srcvector,
+                               float width,
+                               float height)
 {
   v4_t vector;
   vector.x = srcvector.x;
@@ -733,11 +690,10 @@ m4_world_to_screen_coords(m4_t matrix,
 
 /* projects screen space vector4 to model space */
 
-v3_t
-m4_screen_to_world_coords(m4_t mvpmatrix,
-                          v4_t scrvector,
-                          float width,
-                          float height)
+v3_t m4_screen_to_world_coords(m4_t mvpmatrix,
+                               v4_t scrvector,
+                               float width,
+                               float height)
 {
   // get normalized device coordinates
   // ( src.x - ( width / 2.0 ) ) / ( width / 2.0 )
@@ -773,8 +729,7 @@ m4_screen_to_world_coords(m4_t mvpmatrix,
 
 /* extracts data from matrix4 */
 
-void
-m4_extract(m4_t trafo, v3_t* scale, v3_t* rotation, v3_t* translation)
+void m4_extract(m4_t trafo, v3_t* scale, v3_t* rotation, v3_t* translation)
 {
   v4_t base_o = v4_init(0, 0, 0, 1);
   v4_t base_x = v4_init(1, 0, 0, 1);
@@ -807,8 +762,7 @@ m4_extract(m4_t trafo, v3_t* scale, v3_t* rotation, v3_t* translation)
 /* returns point_is coordiantes in the local coordinate system of the quad
  * described by ulc, urc, llc */
 
-v3_t
-v4_quadrelativecoors(v4_t ulc, v4_t urc, v4_t llc, v3_t point_is)
+v3_t v4_quadrelativecoors(v4_t ulc, v4_t urc, v4_t llc, v3_t point_is)
 {
   v3_t plane_a, plane_b, plane_d;
   v3_t mtvec_ab, mtvec_ad, mtvec_n, mtvec_ai;
@@ -846,16 +800,17 @@ v4_quadrelativecoors(v4_t ulc, v4_t urc, v4_t llc, v3_t point_is)
     relative.y *= -1;
 
   if (relative.x > 0.0 && relative.x < v3_length(mtvec_ad) &&
-      relative.y < 0.0 && relative.y > -v3_length(mtvec_ab)) {
+      relative.y < 0.0 && relative.y > -v3_length(mtvec_ab))
+  {
     return relative;
-  } else
+  }
+  else
     return v3_init(FLT_MAX, FLT_MAX, FLT_MAX);
 }
 
 /* calculates intersection point of quad and line */
 
-v3_t
-v4_quadlineintersection(v4_t ulc, v4_t urc, v4_t llc, v3_t linea, v3_t lineb)
+v3_t v4_quadlineintersection(v4_t ulc, v4_t urc, v4_t llc, v3_t linea, v3_t lineb)
 {
   v3_t plane_a, plane_b, plane_d;
   v3_t mtvec_ab, mtvec_ad, mtvec_n, mtvec_ai, point_is;

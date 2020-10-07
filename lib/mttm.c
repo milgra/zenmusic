@@ -118,8 +118,6 @@ char tm_put(tm_t* tm, char* id, bm_t* bm)
   tm->cy = ncy;
   tm->ch = nch;
 
-  printf("tmap %i %i %i\n", ncx, ncy, nch);
-
   return 0; // success
 }
 

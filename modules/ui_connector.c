@@ -7,6 +7,7 @@
 
 void ui_init(int, int);
 void ui_render();
+void ui_update(int x, int y);
 
 #endif
 
@@ -53,13 +54,18 @@ void ui_init(int width, int height)
   frect = uir_new("full", 0, 0, 1024, 1024, 0.0, 0.0, 1.0, 1.0);
 }
 
+void ui_update(int x, int y)
+{
+  uir_set_dim(brect, x, y, 150.0, 70.0);
+}
+
 void ui_render()
 {
   fb_reset(flt_buf);
 
   ++boxy;
 
-  uir_set_dim(brect, 20.0, boxy, 150.0, 70.0);
+  uir_set_dim(grect, 200, boxy, 150.0, 70.0);
 
   //  fb_app_arr(flt_buf, frect->vertexes, 24);
   fb_app_arr(flt_buf, brect->vertexes, 24);

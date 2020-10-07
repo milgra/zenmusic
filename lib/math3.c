@@ -19,38 +19,22 @@ struct _line3_t
   v3_t v2;
 };
 
-v3_t
-v3_init(float x, float y, float z);
-v3_t
-v3_add(v3_t a, v3_t b);
-v3_t
-v3_sub(v3_t a, v3_t b);
-v3_t
-v3_scale(v3_t a, float f);
-v3_t
-v3_cross(v3_t left, v3_t right);
-v3_t
-v3_normalize(v3_t matrix);
-v3_t
-v3_rotatearoundx(v3_t vector, float the_angle);
-v3_t
-v3_rotatearoundy(v3_t vector, float the_angle);
-v3_t
-v3_rotatearoundz(v3_t vector, float the_angle);
-v3_t
-v3_getxyunitrotation(v3_t vx, v3_t vy);
-v3_t
-v3_intersectwithplane(v3_t linev1, v3_t linev2, v3_t planev, v3_t planen);
-float
-v3_dot(v3_t a, v3_t b);
-float
-v3_angle(v3_t a, v3_t b);
-float
-v3_length(v3_t a);
-void
-v3_toarray(v3_t* vector, float* result);
-float
-v3_distance(v3_t vectorA, v3_t vectorB);
+v3_t v3_init(float x, float y, float z);
+v3_t v3_add(v3_t a, v3_t b);
+v3_t v3_sub(v3_t a, v3_t b);
+v3_t v3_scale(v3_t a, float f);
+v3_t v3_cross(v3_t left, v3_t right);
+v3_t v3_normalize(v3_t matrix);
+v3_t v3_rotatearoundx(v3_t vector, float the_angle);
+v3_t v3_rotatearoundy(v3_t vector, float the_angle);
+v3_t v3_rotatearoundz(v3_t vector, float the_angle);
+v3_t v3_getxyunitrotation(v3_t vx, v3_t vy);
+v3_t v3_intersectwithplane(v3_t linev1, v3_t linev2, v3_t planev, v3_t planen);
+float v3_dot(v3_t a, v3_t b);
+float v3_angle(v3_t a, v3_t b);
+float v3_length(v3_t a);
+void v3_toarray(v3_t* vector, float* result);
+float v3_distance(v3_t vectorA, v3_t vectorB);
 
 typedef struct _m3_t m3_t;
 struct _m3_t
@@ -60,31 +44,19 @@ struct _m3_t
   float m20, m21, m22;
 };
 
-m3_t
-m3_defaultidentity(void);
-m3_t
-m3_defaultscale(float x, float y);
-m3_t
-m3_defaulttranslation(float x, float y);
-m3_t
-m3_defaultrotationx(float radian);
-m3_t
-m3_defaultrotationy(float radian);
-m3_t
-m3_defaultrotationz(float radian);
-m3_t
-m3_multiply(m3_t a, m3_t b);
-m3_t
-m3_invert(m3_t source, char* success);
-m3_t
-m3_transpose(m3_t matrix);
-v3_t
-m3_multiply_vector3(m3_t matrix, v3_t vector);
+m3_t m3_defaultidentity(void);
+m3_t m3_defaultscale(float x, float y);
+m3_t m3_defaulttranslation(float x, float y);
+m3_t m3_defaultrotationx(float radian);
+m3_t m3_defaultrotationy(float radian);
+m3_t m3_defaultrotationz(float radian);
+m3_t m3_multiply(m3_t a, m3_t b);
+m3_t m3_invert(m3_t source, char* success);
+m3_t m3_transpose(m3_t matrix);
+v3_t m3_multiply_vector3(m3_t matrix, v3_t vector);
 //    v3_t    m3_multiply_v3_transposed( m3_t matrix , v3_t vector );
-void
-m3_multiplywithnumber(m3_t* matrix, float number);
-void
-m3_describe(m3_t matrix);
+void m3_multiplywithnumber(m3_t* matrix, float number);
+void m3_describe(m3_t matrix);
 
 typedef struct _transformation_t transformation_t;
 struct _transformation_t
@@ -114,8 +86,7 @@ struct _vox_t
 
 /* inits vector3 */
 
-v3_t
-v3_init(float x, float y, float z)
+v3_t v3_init(float x, float y, float z)
 {
   v3_t result;
 
@@ -128,8 +99,7 @@ v3_init(float x, float y, float z)
 
 /* add two vectors */
 
-v3_t
-v3_add(v3_t a, v3_t b)
+v3_t v3_add(v3_t a, v3_t b)
 {
   v3_t result;
 
@@ -142,8 +112,7 @@ v3_add(v3_t a, v3_t b)
 
 /* substracts b from a */
 
-v3_t
-v3_sub(v3_t a, v3_t b)
+v3_t v3_sub(v3_t a, v3_t b)
 {
   v3_t result;
 
@@ -156,8 +125,7 @@ v3_sub(v3_t a, v3_t b)
 
 /* scales vector */
 
-v3_t
-v3_scale(v3_t a, float f)
+v3_t v3_scale(v3_t a, float f)
 {
   v3_t result;
 
@@ -170,8 +138,7 @@ v3_scale(v3_t a, float f)
 
 /* creates cross product of two vectors */
 
-v3_t
-v3_cross(v3_t left, v3_t right)
+v3_t v3_cross(v3_t left, v3_t right)
 {
   v3_t v;
 
@@ -184,8 +151,7 @@ v3_cross(v3_t left, v3_t right)
 
 /* normalizes vector */
 
-v3_t
-v3_normalize(v3_t matrix)
+v3_t v3_normalize(v3_t matrix)
 {
   float scale;
 
@@ -201,11 +167,11 @@ v3_normalize(v3_t matrix)
 
 /* rotates vector around it x axis */
 
-v3_t
-v3_rotatearoundx(v3_t vector, float the_angle)
+v3_t v3_rotatearoundx(v3_t vector, float the_angle)
 {
   float epsilon = 0.00001;
-  if (fabs(vector.y) > epsilon || fabs(vector.z) > epsilon) {
+  if (fabs(vector.y) > epsilon || fabs(vector.z) > epsilon)
+  {
     float angle = atan2(vector.z, vector.y);
     float length = sqrtf(vector.y * vector.y + vector.z * vector.z);
 
@@ -217,11 +183,11 @@ v3_rotatearoundx(v3_t vector, float the_angle)
 
 /* rotates vector around it y axis */
 
-v3_t
-v3_rotatearoundy(v3_t vector, float the_angle)
+v3_t v3_rotatearoundy(v3_t vector, float the_angle)
 {
   float epsilon = 0.00001;
-  if (fabs(vector.x) > epsilon || fabs(vector.z) > epsilon) {
+  if (fabs(vector.x) > epsilon || fabs(vector.z) > epsilon)
+  {
     float angle = atan2(vector.z, vector.x);
     float length = sqrtf(vector.x * vector.x + vector.z * vector.z);
 
@@ -233,11 +199,11 @@ v3_rotatearoundy(v3_t vector, float the_angle)
 
 /* rotates vector around it z axis */
 
-v3_t
-v3_rotatearoundz(v3_t vector, float the_angle)
+v3_t v3_rotatearoundz(v3_t vector, float the_angle)
 {
   float epsilon = 0.00001;
-  if (fabs(vector.y) > epsilon || fabs(vector.x) > epsilon) {
+  if (fabs(vector.y) > epsilon || fabs(vector.x) > epsilon)
+  {
     float angle = atan2(vector.y, vector.x);
     float length = sqrtf(vector.x * vector.x + vector.y * vector.y);
 
@@ -249,8 +215,7 @@ v3_rotatearoundz(v3_t vector, float the_angle)
 
 /* rotates back plane to origo, returns rotation vector */
 
-v3_t
-v3_getxyunitrotation(v3_t vx, v3_t vy)
+v3_t v3_getxyunitrotation(v3_t vx, v3_t vy)
 {
   v3_t rotation;
 
@@ -259,7 +224,8 @@ v3_getxyunitrotation(v3_t vx, v3_t vy)
 
   // rotate back final_x to base_x on Z axis
 
-  if (fabs(vx.x) > epsilon || fabs(vx.y) > epsilon) {
+  if (fabs(vx.x) > epsilon || fabs(vx.y) > epsilon)
+  {
 
     angle = atan2(vx.y, vx.x);
 
@@ -267,13 +233,14 @@ v3_getxyunitrotation(v3_t vx, v3_t vy)
 
     vx = v3_rotatearoundz(vx, -angle);
     vy = v3_rotatearoundz(vy, -angle);
-
-  } else
+  }
+  else
     rotation.z = 0.0;
 
   // rotate back final_x to base_x on Y axis
 
-  if (fabs(vx.x) > epsilon || fabs(vx.z) > epsilon) {
+  if (fabs(vx.x) > epsilon || fabs(vx.z) > epsilon)
+  {
 
     angle = atan2(vx.z, vx.x);
 
@@ -281,13 +248,14 @@ v3_getxyunitrotation(v3_t vx, v3_t vy)
 
     vx = v3_rotatearoundy(vx, -angle);
     vy = v3_rotatearoundy(vy, -angle);
-
-  } else
+  }
+  else
     rotation.y = 0.0;
 
   // finally rotate back final_y to base_y on X axis
 
-  if (fabs(vy.y) > epsilon || fabs(vy.z) > epsilon) {
+  if (fabs(vy.y) > epsilon || fabs(vy.z) > epsilon)
+  {
 
     angle = atan2(vy.z, vy.y);
 
@@ -295,8 +263,8 @@ v3_getxyunitrotation(v3_t vx, v3_t vy)
 
     vx = v3_rotatearoundx(vx, -angle);
     vy = v3_rotatearoundx(vy, -angle);
-
-  } else
+  }
+  else
     rotation.x = 0.0;
 
   return rotation;
@@ -304,8 +272,7 @@ v3_getxyunitrotation(v3_t vx, v3_t vy)
 
 /* intersects vector3 with plane */
 
-v3_t
-v3_intersectwithplane(v3_t linev1, v3_t linev2, v3_t planev, v3_t planen)
+v3_t v3_intersectwithplane(v3_t linev1, v3_t linev2, v3_t planev, v3_t planen)
 {
   v3_t u, w, scale, result;
   float div;
@@ -321,32 +288,28 @@ v3_intersectwithplane(v3_t linev1, v3_t linev2, v3_t planev, v3_t planen)
 
 /* creates dot product of two vectors */
 
-float
-v3_dot(v3_t a, v3_t b)
+float v3_dot(v3_t a, v3_t b)
 {
   return a.x * b.x + a.y * b.y + a.z * b.z;
 }
 
 /* calculates angle between two vectors */
 
-float
-v3_angle(v3_t a, v3_t b)
+float v3_angle(v3_t a, v3_t b)
 {
   return acosf(v3_dot(a, b) / (v3_length(a) * v3_length(b)));
 }
 
 /* calculates vector length */
 
-float
-v3_length(v3_t a)
+float v3_length(v3_t a)
 {
   return sqrtf(a.x * a.x + a.y * a.y + a.z * a.z);
 }
 
 /* converts vector to array */
 
-void
-v3_toarray(v3_t* vector, float* result)
+void v3_toarray(v3_t* vector, float* result)
 {
   result[0] = vector->x;
   result[1] = vector->y;
@@ -355,8 +318,7 @@ v3_toarray(v3_t* vector, float* result)
 
 /* calculates distance of two vectors */
 
-float
-v3_distance(v3_t vectorA, v3_t vectorB)
+float v3_distance(v3_t vectorA, v3_t vectorB)
 {
   float dx, dy, dz;
 
@@ -369,8 +331,7 @@ v3_distance(v3_t vectorA, v3_t vectorB)
 
 /* creates identity matrix */
 
-m3_t
-m3_defaultidentity()
+m3_t m3_defaultidentity()
 {
   m3_t matrix;
 
@@ -389,8 +350,7 @@ m3_defaultidentity()
 
 /* creates identity matrix */
 
-m3_t
-m3_defaultscale(float x, float y)
+m3_t m3_defaultscale(float x, float y)
 {
   m3_t matrix = m3_defaultidentity();
 
@@ -402,8 +362,7 @@ m3_defaultscale(float x, float y)
 
 /* creates translation matrix */
 
-m3_t
-m3_defaulttranslation(float x, float y)
+m3_t m3_defaulttranslation(float x, float y)
 {
   m3_t result;
 
@@ -416,8 +375,7 @@ m3_defaulttranslation(float x, float y)
 
 /* creates rotationx matrix */
 
-m3_t
-m3_defaultrotationx(float rad)
+m3_t m3_defaultrotationx(float rad)
 {
   m3_t result;
 
@@ -432,8 +390,7 @@ m3_defaultrotationx(float rad)
 
 /* creates rotationy matrix */
 
-m3_t
-m3_defaultrotationy(float rad)
+m3_t m3_defaultrotationy(float rad)
 {
   m3_t result;
 
@@ -448,8 +405,7 @@ m3_defaultrotationy(float rad)
 
 /* creates rotationz matrix */
 
-m3_t
-m3_defaultrotationz(float rad)
+m3_t m3_defaultrotationz(float rad)
 {
   m3_t result;
 
@@ -464,8 +420,7 @@ m3_defaultrotationz(float rad)
 
 /* multiplies two matrixes */
 
-m3_t
-m3_multiply(m3_t a, m3_t b)
+m3_t m3_multiply(m3_t a, m3_t b)
 {
   m3_t matrix;
 
@@ -486,8 +441,7 @@ m3_multiply(m3_t a, m3_t b)
 
 /* inverts matrix */
 
-m3_t
-m3_invert(m3_t source, char* success)
+m3_t m3_invert(m3_t source, char* success)
 {
   float determinant;
   m3_t inverse;
@@ -523,8 +477,7 @@ m3_invert(m3_t source, char* success)
 
 /* transposes matrix */
 
-m3_t
-m3_transpose(m3_t matrix)
+m3_t m3_transpose(m3_t matrix)
 {
   m3_t result;
 
@@ -545,17 +498,16 @@ m3_transpose(m3_t matrix)
 
 /* multiplies matrix4 with vector 3 */
 
-v3_t
-m3_multiply_vector3(m3_t matrix, v3_t vector)
+v3_t m3_multiply_vector3(m3_t matrix, v3_t vector)
 {
   v3_t result;
 
   result.x =
-    matrix.m00 * vector.x + matrix.m01 * vector.y + matrix.m02 * vector.z;
+      matrix.m00 * vector.x + matrix.m01 * vector.y + matrix.m02 * vector.z;
   result.y =
-    matrix.m10 * vector.x + matrix.m11 * vector.y + matrix.m12 * vector.z;
+      matrix.m10 * vector.x + matrix.m11 * vector.y + matrix.m12 * vector.z;
   result.z =
-    matrix.m20 * vector.x + matrix.m21 * vector.y + matrix.m22 * vector.z;
+      matrix.m20 * vector.x + matrix.m21 * vector.y + matrix.m22 * vector.z;
 
   return result;
 }
@@ -578,8 +530,7 @@ m3_multiply_vector3(m3_t matrix, v3_t vector)
 
 /* multiplies matrix with number */
 
-void
-m3_multiplywithnumber(m3_t* matrix, float number)
+void m3_multiplywithnumber(m3_t* matrix, float number)
 {
   matrix->m00 *= number;
   matrix->m01 *= number;
@@ -594,8 +545,7 @@ m3_multiplywithnumber(m3_t* matrix, float number)
 
 /* describes matrix */
 
-void
-m3_describe(m3_t matrix)
+void m3_describe(m3_t matrix)
 {
   printf("%.2f %.2f %.2f | %.2f %.2f %.2f | %.2f %.2f %.2f",
          matrix.m00,

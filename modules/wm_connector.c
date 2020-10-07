@@ -13,13 +13,13 @@
 extern SDL_GLContext* wm_context;
 extern float wm_scale;
 
-void wm_init(void (*init)(int, int), void (*render)(), void (*destroy)());
+void wm_init(void (*init)(int, int), void (*update)(int, int), void (*render)(), void (*destroy)());
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-void wm_init(void (*init)(int, int), void (*render)(), void (*destroy)())
+void wm_init(void (*init)(int, int), void (*update)(int, int), void (*render)(int, int, int), void (*destroy)())
 {
   SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0");
 
@@ -77,7 +77,7 @@ void wm_init(void (*init)(int, int), void (*render)(), void (*destroy)())
 
         printf("SDL Scaling will be %f\n", scale);
 
-        if (SDL_GL_SetSwapInterval(1) < 0)
+        if (SDL_GL_SetSwapInterval(0) < 0)
           printf("SDL swap interval error %s\n", SDL_GetError());
 
         SDL_StartTextInput();
@@ -99,27 +99,21 @@ void wm_init(void (*init)(int, int), void (*render)(), void (*destroy)())
               int x = 0, y = 0;
               SDL_GetMouseState(&x, &y);
 
-              // v2_t dimensions = { .x = x * scale, .y = y * scale
-              // };
-
               if (event.type == SDL_MOUSEBUTTONDOWN)
               {
                 drag = 1;
-                printf("mouse button down\n");
               }
               else if (event.type == SDL_MOUSEBUTTONUP)
               {
                 drag = 0;
-                printf("mouse button up'n");
               }
               else if (event.type == SDL_MOUSEMOTION && drag == 1)
               {
-                printf("mouse dragged'n");
+                (*update)(x, y);
               }
             }
             else if (event.type == SDL_QUIT)
             {
-              printf("sdl quit");
               quit = 1;
             }
             else if (event.type == SDL_WINDOWEVENT)
@@ -145,10 +139,10 @@ void wm_init(void (*init)(int, int), void (*render)(), void (*destroy)())
             }
           }
 
-          (*render)(window);
+          (*render)(0, 0, 0);
 
           SDL_GL_SwapWindow(window);
-          SDL_Delay(10);
+          //SDL_Delay(10);
         }
 
         (*destroy)();

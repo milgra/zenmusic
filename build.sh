@@ -20,7 +20,7 @@ clang \
     lib/mtmem.c \
     lib/mtbm.c \
     lib/mttm.c \
-    lib/mtpipe.c \
+    lib/mtch.c \
     lib/mtfb.c \
     lib/mtmap.c \
     lib/mtvec.c \
