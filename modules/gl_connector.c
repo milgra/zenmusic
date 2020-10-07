@@ -1,5 +1,8 @@
 /*
   OpenGL Connector Module for Zen Multimedia Desktop System
+
+  events -> ui_generator -> ui_connector -> ui_compositor -> gl_connector -> GPU
+
  */
 
 #ifndef gl_connector_h

@@ -6,20 +6,22 @@
 #ifndef wm_connector_h
 #define wm_connector_h
 
-#include <SDL.h>
-#include <stdio.h>
-#include <stdlib.h>
-
-extern SDL_GLContext* wm_context;
-extern float wm_scale;
-
 void wm_init(void (*init)(int, int), void (*update)(int, int), void (*render)(), void (*destroy)());
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-void wm_init(void (*init)(int, int), void (*update)(int, int), void (*render)(int, int, int), void (*destroy)())
+#include <SDL.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+uint32_t lastticks = 0;
+
+void wm_init(void (*init)(int, int),
+             void (*update)(int, int),
+             void (*render)(),
+             void (*destroy)())
 {
   SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0");
 
@@ -44,10 +46,12 @@ void wm_init(void (*init)(int, int), void (*update)(int, int), void (*render)(in
     int32_t height = displaymode.h;
 
     SDL_Window* window =
-        SDL_CreateWindow("Zen Music", SDL_WINDOWPOS_UNDEFINED,
-                         SDL_WINDOWPOS_UNDEFINED, width, height,
-                         SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN |
-                             SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
+        SDL_CreateWindow("Zen Music",
+                         SDL_WINDOWPOS_UNDEFINED,
+                         SDL_WINDOWPOS_UNDEFINED,
+                         width,
+                         height,
+                         SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
 
     if (window == NULL)
     {
@@ -139,10 +143,13 @@ void wm_init(void (*init)(int, int), void (*update)(int, int), void (*render)(in
             }
           }
 
-          (*render)(0, 0, 0);
-
-          SDL_GL_SwapWindow(window);
-          //SDL_Delay(10);
+          uint32_t ticks = SDL_GetTicks();
+          if (ticks > lastticks + 16)
+          {
+            lastticks = ticks;
+            (*render)();
+            SDL_GL_SwapWindow(window);
+          }
         }
 
         (*destroy)();

@@ -1,3 +1,0 @@
-/*
-  UI Texture Generator for Zen Multimedia Desktop System
- */

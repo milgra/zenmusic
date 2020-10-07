@@ -13,7 +13,7 @@ clang \
     modules/gl_connector.c \
     modules/wm_connector.c \
     modules/ui_connector.c \
-    modules/ui_rect.c \
+    modules/ui_compositor.c \
     lib/math2.c \
     lib/math3.c \
     lib/math4.c \

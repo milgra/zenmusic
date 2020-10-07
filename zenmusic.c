@@ -1,4 +1,5 @@
 #include "mtch.c"
+#include "ui_compositor.c"
 #include "ui_connector.c"
 #include "wm_connector.c"
 #include <SDL.h>
@@ -15,7 +16,6 @@ void* brender(void* mypointer)
   ch_t* mych = (ch_t*)mypointer;
   while (1)
   {
-
     ch_send(mych, "anyad");
     sleep(5);
   }
@@ -28,7 +28,7 @@ void init(int width, int height)
   srand((unsigned int)time(NULL));
   char* respath = SDL_GetBasePath();
 
-  ui_init(width, height);
+  ui_connector_init(width, height);
 
   // start generator in background thread
 
@@ -43,7 +43,7 @@ void init(int width, int height)
 
 void update(int x, int y)
 {
-  ui_update(x, y);
+  ui_compositor_update(x, y);
 }
 
 void render()
@@ -52,7 +52,7 @@ void render()
   if (data)
     printf("render, recv data %s\n", data);
 
-  ui_render();
+  ui_compositor_render();
 }
 
 void destroy()

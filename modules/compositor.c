@@ -1,3 +1,0 @@
-/*
-  UI Compositor Module for Zen Multimedia Desktop System
- */
