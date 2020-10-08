@@ -7,6 +7,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define MNEW() mtmap_alloc()
+#define MPUT(MAP, ID, OBJ) mtmap_put(MAP, ID, OBJ)
+#define MGET(MAP, ID) mtmap_get(MAP, ID)
+#define MDEL(MAP, OBJ) mtmap_del(MAP, OBJ)
+
 typedef struct pair_t pair_t;
 struct pair_t
 {

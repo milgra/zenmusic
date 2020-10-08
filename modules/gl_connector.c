@@ -1,8 +1,8 @@
 /*
   OpenGL Connector Module for Zen Multimedia Desktop System
 
-  events -> ui_generator -> ui_connector -> ui_compositor -> gl_connector -> GPU
-
+  gl_connector -> GPU
+  
  */
 
 #ifndef gl_connector_h
@@ -38,8 +38,6 @@ void gl_errors(const char* place)
   } while (error > GL_NO_ERROR);
 }
 
-/* internal : compile shader */
-
 GLuint gl_shader_compile(GLenum type, const GLchar* source)
 {
   GLint status, logLength, realLength;
@@ -57,13 +55,18 @@ GLuint gl_shader_compile(GLenum type, const GLchar* source)
     if (logLength > 0)
     {
       GLchar log[logLength];
-      glGetShaderInfoLog(shader, logLength, &realLength, log);
+
+      glGetShaderInfoLog(shader,
+                         logLength,
+                         &realLength,
+                         log);
+
       printf("Shader compile log: %s\n", log);
     }
 
-    // get status
-
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &status);
+    glGetShaderiv(shader,
+                  GL_COMPILE_STATUS,
+                  &status);
 
     if (status != GL_TRUE)
       return 0;
@@ -73,8 +76,6 @@ GLuint gl_shader_compile(GLenum type, const GLchar* source)
 
   return shader;
 }
-
-/* internal : link shaders together in gpu */
 
 int gl_shader_link(GLuint program)
 {

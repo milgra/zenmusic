@@ -1,7 +1,7 @@
 /*
   UI Compositor Module for Zen Multimedia Desktop System
 
-  events -> ui_generator -> ui_connector -> ui_compositor -> gl_connector -> GPU
+  ui_compositor -> gl_connector -> GPU
 
  */
 
@@ -37,13 +37,14 @@ void crect_set_tex(crect_t* rect, float tx, float ty, float tz, float tw);
 #include "mtbm.c"
 #include "mtcstr.c"
 #include "mtfb.c"
+#include "mtmap.c"
 #include "mttm.c"
 #include "mtvec.c"
 
 fb_t* flt_buf;
 tm_t* tex_map;
-mtvec_t* rectvec;
-mtmap_t* rectmap;
+mtvec_t* rectv;
+mtmap_t* rectm;
 
 void ui_compositor_init(int width, int height)
 {
@@ -51,8 +52,8 @@ void ui_compositor_init(int width, int height)
 
   flt_buf = fb_new();
   tex_map = tm_new();
-  rectvec = mtvec_alloc();
-  rectmap = mtmap_alloc();
+  rectv = VNEW();
+  rectm = MNEW();
 }
 
 void ui_compositor_render()
@@ -61,12 +62,11 @@ void ui_compositor_render()
 
   fb_reset(flt_buf);
 
-  for (int index = 0; index < rectvec->length; index++)
+  for (int i = 0; i < rectv->length; i++)
   {
-    rect = rectvec->data[index];
+    rect = rectv->data[i];
     fb_add(flt_buf, rect->data, 24);
   }
-
   gl_render(flt_buf, tex_map->bm);
 }
 
@@ -80,25 +80,24 @@ void ui_compositor_add(char* id, int x, int y, int w, int h, bm_t* bmp)
   texc = tm_get(tex_map, id);
   rect = crect_new(id, x, y, w, h, texc.x, texc.y, texc.z, texc.w);
 
-  mtvec_add(rectvec, rect);
-  mtmap_put(rectmap, id, rect);
+  VADD(rectv, rect);
+  MPUT(rectm, id, rect);
 }
 
 void ui_compositor_upd(char* id, int x, int y, int w, int h, bm_t* bmp)
 {
   crect_t* rect;
 
-  rect = mtmap_get(rectmap, id);
-  if (rect) crect_set_dim(rect, x, y, w, h);
+  if ((rect = MGET(rectm, id))) crect_set_dim(rect, x, y, w, h);
 }
 
 void ui_compositor_rem(char* id)
 {
   crect_t* rect;
 
-  rect = mtmap_get(rectmap, id);
-  mtmap_del(rectmap, id);
-  mtvec_remove(rectvec, rect);
+  rect = mtmap_get(rectm, id);
+  MDEL(rectm, id);
+  VREM(rectv, rect);
 }
 
 //

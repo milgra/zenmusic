@@ -9,12 +9,18 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define VNEW() mtvec_alloc()
+#define VADD(VEC, OBJ) mtvec_add(VEC, OBJ)
+#define VREM(VEC, OBJ) mtvec_rem(VEC, OBJ)
+#
 #define REL_VEC_ITEMS(X) mtvec_decrese_item_retcount(X)
 
 typedef struct mtvec_t mtvec_t;
 struct mtvec_t
 {
   void** data;
+  void** next;
+  uint32_t pos;
   uint32_t length;
   uint32_t length_real;
 };
@@ -24,14 +30,15 @@ void mtvec_dealloc(void* vector);
 void mtvec_reset(mtvec_t* vector);
 void mtvec_decrese_item_retcount(mtvec_t* vector);
 void mtvec_add(mtvec_t* vector, void* data);
+void mtvec_doall(mtvec_t* vector, void* arg1, void* arg2, void* arg3, void* arg4, void* arg5);
 void mtvec_addatindex(mtvec_t* vector, void* data, size_t index);
 void mtvec_addinvector(mtvec_t* mtvec_a, mtvec_t* mtvec_b);
 void mtvec_adduniquedata(mtvec_t* vector, void* data);
 void mtvec_adduniquedataatindex(mtvec_t* vector, void* data, size_t index);
-char mtvec_remove(mtvec_t* vector, void* data);
-char mtvec_removeatindex(mtvec_t* vector, uint32_t index);
-void mtvec_removeinrange(mtvec_t* vector, uint32_t start, uint32_t end);
-void mtvec_removeinvector(mtvec_t* mtvec_a, mtvec_t* mtvec_b);
+char mtvec_rem(mtvec_t* vector, void* data);
+char mtvec_rematindex(mtvec_t* vector, uint32_t index);
+void mtvec_reminrange(mtvec_t* vector, uint32_t start, uint32_t end);
+void mtvec_reminvector(mtvec_t* mtvec_a, mtvec_t* mtvec_b);
 void mtvec_reverse(mtvec_t* vector);
 void* mtvec_head(mtvec_t* vector);
 void* mtvec_tail(mtvec_t* vector);
@@ -46,6 +53,7 @@ mtvec_t* mtvec_alloc()
 {
   mtvec_t* vector = mtmem_calloc(sizeof(mtvec_t), mtvec_dealloc);
   vector->data = mtmem_calloc(sizeof(void*) * 10, NULL);
+  vector->pos = 0;
   vector->length = 0;
   vector->length_real = 10;
   return vector;
@@ -140,12 +148,12 @@ void mtvec_adduniquedataatindex(mtvec_t* vector, void* data, size_t index)
 
 /* removes single data, returns 1 if data is removed and released during removal */
 
-char mtvec_remove(mtvec_t* vector, void* data)
+char mtvec_rem(mtvec_t* vector, void* data)
 {
   uint32_t index = mtvec_indexofdata(vector, data);
   if (index < UINT32_MAX)
   {
-    mtvec_removeatindex(vector, index);
+    mtvec_rematindex(vector, index);
     return 1;
   }
   return 0;
@@ -153,7 +161,7 @@ char mtvec_remove(mtvec_t* vector, void* data)
 
 /* removes single data at index, returns 1 if data is removed and released during removal */
 
-char mtvec_removeatindex(mtvec_t* vector, uint32_t index)
+char mtvec_rematindex(mtvec_t* vector, uint32_t index)
 {
   if (index < vector->length)
   {
@@ -167,7 +175,7 @@ char mtvec_removeatindex(mtvec_t* vector, uint32_t index)
 
 /* removes data in range */
 
-void mtvec_removeinrange(mtvec_t* vector, uint32_t start, uint32_t end)
+void mtvec_reminrange(mtvec_t* vector, uint32_t start, uint32_t end)
 {
   for (uint32_t index = start; index < end; index++)
     mtmem_release(vector->data[index]);
@@ -177,11 +185,11 @@ void mtvec_removeinrange(mtvec_t* vector, uint32_t start, uint32_t end)
 
 /* removes data in vector */
 
-void mtvec_removeinvector(mtvec_t* mtvec_a, mtvec_t* mtvec_b)
+void mtvec_reminvector(mtvec_t* mtvec_a, mtvec_t* mtvec_b)
 {
   for (int index = 0; index < mtvec_b->length; index++)
   {
-    mtvec_remove(mtvec_a, mtvec_b->data[index]);
+    mtvec_rem(mtvec_a, mtvec_b->data[index]);
   }
 }
 
@@ -194,7 +202,7 @@ void mtvec_reverse(mtvec_t* vector)
   {
     mtvec_add(vector, vector->data[index]);
   }
-  mtvec_removeinrange(vector, 0, length - 1);
+  mtvec_reminrange(vector, 0, length - 1);
 }
 
 /* returns head item of vector */

@@ -44,8 +44,8 @@ void ui_connector_init(int width, int height)
 {
   ui_compositor_init(width, height);
 
-  uimap = mtmap_alloc();
-  uivec = mtvec_alloc();
+  uimap = MNEW();
+  uivec = VNEW();
 
   bm_t* gr_bmp = bm_new(256, 256);
   bm_t* bl_bmp = bm_new(150, 70);
