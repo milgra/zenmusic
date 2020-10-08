@@ -12,7 +12,8 @@
 #define VNEW() mtvec_alloc()
 #define VADD(VEC, OBJ) mtvec_add(VEC, OBJ)
 #define VREM(VEC, OBJ) mtvec_rem(VEC, OBJ)
-#
+#define VNXT(VEC) mtvec_next(VEC)
+
 #define REL_VEC_ITEMS(X) mtvec_decrese_item_retcount(X)
 
 typedef struct mtvec_t mtvec_t;
@@ -30,7 +31,7 @@ void mtvec_dealloc(void* vector);
 void mtvec_reset(mtvec_t* vector);
 void mtvec_decrese_item_retcount(mtvec_t* vector);
 void mtvec_add(mtvec_t* vector, void* data);
-void mtvec_doall(mtvec_t* vector, void* arg1, void* arg2, void* arg3, void* arg4, void* arg5);
+void* mtvec_next(mtvec_t* vector);
 void mtvec_addatindex(mtvec_t* vector, void* data, size_t index);
 void mtvec_addinvector(mtvec_t* mtvec_a, mtvec_t* mtvec_b);
 void mtvec_adduniquedata(mtvec_t* vector, void* data);
@@ -76,6 +77,22 @@ void mtvec_reset(mtvec_t* vector)
   for (uint32_t index = 0; index < vector->length; index++)
     mtmem_release(vector->data[index]);
   vector->length = 0;
+}
+
+// iterates through all items, resets position when ran out for next loop
+
+void* mtvec_next(mtvec_t* vector)
+{
+  if (vector->pos < vector->length)
+  {
+    vector->pos += 1;
+    return vector->data[vector->pos - 1];
+  }
+  else
+  {
+    vector->pos = 0;
+    return NULL;
+  }
 }
 
 /* decreases retain count of items. use when you add items inline and don't want to release every item

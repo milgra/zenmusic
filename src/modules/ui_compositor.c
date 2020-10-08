@@ -23,10 +23,10 @@ typedef struct _crect_t
 } crect_t;
 
 crect_t* crect_new(char* id, float x, float y, float w, float h, float tx, float ty, float tz, float tw);
-void crect_del(void* rect);
-void crect_desc(crect_t* rect);
-void crect_set_dim(crect_t* rect, float x, float y, float w, float h);
-void crect_set_tex(crect_t* rect, float tx, float ty, float tz, float tw);
+void     crect_del(void* rect);
+void     crect_desc(crect_t* rect);
+void     crect_set_dim(crect_t* rect, float x, float y, float w, float h);
+void     crect_set_tex(crect_t* rect, float tx, float ty, float tz, float tw);
 
 #endif
 
@@ -41,8 +41,8 @@ void crect_set_tex(crect_t* rect, float tx, float ty, float tz, float tw);
 #include "mttm.c"
 #include "mtvec.c"
 
-fb_t* flt_buf;
-tm_t* tex_map;
+fb_t*    flt_buf;
+tm_t*    tex_map;
 mtvec_t* rectv;
 mtmap_t* rectm;
 
@@ -52,8 +52,8 @@ void ui_compositor_init(int width, int height)
 
   flt_buf = fb_new();
   tex_map = tm_new();
-  rectv = VNEW();
-  rectm = MNEW();
+  rectv   = VNEW();
+  rectm   = MNEW();
 }
 
 void ui_compositor_render()
@@ -62,17 +62,15 @@ void ui_compositor_render()
 
   fb_reset(flt_buf);
 
-  for (int i = 0; i < rectv->length; i++)
-  {
-    rect = rectv->data[i];
+  while ((rect = VNXT(rectv)))
     fb_add(flt_buf, rect->data, 24);
-  }
+
   gl_render(flt_buf, tex_map->bm);
 }
 
 void ui_compositor_add(char* id, int x, int y, int w, int h, bm_t* bmp)
 {
-  v4_t texc;
+  v4_t     texc;
   crect_t* rect;
 
   tm_put(tex_map, id, bmp);
@@ -88,7 +86,11 @@ void ui_compositor_upd(char* id, int x, int y, int w, int h, bm_t* bmp)
 {
   crect_t* rect;
 
-  if ((rect = MGET(rectm, id))) crect_set_dim(rect, x, y, w, h);
+  if ((rect = MGET(rectm, id)))
+  {
+    crect_set_dim(rect, x, y, w, h);
+    if (bmp) tm_upd(tex_map, id, bmp);
+  }
 }
 
 void ui_compositor_rem(char* id)
@@ -128,8 +130,8 @@ crect_t* crect_new(char* id,
   r->data[6] = tz;
   r->data[7] = tw;
 
-  r->data[8] = x;
-  r->data[9] = y + h;
+  r->data[8]  = x;
+  r->data[9]  = y + h;
   r->data[10] = tx;
   r->data[11] = tw;
 

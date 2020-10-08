@@ -42,7 +42,7 @@ void wm_init(void (*init)(int, int),
     SDL_DisplayMode displaymode;
     SDL_GetCurrentDisplayMode(0, &displaymode);
 
-    int32_t width = displaymode.w;
+    int32_t width  = displaymode.w;
     int32_t height = displaymode.h;
 
     SDL_Window* window =
@@ -88,8 +88,8 @@ void wm_init(void (*init)(int, int),
 
         (*init)(width, height);
 
-        char drag = 0;
-        char quit = 0;
+        char      drag = 0;
+        char      quit = 0;
         SDL_Event event;
 
         while (!quit)
@@ -124,7 +124,7 @@ void wm_init(void (*init)(int, int),
             {
               if (event.window.event == SDL_WINDOWEVENT_RESIZED)
               {
-                int32_t width = event.window.data1;
+                int32_t width  = event.window.data1;
                 int32_t height = event.window.data2;
 
                 printf("window resized %i %i\n", width, height);
@@ -150,6 +150,7 @@ void wm_init(void (*init)(int, int),
             (*render)();
             SDL_GL_SwapWindow(window);
           }
+          SDL_Delay(10);
         }
 
         (*destroy)();

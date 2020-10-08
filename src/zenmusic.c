@@ -1,10 +1,14 @@
 #include "ui_compositor.c"
 #include "ui_connector.c"
+#include "view.c"
 #include "wm_connector.c"
 #include <SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
+view_t* viewA;
+view_t* viewB;
 
 void init(int width, int height)
 {
@@ -14,11 +18,19 @@ void init(int width, int height)
   char* respath = SDL_GetBasePath();
 
   ui_connector_init(width, height);
+
+  viewA = view_new("viewa", (v4_t){20.0, 20.0, 150.0, 70.0}, 0xFF0000FF);
+  viewB = view_new("viewb", (v4_t){200.0, 420.0, 350.0, 170.0}, 0x00FF00FF);
+
+  ui_connector_add(viewA);
+  ui_connector_add(viewB);
 }
 
 void update(int x, int y)
 {
-  ui_connector_update(x, y);
+  viewA->frame.x     = x;
+  viewA->frame.y     = y;
+  viewA->dim_changed = 1;
 }
 
 void render()
