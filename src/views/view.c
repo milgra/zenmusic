@@ -23,9 +23,11 @@ void    view_gen(view_t* view);
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "common.c"
 #include "mtbm.c"
 #include "mtcstr.c"
 #include "mtmem.c"
+#include "text.c"
 
 void view_del(void* pointer)
 {
@@ -55,6 +57,28 @@ void view_gen(view_t* view)
           (int)view->frame.w,
           view->color);
   view->bitmap_state = 2;
+
+  mtstr_t* str = mtstr_frombytes("KUTYAFASZA");
+
+  textstyle_t ts =
+      {
+          .align      = 0,
+          .editable   = 0,
+          .selectable = 0,
+          .multiline  = 1,
+          .autosize   = 1,
+          .uppercase  = 0,
+
+          .textsize   = 25.0,
+          .marginsize = 10.0,
+          .cursorsize = 15.0,
+
+          .textcolor = 0xFFFFFFFF,
+          .backcolor = 0x000000FF,
+      };
+
+  bm_t* bitmap = font_render_text((int)view->frame.z, (int)view->frame.w, str, common_font, ts, NULL, NULL);
+  view->bmp    = bitmap;
 }
 
 #endif

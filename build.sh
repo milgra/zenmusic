@@ -8,6 +8,7 @@ clang \
     -lGL \
     -lGLEW \
     -lSDL2 \
+    -Isrc \
     -Isrc/lib \
     -Isrc/views \
     -Isrc/modules \
@@ -28,7 +29,9 @@ clang \
     src/lib/math4.c \
     src/lib/mtmem.c \
     src/lib/mtvec.c \
+    src/lib/mtstr.c \
     src/lib/mtcstr.c \
     src/views/view.c \
     src/zenmusic.c \
+    src/common.c \
     -o bin/zenmusic

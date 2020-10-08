@@ -1,3 +1,8 @@
+#include "common.c"
+#include "font.c"
+#include "mtbm.c"
+#include "mtcstr.c"
+#include "mtstr.c"
 #include "ui_compositor.c"
 #include "ui_connector.c"
 #include "view.c"
@@ -16,6 +21,10 @@ void init(int width, int height)
 
   srand((unsigned int)time(NULL));
   char* respath = SDL_GetBasePath();
+
+  char* path = mtcstr_fromformat("%s/../res/Avenir.ttc", respath, NULL);
+
+  common_font = font_alloc(path);
 
   ui_connector_init(width, height);
 
