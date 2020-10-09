@@ -1,0 +1,3 @@
+/*
+  Generates row for music list table
+ */

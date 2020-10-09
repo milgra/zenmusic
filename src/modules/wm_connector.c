@@ -1,5 +1,7 @@
 /*
   Window Manager Connector Module for Zen Multimedia Desktop System
+  Creates window and listens for events
+  
   Currently it is SDL2
  */
 

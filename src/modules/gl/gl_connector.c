@@ -1,5 +1,6 @@
 /*
   OpenGL Connector Module for Zen Multimedia Desktop System
+  Renders incoming triangles and textures to screen
 
   gl_connector -> GPU
   
@@ -158,10 +159,10 @@ GLuint gl_shader_create(const char*  vertex_source,
 }
 
 char* blend_vsh =
-#include "shaders/blend.vsh"
+#include "blend.vsh"
     ;
 char* blend_fsh =
-#include "shaders/blend.fsh"
+#include "blend.fsh"
     ;
 
 void gl_init(width, height)

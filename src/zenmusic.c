@@ -1,6 +1,7 @@
 #include "common.c"
 #include "event.c"
 #include "font.c"
+#include "math2.c"
 #include "mtbm.c"
 #include "mtcstr.c"
 #include "mtstr.c"
@@ -23,14 +24,14 @@ void init(int width, int height)
   srand((unsigned int)time(NULL));
   char* respath = SDL_GetBasePath();
 
-  char* path = mtcstr_fromformat("%s/../res/Avenir.ttc", respath, NULL);
+  char* path = mtcstr_fromformat("%s/../res/Terminus.ttf", respath, NULL);
 
   common_font = font_alloc(path);
 
   ui_connector_init(width, height);
 
-  viewA = view_new("viewa", (v4_t){20.0, 20.0, 150.0, 70.0}, 0xFF0000FF);
-  viewB = view_new("viewb", (v4_t){200.0, 420.0, 350.0, 170.0}, 0x00FF00FF);
+  viewA = view_new("viewa", (v4_t){20.0, 20.0, 150.0, 70.0});
+  viewB = view_new("viewb", (v4_t){200.0, 420.0, 350.0, 170.0});
 
   ui_connector_add(viewA);
   ui_connector_add(viewB);
@@ -41,9 +42,7 @@ void update(ev_t ev)
 
   if (ev.type == EV_MMOVE && ev.drag)
   {
-    viewA->frame.x     = ev.x;
-    viewA->frame.y     = ev.y;
-    viewA->dim_changed = 1;
+    view_setpos(viewA, (v2_t){ev.x, ev.y});
   }
 }
 

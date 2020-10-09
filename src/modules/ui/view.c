@@ -1,23 +1,35 @@
 #ifndef view_h
 #define view_h
 
+#include "event.c"
+#include "math2.c"
 #include "math4.c"
 #include "mtbm.c"
+#include "mtvec.c"
 
 typedef struct _view_t
 {
-  char*    id;
-  bm_t*    bmp;
-  char*    type;
-  v4_t     frame;
-  uint32_t color;
-  char     bitmap_state; // 0 - blank , 1 - pending , 2 - ready to render, 3 - added to compositor
-  char     dim_changed;
-  char     bmp_changed;
+  char*    id;    // identifier for handling view
+  void*    data;  // data for event handler and bitmap generator
+  mtvec_t* views; // subviews
+
+  v4_t frame;       // position and dimensions
+  char dim_changed; // frame changed
+
+  bm_t* bmp;          // bitmap of view
+  char  bmp_changed;  // bitmap changed
+  char  bitmap_state; // 0 - blank , 1 - pending , 2 - ready to render, 3 - added to compositor
+
+  void (*evt)(struct _view_t*, ev_t); // event handler for view
+  void (*gen)(struct _view_t*);       // bitmap generator for view
+
 } view_t;
 
-view_t* view_new(char* id, v4_t frame, uint32_t color);
+view_t* view_new(char* id, v4_t frame);
 void    view_gen(view_t* view);
+void    view_setpos(view_t* view, v2_t pos);
+void    view_setdim(view_t* view, v2_t dim);
+void    view_setbmp(view_t* view, bm_t* bmp);
 
 #endif
 
@@ -36,14 +48,13 @@ void view_del(void* pointer)
   REL(view->bmp);
 }
 
-view_t* view_new(char* id, v4_t frame, uint32_t color)
+view_t* view_new(char* id, v4_t frame)
 {
   view_t* view = mtmem_calloc(sizeof(view_t), view_del);
-  view->color  = color;
-  view->frame  = frame;
-  view->type   = "default";
-  view->bmp    = bm_new(frame.z, frame.w);
   view->id     = mtcstr_fromcstring(id);
+  view->bmp    = bm_new(frame.z, frame.w);
+  view->views  = VNEW();
+  view->frame  = frame;
 
   return view;
 }
@@ -55,7 +66,7 @@ void view_gen(view_t* view)
           0,
           (int)view->frame.z,
           (int)view->frame.w,
-          view->color);
+          0xFF0000FF);
   view->bitmap_state = 2;
 
   mtstr_t* str = mtstr_frombytes("KUTYAFASZA");
@@ -79,6 +90,20 @@ void view_gen(view_t* view)
 
   bm_t* bitmap = font_render_text((int)view->frame.z, (int)view->frame.w, str, common_font, ts, NULL, NULL);
   view->bmp    = bitmap;
+}
+
+void view_setpos(view_t* view, v2_t pos)
+{
+  view->frame.x     = pos.x;
+  view->frame.y     = pos.y;
+  view->dim_changed = 1;
+}
+
+void view_setdim(view_t* view, v2_t dim)
+{
+  view->frame.z     = dim.x;
+  view->frame.w     = dim.y;
+  view->dim_changed = 1;
 }
 
 #endif

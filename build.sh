@@ -1,22 +1,26 @@
 clang \
     -L/usr/local/lib \
-    -I/usr/local/include \
-    -I/usr/local/include/GL \
-    -I/usr/local/include/SDL2 \
     -lm \
-    -lpthread \
     -lGL \
     -lGLEW \
     -lSDL2 \
+    -lpthread \
+    -I/usr/local/include \
+    -I/usr/local/include/GL \
+    -I/usr/local/include/SDL2 \
     -Isrc \
     -Isrc/lib \
     -Isrc/views \
     -Isrc/modules \
     -Isrc/modules/text \
-    src/modules/gl_connector.c \
-    src/modules/wm_connector.c \
+    -Isrc/modules/gl \
+    -Isrc/modules/ui \
+    src/modules/gl/gl_connector.c \
+    src/modules/ui/ui_manager.c \
+    src/modules/ui/view.c \
     src/modules/ui_connector.c \
     src/modules/ui_compositor.c \
+    src/modules/wm_connector.c \
     src/modules/text/font.c \
     src/modules/text/text.c \
     src/lib/mtbm.c \
@@ -31,7 +35,6 @@ clang \
     src/lib/mtvec.c \
     src/lib/mtstr.c \
     src/lib/mtcstr.c \
-    src/views/view.c \
     src/event.c \
     src/zenmusic.c \
     src/common.c \
