@@ -12,15 +12,17 @@ clang \
     -Isrc/lib \
     -Isrc/views \
     -Isrc/modules \
-    -Isrc/modules/text \
     -Isrc/modules/gl \
     -Isrc/modules/ui \
+    -Isrc/modules/wm \
+    -Isrc/modules/text \
     src/modules/gl/gl_connector.c \
     src/modules/ui/ui_manager.c \
     src/modules/ui/view.c \
     src/modules/ui_connector.c \
     src/modules/ui_compositor.c \
-    src/modules/wm_connector.c \
+    src/modules/wm/wm_event.c \
+    src/modules/wm/wm_connector.c \
     src/modules/text/font.c \
     src/modules/text/text.c \
     src/lib/mtbm.c \
@@ -35,7 +37,6 @@ clang \
     src/lib/mtvec.c \
     src/lib/mtstr.c \
     src/lib/mtcstr.c \
-    src/event.c \
     src/zenmusic.c \
     src/common.c \
     -o bin/zenmusic

@@ -8,7 +8,7 @@
 #ifndef wm_connector_h
 #define wm_connector_h
 
-#include "event.c"
+#include "wm_event.c"
 
 void wm_init(void (*init)(int, int), void (*update)(ev_t), void (*render)(), void (*destroy)());
 
@@ -16,7 +16,7 @@ void wm_init(void (*init)(int, int), void (*update)(ev_t), void (*render)(), voi
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "event.c"
+#include "wm_event.c"
 #include <SDL.h>
 #include <stdio.h>
 #include <stdlib.h>

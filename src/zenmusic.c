@@ -1,5 +1,4 @@
 #include "common.c"
-#include "event.c"
 #include "font.c"
 #include "math2.c"
 #include "mtbm.c"
@@ -9,6 +8,7 @@
 #include "ui_connector.c"
 #include "view.c"
 #include "wm_connector.c"
+#include "wm_event.c"
 #include <SDL.h>
 #include <stdio.h>
 #include <stdlib.h>

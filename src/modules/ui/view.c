@@ -1,11 +1,11 @@
 #ifndef view_h
 #define view_h
 
-#include "event.c"
 #include "math2.c"
 #include "math4.c"
 #include "mtbm.c"
 #include "mtvec.c"
+#include "wm_event.c"
 
 typedef struct _view_t
 {
@@ -21,12 +21,12 @@ typedef struct _view_t
   char  bmp_state;   // 0 - blank , 1 - pending , 2 - ready to render, 3 - added to compositor
 
   void (*evt)(struct _view_t*, ev_t); // event handler for view
-  void (*gen)(struct _view_t*);       // bitmap generator for view
+  void (*tex)(struct _view_t*);       // texture generator for view
 
 } view_t;
 
-view_t* view_new(char* id, v4_t frame, void (*evt)(struct _view_t*, ev_t), void (*gen)(struct _view_t*), void* data);
-void    view_gen(view_t* view);
+view_t* view_new(char* id, v4_t frame, void (*evt)(struct _view_t*, ev_t), void (*tex)(struct _view_t*), void* data);
+void    view_tex(view_t* view);
 void    view_evt(view_t* view, ev_t ev);
 void    view_setpos(view_t* view, v2_t pos);
 void    view_setdim(view_t* view, v2_t dim);
@@ -50,13 +50,13 @@ void view_del(void* pointer)
   REL(view->views);
 }
 
-view_t* view_new(char* id, v4_t frame, void (*pevt)(struct _view_t*, ev_t), void (*pgen)(struct _view_t*), void* data)
+view_t* view_new(char* id, v4_t frame, void (*pevt)(struct _view_t*, ev_t), void (*ptex)(struct _view_t*), void* data)
 {
   view_t* view = mtmem_calloc(sizeof(view_t), view_del);
   view->id     = mtcstr_fromcstring(id);
   view->bmp    = NULL;
   view->evt    = pevt;
-  view->gen    = pgen;
+  view->tex    = ptex;
   view->data   = data;
   view->views  = VNEW();
   view->frame  = frame;
@@ -69,9 +69,9 @@ void view_evt(view_t* view, ev_t ev)
   (*view->evt)(view, ev);
 }
 
-void view_gen(view_t* view)
+void view_tex(view_t* view)
 {
-  (*view->gen)(view);
+  (*view->tex)(view);
 }
 
 void view_setpos(view_t* view, v2_t pos)

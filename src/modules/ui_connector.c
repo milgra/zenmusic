@@ -112,7 +112,7 @@ void* ui_connector_workloop()
     if ((view = ch_recv(uich)))
     {
       printf("generating bmp for %s\n", view->id);
-      view_gen(view);
+      view_tex(view);
     }
     nanosleep(&ts, &ts);
   }
