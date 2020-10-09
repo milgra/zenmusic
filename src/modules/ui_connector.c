@@ -68,14 +68,15 @@ void ui_connector_render()
 
   while ((view = VNXT(uiv)))
   {
-    if (view->bitmap_state == 0) // send unrendered views to renderer thread
+    if (view->bmp_state == 0) // send unrendered views to renderer thread
     {
-      view->bitmap_state = 1; // pending
+      view->bmp_state = 1; // pending
       ch_send(uich, view);
     }
-    if (view->bitmap_state == 2) // add rendered views to compositor
+    if (view->bmp_state == 2) // add rendered views to compositor
     {
-      view->bitmap_state = 3; // added to compositor
+      view->bmp_state   = 3; // added to compositor
+      view->bmp_changed = 0;
       ui_compositor_add(view->id,
                         view->frame.x,
                         view->frame.y,
@@ -83,10 +84,10 @@ void ui_connector_render()
                         view->frame.w,
                         view->bmp);
     }
-    if (view->dim_changed) // update dimension if needed
+    if (view->frame_changed) // update dimension if needed
     {
       ui_compositor_upd(view->id, view->frame.x, view->frame.y, view->frame.z, view->frame.w, NULL);
-      view->dim_changed = 0;
+      view->frame_changed = 0;
     }
     if (view->bmp_changed) // update bitmap if needed
     {
@@ -104,7 +105,7 @@ void* ui_connector_workloop()
   view_t*         view;
 
   ts.tv_sec  = 0;
-  ts.tv_nsec = 10000000;
+  ts.tv_nsec = 15000000;
 
   while (1)
   {
