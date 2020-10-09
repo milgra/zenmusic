@@ -40,7 +40,7 @@ void gl_errors(const char* place)
 
 GLuint gl_shader_compile(GLenum type, const GLchar* source)
 {
-  GLint status, logLength, realLength;
+  GLint  status, logLength, realLength;
   GLuint shader = 0;
 
   status = 0;
@@ -97,14 +97,14 @@ int gl_shader_link(GLuint program)
   return 0;
 }
 
-GLuint gl_shader_create(const char* vertex_source,
-                        const char* fragment_source,
+GLuint gl_shader_create(const char*  vertex_source,
+                        const char*  fragment_source,
                         const char** uniform_structure,
                         const char** attribute_structure,
-                        GLint* uniform_locations)
+                        GLint*       uniform_locations)
 {
 
-  int uniform_locations_length = atoi(uniform_structure[0]);
+  int uniform_locations_length   = atoi(uniform_structure[0]);
   int attribute_locations_length = atoi(attribute_structure[0]);
 
   GLuint program = glCreateProgram();
@@ -130,8 +130,8 @@ GLuint gl_shader_create(const char* vertex_source,
   {
     for (int index = 0; index < uniform_locations_length; index++)
     {
-      const GLchar* name = uniform_structure[index + 1];
-      GLint location = glGetUniformLocation(program, name);
+      const GLchar* name       = uniform_structure[index + 1];
+      GLint         location   = glGetUniformLocation(program, name);
       uniform_locations[index] = location;
     }
   }
@@ -167,7 +167,7 @@ char* blend_fsh =
 void gl_init(width, height)
 {
 
-  const char* uniforms_blend[] = {"2", "projection", "texture"};
+  const char* uniforms_blend[]   = {"2", "projection", "texture"};
   const char* attributes_blend[] = {"2", "position", "texcoord"};
 
   glewInit();

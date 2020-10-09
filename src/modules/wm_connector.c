@@ -6,12 +6,15 @@
 #ifndef wm_connector_h
 #define wm_connector_h
 
-void wm_init(void (*init)(int, int), void (*update)(int, int), void (*render)(), void (*destroy)());
+#include "event.c"
+
+void wm_init(void (*init)(int, int), void (*update)(ev_t), void (*render)(), void (*destroy)());
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "event.c"
 #include <SDL.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,7 +22,7 @@ void wm_init(void (*init)(int, int), void (*update)(int, int), void (*render)(),
 uint32_t lastticks = 0;
 
 void wm_init(void (*init)(int, int),
-             void (*update)(int, int),
+             void (*update)(ev_t),
              void (*render)(),
              void (*destroy)())
 {
@@ -45,18 +48,19 @@ void wm_init(void (*init)(int, int),
     int32_t width  = displaymode.w;
     int32_t height = displaymode.h;
 
-    SDL_Window* window =
-        SDL_CreateWindow("Zen Music",
-                         SDL_WINDOWPOS_UNDEFINED,
-                         SDL_WINDOWPOS_UNDEFINED,
-                         width,
-                         height,
-                         SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE);
+    SDL_Window* window = SDL_CreateWindow("Zen Music",
+                                          SDL_WINDOWPOS_UNDEFINED,
+                                          SDL_WINDOWPOS_UNDEFINED,
+                                          width,
+                                          height,
+                                          SDL_WINDOW_OPENGL |
+                                              SDL_WINDOW_SHOWN |
+                                              SDL_WINDOW_ALLOW_HIGHDPI |
+                                              SDL_WINDOW_RESIZABLE);
 
     if (window == NULL)
     {
-      printf("SDL Window could not be created! SDL_Error: %s\n",
-             SDL_GetError());
+      printf("SDL Window could not be created! SDL_Error: %s\n", SDL_GetError());
     }
     else
     {
@@ -65,8 +69,7 @@ void wm_init(void (*init)(int, int),
       SDL_GLContext* context = SDL_GL_CreateContext(window);
       if (context == NULL)
       {
-        printf("SDL Context could not be created! SDL_Error: %s\n",
-               SDL_GetError());
+        printf("SDL Context could not be created! SDL_Error: %s\n", SDL_GetError());
       }
       else
       {
@@ -88,32 +91,36 @@ void wm_init(void (*init)(int, int),
 
         (*init)(width, height);
 
-        char      drag = 0;
         char      quit = 0;
+        ev_t      ev; // zen event
         SDL_Event event;
 
         while (!quit)
         {
-          while (SDL_PollEvent(&event) != 0)
+          ev.type = EV_EMPTY;
+          ev.time = SDL_GetTicks();
+
+          if (SDL_WaitEvent(&event) != 0)
           {
             if (event.type == SDL_MOUSEBUTTONDOWN ||
                 event.type == SDL_MOUSEBUTTONUP ||
                 event.type == SDL_MOUSEMOTION)
             {
-              int x = 0, y = 0;
-              SDL_GetMouseState(&x, &y);
+              SDL_GetMouseState(&ev.x, &ev.y);
 
               if (event.type == SDL_MOUSEBUTTONDOWN)
               {
-                drag = 1;
+                ev.type = EV_MDOWN;
+                ev.drag = 1;
               }
               else if (event.type == SDL_MOUSEBUTTONUP)
               {
-                drag = 0;
+                ev.type = EV_MUP;
+                ev.drag = 0;
               }
-              else if (event.type == SDL_MOUSEMOTION && drag == 1)
+              else if (event.type == SDL_MOUSEMOTION)
               {
-                (*update)(x, y);
+                ev.type = EV_MMOVE;
               }
             }
             else if (event.type == SDL_QUIT)
@@ -124,10 +131,9 @@ void wm_init(void (*init)(int, int),
             {
               if (event.window.event == SDL_WINDOWEVENT_RESIZED)
               {
-                int32_t width  = event.window.data1;
-                int32_t height = event.window.data2;
-
-                printf("window resized %i %i\n", width, height);
+                ev.type = EV_RESIZE;
+                ev.w    = event.window.data1;
+                ev.h    = event.window.data2;
               }
             }
             else if (event.type == SDL_KEYDOWN)
@@ -135,22 +141,14 @@ void wm_init(void (*init)(int, int),
             }
             else if (event.type == SDL_TEXTINPUT)
             {
-              printf("TEXT %s\n", event.text.text);
-            }
-            else if (event.type == SDL_APP_WILLENTERFOREGROUND)
-            {
-              printf("FOREGROUND\n");
+              ev.type = EV_TEXT;
+              ev.text = event.text.text;
             }
           }
 
-          uint32_t ticks = SDL_GetTicks();
-          if (ticks > lastticks + 16)
-          {
-            lastticks = ticks;
-            (*render)();
-            SDL_GL_SwapWindow(window);
-          }
-          SDL_Delay(10);
+          (*update)(ev);
+          (*render)();
+          SDL_GL_SwapWindow(window);
         }
 
         (*destroy)();

@@ -1,4 +1,5 @@
 #include "common.c"
+#include "event.c"
 #include "font.c"
 #include "mtbm.c"
 #include "mtcstr.c"
@@ -35,11 +36,15 @@ void init(int width, int height)
   ui_connector_add(viewB);
 }
 
-void update(int x, int y)
+void update(ev_t ev)
 {
-  viewA->frame.x     = x;
-  viewA->frame.y     = y;
-  viewA->dim_changed = 1;
+
+  if (ev.type == EV_MMOVE && ev.drag)
+  {
+    viewA->frame.x     = ev.x;
+    viewA->frame.y     = ev.y;
+    viewA->dim_changed = 1;
+  }
 }
 
 void render()
