@@ -9,7 +9,7 @@
 #ifndef ui_compositor_h
 #define ui_compositor_h
 
-#include "mtbm.c"
+#include "mtbitmap.c"
 
 void ui_compositor_init(int, int);
 void ui_compositor_render();
@@ -34,39 +34,38 @@ void     crect_set_tex(crect_t* rect, float tx, float ty, float tz, float tw);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "gl_connector.c"
-#include "math4.c"
-#include "mtbm.c"
-#include "mtcstr.c"
-#include "mtfb.c"
+#include "mtcstring.c"
+#include "mtfltbuf.c"
 #include "mtmap.c"
-#include "mttm.c"
-#include "mtvec.c"
+#include "mtmath4.c"
+#include "mttexmap.c"
+#include "mtvector.c"
 
-fb_t*    flt_buf;
-tm_t*    tex_map;
-mtvec_t* rectv;
-mtmap_t* rectm;
+fb_t*    fb;    // float buffer
+tm_t*    tm;    // texture map
+mtvec_t* rectv; // rectangle vector
+mtmap_t* rectm; // rectangle map
 
 void ui_compositor_init(int width, int height)
 {
   gl_init(width, height);
 
-  flt_buf = fb_new();
-  tex_map = tm_new();
-  rectv   = VNEW();
-  rectm   = MNEW();
+  fb    = fb_new();
+  tm    = tm_new();
+  rectv = VNEW();
+  rectm = MNEW();
 }
 
 void ui_compositor_render()
 {
   crect_t* rect;
 
-  fb_reset(flt_buf);
+  fb_reset(fb);
 
   while ((rect = VNXT(rectv)))
-    fb_add(flt_buf, rect->data, 24);
+    fb_add(fb, rect->data, 24);
 
-  gl_render(flt_buf, tex_map->bm);
+  gl_render(fb, tm->bm);
 }
 
 void ui_compositor_add(char* id, int x, int y, int w, int h, bm_t* bmp)
@@ -74,9 +73,9 @@ void ui_compositor_add(char* id, int x, int y, int w, int h, bm_t* bmp)
   v4_t     texc;
   crect_t* rect;
 
-  tm_put(tex_map, id, bmp);
+  tm_put(tm, id, bmp);
 
-  texc = tm_get(tex_map, id);
+  texc = tm_get(tm, id);
   rect = crect_new(id, x, y, w, h, texc.x, texc.y, texc.z, texc.w);
 
   VADD(rectv, rect);
@@ -90,7 +89,7 @@ void ui_compositor_upd(char* id, int x, int y, int w, int h, bm_t* bmp)
   if ((rect = MGET(rectm, id)))
   {
     crect_set_dim(rect, x, y, w, h);
-    if (bmp) tm_upd(tex_map, id, bmp);
+    if (bmp) tm_upd(tm, id, bmp);
   }
 }
 

@@ -2,9 +2,9 @@
 #ifndef font_h
 #define font_h
 
-#include "mtbm.c"
-#include "mtstr.c"
-#include "mtvec.c"
+#include "mtbitmap.c"
+#include "mtstring.c"
+#include "mtvector.c"
 #include "stb_truetype.h"
 #include "text.c"
 #include <stdint.h>
@@ -33,9 +33,9 @@ int font_lineheight(font_t* the_font, float textsize);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtcstr.c"
-#include "mtfb.c"
-#include "mtmem.c"
+#include "mtcstring.c"
+#include "mtfltbuf.c"
+#include "mtmemory.c"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -20,10 +20,10 @@ void gl_render();
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "math2.c"
-#include "math4.c"
-#include "mtbm.c"
-#include "mtfb.c"
+#include "mtbitmap.c"
+#include "mtfltbuf.c"
+#include "mtmath2.c"
+#include "mtmath4.c"
 #include <GL/glew.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -3,7 +3,7 @@
 #ifndef mtch_h
 #define mtch_h
 
-#include "mtmem.c"
+#include "mtmemory.c"
 #include <assert.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -12,7 +12,7 @@
 typedef struct ch_t ch_t;
 struct ch_t
 {
-  char* flags;
+  char*  flags;
   void** boxes;
 
   uint32_t size;
@@ -21,10 +21,10 @@ struct ch_t
 };
 
 ch_t* ch_new(uint32_t size);
-void ch_del(void* pointer);
-char ch_send(ch_t* boxes, void* data);
+void  ch_del(void* pointer);
+char  ch_send(ch_t* boxes, void* data);
 void* ch_recv(ch_t* boxes);
-void ch_test(void);
+void  ch_test(void);
 
 #endif
 
@@ -34,10 +34,10 @@ ch_t* ch_new(uint32_t size)
 {
   ch_t* boxes = mtmem_calloc(sizeof(ch_t), ch_del);
 
-  boxes->flags = mtmem_calloc(sizeof(char) * size, NULL);
-  boxes->boxes = mtmem_calloc(sizeof(void*) * size, NULL);
-  boxes->size = size;
-  boxes->read_index = 0;
+  boxes->flags       = mtmem_calloc(sizeof(char) * size, NULL);
+  boxes->boxes       = mtmem_calloc(sizeof(void*) * size, NULL);
+  boxes->size        = size;
+  boxes->read_index  = 0;
   boxes->write_index = 0;
 
   return boxes;
@@ -105,8 +105,8 @@ void send_test(ch_t* boxes)
   while (1)
   {
     uint32_t* number = mtmem_calloc(sizeof(uint32_t), NULL);
-    *number = counter;
-    char success = ch_send(boxes, number);
+    *number          = counter;
+    char success     = ch_send(boxes, number);
     if (success == 0)
       mtmem_release(number);
     else

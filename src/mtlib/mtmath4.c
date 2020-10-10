@@ -3,7 +3,7 @@
 #ifndef __c36__math4__
 #define __c36__math4__
 
-#include "math3.c"
+#include "mtmath3.c"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -38,7 +38,7 @@ struct _m4_t
 
 typedef union _matrix4array_t matrix4array_t;
 union _matrix4array_t {
-  m4_t matrix;
+  m4_t  matrix;
   float array[16];
 };
 
@@ -63,12 +63,12 @@ void m4_describe(m4_t matrix);
 void m4_extractangles(m4_t matrix, float* x, float* y, float* z);
 
 v4_t m4_multiply_vector4(m4_t matrix, v4_t vector);
-v4_t m4_world_to_screen_coords(m4_t proj_matrix,
-                               v4_t vector,
+v4_t m4_world_to_screen_coords(m4_t  proj_matrix,
+                               v4_t  vector,
                                float width,
                                float height);
-v3_t m4_screen_to_world_coords(m4_t proj_matrix,
-                               v4_t vector,
+v3_t m4_screen_to_world_coords(m4_t  proj_matrix,
+                               v4_t  vector,
                                float width,
                                float height);
 void m4_extract(m4_t trafo, v3_t* scale, v3_t* rotation, v3_t* translation);
@@ -194,7 +194,7 @@ m4_t m4_defaultscale(float x, float y, float z)
 m4_t m4_defaultrotation(float x, float y, float z)
 {
   float max = fabs(x) > fabs(y) ? x : y;
-  max = fabs(z) > fabs(max) ? z : max;
+  max       = fabs(z) > fabs(max) ? z : max;
 
   if (max == 0.0)
     return m4_defaultidentity();
@@ -204,7 +204,7 @@ m4_t m4_defaultrotation(float x, float y, float z)
   z = z / max;
 
   float nx, ny, nz, scale, sin, cos, cosp;
-  m4_t matrix;
+  m4_t  matrix;
 
   // normalize values
 
@@ -220,8 +220,8 @@ m4_t m4_defaultrotation(float x, float y, float z)
 
   // precalc
 
-  sin = sinf(max);
-  cos = cosf(max);
+  sin  = sinf(max);
+  cos  = cosf(max);
   cosp = 1.0f - cos;
 
   // create matrix
@@ -252,7 +252,7 @@ m4_t m4_defaulttranslation(float x, float y, float z)
 {
   m4_t result;
 
-  result = m4_defaultidentity();
+  result     = m4_defaultidentity();
   result.m00 = 1;
 
   result.m30 = x;
@@ -272,7 +272,7 @@ m4_t m4_defaultortho(float left,
                      float far)
 {
   float rpl, rml, tpb, tmb, fpn, fmn;
-  m4_t matrix;
+  m4_t  matrix;
 
   rpl = right + left;
   rml = right - left;
@@ -306,7 +306,7 @@ m4_t m4_defaultortho(float left,
 m4_t m4_defaultperspective(float fovy, float aspect, float nearz, float farz)
 {
   float cotan;
-  m4_t matrix;
+  m4_t  matrix;
 
   cotan = 1.0f / tanf(fovy / 2.0f);
 
@@ -370,7 +370,7 @@ m4_t m4_translate(m4_t other, float x, float y, float z)
 m4_t m4_invert(m4_t source, char* success)
 {
   float determinant;
-  m4_t inverse;
+  m4_t  inverse;
 
   inverse.m00 = source.m11 * source.m22 * source.m33 -
                 source.m11 * source.m23 * source.m32 -
@@ -655,8 +655,8 @@ v4_t m4_multiply_vector4(m4_t matrix, v4_t vector)
 
 /* projects model space vector4 to screen space */
 
-v4_t m4_world_to_screen_coords(m4_t matrix,
-                               v4_t srcvector,
+v4_t m4_world_to_screen_coords(m4_t  matrix,
+                               v4_t  srcvector,
                                float width,
                                float height)
 {
@@ -690,8 +690,8 @@ v4_t m4_world_to_screen_coords(m4_t matrix,
 
 /* projects screen space vector4 to model space */
 
-v3_t m4_screen_to_world_coords(m4_t mvpmatrix,
-                               v4_t scrvector,
+v3_t m4_screen_to_world_coords(m4_t  mvpmatrix,
+                               v4_t  scrvector,
                                float width,
                                float height)
 {
@@ -708,7 +708,7 @@ v3_t m4_screen_to_world_coords(m4_t mvpmatrix,
   // invert projection matrix
 
   char success = 1;
-  m4_t invert = m4_invert(mvpmatrix, &success);
+  m4_t invert  = m4_invert(mvpmatrix, &success);
 
   // multiply transposed inverted projection matrix with vector
 
@@ -775,15 +775,15 @@ v3_t v4_quadrelativecoors(v4_t ulc, v4_t urc, v4_t llc, v3_t point_is)
 
   mtvec_ab = v3_sub(plane_b, plane_a);
   mtvec_ad = v3_sub(plane_d, plane_a);
-  mtvec_n = v3_cross(mtvec_ab, mtvec_ad);
+  mtvec_n  = v3_cross(mtvec_ab, mtvec_ad);
 
   // get angle of AI from AB and AC to build up the frame square in its actual
   // position
 
   mtvec_ai = v3_sub(point_is, plane_a);
 
-  float angle_ab_ai = v3_angle(mtvec_ab, mtvec_ai);
-  float angle_ad_ai = v3_angle(mtvec_ad, mtvec_ai);
+  float angle_ab_ai     = v3_angle(mtvec_ab, mtvec_ai);
+  float angle_ad_ai     = v3_angle(mtvec_ad, mtvec_ai);
   float length_mtvec_ai = v3_length(mtvec_ai);
 
   // get relative coordinates
@@ -823,7 +823,7 @@ v3_t v4_quadlineintersection(v4_t ulc, v4_t urc, v4_t llc, v3_t linea, v3_t line
 
   mtvec_ab = v3_sub(plane_b, plane_a);
   mtvec_ad = v3_sub(plane_d, plane_a);
-  mtvec_n = v3_cross(mtvec_ab, mtvec_ad);
+  mtvec_n  = v3_cross(mtvec_ab, mtvec_ad);
 
   // get intersection point
 
@@ -834,8 +834,8 @@ v3_t v4_quadlineintersection(v4_t ulc, v4_t urc, v4_t llc, v3_t linea, v3_t line
 
   mtvec_ai = v3_sub(point_is, plane_a);
 
-  float angle_ab_ai = v3_angle(mtvec_ab, mtvec_ai);
-  float angle_ad_ai = v3_angle(mtvec_ad, mtvec_ai);
+  float angle_ab_ai     = v3_angle(mtvec_ab, mtvec_ai);
+  float angle_ad_ai     = v3_angle(mtvec_ad, mtvec_ai);
   float length_mtvec_ai = v3_length(mtvec_ai);
 
   // get relative coordinates

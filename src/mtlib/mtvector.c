@@ -3,7 +3,7 @@
 #ifndef mtvec_h
 #define mtvec_h
 
-#include "mtmem.c"
+#include "mtmemory.c"
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,30 +19,30 @@
 typedef struct mtvec_t mtvec_t;
 struct mtvec_t
 {
-  void** data;
-  void** next;
+  void**   data;
+  void**   next;
   uint32_t pos;
   uint32_t length;
   uint32_t length_real;
 };
 
 mtvec_t* mtvec_alloc(void);
-void mtvec_dealloc(void* vector);
-void mtvec_reset(mtvec_t* vector);
-void mtvec_decrese_item_retcount(mtvec_t* vector);
-void mtvec_add(mtvec_t* vector, void* data);
-void* mtvec_next(mtvec_t* vector);
-void mtvec_addatindex(mtvec_t* vector, void* data, size_t index);
-void mtvec_addinvector(mtvec_t* mtvec_a, mtvec_t* mtvec_b);
-void mtvec_adduniquedata(mtvec_t* vector, void* data);
-void mtvec_adduniquedataatindex(mtvec_t* vector, void* data, size_t index);
-char mtvec_rem(mtvec_t* vector, void* data);
-char mtvec_rematindex(mtvec_t* vector, uint32_t index);
-void mtvec_reminrange(mtvec_t* vector, uint32_t start, uint32_t end);
-void mtvec_reminvector(mtvec_t* mtvec_a, mtvec_t* mtvec_b);
-void mtvec_reverse(mtvec_t* vector);
-void* mtvec_head(mtvec_t* vector);
-void* mtvec_tail(mtvec_t* vector);
+void     mtvec_dealloc(void* vector);
+void     mtvec_reset(mtvec_t* vector);
+void     mtvec_decrese_item_retcount(mtvec_t* vector);
+void     mtvec_add(mtvec_t* vector, void* data);
+void*    mtvec_next(mtvec_t* vector);
+void     mtvec_addatindex(mtvec_t* vector, void* data, size_t index);
+void     mtvec_addinvector(mtvec_t* mtvec_a, mtvec_t* mtvec_b);
+void     mtvec_adduniquedata(mtvec_t* vector, void* data);
+void     mtvec_adduniquedataatindex(mtvec_t* vector, void* data, size_t index);
+char     mtvec_rem(mtvec_t* vector, void* data);
+char     mtvec_rematindex(mtvec_t* vector, uint32_t index);
+void     mtvec_reminrange(mtvec_t* vector, uint32_t start, uint32_t end);
+void     mtvec_reminvector(mtvec_t* mtvec_a, mtvec_t* mtvec_b);
+void     mtvec_reverse(mtvec_t* vector);
+void*    mtvec_head(mtvec_t* vector);
+void*    mtvec_tail(mtvec_t* vector);
 uint32_t mtvec_indexofdata(mtvec_t* vector, void* data);
 
 #endif
@@ -52,10 +52,10 @@ uint32_t mtvec_indexofdata(mtvec_t* vector, void* data);
 
 mtvec_t* mtvec_alloc()
 {
-  mtvec_t* vector = mtmem_calloc(sizeof(mtvec_t), mtvec_dealloc);
-  vector->data = mtmem_calloc(sizeof(void*) * 10, NULL);
-  vector->pos = 0;
-  vector->length = 0;
+  mtvec_t* vector     = mtmem_calloc(sizeof(mtvec_t), mtvec_dealloc);
+  vector->data        = mtmem_calloc(sizeof(void*) * 10, NULL);
+  vector->pos         = 0;
+  vector->length      = 0;
   vector->length_real = 10;
   return vector;
 }
@@ -246,8 +246,8 @@ void* mtvec_tail(mtvec_t* vector)
 
 uint32_t mtvec_indexofdata(mtvec_t* vector, void* data)
 {
-  void** actual = vector->data;
-  uint32_t index = 0;
+  void**   actual = vector->data;
+  uint32_t index  = 0;
   while (index < vector->length)
   {
     if (*actual == data) return index;

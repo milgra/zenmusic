@@ -2,7 +2,7 @@
 #ifndef fb_h
 #define fb_h
 
-#include "mtmem.c"
+#include "mtmemory.c"
 #include <GL/glew.h>
 #include <string.h>
 
@@ -12,13 +12,13 @@ struct fb_t
   GLfloat* data;
   uint32_t pos;
   uint32_t cap;
-  char changed;
+  char     changed;
 };
 
 fb_t* fb_new(void);
-void fb_del(void* fb);
-void fb_reset(fb_t* fb);
-void fb_add(fb_t* fb, GLfloat* data, size_t count);
+void  fb_del(void* fb);
+void  fb_reset(fb_t* fb);
+void  fb_add(fb_t* fb, GLfloat* data, size_t count);
 
 #endif
 
@@ -28,8 +28,8 @@ fb_t* fb_new()
 {
   fb_t* fb = mtmem_calloc(sizeof(fb_t), fb_del);
   fb->data = mtmem_calloc(sizeof(GLfloat) * 10, NULL);
-  fb->pos = 0;
-  fb->cap = 10;
+  fb->pos  = 0;
+  fb->cap  = 10;
 
   return fb;
 }

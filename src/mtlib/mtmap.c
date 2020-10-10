@@ -3,7 +3,7 @@
 #ifndef mtmap_h
 #define mtmap_h
 
-#include "mtvec.c"
+#include "mtvector.c"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -23,7 +23,7 @@ typedef struct bucket_t bucket_t;
 struct bucket_t
 {
   unsigned int count;
-  pair_t* pairs;
+  pair_t*      pairs;
 };
 
 typedef struct mtmap_t mtmap_t;
@@ -31,20 +31,18 @@ struct mtmap_t
 {
   unsigned int count_real;
   unsigned int count;
-  bucket_t* buckets;
+  bucket_t*    buckets;
 };
 
 mtmap_t* mtmap_alloc(void);
-void mtmap_dealloc(void* pointer);
-void mtmap_reset(mtmap_t* map);
-
-int mtmap_put(mtmap_t* map, const char* key, void* value);
-void* mtmap_get(mtmap_t* map, const char* key);
-void mtmap_del(mtmap_t* map, const char* key);
-
+void     mtmap_dealloc(void* pointer);
+void     mtmap_reset(mtmap_t* map);
+int      mtmap_put(mtmap_t* map, const char* key, void* value);
+void*    mtmap_get(mtmap_t* map, const char* key);
+void     mtmap_del(mtmap_t* map, const char* key);
 mtvec_t* mtmap_keys(mtmap_t* map);
 mtvec_t* mtmap_values(mtmap_t* map);
-void mtmap_printkeys(mtmap_t* map);
+void     mtmap_printkeys(mtmap_t* map);
 
 #ifdef DEBUG
 void mtmap_test(void);
@@ -54,7 +52,7 @@ void mtmap_test(void);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtmem.c"
+#include "mtmemory.c"
 #include <string.h>
 
 /* creates map */
@@ -66,8 +64,8 @@ mtmap_t* mtmap_alloc()
   if (map == NULL) return NULL;
 
   map->count_real = 10;
-  map->count = 0;
-  map->buckets = mtmem_calloc(map->count_real * sizeof(bucket_t), NULL);
+  map->count      = 0;
+  map->buckets    = mtmem_calloc(map->count_real * sizeof(bucket_t), NULL);
 
   if (map->buckets == NULL)
   {
@@ -86,12 +84,12 @@ void mtmap_dealloc(void* pointer)
   mtmap_t* map = pointer;
 
   unsigned int index, bindex;
-  bucket_t* bucket;
-  pair_t* pair;
-  pair_t* last;
+  bucket_t*    bucket;
+  pair_t*      pair;
+  pair_t*      last;
 
   bucket = map->buckets;
-  index = 0;
+  index  = 0;
 
   // clean up buckets and pairs
 
@@ -124,8 +122,8 @@ void mtmap_reset(mtmap_t* map)
   mtmap_dealloc(map);
 
   map->count_real = 10;
-  map->count = 0;
-  map->buckets = mtmem_calloc(map->count_real * sizeof(bucket_t), NULL);
+  map->count      = 0;
+  map->buckets    = mtmem_calloc(map->count_real * sizeof(bucket_t), NULL);
 }
 
 /* resizes map */
@@ -134,17 +132,17 @@ void mtmap_resize(mtmap_t* map)
 {
   // create new map
 
-  mtmap_t* newmap = mtmem_calloc(sizeof(mtmap_t), mtmap_dealloc);
+  mtmap_t* newmap    = mtmem_calloc(sizeof(mtmap_t), mtmap_dealloc);
   newmap->count_real = map->count_real * 2;
-  newmap->count = 0;
-  newmap->buckets = mtmem_calloc(newmap->count_real * sizeof(bucket_t), NULL);
+  newmap->count      = 0;
+  newmap->buckets    = mtmem_calloc(newmap->count_real * sizeof(bucket_t), NULL);
 
   // put old values in new map
 
   mtvec_t* oldkeys = mtmap_keys(map);
   for (uint32_t index = 0; index < oldkeys->length; index++)
   {
-    char* key = oldkeys->data[index];
+    char* key   = oldkeys->data[index];
     void* value = mtmap_get(map, key);
     mtmap_put(newmap, key, value);
   }
@@ -155,8 +153,8 @@ void mtmap_resize(mtmap_t* map)
   mtmap_dealloc(map);
 
   map->count_real = newmap->count_real;
-  map->buckets = newmap->buckets;
-  map->count = newmap->count;
+  map->buckets    = newmap->buckets;
+  map->count      = newmap->count;
 
   unsigned char* bytes = (unsigned char*)newmap;
   bytes -= sizeof(struct mtmem_head);
@@ -168,11 +166,11 @@ void mtmap_resize(mtmap_t* map)
 static pair_t* get_pair(bucket_t* bucket, const char* key)
 {
   unsigned int index;
-  pair_t* pair;
+  pair_t*      pair;
 
   if (bucket->count == 0) return NULL;
 
-  pair = bucket->pairs;
+  pair  = bucket->pairs;
   index = 0;
 
   while (index < bucket->count)
@@ -193,7 +191,7 @@ static pair_t* get_pair(bucket_t* bucket, const char* key)
 static unsigned long hash(const char* str)
 {
   unsigned long hash = 5381;
-  int chr;
+  int           chr;
   while ((chr = *str++))
     hash = ((hash << 5) + hash) + chr;
   return hash;
@@ -205,16 +203,16 @@ int mtmap_put(mtmap_t* map, const char* key, void* value)
 {
   mtmem_retain(value);
 
-  size_t index;
+  size_t    index;
   bucket_t* bucket;
-  pair_t *tmp_pairs, *pair;
+  pair_t *  tmp_pairs, *pair;
 
   if (map == NULL) return 0;
   if (key == NULL) return 0;
 
   // get a pointer to the bucket the key string hashes to
 
-  index = hash(key) % map->count_real;
+  index  = hash(key) % map->count_real;
   bucket = &(map->buckets[index]);
 
   // check if we can handle insertion by simply replacing
@@ -254,8 +252,8 @@ int mtmap_put(mtmap_t* map, const char* key, void* value)
 
   // get the last pair in the chain for the bucket
 
-  pair = &(bucket->pairs[bucket->count - 1]);
-  pair->key = mtmem_calloc((strlen(key) + 1) * sizeof(char), NULL);
+  pair        = &(bucket->pairs[bucket->count - 1]);
+  pair->key   = mtmem_calloc((strlen(key) + 1) * sizeof(char), NULL);
   pair->value = value;
 
   map->count += 1;
@@ -274,13 +272,13 @@ int mtmap_put(mtmap_t* map, const char* key, void* value)
 void* mtmap_get(mtmap_t* map, const char* key)
 {
   unsigned int index;
-  bucket_t* bucket;
-  pair_t* pair;
+  bucket_t*    bucket;
+  pair_t*      pair;
 
   if (map == NULL) return NULL;
   if (key == NULL) return NULL;
 
-  index = hash(key) % map->count_real;
+  index  = hash(key) % map->count_real;
   bucket = &(map->buckets[index]);
 
   pair = get_pair(bucket, key);
@@ -293,15 +291,15 @@ void* mtmap_get(mtmap_t* map, const char* key)
 void mtmap_del(mtmap_t* map, const char* key)
 {
   unsigned int index, found = 0;
-  bucket_t* bucket;
-  pair_t* pair;
+  bucket_t*    bucket;
+  pair_t*      pair;
 
-  index = hash(key) % map->count_real;
+  index  = hash(key) % map->count_real;
   bucket = &(map->buckets[index]);
 
   if (bucket->count > 0)
   {
-    pair = bucket->pairs;
+    pair  = bucket->pairs;
     index = 0;
     while (index < bucket->count)
     {
@@ -346,15 +344,15 @@ mtvec_t* mtmap_keys(mtmap_t* map)
   mtvec_t* result = mtvec_alloc();
 
   unsigned int index, bindex;
-  bucket_t* bucket;
-  pair_t* pair;
+  bucket_t*    bucket;
+  pair_t*      pair;
 
   if (map == NULL) return NULL;
   bucket = map->buckets;
-  index = 0;
+  index  = 0;
   while (index < map->count_real)
   {
-    pair = bucket->pairs;
+    pair   = bucket->pairs;
     bindex = 0;
     while (bindex < bucket->count)
     {
@@ -375,15 +373,15 @@ mtvec_t* mtmap_values(mtmap_t* map)
   mtvec_t* result = mtvec_alloc();
 
   unsigned int index, bindex;
-  bucket_t* bucket;
-  pair_t* pair;
+  bucket_t*    bucket;
+  pair_t*      pair;
 
   if (map == NULL) return NULL;
   bucket = map->buckets;
-  index = 0;
+  index  = 0;
   while (index < map->count_real)
   {
-    pair = bucket->pairs;
+    pair   = bucket->pairs;
     bindex = 0;
     while (bindex < bucket->count)
     {

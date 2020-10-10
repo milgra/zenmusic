@@ -19,21 +19,21 @@ struct _line3_t
   v3_t v2;
 };
 
-v3_t v3_init(float x, float y, float z);
-v3_t v3_add(v3_t a, v3_t b);
-v3_t v3_sub(v3_t a, v3_t b);
-v3_t v3_scale(v3_t a, float f);
-v3_t v3_cross(v3_t left, v3_t right);
-v3_t v3_normalize(v3_t matrix);
-v3_t v3_rotatearoundx(v3_t vector, float the_angle);
-v3_t v3_rotatearoundy(v3_t vector, float the_angle);
-v3_t v3_rotatearoundz(v3_t vector, float the_angle);
-v3_t v3_getxyunitrotation(v3_t vx, v3_t vy);
-v3_t v3_intersectwithplane(v3_t linev1, v3_t linev2, v3_t planev, v3_t planen);
+v3_t  v3_init(float x, float y, float z);
+v3_t  v3_add(v3_t a, v3_t b);
+v3_t  v3_sub(v3_t a, v3_t b);
+v3_t  v3_scale(v3_t a, float f);
+v3_t  v3_cross(v3_t left, v3_t right);
+v3_t  v3_normalize(v3_t matrix);
+v3_t  v3_rotatearoundx(v3_t vector, float the_angle);
+v3_t  v3_rotatearoundy(v3_t vector, float the_angle);
+v3_t  v3_rotatearoundz(v3_t vector, float the_angle);
+v3_t  v3_getxyunitrotation(v3_t vx, v3_t vy);
+v3_t  v3_intersectwithplane(v3_t linev1, v3_t linev2, v3_t planev, v3_t planen);
 float v3_dot(v3_t a, v3_t b);
 float v3_angle(v3_t a, v3_t b);
 float v3_length(v3_t a);
-void v3_toarray(v3_t* vector, float* result);
+void  v3_toarray(v3_t* vector, float* result);
 float v3_distance(v3_t vectorA, v3_t vectorB);
 
 typedef struct _m3_t m3_t;
@@ -172,7 +172,7 @@ v3_t v3_rotatearoundx(v3_t vector, float the_angle)
   float epsilon = 0.00001;
   if (fabs(vector.y) > epsilon || fabs(vector.z) > epsilon)
   {
-    float angle = atan2(vector.z, vector.y);
+    float angle  = atan2(vector.z, vector.y);
     float length = sqrtf(vector.y * vector.y + vector.z * vector.z);
 
     vector.z = sin(angle + the_angle) * length;
@@ -188,7 +188,7 @@ v3_t v3_rotatearoundy(v3_t vector, float the_angle)
   float epsilon = 0.00001;
   if (fabs(vector.x) > epsilon || fabs(vector.z) > epsilon)
   {
-    float angle = atan2(vector.z, vector.x);
+    float angle  = atan2(vector.z, vector.x);
     float length = sqrtf(vector.x * vector.x + vector.z * vector.z);
 
     vector.z = sin(angle + the_angle) * length;
@@ -204,7 +204,7 @@ v3_t v3_rotatearoundz(v3_t vector, float the_angle)
   float epsilon = 0.00001;
   if (fabs(vector.y) > epsilon || fabs(vector.x) > epsilon)
   {
-    float angle = atan2(vector.y, vector.x);
+    float angle  = atan2(vector.y, vector.x);
     float length = sqrtf(vector.x * vector.x + vector.y * vector.y);
 
     vector.y = sin(angle + the_angle) * length;
@@ -274,13 +274,13 @@ v3_t v3_getxyunitrotation(v3_t vx, v3_t vy)
 
 v3_t v3_intersectwithplane(v3_t linev1, v3_t linev2, v3_t planev, v3_t planen)
 {
-  v3_t u, w, scale, result;
+  v3_t  u, w, scale, result;
   float div;
 
-  u = v3_sub(linev2, linev1);
-  w = v3_sub(planev, linev1);
-  div = v3_dot(planen, w) / v3_dot(planen, u);
-  scale = v3_scale(u, div);
+  u      = v3_sub(linev2, linev1);
+  w      = v3_sub(planev, linev1);
+  div    = v3_dot(planen, w) / v3_dot(planen, u);
+  scale  = v3_scale(u, div);
   result = v3_add(linev1, scale);
 
   return result;
@@ -366,7 +366,7 @@ m3_t m3_defaulttranslation(float x, float y)
 {
   m3_t result;
 
-  result = m3_defaultidentity();
+  result     = m3_defaultidentity();
   result.m02 = x;
   result.m12 = y;
 
@@ -379,7 +379,7 @@ m3_t m3_defaultrotationx(float rad)
 {
   m3_t result;
 
-  result = m3_defaultidentity();
+  result     = m3_defaultidentity();
   result.m11 = cosf(rad);
   result.m12 = -sinf(rad);
   result.m21 = sinf(rad);
@@ -394,7 +394,7 @@ m3_t m3_defaultrotationy(float rad)
 {
   m3_t result;
 
-  result = m3_defaultidentity();
+  result     = m3_defaultidentity();
   result.m00 = cosf(rad);
   result.m02 = sinf(rad);
   result.m20 = -sinf(rad);
@@ -409,7 +409,7 @@ m3_t m3_defaultrotationz(float rad)
 {
   m3_t result;
 
-  result = m3_defaultidentity();
+  result     = m3_defaultidentity();
   result.m00 = cosf(rad);
   result.m01 = sinf(rad);
   result.m10 = -sinf(rad);
@@ -444,7 +444,7 @@ m3_t m3_multiply(m3_t a, m3_t b)
 m3_t m3_invert(m3_t source, char* success)
 {
   float determinant;
-  m3_t inverse;
+  m3_t  inverse;
 
   inverse.m00 = source.m11 * source.m22 - source.m12 * source.m21;
 
@@ -566,8 +566,8 @@ transformation_alloc()
 {
   transformation_t result;
   result.translation = v3_init(0.0, 0.0, 0.0);
-  result.rotation = v3_init(0.0, 0.0, 0.0);
-  result.scale = v3_init(1.0, 1.0, 1.0);
+  result.rotation    = v3_init(0.0, 0.0, 0.0);
+  result.scale       = v3_init(1.0, 1.0, 1.0);
 
   return result;
 }

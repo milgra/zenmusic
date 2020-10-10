@@ -35,16 +35,16 @@ struct mtmem_head
   size_t retaincount;
 };
 
-void* mtmem_alloc(size_t size, void (*destructor)(void*));
-void* mtmem_calloc(size_t size, void (*destructor)(void*));
-void* mtmem_realloc(void* pointer, size_t size);
-void* mtmem_retain(void* pointer);
-char mtmem_release(void* pointer);
-char mtmem_releaseeach(void* first, ...);
-void mtmem_track(void* pointer, uint8_t force);
+void*  mtmem_alloc(size_t size, void (*destructor)(void*));
+void*  mtmem_calloc(size_t size, void (*destructor)(void*));
+void*  mtmem_realloc(void* pointer, size_t size);
+void*  mtmem_retain(void* pointer);
+char   mtmem_release(void* pointer);
+char   mtmem_releaseeach(void* first, ...);
+void   mtmem_track(void* pointer, uint8_t force);
 size_t mtmem_retaincount(void* pointer);
-void mtmem_replace(void** address, void* data);
-void* mtmem_stack_to_heap(size_t size, void (*destructor)(void*), unsigned char* data);
+void   mtmem_replace(void** address, void* data);
+void*  mtmem_stack_to_heap(size_t size, void (*destructor)(void*), unsigned char* data);
 
 #endif
 
@@ -66,7 +66,7 @@ void* mtmem_alloc(size_t size, void (*destructor)(void*))
 
   struct mtmem_head* head = (struct mtmem_head*)bytes;
 
-  head->destructor = destructor;
+  head->destructor  = destructor;
   head->retaincount = 1;
 
   return bytes + sizeof(struct mtmem_head);
@@ -91,7 +91,7 @@ void* mtmem_calloc(size_t size, void (*destructor)(void*))
 
   struct mtmem_head* head = (struct mtmem_head*)bytes;
 
-  head->destructor = destructor;
+  head->destructor  = destructor;
   head->retaincount = 1;
 
   return bytes + sizeof(struct mtmem_head);
@@ -174,8 +174,8 @@ char mtmem_release(void* pointer)
 char mtmem_releaseeach(void* first, ...)
 {
   va_list ap;
-  void* actual;
-  char released = 1;
+  void*   actual;
+  char    released = 1;
   va_start(ap, first);
   for (actual = first; actual != NULL; actual = va_arg(ap, void*))
   {

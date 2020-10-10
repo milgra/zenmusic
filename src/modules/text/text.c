@@ -2,7 +2,7 @@
 #ifndef text_h
 #define text_h
 
-#include "math2.c"
+#include "mtmath2.c"
 
 #define kTextAlignLeft 0
 #define kTextAlignCenter 1
@@ -74,7 +74,7 @@ typedef struct _textselection_t
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtstr.c"
+#include "mtstring.c"
 
 /* init glyph metrics */
 

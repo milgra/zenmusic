@@ -21,9 +21,9 @@ void ui_connector_del(view_t* view);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtch.c"
+#include "mtchannel.c"
 #include "mtmap.c"
-#include "mtvec.c"
+#include "mtvector.c"
 #include "ui_compositor.c"
 #include "view.c"
 #include <pthread.h>

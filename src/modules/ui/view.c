@@ -1,10 +1,10 @@
 #ifndef view_h
 #define view_h
 
-#include "math2.c"
-#include "math4.c"
-#include "mtbm.c"
-#include "mtvec.c"
+#include "mtbitmap.c"
+#include "mtmath2.c"
+#include "mtmath4.c"
+#include "mtvector.c"
 #include "wm_event.c"
 
 typedef struct _view_t
@@ -37,9 +37,8 @@ void    view_setbmp(view_t* view, bm_t* bmp);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "common.c"
-#include "mtbm.c"
-#include "mtcstr.c"
-#include "mtmem.c"
+#include "mtcstring.c"
+#include "mtmemory.c"
 #include "text.c"
 
 void view_del(void* pointer)

@@ -1,44 +1,39 @@
 #ifndef __KineticUI__tm__
 #define __KineticUI__tm__
 
-#include "mttm.c"
-#include "math4.c"
-#include "mtbm.c"
+#include "mtbitmap.c"
 #include "mtmap.c"
+#include "mtmath4.c"
 
 typedef struct _tm_t tm_t;
 struct _tm_t
 {
-  bm_t* bm;
+  bm_t*    bm;
   mtmap_t* coords;
-  int cx; // cursor x
-  int cy; // cursor y
-  int ch; // cursor height
-  char is_full;
-  char did_change;
+  int      cx; // cursor x
+  int      cy; // cursor y
+  int      ch; // cursor height
+  char     is_full;
+  char     did_change;
 };
 
 tm_t* tm_new();
-void tm_del(tm_t* tm);
-void tm_reset(tm_t* tm);
-v4_t tm_get(tm_t* tm, char* id);
-char tm_put(tm_t* tm, char* id, bm_t* bm);
-void tm_upd(tm_t* tm, char* id, bm_t* bm);
+void  tm_del(tm_t* tm);
+void  tm_reset(tm_t* tm);
+v4_t  tm_get(tm_t* tm, char* id);
+char  tm_put(tm_t* tm, char* id, bm_t* bm);
+void  tm_upd(tm_t* tm, char* id, bm_t* bm);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "math4.c"
-#include "mtbm.c"
-#include "mtmap.c"
-#include "mtmem.c"
-#include "mttm.c"
+#include "mtmemory.c"
 
 tm_t* tm_new()
 {
-  tm_t* tm = mtmem_calloc(sizeof(tm_t), NULL);
-  tm->bm = bm_new(1024, 1024);
+  tm_t* tm   = mtmem_calloc(sizeof(tm_t), NULL);
+  tm->bm     = bm_new(1024, 1024);
   tm->coords = mtmap_alloc();
 
   return tm;
@@ -54,10 +49,10 @@ void tm_reset(tm_t* tm)
 {
   mtmap_reset(tm->coords);
   bm_reset(tm->bm);
-  tm->cx = 0;
-  tm->cy = 0;
-  tm->ch = 0;
-  tm->is_full = 0;
+  tm->cx         = 0;
+  tm->cy         = 0;
+  tm->ch         = 0;
+  tm->is_full    = 0;
   tm->did_change = 0;
 }
 
@@ -128,8 +123,8 @@ void tm_upd(tm_t* tm, char* id, bm_t* bm)
   if (coords)
   {
     v4_t c = *coords;
-    int w = c.z - c.x;
-    int h = c.w - c.y;
+    int  w = c.z - c.x;
+    int  h = c.w - c.y;
 
     if (bm->w == w && bm->h == h)
     {

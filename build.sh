@@ -9,7 +9,7 @@ clang \
     -I/usr/local/include/GL \
     -I/usr/local/include/SDL2 \
     -Isrc \
-    -Isrc/lib \
+    -Isrc/mtlib \
     -Isrc/views \
     -Isrc/modules \
     -Isrc/modules/gl \
@@ -25,18 +25,18 @@ clang \
     src/modules/wm/wm_connector.c \
     src/modules/text/font.c \
     src/modules/text/text.c \
-    src/lib/mtbm.c \
-    src/lib/mttm.c \
-    src/lib/mtch.c \
-    src/lib/mtfb.c \
-    src/lib/mtmap.c \
-    src/lib/math2.c \
-    src/lib/math3.c \
-    src/lib/math4.c \
-    src/lib/mtmem.c \
-    src/lib/mtvec.c \
-    src/lib/mtstr.c \
-    src/lib/mtcstr.c \
+    src/mtlib/mtbitmap.c \
+    src/mtlib/mttexmap.c \
+    src/mtlib/mtchannel.c \
+    src/mtlib/mtfltbuf.c \
+    src/mtlib/mtmap.c \
+    src/mtlib/mtmath2.c \
+    src/mtlib/mtmath3.c \
+    src/mtlib/mtmath4.c \
+    src/mtlib/mtmemory.c \
+    src/mtlib/mtvector.c \
+    src/mtlib/mtstring.c \
+    src/mtlib/mtcstring.c \
     src/zenmusic.c \
     src/common.c \
     -o bin/zenmusic

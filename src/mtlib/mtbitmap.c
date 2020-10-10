@@ -19,16 +19,16 @@ bm_t* bm_new(int the_w, int the_h);
 bm_t* bm_new_from_bm(bm_t* bm);
 bm_t* bm_new_from_grayscale(int the_w, int the_h, uint32_t backcolor, uint32_t fontcolor, unsigned char* bm);
 bm_t* bm_fill(bm_t* bm, int the_sx, int the_sy, int the_ex, int the_ey, uint32_t color);
-void bm_del(void* bm);
-void bm_reset(bm_t* bm);
-void bm_insert(bm_t* the_base, bm_t* bm, int the_x, int the_y);
-void bm_insert_blend(bm_t* the_base, bm_t* bm, int the_x, int the_y);
+void  bm_del(void* bm);
+void  bm_reset(bm_t* bm);
+void  bm_insert(bm_t* the_base, bm_t* bm, int the_x, int the_y);
+void  bm_insert_blend(bm_t* the_base, bm_t* bm, int the_x, int the_y);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtmem.c"
+#include "mtmemory.c"
 #include <string.h>
 
 bm_t* bm_new(int the_w, int the_h)
@@ -62,10 +62,10 @@ bm_t* bm_new_from_bm(bm_t* the_bm)
   return bm;
 }
 
-bm_t* bm_new_from_grayscale(int the_w,
-                            int the_h,
-                            uint32_t bc, // background
-                            uint32_t fc, // frontcolor
+bm_t* bm_new_from_grayscale(int            the_w,
+                            int            the_h,
+                            uint32_t       bc, // background
+                            uint32_t       fc, // frontcolor
                             unsigned char* bm)
 {
   if (the_w == 0 || the_h == 0) return NULL;
@@ -84,8 +84,8 @@ bm_t* bm_new_from_grayscale(int the_w,
 
   for (int i = 0; i < the_w * the_h; i++)
   {
-    float ratio = (float)bm[i] / 255.0;
-    nbm->data[i * 4] = (int)(fr * ratio + br * (1.0 - ratio));
+    float ratio          = (float)bm[i] / 255.0;
+    nbm->data[i * 4]     = (int)(fr * ratio + br * (1.0 - ratio));
     nbm->data[i * 4 + 1] = (int)(fg * ratio + bg * (1.0 - ratio));
     nbm->data[i * 4 + 2] = (int)(fb * ratio + bb * (1.0 - ratio));
     nbm->data[i * 4 + 3] = (int)(fa * ratio + ba * (1.0 - ratio));
@@ -94,11 +94,11 @@ bm_t* bm_new_from_grayscale(int the_w,
   return nbm;
 }
 
-bm_t* bm_fill(bm_t* bm,
-              int sx,
-              int sy,
-              int ex,
-              int ey,
+bm_t* bm_fill(bm_t*    bm,
+              int      sx,
+              int      sy,
+              int      ex,
+              int      ey,
               uint32_t color)
 {
   if (ex < sx) return bm;
@@ -119,7 +119,7 @@ bm_t* bm_fill(bm_t* bm,
     {
       int p = (y * bm->w + x) * 4; // position
 
-      bm->data[p] = r;
+      bm->data[p]     = r;
       bm->data[p + 1] = g;
       bm->data[p + 2] = b;
       bm->data[p + 3] = a;
@@ -183,7 +183,7 @@ void bm_insert_blend(bm_t* base, bm_t* src, int sx, int sy)
       float outG = (srcG * srcA + dstG * dstA * (1 - srcA)) / outA;
       float outB = (srcB * srcA + dstB * dstA * (1 - srcA)) / outA;
 
-      bdata[bi] = (int)(outR * 255.0);
+      bdata[bi]     = (int)(outR * 255.0);
       bdata[bi + 1] = (int)(outG * 255.0);
       bdata[bi + 2] = (int)(outB * 255.0);
       bdata[bi + 3] = (int)(outA * 255.0);

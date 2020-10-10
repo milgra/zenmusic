@@ -7,18 +7,18 @@
 #include <stdint.h>
 #include <stdio.h>
 
-char* mtcstr_fromformat(char* format, ...);
-char* mtcstr_fromcstring(char* string);
-char* mtcstr_fromfile(char* path);
+char*    mtcstr_fromformat(char* format, ...);
+char*    mtcstr_fromcstring(char* string);
+char*    mtcstr_fromfile(char* path);
 uint32_t mtcstr_color_from_cstring(char* string);
-char* mtcstr_generate_readablec(uint32_t length);
-char* mtcstr_generate_alphanumeric(uint32_t length);
+char*    mtcstr_generate_readablec(uint32_t length);
+char*    mtcstr_generate_alphanumeric(uint32_t length);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtmem.c"
+#include "mtmemory.c"
 #include <string.h>
 
 static char hexa[] =
@@ -52,8 +52,8 @@ uint32_t mtcstr_color_from_cstring(char* string)
 char* mtcstr_fromformat(char* format, ...)
 {
   va_list ap;
-  char* text;
-  size_t length = strlen(format);
+  char*   text;
+  size_t  length = strlen(format);
 
   va_start(ap, format);
   for (text = format; text != NULL; text = va_arg(ap, char*))
@@ -88,7 +88,7 @@ char* mtcstr_fromfile(char* path)
 {
 
   char* buffer = NULL;
-  int string_size, read_size;
+  int   string_size, read_size;
   FILE* handler = fopen(path, "r");
 
   if (handler)
@@ -127,7 +127,7 @@ char* mtcstr_fromfile(char* path)
 
 /* generates readable string */
 
-char* vowels = "aeiou";
+char* vowels     = "aeiou";
 char* consonants = "bcdefghijklmnpqrstvwxyz";
 
 char* mtcstr_generate_readablec(uint32_t length)
