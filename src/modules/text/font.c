@@ -34,7 +34,6 @@ int font_lineheight(font_t* the_font, float textsize);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "mtcstring.c"
-#include "mtfltbuf.c"
 #include "mtmemory.c"
 #include <math.h>
 #include <stdio.h>

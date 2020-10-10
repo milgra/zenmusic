@@ -34,8 +34,8 @@ void     crect_set_tex(crect_t* rect, float tx, float ty, float tz, float tw);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "gl_connector.c"
+#include "gl_floatbuffer.c"
 #include "mtcstring.c"
-#include "mtfltbuf.c"
 #include "mtmap.c"
 #include "mtmath4.c"
 #include "mttexmap.c"

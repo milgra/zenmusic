@@ -20,50 +20,32 @@ struct _segment2_t
   v2_t basis;
 };
 
-v2_t  v2_init(float x, float y);
-v2_t  v2_add(v2_t a, v2_t b);
-v2_t  v2_sub(v2_t a, v2_t b);
-v2_t  v2_scale(v2_t vector, float ratio);
-v2_t  v2_resize(v2_t a, float size);
-v2_t  v2_rotate(v2_t vector, float newangle);
-v2_t  v2_rotate_90_left(v2_t vector);
-v2_t  v2_rotate_90_right(v2_t vector);
-v2_t  v2_mirror(v2_t axis, v2_t vector);
-v2_t  v2_midpoints(v2_t pointa, v2_t pointb);
-float v2_length(v2_t a);
-float v2_angle_x(v2_t a);
-float v2_circular_angle_between(v2_t a, v2_t b);
-char  v2_equals(v2_t a, v2_t b);
-void  v2_describe(v2_t vector);
-float v2_longside(v2_t a);
-v2_t  v2_intersect_lines(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb);
-char  v2_point_inside_vector(v2_t transa, v2_t basisa, v2_t point);
-v2_t  v2_intersect_vectors(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb);
-char  v2_box_intersect(v2_t  basisa,
-                       v2_t  transa,
-                       v2_t  basisb,
-                       v2_t  transb,
-                       float extra_distance);
-float v2_endpoint_proximity(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb);
-v2_t  v2_intersect_with_proximity(v2_t  trans_a,
-                                  v2_t  basis_a,
-                                  v2_t  trans_b,
-                                  v2_t  basis_b,
-                                  float proximity);
-v2_t  v2_intersect_with_nearby(v2_t  trans_a,
-                               v2_t  basis_a,
-                               v2_t  trans_b,
-                               v2_t  basis_b,
-                               float proximity);
-v2_t  v2_triangle_with_bases(v2_t   point_a,
-                             v2_t   point_b,
-                             float  segmentlength,
-                             int8_t direction);
-segment2_t
-v2_collide_and_fragment(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb);
-
-segment2_t
-segment2_init(v2_t trans, v2_t basis);
+v2_t       v2_init(float x, float y);
+v2_t       v2_add(v2_t a, v2_t b);
+v2_t       v2_sub(v2_t a, v2_t b);
+v2_t       v2_scale(v2_t vector, float ratio);
+v2_t       v2_resize(v2_t a, float size);
+v2_t       v2_rotate(v2_t vector, float newangle);
+v2_t       v2_rotate_90_left(v2_t vector);
+v2_t       v2_rotate_90_right(v2_t vector);
+v2_t       v2_mirror(v2_t axis, v2_t vector);
+v2_t       v2_midpoints(v2_t pointa, v2_t pointb);
+float      v2_length(v2_t a);
+float      v2_angle_x(v2_t a);
+float      v2_circular_angle_between(v2_t a, v2_t b);
+char       v2_equals(v2_t a, v2_t b);
+void       v2_describe(v2_t vector);
+float      v2_longside(v2_t a);
+v2_t       v2_intersect_lines(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb);
+char       v2_point_inside_vector(v2_t transa, v2_t basisa, v2_t point);
+v2_t       v2_intersect_vectors(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb);
+char       v2_box_intersect(v2_t basisa, v2_t transa, v2_t basisb, v2_t transb, float extra_distance);
+float      v2_endpoint_proximity(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb);
+v2_t       v2_intersect_with_proximity(v2_t trans_a, v2_t basis_a, v2_t trans_b, v2_t basis_b, float proximity);
+v2_t       v2_intersect_with_nearby(v2_t trans_a, v2_t basis_a, v2_t trans_b, v2_t basis_b, float proximity);
+v2_t       v2_triangle_with_bases(v2_t point_a, v2_t point_b, float segmentlength, int8_t direction);
+segment2_t v2_collide_and_fragment(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb);
+segment2_t segment2_init(v2_t trans, v2_t basis);
 
 #define kSquareOverlappingNone 0
 #define kSquareOverlappingInside 1
@@ -76,14 +58,9 @@ struct square2_t
   v2_t extent;
 };
 
-square2_t
-square_alloc(v2_t origo, v2_t extent);
-
-square2_t
-square_intersect(square2_t squarea, square2_t squareb);
-
-uint8_t
-square_checkoverlapping(square2_t squarea, square2_t squareb);
+square2_t square_alloc(v2_t origo, v2_t extent);
+square2_t square_intersect(square2_t squarea, square2_t squareb);
+uint8_t   square_checkoverlapping(square2_t squarea, square2_t squareb);
 
 #endif
 

@@ -17,6 +17,7 @@ clang \
     -Isrc/modules/wm \
     -Isrc/modules/text \
     src/modules/gl/gl_connector.c \
+    src/modules/gl/gl_floatbuffer.c \
     src/modules/ui/ui_manager.c \
     src/modules/ui/view.c \
     src/modules/ui_connector.c \
@@ -28,7 +29,6 @@ clang \
     src/mtlib/mtbitmap.c \
     src/mtlib/mttexmap.c \
     src/mtlib/mtchannel.c \
-    src/mtlib/mtfltbuf.c \
     src/mtlib/mtmap.c \
     src/mtlib/mtmath2.c \
     src/mtlib/mtmath3.c \

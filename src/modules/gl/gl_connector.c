@@ -20,8 +20,8 @@ void gl_render();
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "gl_floatbuffer.c"
 #include "mtbitmap.c"
-#include "mtfltbuf.c"
 #include "mtmath2.c"
 #include "mtmath4.c"
 #include <GL/glew.h>
