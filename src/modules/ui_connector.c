@@ -32,7 +32,7 @@ void ui_connector_del(view_t* view);
 
 mtmap_t*  uim;
 mtvec_t*  uiv;
-ch_t*     uich;
+mtch_t*   uich;
 pthread_t uibgth;
 void*     ui_connector_workloop(void* mypointer);
 
@@ -42,7 +42,7 @@ int ui_connector_init(int width, int height)
 
   uim  = MNEW();
   uiv  = VNEW();
-  uich = ch_new(10);
+  uich = mtch_new(10);
 
   int success = pthread_create(&uibgth,
                                NULL,
@@ -71,7 +71,7 @@ void ui_connector_render()
     if (view->bmp_state == 0) // send unrendered views to renderer thread
     {
       view->bmp_state = 1; // pending
-      ch_send(uich, view);
+      mtch_send(uich, view);
     }
     if (view->bmp_state == 2) // add rendered views to compositor
     {
@@ -109,7 +109,7 @@ void* ui_connector_workloop()
 
   while (1)
   {
-    if ((view = ch_recv(uich)))
+    if ((view = mtch_recv(uich)))
     {
       printf("generating bmp for %s\n", view->id);
       view_tex(view);

@@ -1,4 +1,9 @@
-//  Created by Milan Toth milgra@milgra.com Public Domain
+/*  
+    Created by Milan Toth milgra@milgra.com Public Domain
+    One-way non-locking communication channel between threads
+    If mtch_send returns 0, channel is full, send data again later
+    If mtch_recv returns 0, channel is empty
+ */
 
 #ifndef mtch_h
 #define mtch_h
@@ -9,63 +14,63 @@
 #include <stdio.h>
 #include <time.h>
 
-typedef struct ch_t ch_t;
-struct ch_t
+typedef struct mtch_t mtch_t;
+struct mtch_t
 {
   char*  flags;
   void** boxes;
 
   uint32_t size;
-  uint32_t read_index;
-  uint32_t write_index;
+  uint32_t rpos; // read position
+  uint32_t wpos; // write position
 };
 
-ch_t* ch_new(uint32_t size);
-void  ch_del(void* pointer);
-char  ch_send(ch_t* boxes, void* data);
-void* ch_recv(ch_t* boxes);
-void  ch_test(void);
+mtch_t* mtch_new(uint32_t size);
+void    mtch_del(void* pointer);
+char    mtch_send(mtch_t* ch, void* data);
+void*   mtch_recv(mtch_t* ch);
+void    mtch_test(void);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-ch_t* ch_new(uint32_t size)
+mtch_t* mtch_new(uint32_t size)
 {
-  ch_t* boxes = mtmem_calloc(sizeof(ch_t), ch_del);
+  mtch_t* ch = mtmem_calloc(sizeof(mtch_t), mtch_del);
 
-  boxes->flags       = mtmem_calloc(sizeof(char) * size, NULL);
-  boxes->boxes       = mtmem_calloc(sizeof(void*) * size, NULL);
-  boxes->size        = size;
-  boxes->read_index  = 0;
-  boxes->write_index = 0;
+  ch->flags = mtmem_calloc(sizeof(char) * size, NULL);
+  ch->boxes = mtmem_calloc(sizeof(void*) * size, NULL);
+  ch->size  = size;
+  ch->rpos  = 0;
+  ch->wpos  = 0;
 
-  return boxes;
+  return ch;
 }
 
-void ch_del(void* pointer)
+void mtch_del(void* pointer)
 {
   assert(pointer != NULL);
 
-  ch_t* boxes = pointer;
+  mtch_t* ch = pointer;
 
-  mtmem_release(boxes->flags);
-  mtmem_release(boxes->boxes);
+  mtmem_release(ch->flags);
+  mtmem_release(ch->boxes);
 }
 
-char ch_send(ch_t* boxes, void* data)
+char mtch_send(mtch_t* ch, void* data)
 {
-  assert(boxes != NULL);
+  assert(ch != NULL);
   assert(data != NULL);
 
   // wait for the box to get empty
 
-  if (boxes->flags[boxes->write_index] == 0)
+  if (ch->flags[ch->wpos] == 0)
   {
-    boxes->boxes[boxes->write_index] = data;
-    boxes->flags[boxes->write_index] = 1; // set flag, it doesn't have to be atomic, only the last bit counts
-    boxes->write_index += 1;              // increment write index, doesn't have to be atomic, this thread uses it only
-    if (boxes->write_index == boxes->size) boxes->write_index = 0;
+    ch->boxes[ch->wpos] = data;
+    ch->flags[ch->wpos] = 1; // set flag, it doesn't have to be atomic, only the last bit counts
+    ch->wpos += 1;           // increment write index, doesn't have to be atomic, this thread uses it only
+    if (ch->wpos == ch->size) ch->wpos = 0;
 
     return 1;
   }
@@ -73,19 +78,19 @@ char ch_send(ch_t* boxes, void* data)
   return 0;
 }
 
-void* ch_recv(ch_t* boxes)
+void* mtch_recv(mtch_t* ch)
 {
-  assert(boxes != NULL);
+  assert(ch != NULL);
 
-  if (boxes->flags[boxes->read_index] == 1)
+  if (ch->flags[ch->rpos] == 1)
   {
-    void* result = boxes->boxes[boxes->read_index];
+    void* result = ch->boxes[ch->rpos];
 
-    boxes->boxes[boxes->read_index] = NULL; // empty box
-    boxes->flags[boxes->read_index] = 0;    // set flag, it doesn't have to be atomic, only the last bit counts
-    boxes->read_index += 1;                 // increment read index, it doesn't have to be atomic, this thread
+    ch->boxes[ch->rpos] = NULL; // empty box
+    ch->flags[ch->rpos] = 0;    // set flag, it doesn't have to be atomic, only the last bit counts
+    ch->rpos += 1;              // increment read index, it doesn't have to be atomic, this thread
 
-    if (boxes->read_index == boxes->size) boxes->read_index = 0;
+    if (ch->rpos == ch->size) ch->rpos = 0;
 
     return result;
   }
@@ -97,16 +102,16 @@ void* ch_recv(ch_t* boxes)
 //  TEST
 //
 
-#define kBoxesTestThreads 10
+#define kChTestThreads 10
 
-void send_test(ch_t* boxes)
+void send_test(mtch_t* ch)
 {
   uint32_t counter = 0;
   while (1)
   {
     uint32_t* number = mtmem_calloc(sizeof(uint32_t), NULL);
     *number          = counter;
-    char success     = ch_send(boxes, number);
+    char success     = mtch_send(ch, number);
     if (success == 0)
       mtmem_release(number);
     else
@@ -120,12 +125,12 @@ void send_test(ch_t* boxes)
   }
 }
 
-void recv_test(ch_t* boxes)
+void recv_test(mtch_t* ch)
 {
   uint32_t last = 0;
   while (1)
   {
-    uint32_t* number = ch_recv(boxes);
+    uint32_t* number = mtch_recv(ch);
     if (number != NULL)
     {
       if (*number != last)
@@ -135,7 +140,7 @@ void recv_test(ch_t* boxes)
       if (last == UINT32_MAX - 1)
         last = 0;
       if (last % 100000 == 0)
-        printf("%zx OK %u %u", (size_t)boxes, last, UINT32_MAX);
+        printf("%zx OK %u %u", (size_t)ch, last, UINT32_MAX);
       //                struct timespec time;
       //                time.tv_sec = 0;
       //                time.tv_nsec = rand() % 100000;
@@ -144,15 +149,15 @@ void recv_test(ch_t* boxes)
   }
 }
 
-ch_t** testarray;
+mtch_t** testarray;
 
-void ch_test()
+void mtch_test()
 {
-  testarray = mtmem_calloc(sizeof(ch_t) * kBoxesTestThreads, NULL);
+  testarray = mtmem_calloc(sizeof(mtch_t) * kChTestThreads, NULL);
 
-  for (int index = 0; index < kBoxesTestThreads; index++)
+  for (int index = 0; index < kChTestThreads; index++)
   {
-    testarray[index] = ch_new(100);
+    testarray[index] = mtch_new(100);
     pthread_t thread;
     pthread_create(&thread, NULL, (void*)send_test, testarray[index]);
     pthread_create(&thread, NULL, (void*)recv_test, testarray[index]);

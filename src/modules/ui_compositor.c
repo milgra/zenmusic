@@ -1,6 +1,6 @@
 /*
   UI Compositor Module for Zen Multimedia Desktop System
-  Places incoming bitmaps in texture maps, renders rects on demand.
+  Places incoming bitmaps in texture maps, points in floatbuffers, renders rects on demand.
 
   ui_compositor -> gl_connector -> GPU
 
