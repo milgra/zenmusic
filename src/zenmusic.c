@@ -1,5 +1,6 @@
 #include "common.c"
 #include "evthan_drag.c"
+#include "evthan_music_list.c"
 #include "font.c"
 #include "mtcstring.c"
 #include "mtmath4.c"
@@ -14,7 +15,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-view_t* viewA;
+view_t* song_list;
 view_t* viewB;
 
 void init(int width, int height)
@@ -30,10 +31,10 @@ void init(int width, int height)
 
   ui_manager_init(width, height);
 
-  viewA = view_new("viewa", (v4_t){20.0, 20.0, 150.0, 70.0}, evthan_drag, texgen_color, NULL);
-  viewB = view_new("viewb", (v4_t){200.0, 420.0, 350.0, 170.0}, NULL, texgen_text, NULL);
+  song_list = view_new("viewa", (v4_t){20.0, 20.0, 500.0, 600.0}, evthan_music_list, texgen_color, NULL);
+  viewB     = view_new("viewb", (v4_t){200.0, 420.0, 350.0, 170.0}, evthan_drag, texgen_text, NULL);
 
-  ui_manager_add(viewA);
+  ui_manager_add(song_list);
   ui_manager_add(viewB);
 }
 

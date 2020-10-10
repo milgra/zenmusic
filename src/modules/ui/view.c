@@ -9,19 +9,19 @@
 
 typedef struct _view_t
 {
-  char*    id;    // identifier for handling view
-  void*    data;  // data for event handler and bitmap generator
-  mtvec_t* views; // subviews
+  char*    id;    /* identifier for handling view */
+  void*    data;  /* data for event handler and bitmap generator */
+  mtvec_t* views; /* subviews */
 
-  v4_t frame;         // position and dimensions
-  char frame_changed; // frame changed
+  v4_t frame;         /* position and dimensions */
+  char frame_changed; /* frame changed */
 
-  bm_t* bmp;         // bitmap of view
-  char  bmp_changed; // bitmap changed
-  char  bmp_state;   // 0 - blank , 1 - pending , 2 - ready to render, 3 - added to compositor
+  bm_t* bmp;         /* bitmap of view */
+  char  bmp_changed; /* bitmap changed */
+  char  bmp_state;   /* 0 - blank , 1 - pending , 2 - ready to render, 3 - added to compositor */
 
-  void (*evt)(struct _view_t*, ev_t); // event handler for view
-  void (*tex)(struct _view_t*);       // texture generator for view
+  void (*evt)(struct _view_t*, ev_t); /* event handler for view */
+  void (*tex)(struct _view_t*);       /* texture generator for view */
 
 } view_t;
 

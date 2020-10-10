@@ -9,6 +9,7 @@ clang \
     -I/usr/local/include/GL \
     -I/usr/local/include/SDL2 \
     -Isrc \
+    -Isrc/ui \
     -Isrc/mtlib \
     -Isrc/views \
     -Isrc/modules \
@@ -40,6 +41,7 @@ clang \
     src/mtlib/mtvector.c \
     src/mtlib/mtstring.c \
     src/mtlib/mtcstring.c \
+    src/ui/evthan_music_list.c \
     src/zenmusic.c \
     src/common.c \
     -o bin/zenmusic

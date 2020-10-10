@@ -18,8 +18,8 @@ void ui_manager_render();
 #include "mtvector.c"
 #include "ui_connector.c"
 
-mtmap_t* viewm; // view map
-mtvec_t* viewv; // view vector
+mtmap_t* viewm; /* view map */
+mtvec_t* viewv; /* view vector */
 
 void ui_manager_init(int width, int height)
 {
