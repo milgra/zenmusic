@@ -31,7 +31,7 @@ void init(int width, int height)
 
   ui_manager_init(width, height);
 
-  song_list = view_new("viewa", (v4_t){20.0, 20.0, 500.0, 600.0}, evthan_music_list, texgen_color, NULL);
+  song_list = view_new("song_list", (v4_t){20.0, 20.0, 500.0, 600.0}, evthan_music_list, texgen_color, NULL);
   viewB     = view_new("viewb", (v4_t){200.0, 420.0, 350.0, 170.0}, evthan_drag, texgen_text, NULL);
 
   ui_manager_add(song_list);

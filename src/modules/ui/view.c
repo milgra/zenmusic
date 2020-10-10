@@ -13,6 +13,8 @@ typedef struct _view_t
   void*    data;  /* data for event handler and bitmap generator */
   mtvec_t* views; /* subviews */
 
+  char attached;
+
   v4_t frame;         /* position and dimensions */
   char frame_changed; /* frame changed */
 
@@ -31,6 +33,10 @@ void    view_evt(view_t* view, ev_t ev);
 void    view_setpos(view_t* view, v2_t pos);
 void    view_setdim(view_t* view, v2_t dim);
 void    view_setbmp(view_t* view, bm_t* bmp);
+void    view_add(view_t* view, view_t* subview);
+void    view_rem(view_t* view, view_t* subview);
+
+extern char view_needs_resend;
 
 #endif
 
@@ -40,6 +46,8 @@ void    view_setbmp(view_t* view, bm_t* bmp);
 #include "mtcstring.c"
 #include "mtmemory.c"
 #include "text.c"
+
+char view_needs_resend = 1;
 
 void view_del(void* pointer)
 {
@@ -92,6 +100,18 @@ void view_setbmp(view_t* view, bm_t* bmp)
   RPL(view->bmp, bmp);
   view->bmp_state   = 2;
   view->bmp_changed = 1;
+}
+
+void view_add(view_t* view, view_t* subview)
+{
+  VADD(view->views, subview);
+  view_needs_resend = 1;
+}
+
+void view_rem(view_t* view, view_t* subview)
+{
+  VREM(view->views, subview);
+  view_needs_resend = 1;
 }
 
 #endif

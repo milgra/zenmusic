@@ -1,3 +1,9 @@
+/*
+  UI Manager Module for Zen Multimedia Desktop System
+  Collects root windows, dispatches events to them, readds them to UI Connector is view chain is changed.
+  
+ */
+
 #ifndef ui_manager_h
 #define ui_manager_h
 
@@ -32,7 +38,7 @@ void ui_manager_init(int width, int height)
 void ui_manager_event(ev_t ev)
 {
   view_t* view;
-  if ((view = VNXT(viewv)))
+  while ((view = VNXT(viewv)))
   {
     view_evt(view, ev);
   }
@@ -40,18 +46,36 @@ void ui_manager_event(ev_t ev)
 
 void ui_manager_add(view_t* view)
 {
-  ui_connector_add(view);
   VADD(viewv, view);
 }
 
 void ui_manager_rem(view_t* view)
 {
-  ui_connector_rem(view);
   VREM(viewv, view);
+}
+
+void ui_manager_add_recursively(view_t* view)
+{
+  ui_connector_add(view);
+  view_t* v;
+  while ((v = VNXT(view->views)))
+  {
+    ui_manager_add_recursively(v);
+  }
 }
 
 void ui_manager_render()
 {
+  if (view_needs_resend)
+  {
+    ui_connector_reset();
+    view_t* v;
+    while ((v = VNXT(viewv)))
+    {
+      ui_manager_add_recursively(v);
+    }
+    view_needs_resend = 0;
+  }
   ui_connector_render();
 }
 

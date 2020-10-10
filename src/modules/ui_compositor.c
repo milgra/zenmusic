@@ -28,6 +28,7 @@ void     crect_del(void* rect);
 void     crect_desc(crect_t* rect);
 void     crect_set_dim(crect_t* rect, float x, float y, float w, float h);
 void     crect_set_tex(crect_t* rect, float tx, float ty, float tz, float tw);
+void     ui_compositor_reset();
 
 #endif
 
@@ -54,6 +55,14 @@ void ui_compositor_init(int width, int height)
   tm    = tm_new();
   rectv = VNEW();
   rectm = MNEW();
+}
+
+void ui_compositor_reset()
+{
+  fb_reset(fb);
+  tm_reset(tm);
+  mtvec_reset(rectv);
+  mtmap_reset(rectm);
 }
 
 void ui_compositor_render()

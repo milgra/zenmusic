@@ -13,6 +13,7 @@
 #include "view.c"
 
 int  ui_connector_init(int, int);
+void ui_connector_reset();
 void ui_connector_render();
 void ui_connector_add(view_t* view);
 void ui_connector_rem(view_t* view);
@@ -52,14 +53,24 @@ int ui_connector_init(int width, int height)
   return success;
 }
 
+void ui_connector_reset()
+{
+  ui_compositor_reset();
+  mtvec_reset(uiv);
+  mtmap_reset(uim);
+}
+
 void ui_connector_add(view_t* view)
 {
+  printf("add %s\n", view->id);
   VADD(uiv, view);
+  view->attached = 1;
 }
 
 void ui_connector_rem(view_t* view)
 {
   VREM(uiv, view);
+  view->attached = 0;
 }
 
 void ui_connector_render()
@@ -68,14 +79,14 @@ void ui_connector_render()
 
   while ((view = VNXT(uiv)))
   {
-    if (view->bmp_state == 0) // send unrendered views to renderer thread
+    if (view->bmp_state == 0) /* send unrendered views to renderer thread */
     {
-      view->bmp_state = 1; // pending
+      view->bmp_state = 1; /* pending */
       mtch_send(uich, view);
     }
-    if (view->bmp_state == 2) // add rendered views to compositor
+    if (view->bmp_state == 2) /* add rendered views to compositor */
     {
-      view->bmp_state   = 3; // added to compositor
+      view->bmp_state   = 3; /* added to compositor */
       view->bmp_changed = 0;
       ui_compositor_add(view->id,
                         view->frame.x,
@@ -84,12 +95,12 @@ void ui_connector_render()
                         view->frame.w,
                         view->bmp);
     }
-    if (view->frame_changed) // update dimension if needed
+    if (view->frame_changed) /* update dimension if needed */
     {
       ui_compositor_upd(view->id, view->frame.x, view->frame.y, view->frame.z, view->frame.w, NULL);
       view->frame_changed = 0;
     }
-    if (view->bmp_changed) // update bitmap if needed
+    if (view->bmp_changed) /* update bitmap if needed */
     {
       ui_compositor_upd(view->id, view->frame.x, view->frame.y, view->frame.z, view->frame.w, view->bmp);
       view->bmp_changed = 0;
