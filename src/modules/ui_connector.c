@@ -15,7 +15,7 @@
 int  ui_connector_init(int, int);
 void ui_connector_render();
 void ui_connector_add(view_t* view);
-void ui_connector_del(view_t* view);
+void ui_connector_rem(view_t* view);
 
 #endif
 
@@ -57,7 +57,7 @@ void ui_connector_add(view_t* view)
   VADD(uiv, view);
 }
 
-void ui_connector_del(view_t* view)
+void ui_connector_rem(view_t* view)
 {
   VREM(uiv, view);
 }

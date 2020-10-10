@@ -65,12 +65,12 @@ view_t* view_new(char* id, v4_t frame, void (*pevt)(struct _view_t*, ev_t), void
 
 void view_evt(view_t* view, ev_t ev)
 {
-  (*view->evt)(view, ev);
+  if (*view->evt) (*view->evt)(view, ev);
 }
 
 void view_tex(view_t* view)
 {
-  (*view->tex)(view);
+  if (*view->tex) (*view->tex)(view);
 }
 
 void view_setpos(view_t* view, v2_t pos)
