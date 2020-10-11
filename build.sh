@@ -4,11 +4,11 @@ clang \
     -lGL \
     -lGLEW \
     -lSDL2 \
-    -lpthread \
+    -lavutil \
     -I/usr/local/include \
     -I/usr/local/include/GL \
     -I/usr/local/include/SDL2 \
-    -I/usr/local/include/libavutil \
+    -I/usr/local/include \
     -Isrc \
     -Isrc/ui \
     -Isrc/mtlib \
@@ -43,6 +43,7 @@ clang \
     src/mtlib/mtstring.c \
     src/mtlib/mtcstring.c \
     src/musiclist.c \
+    src/player.c \
     src/zenmusic.c \
     src/common.c \
     -o bin/zenmusic

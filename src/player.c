@@ -16,6 +16,5 @@
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
-font_t* common_font;
 
 #endif
