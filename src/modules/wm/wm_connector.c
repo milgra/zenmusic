@@ -84,7 +84,7 @@ void wm_init(void (*init)(int, int),
 
         printf("SDL Scaling will be %f\n", scale);
 
-        if (SDL_GL_SetSwapInterval(0) < 0) printf("SDL swap interval error %s\n", SDL_GetError());
+        if (SDL_GL_SetSwapInterval(1) < 0) printf("SDL swap interval error %s\n", SDL_GetError());
 
         SDL_StartTextInput();
 
@@ -157,14 +157,11 @@ void wm_init(void (*init)(int, int),
             (*update)(ev);
           }
 
-          if (ev.time - lastticks > 16)
-          {
-            ev.type   = EV_TIME;
-            ev.dtime  = ev.time - lastticks;
-            lastticks = ev.time;
-            (*update)(ev);
-          }
+          ev.type   = EV_TIME;
+          ev.dtime  = ev.time - lastticks;
+          lastticks = ev.time;
 
+          (*update)(ev);
           (*render)();
           SDL_GL_SwapWindow(window);
         }

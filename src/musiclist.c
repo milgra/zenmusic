@@ -9,8 +9,8 @@ typedef struct _mlist_t
 {
   float    headpos;
   float    speed;
-  float    slowdown;
   uint32_t scroll;
+  uint32_t time_to_stop;
   mtvec_t* items;
 } mlist_t;
 
@@ -35,10 +35,9 @@ void musiclist_new(view_t* view, void* data)
 {
   printf("musiclist new\n");
 
-  mlist_t* mlist  = mtmem_alloc(sizeof(mlist_t), "musiclist", musiclist_del, NULL);
-  mlist->items    = VNEW();
-  mlist->headpos  = 0;
-  mlist->slowdown = 0.95;
+  mlist_t* mlist = mtmem_alloc(sizeof(mlist_t), "musiclist", musiclist_del, NULL);
+  mlist->items   = VNEW();
+  mlist->headpos = 0;
 
   view_setdata(view, mlist);
 
@@ -64,24 +63,40 @@ void musiclist_event(view_t* view, ev_t ev)
   if (ev.type == EV_TIME)
   {
     float ratio = (float)ev.dtime / 16.0;
-    list->headpos += list->speed;
-    list->speed *= list->slowdown;
-
-    view_t* sview;
-    while ((sview = VNXT(view->views)))
+    if (ev.time < list->time_to_stop)
     {
-      vframe_t frame = sview->frame;
-      frame.y += round(list->headpos);
-      view_setframe(sview, frame);
+      list->headpos += list->speed * ratio;
+      list->speed *= 0.95;
+
+      view_t* sview;
+      while ((sview = VNXT(view->views)))
+      {
+        vframe_t frame = sview->frame;
+        frame.y        = round(list->headpos);
+        view_setframe(sview, frame);
+      }
+
+      if (fabs(list->speed) < 0.4) list->speed = 0.0;
     }
+    else
+      list->speed = 0.0;
   }
   else if (ev.type == EV_SCROLL)
   {
-    uint32_t delta = ev.time - list->scroll;
-    list->scroll   = ev.time;
-    list->slowdown = delta < 10 ? 0.5 : 0.4;
-    float multi    = delta < 10 ? 2.0 : 8.0;
-    list->speed += ev.dy;
+    uint32_t delta    = ev.time - list->scroll;
+    int      mindelta = 30 - delta;
+    if (mindelta < 0) mindelta = 0;
+    list->scroll = ev.time;
+    list->speed += ev.dy * 2.0 * (float)mindelta / 30.0;
+
+    if (delta < 15)
+    {
+      list->time_to_stop = UINT32_MAX;
+    }
+    else
+    {
+      list->time_to_stop = ev.time + 100;
+    }
   }
   else if (ev.type == EV_MMOVE && ev.drag)
   {

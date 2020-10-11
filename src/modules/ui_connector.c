@@ -116,7 +116,7 @@ void* ui_connector_workloop()
   view_t*         view;
 
   ts.tv_sec  = 0;
-  ts.tv_nsec = 15000000;
+  ts.tv_nsec = 16000000;
 
   while (1)
   {
