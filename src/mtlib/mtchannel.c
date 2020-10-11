@@ -9,6 +9,7 @@
 #define mtch_h
 
 #include "mtmemory.c"
+#include <SDL.h>
 #include <assert.h>
 #include <pthread.h>
 #include <stdio.h>
@@ -159,8 +160,8 @@ void mtch_test()
   {
     testarray[index] = mtch_new(100);
     pthread_t thread;
-    pthread_create(&thread, NULL, (void*)send_test, testarray[index]);
-    pthread_create(&thread, NULL, (void*)recv_test, testarray[index]);
+    /* pthread_create(&thread, NULL, (void*)send_test, testarray[index]); */
+    /* pthread_create(&thread, NULL, (void*)recv_test, testarray[index]); */
   }
 }
 

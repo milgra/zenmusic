@@ -27,6 +27,11 @@ void init(int width, int height)
 
   ui_manager_init(width, height);
 
+  // header_texture_generator = text_gen("Header",0x000000FF,0xFFFFFFFF );
+  // header_event_handler =
+  // musiclist_texture_generatpr = color_gen(0x000000FF)
+  // musiclist_event_handler = musiclist_ev_gen
+
   view_t* header = view_new("header",
                             (vframe_t){0, 0, 600, 100},
                             NULL,

@@ -28,15 +28,14 @@ void ui_connector_resize(float width, float height);
 #include "mtvector.c"
 #include "ui_compositor.c"
 #include "view.c"
-#include <pthread.h>
-#include <time.h>
+#include <SDL.h>
 #include <unistd.h>
 
 mtmap_t*  uim;
 mtvec_t*  uiv;
 mtch_t*   uich;
 pthread_t uibgth;
-void*     ui_connector_workloop(void* mypointer);
+int       ui_connector_workloop(void* mypointer);
 
 int ui_connector_init(int width, int height)
 {
@@ -46,12 +45,12 @@ int ui_connector_init(int width, int height)
   uiv  = VNEW();
   uich = mtch_new(10);
 
-  int success = pthread_create(&uibgth,
-                               NULL,
-                               ui_connector_workloop,
-                               NULL);
+  // TODO SDL_CreateThread
+  SDL_Thread* thread = SDL_CreateThread(ui_connector_workloop,
+                                        "connector",
+                                        NULL);
 
-  return success;
+  return (thread != NULL);
 }
 
 void ui_connector_reset()
@@ -111,13 +110,9 @@ void ui_connector_render()
   ui_compositor_render();
 }
 
-void* ui_connector_workloop()
+int ui_connector_workloop()
 {
-  struct timespec ts;
-  view_t*         view;
-
-  ts.tv_sec  = 0;
-  ts.tv_nsec = 16000000;
+  view_t* view;
 
   while (1)
   {
@@ -126,7 +121,7 @@ void* ui_connector_workloop()
       printf("generating bmp for %s\n", view->id);
       view_tex(view);
     }
-    nanosleep(&ts, &ts);
+    SDL_Delay(16);
   }
 }
 

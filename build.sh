@@ -8,6 +8,7 @@ clang \
     -I/usr/local/include \
     -I/usr/local/include/GL \
     -I/usr/local/include/SDL2 \
+    -I/usr/local/include/libavutil \
     -Isrc \
     -Isrc/ui \
     -Isrc/mtlib \
