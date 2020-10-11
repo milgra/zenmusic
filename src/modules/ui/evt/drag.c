@@ -4,13 +4,13 @@
 #include "view.c"
 #include "wm_event.c"
 
-void evthan_drag(view_t* view, ev_t event);
+void drag_evt(view_t* view, ev_t event);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-void evthan_drag(view_t* view, ev_t ev)
+void drag_evt(view_t* view, ev_t ev)
 {
   if (ev.type == EV_MMOVE && ev.drag)
   {

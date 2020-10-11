@@ -1,11 +1,11 @@
 #include "common.c"
-#include "evthan_drag.c"
+#include "evt/drag.c"
 #include "font.c"
 #include "mtcstring.c"
 #include "mtmath4.c"
 #include "musiclist.c"
-#include "texgen_color.c"
-#include "texgen_text.c"
+#include "tex/color.c"
+#include "tex/text.c"
 #include "ui_manager.c"
 #include "view.c"
 #include "wm_connector.c"
@@ -34,13 +34,13 @@ void init(int width, int height)
   song_list = view_new("song_list",
                        (vframe_t){20, 20, 500, 600},
                        musiclist_event,
-                       texgen_color,
+                       color_gen,
                        musiclist_new,
                        NULL);
   viewB     = view_new("viewb",
                    (vframe_t){200, 420, 350, 170},
-                   evthan_drag,
-                   texgen_text,
+                   drag_evt,
+                   text_gen,
                    NULL,
                    NULL);
 

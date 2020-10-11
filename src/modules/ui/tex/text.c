@@ -3,7 +3,7 @@
 
 #include "view.c"
 
-void texgen_text(view_t* view);
+void text_gen(view_t* view);
 
 #endif
 
@@ -14,7 +14,7 @@ void texgen_text(view_t* view);
 #include "mtbitmap.c"
 #include "mtstring.c"
 
-void texgen_text(view_t* view)
+void text_gen(view_t* view)
 {
   printf("gen_text %s\n", view->id);
   mtstr_t* str = mtstr_frombytes("KUTYAFASZA");

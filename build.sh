@@ -21,9 +21,9 @@ clang \
     src/modules/gl/gl_floatbuffer.c \
     src/modules/ui/ui_manager.c \
     src/modules/ui/view.c \
-    src/modules/ui/evthan_drag.c \
-    src/modules/ui/texgen_text.c \
-    src/modules/ui/texgen_color.c \
+    src/modules/ui/evt/drag.c \
+    src/modules/ui/tex/text.c \
+    src/modules/ui/tex/color.c \
     src/modules/ui_connector.c \
     src/modules/ui_compositor.c \
     src/modules/wm/wm_event.c \
