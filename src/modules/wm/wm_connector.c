@@ -163,10 +163,10 @@ void wm_init(void (*init)(int, int),
             ev.dtime  = ev.time - lastticks;
             lastticks = ev.time;
             (*update)(ev);
-            (*render)();
-            SDL_GL_SwapWindow(window);
           }
-          SDL_Delay(5);
+
+          (*render)();
+          SDL_GL_SwapWindow(window);
         }
 
         (*destroy)();

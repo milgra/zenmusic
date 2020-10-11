@@ -7,7 +7,7 @@
 
 typedef struct _mlist_t
 {
-  int      headpos;
+  float    headpos;
   float    speed;
   float    slowdown;
   uint32_t scroll;
@@ -23,6 +23,7 @@ void musiclist_event(view_t* view, ev_t ev);
 
 #include "mtstring.c"
 #include "tex/text.c"
+#include <math.h>
 
 void musiclist_del(void* p)
 {
@@ -41,13 +42,20 @@ void musiclist_new(view_t* view, void* data)
 
   view_setdata(view, mlist);
 
-  view_t* item = view_new("list_item",
-                          (vframe_t){0, 0, 350, 50},
-                          NULL,
-                          text_gen,
-                          NULL,
-                          NULL);
-  view_add(view, item);
+  view_t* item0 = view_new("list_item0",
+                           (vframe_t){0, 0, 350, 50},
+                           NULL,
+                           text_gen,
+                           NULL,
+                           NULL);
+  view_t* item1 = view_new("list_item1",
+                           (vframe_t){0, 50, 350, 50},
+                           NULL,
+                           text_gen,
+                           NULL,
+                           NULL);
+  view_add(view, item0);
+  view_add(view, item1);
 }
 
 void musiclist_event(view_t* view, ev_t ev)
@@ -55,13 +63,15 @@ void musiclist_event(view_t* view, ev_t ev)
   mlist_t* list = view->data;
   if (ev.type == EV_TIME)
   {
+    float ratio = (float)ev.dtime / 16.0;
+    list->headpos += list->speed;
+    list->speed *= list->slowdown;
+
     view_t* sview;
     while ((sview = VNXT(view->views)))
     {
-      // todo calculate time delta between frames
       vframe_t frame = sview->frame;
-      frame.y += (int)list->speed;
-      list->speed *= list->slowdown;
+      frame.y += round(list->headpos);
       view_setframe(sview, frame);
     }
   }
@@ -69,9 +79,9 @@ void musiclist_event(view_t* view, ev_t ev)
   {
     uint32_t delta = ev.time - list->scroll;
     list->scroll   = ev.time;
-    list->slowdown = delta < 10 ? 0.97 : 0.4;
+    list->slowdown = delta < 10 ? 0.5 : 0.4;
     float multi    = delta < 10 ? 2.0 : 8.0;
-    list->speed += ev.dy * multi;
+    list->speed += ev.dy;
   }
   else if (ev.type == EV_MMOVE && ev.drag)
   {
