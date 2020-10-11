@@ -41,7 +41,7 @@ clang \
     src/mtlib/mtvector.c \
     src/mtlib/mtstring.c \
     src/mtlib/mtcstring.c \
-    src/ui/evthan_music_list.c \
+    src/musiclist.c \
     src/zenmusic.c \
     src/common.c \
     -o bin/zenmusic

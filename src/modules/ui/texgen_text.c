@@ -36,7 +36,7 @@ void texgen_text(view_t* view)
           .backcolor = 0x000000FF,
       };
 
-  bm_t* bmp = font_render_text((int)view->frame.z, (int)view->frame.w, str, common_font, ts, NULL, NULL);
+  bm_t* bmp = font_render_text((int)view->frame.w, (int)view->frame.h, str, common_font, ts, NULL, NULL);
   view_setbmp(view, bmp);
 }
 

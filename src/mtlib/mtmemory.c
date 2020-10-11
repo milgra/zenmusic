@@ -179,9 +179,8 @@ void mtmem_describe(void* pointer)
   bytes -= sizeof(struct mtmem_head);
   struct mtmem_head* head = (struct mtmem_head*)bytes;
 
-  printf("%s :", head->type);
+  printf("%s:\n", head->type);
   if (head->descriptor != NULL) head->descriptor(pointer);
-  printf("\n");
 }
 
 void mtmem_exit(char* text, char* type)

@@ -22,6 +22,8 @@ void wm_init(void (*init)(int, int), void (*update)(ev_t), void (*render)(), voi
 #include <stdlib.h>
 
 uint32_t lastticks = 0;
+int      lastx     = 0;
+int      lasty     = 0;
 
 void wm_init(void (*init)(int, int),
              void (*update)(ev_t),
@@ -86,8 +88,7 @@ void wm_init(void (*init)(int, int),
 
         printf("SDL Scaling will be %f\n", scale);
 
-        if (SDL_GL_SetSwapInterval(0) < 0)
-          printf("SDL swap interval error %s\n", SDL_GetError());
+        if (SDL_GL_SetSwapInterval(0) < 0) printf("SDL swap interval error %s\n", SDL_GetError());
 
         SDL_StartTextInput();
 
@@ -112,6 +113,8 @@ void wm_init(void (*init)(int, int),
 
               if (event.type == SDL_MOUSEBUTTONDOWN)
               {
+                lastx   = ev.x;
+                lasty   = ev.y;
                 ev.type = EV_MDOWN;
                 ev.drag = 1;
               }
@@ -122,6 +125,10 @@ void wm_init(void (*init)(int, int),
               }
               else if (event.type == SDL_MOUSEMOTION)
               {
+                ev.dx   = ev.x - lastx;
+                ev.dy   = ev.y - lasty;
+                lastx   = ev.x;
+                lasty   = ev.y;
                 ev.type = EV_MMOVE;
               }
             }

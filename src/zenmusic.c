@@ -1,9 +1,9 @@
 #include "common.c"
 #include "evthan_drag.c"
-#include "evthan_music_list.c"
 #include "font.c"
 #include "mtcstring.c"
 #include "mtmath4.c"
+#include "musiclist.c"
 #include "texgen_color.c"
 #include "texgen_text.c"
 #include "ui_manager.c"
@@ -31,8 +31,18 @@ void init(int width, int height)
 
   ui_manager_init(width, height);
 
-  song_list = view_new("song_list", (v4_t){20.0, 20.0, 500.0, 600.0}, evthan_music_list, texgen_color, NULL);
-  viewB     = view_new("viewb", (v4_t){200.0, 420.0, 350.0, 170.0}, evthan_drag, texgen_text, NULL);
+  song_list = view_new("song_list",
+                       (vframe_t){20, 20, 500, 600},
+                       musiclist_event,
+                       texgen_color,
+                       musiclist_new,
+                       NULL);
+  viewB     = view_new("viewb",
+                   (vframe_t){200, 420, 350, 170},
+                   evthan_drag,
+                   texgen_text,
+                   NULL,
+                   NULL);
 
   ui_manager_add(song_list);
   ui_manager_add(viewB);

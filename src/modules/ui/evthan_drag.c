@@ -14,7 +14,10 @@ void evthan_drag(view_t* view, ev_t ev)
 {
   if (ev.type == EV_MMOVE && ev.drag)
   {
-    view_setpos(view, (v2_t){ev.x, ev.y});
+    vframe_t frame = view->frame;
+    frame.x        = ev.x;
+    frame.y        = ev.y;
+    view_setframe(view, frame);
   }
 }
 

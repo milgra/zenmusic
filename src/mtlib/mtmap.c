@@ -411,7 +411,7 @@ void mtmap_describe(void* p)
   for (int index = 0; index < keys->length; index++)
   {
     char* key = (char*)keys->data[index];
-    printf(" %s", key);
+    printf("%s:", key);
     mtmem_describe(mtmap_get(map, key));
   }
 }

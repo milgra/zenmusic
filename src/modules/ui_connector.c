@@ -91,18 +91,18 @@ void ui_connector_render()
       ui_compositor_add(view->id,
                         view->frame.x,
                         view->frame.y,
-                        view->frame.z,
                         view->frame.w,
+                        view->frame.h,
                         view->bmp);
     }
     if (view->frame_changed) /* update dimension if needed */
     {
-      ui_compositor_upd(view->id, view->frame.x, view->frame.y, view->frame.z, view->frame.w, NULL);
+      ui_compositor_upd(view->id, view->frame.x, view->frame.y, view->frame.w, view->frame.h, NULL);
       view->frame_changed = 0;
     }
     if (view->bmp_changed) /* update bitmap if needed */
     {
-      ui_compositor_upd(view->id, view->frame.x, view->frame.y, view->frame.z, view->frame.w, view->bmp);
+      ui_compositor_upd(view->id, view->frame.x, view->frame.y, view->frame.w, view->frame.h, view->bmp);
       view->bmp_changed = 0;
     }
   }
