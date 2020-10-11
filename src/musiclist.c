@@ -8,6 +8,9 @@
 typedef struct _mlist_t
 {
   int      headpos;
+  float    speed;
+  float    slowdown;
+  uint32_t scroll;
   mtvec_t* items;
 } mlist_t;
 
@@ -31,9 +34,10 @@ void musiclist_new(view_t* view, void* data)
 {
   printf("musiclist new\n");
 
-  mlist_t* mlist = mtmem_alloc(sizeof(mlist_t), "musiclist", musiclist_del, NULL);
-  mlist->items   = VNEW();
-  mlist->headpos = 0;
+  mlist_t* mlist  = mtmem_alloc(sizeof(mlist_t), "musiclist", musiclist_del, NULL);
+  mlist->items    = VNEW();
+  mlist->headpos  = 0;
+  mlist->slowdown = 0.95;
 
   view_setdata(view, mlist);
 
@@ -48,7 +52,28 @@ void musiclist_new(view_t* view, void* data)
 
 void musiclist_event(view_t* view, ev_t ev)
 {
-  if (ev.type == EV_MMOVE && ev.drag)
+  mlist_t* list = view->data;
+  if (ev.type == EV_TIME)
+  {
+    view_t* sview;
+    while ((sview = VNXT(view->views)))
+    {
+      // todo calculate time delta between frames
+      vframe_t frame = sview->frame;
+      frame.y += (int)list->speed;
+      list->speed *= list->slowdown;
+      view_setframe(sview, frame);
+    }
+  }
+  else if (ev.type == EV_SCROLL)
+  {
+    uint32_t delta = ev.time - list->scroll;
+    list->scroll   = ev.time;
+    list->slowdown = delta < 10 ? 0.97 : 0.4;
+    float multi    = delta < 10 ? 2.0 : 8.0;
+    list->speed += ev.dy * multi;
+  }
+  else if (ev.type == EV_MMOVE && ev.drag)
   {
     view_t* sview;
     while ((sview = VNXT(view->views)))

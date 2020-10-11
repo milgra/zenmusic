@@ -21,10 +21,6 @@ void wm_init(void (*init)(int, int), void (*update)(ev_t), void (*render)(), voi
 #include <stdio.h>
 #include <stdlib.h>
 
-uint32_t lastticks = 0;
-int      lastx     = 0;
-int      lasty     = 0;
-
 void wm_init(void (*init)(int, int),
              void (*update)(ev_t),
              void (*render)(),
@@ -97,24 +93,24 @@ void wm_init(void (*init)(int, int),
         char      quit = 0;
         ev_t      ev; // zen event
         SDL_Event event;
+        uint32_t  lastticks = SDL_GetTicks();
 
         while (!quit)
         {
           ev.type = EV_EMPTY;
           ev.time = SDL_GetTicks();
 
-          if (SDL_WaitEvent(&event) != 0)
+          while (SDL_PollEvent(&event) != 0)
           {
             if (event.type == SDL_MOUSEBUTTONDOWN ||
                 event.type == SDL_MOUSEBUTTONUP ||
                 event.type == SDL_MOUSEMOTION)
             {
+
               SDL_GetMouseState(&ev.x, &ev.y);
 
               if (event.type == SDL_MOUSEBUTTONDOWN)
               {
-                lastx   = ev.x;
-                lasty   = ev.y;
                 ev.type = EV_MDOWN;
                 ev.drag = 1;
               }
@@ -125,12 +121,16 @@ void wm_init(void (*init)(int, int),
               }
               else if (event.type == SDL_MOUSEMOTION)
               {
-                ev.dx   = ev.x - lastx;
-                ev.dy   = ev.y - lasty;
-                lastx   = ev.x;
-                lasty   = ev.y;
+                ev.dx   = event.motion.xrel;
+                ev.dy   = event.motion.yrel;
                 ev.type = EV_MMOVE;
               }
+            }
+            else if (event.type == SDL_MOUSEWHEEL)
+            {
+              ev.type = EV_SCROLL;
+              ev.dx   = event.wheel.x;
+              ev.dy   = event.wheel.y;
             }
             else if (event.type == SDL_QUIT)
             {
@@ -153,11 +153,20 @@ void wm_init(void (*init)(int, int),
               ev.type = EV_TEXT;
               ev.text = event.text.text;
             }
+
+            (*update)(ev);
           }
 
-          (*update)(ev);
-          (*render)();
-          SDL_GL_SwapWindow(window);
+          if (ev.time - lastticks > 16)
+          {
+            ev.type   = EV_TIME;
+            ev.dtime  = ev.time - lastticks;
+            lastticks = ev.time;
+            (*update)(ev);
+            (*render)();
+            SDL_GL_SwapWindow(window);
+          }
+          SDL_Delay(5);
         }
 
         (*destroy)();

@@ -9,8 +9,10 @@ enum evtype
   EV_MDOWN,
   EV_MUP,
   EV_MMOVE,
+  EV_SCROLL,
   EV_TEXT,
-  EV_RESIZE
+  EV_RESIZE,
+  EV_TIME
 };
 
 typedef struct _ev_t
@@ -25,6 +27,7 @@ typedef struct _ev_t
   char*       text;
   char        drag;
   uint32_t    time;
+  uint32_t    dtime;
 } ev_t;
 
 #endif
