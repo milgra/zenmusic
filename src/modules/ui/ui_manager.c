@@ -42,6 +42,11 @@ void ui_manager_event(ev_t ev)
   {
     view_evt(view, ev);
   }
+
+  if (ev.type == EV_RESIZE)
+  {
+    ui_connector_resize(ev.w, ev.h);
+  }
 }
 
 void ui_manager_add(view_t* view)

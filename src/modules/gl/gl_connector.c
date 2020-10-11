@@ -15,6 +15,7 @@
 
 void gl_init();
 void gl_render();
+void gl_resize(float width, float height);
 
 #endif
 
@@ -165,6 +166,8 @@ char* blend_fsh =
 #include "blend.fsh"
     ;
 
+GLint uniform_name_a[2];
+
 void gl_init(width, height)
 {
 
@@ -172,8 +175,6 @@ void gl_init(width, height)
   const char* attributes_blend[] = {"2", "position", "texcoord"};
 
   glewInit();
-
-  GLint uniform_name_a[2];
 
   GLuint shader_name_i = gl_shader_create(blend_vsh, blend_fsh,
                                           uniforms_blend,
@@ -213,6 +214,18 @@ void gl_init(width, height)
   glBindTexture(GL_TEXTURE_2D, texture_name_u);
   glUniform1i(uniform_name_a[1], 0);
   glClearColor(0.5, 0.5, 0.5, 1.0);
+}
+
+void gl_resize(float width, float height)
+{
+  printf("gl resize %f %f\n", width, height);
+  m4_t matrix = m4_defaultortho(0.0, width, height, 0, 0.0, 1.0);
+
+  matrix4array_t projection;
+  projection.matrix = matrix;
+
+  glUniformMatrix4fv(uniform_name_a[0], 1, 0, projection.array);
+  glViewport(0, 0, width, height);
 }
 
 void gl_render(fb_t* fb, bm_t* bmp)

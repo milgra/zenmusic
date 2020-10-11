@@ -1,5 +1,4 @@
 #include "common.c"
-#include "evt/drag.c"
 #include "font.c"
 #include "mtcstring.c"
 #include "mtmath4.c"
@@ -15,9 +14,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-view_t* song_list;
-view_t* viewB;
-
 void init(int width, int height)
 {
   printf("zenmusic init %i %i\n", width, height);
@@ -31,21 +27,22 @@ void init(int width, int height)
 
   ui_manager_init(width, height);
 
-  song_list = view_new("song_list",
-                       (vframe_t){20, 20, 500, 600},
-                       musiclist_event,
-                       color_gen,
-                       musiclist_new,
-                       NULL);
-  viewB     = view_new("viewb",
-                   (vframe_t){200, 420, 350, 170},
-                   drag_evt,
-                   text_gen,
-                   NULL,
-                   NULL);
+  view_t* header = view_new("header",
+                            (vframe_t){0, 0, 600, 100},
+                            NULL,
+                            text_gen,
+                            NULL,
+                            NULL);
 
+  view_t* song_list = view_new("song_list",
+                               (vframe_t){0, 100, 600, 600},
+                               musiclist_event,
+                               color_gen,
+                               musiclist_new,
+                               NULL);
+
+  ui_manager_add(header);
   ui_manager_add(song_list);
-  ui_manager_add(viewB);
 }
 
 void update(ev_t ev)

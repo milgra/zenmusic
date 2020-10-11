@@ -63,6 +63,7 @@ void musiclist_event(view_t* view, ev_t ev)
   else if (ev.type == EV_SCROLL)
   {
     list->headpos += ev.dy;
+    if (list->headpos < 0.0) list->headpos = 0.0;
 
     view_t* sview;
     while ((sview = VNXT(view->views)))

@@ -13,9 +13,11 @@
 
 void ui_compositor_init(int, int);
 void ui_compositor_render();
+void ui_compositor_reset();
 void ui_compositor_add(char* id, int x, int y, int w, int h, bm_t* bmp);
 void ui_compositor_upd(char* id, int x, int y, int w, int h, bm_t* bmp);
 void ui_compositor_rem(char* id);
+void ui_compositor_resize(float width, float height);
 
 typedef struct _crect_t
 {
@@ -28,7 +30,6 @@ void     crect_del(void* rect);
 void     crect_desc(crect_t* rect);
 void     crect_set_dim(crect_t* rect, float x, float y, float w, float h);
 void     crect_set_tex(crect_t* rect, float tx, float ty, float tz, float tw);
-void     ui_compositor_reset();
 
 #endif
 
@@ -109,6 +110,11 @@ void ui_compositor_rem(char* id)
   rect = mtmap_get(rectm, id);
   MDEL(rectm, id);
   VREM(rectv, rect);
+}
+
+void ui_compositor_resize(float width, float height)
+{
+  gl_resize(width, height);
 }
 
 //

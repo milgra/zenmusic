@@ -17,6 +17,7 @@ void ui_connector_reset();
 void ui_connector_render();
 void ui_connector_add(view_t* view);
 void ui_connector_rem(view_t* view);
+void ui_connector_resize(float width, float height);
 
 #endif
 
@@ -127,6 +128,11 @@ void* ui_connector_workloop()
     }
     nanosleep(&ts, &ts);
   }
+}
+
+void ui_connector_resize(float width, float height)
+{
+  ui_compositor_resize(width, height);
 }
 
 #endif
