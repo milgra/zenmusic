@@ -23,6 +23,7 @@ void  bm_del(void* bm);
 void  bm_reset(bm_t* bm);
 void  bm_insert(bm_t* the_base, bm_t* bm, int the_x, int the_y);
 void  bm_insert_blend(bm_t* the_base, bm_t* bm, int the_x, int the_y);
+void  bm_describe(void* p);
 
 #endif
 
@@ -33,13 +34,13 @@ void  bm_insert_blend(bm_t* the_base, bm_t* bm, int the_x, int the_y);
 
 bm_t* bm_new(int the_w, int the_h)
 {
-  bm_t* bm = mtmem_calloc(sizeof(bm_t), bm_del);
+  bm_t* bm = mtmem_calloc(sizeof(bm_t), "mtbitmap", bm_del, bm_describe);
 
   bm->w = the_w;
   bm->h = the_h;
 
   bm->size = 4 * the_w * the_h;
-  bm->data = mtmem_calloc(bm->size * sizeof(unsigned char), NULL);
+  bm->data = mtmem_calloc(bm->size * sizeof(unsigned char), "uint8_t*", NULL, NULL);
 
   return bm;
 }
@@ -189,6 +190,12 @@ void bm_insert_blend(bm_t* base, bm_t* src, int sx, int sy)
       bdata[bi + 3] = (int)(outA * 255.0);
     }
   }
+}
+
+void bm_describe(void* p)
+{
+  bm_t* bm = p;
+  printf("width %i height %i size %u", bm->w, bm->h, bm->size);
 }
 
 #endif

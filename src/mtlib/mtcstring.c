@@ -61,7 +61,7 @@ char* mtcstr_fromformat(char* format, ...)
   length += 1;
   va_end(ap);
 
-  char* result = mtmem_calloc(sizeof(char) * length, NULL);
+  char* result = mtmem_calloc(sizeof(char) * length, "char*", NULL, NULL);
   va_start(ap, format);
   vsnprintf(result, length, format, ap);
   va_end(ap);
@@ -76,7 +76,7 @@ char* mtcstr_fromcstring(char* string)
   char* result = NULL;
   if (string != NULL)
   {
-    result = mtmem_calloc((strlen(string) + 1) * sizeof(char), NULL);
+    result = mtmem_calloc((strlen(string) + 1) * sizeof(char), "char*", NULL, NULL);
     memcpy(result, string, strlen(string));
   }
   return result;
@@ -101,7 +101,7 @@ char* mtcstr_fromfile(char* path)
     rewind(handler);
 
     // Allocate a string that can hold it all
-    buffer = (char*)mtmem_calloc(sizeof(char) * (string_size + 1), NULL);
+    buffer = (char*)mtmem_calloc(sizeof(char) * (string_size + 1), "char*", NULL, NULL);
 
     // Read it all in one operation
     read_size = fread(buffer, sizeof(char), string_size, handler);
@@ -132,7 +132,7 @@ char* consonants = "bcdefghijklmnpqrstvwxyz";
 
 char* mtcstr_generate_readablec(uint32_t length)
 {
-  char* result = mtmem_calloc(sizeof(char) * (length + 1), NULL);
+  char* result = mtmem_calloc(sizeof(char) * (length + 1), "char*", NULL, NULL);
   for (int index = 0; index < length; index += 2)
   {
     result[index] = consonants[rand() % strlen(consonants)];
@@ -150,7 +150,7 @@ char* mtcstr_alphanumeric =
 
 char* mtcstr_generate_alphanumeric(uint32_t length)
 {
-  char* result = mtmem_calloc(sizeof(char) * (length + 1), NULL);
+  char* result = mtmem_calloc(sizeof(char) * (length + 1), "char*", NULL, NULL);
   for (int index = 0; index < length; index++)
   {
     result[index] = mtcstr_alphanumeric[rand() % strlen(mtcstr_alphanumeric)];

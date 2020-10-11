@@ -10,3 +10,4 @@ zen music - offline music player and library manager
 zen photo - offline photo viewer and library manager
 
 stencil, layer groups, space-autstart-stop files
+spectrum analyzer/bar in the background

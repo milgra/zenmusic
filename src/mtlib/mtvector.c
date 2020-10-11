@@ -44,6 +44,7 @@ void     mtvec_reverse(mtvec_t* vector);
 void*    mtvec_head(mtvec_t* vector);
 void*    mtvec_tail(mtvec_t* vector);
 uint32_t mtvec_indexofdata(mtvec_t* vector, void* data);
+void     mtvec_describe(void* p);
 
 #endif
 #if __INCLUDE_LEVEL__ == 0
@@ -52,8 +53,8 @@ uint32_t mtvec_indexofdata(mtvec_t* vector, void* data);
 
 mtvec_t* mtvec_alloc()
 {
-  mtvec_t* vector     = mtmem_calloc(sizeof(mtvec_t), mtvec_dealloc);
-  vector->data        = mtmem_calloc(sizeof(void*) * 10, NULL);
+  mtvec_t* vector     = mtmem_calloc(sizeof(mtvec_t), "mtvec_t", mtvec_dealloc, mtvec_describe);
+  vector->data        = mtmem_calloc(sizeof(void*) * 10, "void**", NULL, NULL);
   vector->pos         = 0;
   vector->length      = 0;
   vector->length_real = 10;
@@ -255,6 +256,13 @@ uint32_t mtvec_indexofdata(mtvec_t* vector, void* data)
     actual += 1;
   }
   return UINT32_MAX;
+}
+
+void mtvec_describe(void* pointer)
+{
+  mtvec_t* vector = pointer;
+  for (uint32_t index = 0; index < vector->length; index++)
+    mtmem_describe(vector->data[index]);
 }
 
 #endif

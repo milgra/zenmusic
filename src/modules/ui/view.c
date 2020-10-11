@@ -35,6 +35,7 @@ void    view_setdim(view_t* view, v2_t dim);
 void    view_setbmp(view_t* view, bm_t* bmp);
 void    view_add(view_t* view, view_t* subview);
 void    view_rem(view_t* view, view_t* subview);
+void    view_desc(void* pointer);
 
 extern char view_needs_resend;
 
@@ -59,7 +60,7 @@ void view_del(void* pointer)
 
 view_t* view_new(char* id, v4_t frame, void (*pevt)(struct _view_t*, ev_t), void (*ptex)(struct _view_t*), void* data)
 {
-  view_t* view = mtmem_calloc(sizeof(view_t), view_del);
+  view_t* view = mtmem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
   view->id     = mtcstr_fromcstring(id);
   view->bmp    = NULL;
   view->evt    = pevt;
@@ -112,6 +113,12 @@ void view_rem(view_t* view, view_t* subview)
 {
   VREM(view->views, subview);
   view_needs_resend = 1;
+}
+
+void view_desc(void* pointer)
+{
+  view_t* view = (view_t*)pointer;
+  printf("id %s frame %f %f %f %f\n", view->id, view->frame.x, view->frame.y, view->frame.z, view->frame.w);
 }
 
 #endif

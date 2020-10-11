@@ -27,7 +27,7 @@ void evthan_music_list_del(void* pointer)
 
 mlist_t* evthan_music_list_new()
 {
-  mlist_t* data = mtmem_alloc(sizeof(mlist_t), evthan_music_list_del);
+  mlist_t* data = mtmem_alloc(sizeof(mlist_t), "evthan_music", evthan_music_list_del, NULL);
   data->items   = VNEW();
 
   VADD(data->items, mtstr_frombytes("ITEM 0"));

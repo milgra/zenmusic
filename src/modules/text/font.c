@@ -13,7 +13,7 @@ typedef struct _font_t font_t;
 struct _font_t
 {
   stbtt_fontinfo info;
-  unsigned char* buffer;
+  uint8_t*       buffer;
   int            gap;
   int            ascent;
   int            descent;
@@ -59,8 +59,8 @@ font_alloc(char* font_path)
     {
       // read file
 
-      font_t* font = mtmem_calloc(sizeof(font_t), font_dealloc);
-      font->buffer = mtmem_calloc((size_t)filestat.st_size, NULL);
+      font_t* font = mtmem_calloc(sizeof(font_t), "font_t", font_dealloc, NULL);
+      font->buffer = mtmem_calloc((size_t)filestat.st_size, "uint8_t*", NULL, NULL);
 
       fread(font->buffer, (size_t)filestat.st_size, 1, font_file);
 
@@ -156,7 +156,7 @@ bm_t* font_render_glyph(
   int gw;
   int gh;
 
-  unsigned char* rawmap = stbtt_GetCodepointBitmap(
+  uint8_t* rawmap = stbtt_GetCodepointBitmap(
       &(the_font->info),
       scale,
       scale,
@@ -207,7 +207,7 @@ bm_t* font_render_text(int width, int height, mtstr_t* string, font_t* the_font,
 
   if (glyphmetrics == NULL)
   {
-    metrics = mtmem_calloc(sizeof(glyphmetrics_t) * (string == NULL ? 2 : string->length + 2), NULL);
+    metrics = mtmem_calloc(sizeof(glyphmetrics_t) * (string == NULL ? 2 : string->length + 2), "glyphmetrics", NULL, NULL);
   }
 
   if (string == NULL || string->length == 0)
@@ -268,7 +268,7 @@ bm_t* font_render_text(int width, int height, mtstr_t* string, font_t* the_font,
 
     /* generate raw font bitmap */
 
-    unsigned char* rawmap = stbtt_GetCodepointBitmap(&(the_font->info), scale, scale, string->codepoints[index], &gw, &gh, &gxo, &gyo);
+    uint8_t* rawmap = stbtt_GetCodepointBitmap(&(the_font->info), scale, scale, string->codepoints[index], &gw, &gh, &gxo, &gyo);
 
     /* get kerning */
 

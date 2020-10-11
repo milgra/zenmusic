@@ -37,10 +37,10 @@ void    mtch_test(void);
 
 mtch_t* mtch_new(uint32_t size)
 {
-  mtch_t* ch = mtmem_calloc(sizeof(mtch_t), mtch_del);
+  mtch_t* ch = mtmem_calloc(sizeof(mtch_t), "mtchannel", mtch_del, NULL);
 
-  ch->flags = mtmem_calloc(sizeof(char) * size, NULL);
-  ch->boxes = mtmem_calloc(sizeof(void*) * size, NULL);
+  ch->flags = mtmem_calloc(sizeof(char) * size, "char*", NULL, NULL);
+  ch->boxes = mtmem_calloc(sizeof(void*) * size, "void**", NULL, NULL);
   ch->size  = size;
   ch->rpos  = 0;
   ch->wpos  = 0;
@@ -109,7 +109,7 @@ void send_test(mtch_t* ch)
   uint32_t counter = 0;
   while (1)
   {
-    uint32_t* number = mtmem_calloc(sizeof(uint32_t), NULL);
+    uint32_t* number = mtmem_calloc(sizeof(uint32_t), "uint32_t", NULL, NULL);
     *number          = counter;
     char success     = mtch_send(ch, number);
     if (success == 0)
@@ -153,7 +153,7 @@ mtch_t** testarray;
 
 void mtch_test()
 {
-  testarray = mtmem_calloc(sizeof(mtch_t) * kChTestThreads, NULL);
+  testarray = mtmem_calloc(sizeof(mtch_t) * kChTestThreads, "mtch_t**", NULL, NULL);
 
   for (int index = 0; index < kChTestThreads; index++)
   {

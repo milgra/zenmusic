@@ -18,7 +18,7 @@ struct _tm_t
 };
 
 tm_t* tm_new();
-void  tm_del(tm_t* tm);
+void  tm_del(void* p);
 void  tm_reset(tm_t* tm);
 v4_t  tm_get(tm_t* tm, char* id);
 char  tm_put(tm_t* tm, char* id, bm_t* bm);
@@ -32,17 +32,18 @@ void  tm_upd(tm_t* tm, char* id, bm_t* bm);
 
 tm_t* tm_new()
 {
-  tm_t* tm   = mtmem_calloc(sizeof(tm_t), NULL);
+  tm_t* tm   = mtmem_calloc(sizeof(tm_t), "tm_t", tm_del, NULL);
   tm->bm     = bm_new(1024, 1024);
   tm->coords = mtmap_alloc();
 
   return tm;
 }
 
-void tm_del(tm_t* tm)
+void tm_del(void* p)
 {
+  tm_t* tm = (tm_t*)p;
   REL(tm->bm);
-  REL(tm);
+  REL(tm->coords);
 }
 
 void tm_reset(tm_t* tm)
@@ -105,7 +106,8 @@ char tm_put(tm_t* tm, char* id, bm_t* bm)
   float* coords = HEAP(((v4_t){(float)ncx / (float)tm->bm->w,
                                (float)ncy / (float)tm->bm->h,
                                (float)rbx / (float)tm->bm->w,
-                               (float)rby / (float)tm->bm->h}));
+                               (float)rby / (float)tm->bm->h}),
+                       "float*");
 
   mtmap_put(tm->coords, id, coords);
 

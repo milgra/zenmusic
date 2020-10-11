@@ -42,6 +42,7 @@ mtvec_t* mtstr_split(mtstr_t* string, char character);
 mtmap_t* mtstr_tokenize(mtstr_t* descriptor);
 uint32_t mtstr_find(mtstr_t* string, mtstr_t* substring, uint32_t from);
 char*    mtstr_bytes(mtstr_t* string);
+void     mtstr_describe(void* p);
 
 #endif
 #if __INCLUDE_LEVEL__ == 0
@@ -55,12 +56,12 @@ char*    mtstr_bytes(mtstr_t* string);
 
 mtstr_t* mtstr_alloc()
 {
-  mtstr_t* string = mtmem_calloc(sizeof(mtstr_t), mtstr_dealloc);
+  mtstr_t* string = mtmem_calloc(sizeof(mtstr_t), "mtstr_t", mtstr_dealloc, mtstr_describe);
 
   string->length       = 0;  // current length of codepoint array
   string->length_real  = 10; // backing length of codepoint array
   string->length_bytes = 0;  // needed length of byte array for all codepoints
-  string->codepoints   = mtmem_calloc(string->length_real * sizeof(uint32_t), NULL);
+  string->codepoints   = mtmem_calloc(string->length_real * sizeof(uint32_t), "uint32_t*", NULL, NULL);
 
   return string;
 }
@@ -98,7 +99,7 @@ mtstr_t* mtstr_fromformat(char* format, ...)
   length += 1;
   va_end(ap);
 
-  char* result = mtmem_calloc(sizeof(char) * length, NULL);
+  char* result = mtmem_calloc(sizeof(char) * length, "char*", NULL, NULL);
   va_start(ap, format);
   vsnprintf(result, length, format, ap);
   va_end(ap);
@@ -453,7 +454,7 @@ uint32_t mtstr_find(mtstr_t* string, mtstr_t* substring, uint32_t from)
 char* mtstr_bytes(mtstr_t* string)
 {
   if (string == NULL) return NULL;
-  char*    bytes    = mtmem_calloc((string->length_bytes + 1) * sizeof(char), NULL);
+  char*    bytes    = mtmem_calloc((string->length_bytes + 1) * sizeof(char), "char*", NULL, NULL);
   uint32_t position = 0;
   for (int index = 0; index < string->length; index++)
   {
@@ -482,6 +483,12 @@ char* mtstr_bytes(mtstr_t* string)
     }
   }
   return bytes;
+}
+
+void mtstr_describe(void* p)
+{
+  mtstr_t* str = p;
+  printf("length %u", str->length);
 }
 
 #endif
