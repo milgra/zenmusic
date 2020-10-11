@@ -8,9 +8,6 @@
 typedef struct _mlist_t
 {
   float    headpos;
-  float    speed;
-  uint32_t scroll;
-  uint32_t time_to_stop;
   mtvec_t* items;
 } mlist_t;
 
@@ -62,40 +59,17 @@ void musiclist_event(view_t* view, ev_t ev)
   mlist_t* list = view->data;
   if (ev.type == EV_TIME)
   {
-    float ratio = (float)ev.dtime / 16.0;
-    if (ev.time < list->time_to_stop)
-    {
-      list->headpos += list->speed * ratio;
-      list->speed *= 0.95;
-
-      view_t* sview;
-      while ((sview = VNXT(view->views)))
-      {
-        vframe_t frame = sview->frame;
-        frame.y        = round(list->headpos);
-        view_setframe(sview, frame);
-      }
-
-      if (fabs(list->speed) < 0.4) list->speed = 0.0;
-    }
-    else
-      list->speed = 0.0;
   }
   else if (ev.type == EV_SCROLL)
   {
-    uint32_t delta    = ev.time - list->scroll;
-    int      mindelta = 30 - delta;
-    if (mindelta < 0) mindelta = 0;
-    list->scroll = ev.time;
-    list->speed += ev.dy * 2.0 * (float)mindelta / 30.0;
+    list->headpos += ev.dy;
 
-    if (delta < 15)
+    view_t* sview;
+    while ((sview = VNXT(view->views)))
     {
-      list->time_to_stop = UINT32_MAX;
-    }
-    else
-    {
-      list->time_to_stop = ev.time + 100;
+      vframe_t frame = sview->frame;
+      frame.y        = round(list->headpos);
+      view_setframe(sview, frame);
     }
   }
   else if (ev.type == EV_MMOVE && ev.drag)

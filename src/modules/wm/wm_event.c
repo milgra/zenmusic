@@ -20,8 +20,8 @@ typedef struct _ev_t
   enum evtype type;
   int         x;
   int         y;
-  int         dx;
-  int         dy;
+  float       dx;
+  float       dy;
   int         w;
   int         h;
   char*       text;

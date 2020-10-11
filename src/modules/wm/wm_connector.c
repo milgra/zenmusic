@@ -95,6 +95,15 @@ void wm_init(void (*init)(int, int),
         SDL_Event event;
         uint32_t  lastticks = SDL_GetTicks();
 
+        struct scroll_t
+        {
+          char     active;
+          float    sx;
+          float    sy;
+          uint32_t time_to_stop;
+          uint32_t time_last;
+        } scroll;
+
         while (!quit)
         {
           ev.type = EV_EMPTY;
@@ -128,9 +137,18 @@ void wm_init(void (*init)(int, int),
             }
             else if (event.type == SDL_MOUSEWHEEL)
             {
-              ev.type = EV_SCROLL;
-              ev.dx   = event.wheel.x;
-              ev.dy   = event.wheel.y;
+              scroll.active = 1;
+
+              uint32_t delta   = ev.time - scroll.time_last;
+              scroll.time_last = ev.time;
+
+              int mindelta = 30 - delta;
+              if (mindelta < 0) mindelta = 0;
+
+              scroll.sx += (float)event.wheel.x * 2.0 * (float)mindelta / 30.0;
+              scroll.sy += (float)event.wheel.y * 2.0 * (float)mindelta / 30.0;
+
+              scroll.time_to_stop = delta < 15 ? UINT32_MAX : ev.time + 100;
             }
             else if (event.type == SDL_QUIT)
             {
@@ -157,9 +175,32 @@ void wm_init(void (*init)(int, int),
             (*update)(ev);
           }
 
-          ev.type   = EV_TIME;
-          ev.dtime  = ev.time - lastticks;
-          lastticks = ev.time;
+          if (scroll.active)
+          {
+            if (ev.time < scroll.time_to_stop &&
+                (fabs(scroll.sx) > 0.1 ||
+                 fabs(scroll.sy) > 0.1))
+            {
+              ev.type = EV_SCROLL;
+              ev.dx   = scroll.sx;
+              ev.dy   = scroll.sy;
+              scroll.sx *= 0.95;
+              scroll.sy *= 0.95;
+              (*update)(ev);
+            }
+            else
+            {
+              ev.type       = EV_SCROLL;
+              ev.dx         = 0.0;
+              ev.dy         = 0.0;
+              scroll.sx     = 0.0;
+              scroll.sy     = 0.0;
+              scroll.active = 0;
+              (*update)(ev);
+            }
+          }
+
+          ev.type = EV_TIME;
 
           (*update)(ev);
           (*render)();
