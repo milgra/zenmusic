@@ -4,13 +4,13 @@
 #include "view.c"
 #include "wm_event.c"
 
-void drag_evt(view_t* view, ev_t event);
+void eh_drag_add(view_t* view);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-void drag_evt(view_t* view, ev_t ev)
+void eh_drag_evt(view_t* view, ev_t ev)
 {
   if (ev.type == EV_MMOVE && ev.drag)
   {
@@ -19,6 +19,11 @@ void drag_evt(view_t* view, ev_t ev)
     frame.y        = ev.y;
     view_setframe(view, frame);
   }
+}
+
+void eh_drag_add(view_t* view)
+{
+  view->eh = eh_drag_evt;
 }
 
 #endif

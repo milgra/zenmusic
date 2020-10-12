@@ -22,9 +22,9 @@ clang \
     src/modules/gl/gl_floatbuffer.c \
     src/modules/ui/ui_manager.c \
     src/modules/ui/view.c \
-    src/modules/ui/evt/drag.c \
-    src/modules/ui/tex/text.c \
-    src/modules/ui/tex/color.c \
+    src/modules/ui/eh_drag.c \
+    src/modules/ui/tg_text.c \
+    src/modules/ui/tg_color.c \
     src/modules/ui_connector.c \
     src/modules/ui_compositor.c \
     src/modules/wm/wm_event.c \
@@ -42,7 +42,7 @@ clang \
     src/mtlib/mtvector.c \
     src/mtlib/mtstring.c \
     src/mtlib/mtcstring.c \
-    src/musiclist.c \
+    src/eh_songs.c \
     src/player.c \
     src/zenmusic.c \
     src/common.c \

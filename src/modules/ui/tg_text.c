@@ -3,7 +3,15 @@
 
 #include "view.c"
 
-void text_gen(view_t* view);
+typedef struct _tg_text_t
+{
+  char*    text;
+  uint32_t fc;
+  uint32_t bc;
+
+} tg_text_t;
+
+void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text);
 
 #endif
 
@@ -14,10 +22,11 @@ void text_gen(view_t* view);
 #include "mtbitmap.c"
 #include "mtstring.c"
 
-void text_gen(view_t* view)
+void tg_text_gen(view_t* view)
 {
-  printf("gen_text %s\n", view->id);
-  mtstr_t* str = mtstr_frombytes("KUTYAFASZA");
+  tg_text_t* gen = view->tgdata;
+
+  mtstr_t* str = mtstr_frombytes(gen->text);
 
   textstyle_t ts =
       {
@@ -32,12 +41,23 @@ void text_gen(view_t* view)
           .marginsize = 10.0,
           .cursorsize = 15.0,
 
-          .textcolor = 0xFFFFFFFF,
-          .backcolor = 0x000000FF,
+          .textcolor = gen->fc,
+          .backcolor = gen->bc,
       };
 
   bm_t* bmp = font_render_text((int)view->frame.w, (int)view->frame.h, str, common_font, ts, NULL, NULL);
   view_setbmp(view, bmp);
+}
+
+void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text)
+{
+  tg_text_t* gen = mtmem_alloc(sizeof(tg_text_t), "tg_text_t", NULL, NULL);
+  gen->fc        = fc;
+  gen->bc        = bc;
+  gen->text      = text;
+
+  view->tgdata = gen;
+  view->tg     = tg_text_gen;
 }
 
 #endif

@@ -18,7 +18,6 @@ typedef struct _view_t view_t;
 struct _view_t
 {
   char*    id;     /* identifier for handling view */
-  void*    data;   /* data for event handler and bitmap generator */
   mtvec_t* views;  /* subviews */
   view_t*  parent; /* parent view */
 
@@ -31,11 +30,13 @@ struct _view_t
   char  bmp_changed; /* bitmap changed */
   char  bmp_state;   /* 0 - blank , 1 - pending , 2 - ready to render, 3 - added to compositor */
 
-  void (*evt)(view_t*, ev_t); /* event handler for view */
-  void (*tex)(view_t*);       /* texture generator for view */
+  void (*eh)(view_t*, ev_t); /* event handler for view */
+  void (*tg)(view_t*);       /* texture generator for view */
+  void* ehdata;              /* data for event handler */
+  void* tgdata;              /* data for texture generator */
 };
 
-view_t* view_new(char* id, vframe_t frame, void (*evt)(struct _view_t*, ev_t), void (*tex)(struct _view_t*), void (*new)(struct _view_t*, void* arg), void* arg);
+view_t* view_new(char* id, vframe_t frame);
 void    view_tex(view_t* view);
 void    view_evt(view_t* view, ev_t ev);
 void    view_setframe(view_t* view, vframe_t frame);
@@ -43,7 +44,6 @@ void    view_setbmp(view_t* view, bm_t* bmp);
 void    view_add(view_t* view, view_t* subview);
 void    view_rem(view_t* view, view_t* subview);
 void    view_desc(void* pointer);
-void    view_setdata(view_t* view, void* data);
 
 extern char view_needs_resend;
 
@@ -66,34 +66,26 @@ void view_del(void* pointer)
   REL(view->views);
 }
 
-view_t* view_new(char*    id,                              /* view id */
-                 vframe_t frame,                           /* view frame */
-                 void (*pevt)(struct _view_t*, ev_t),      /* event handles for view */
-                 void (*ptex)(struct _view_t*),            /* texture generator for view */
-                 void (*pnew)(struct _view_t*, void* arg), /* event handler initializer for view */
-                 void* arg)                                /* event handler initializer argument for view */
+view_t* view_new(char*    id,    /* view id */
+                 vframe_t frame) /* view frame */
 {
   view_t* view = mtmem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
   view->id     = mtcstr_fromcstring(id);
   view->bmp    = NULL;
-  view->evt    = pevt;
-  view->tex    = ptex;
   view->views  = VNEW();
   view->frame  = frame;
-
-  if (pnew) (*pnew)(view, arg);
 
   return view;
 }
 
 void view_evt(view_t* view, ev_t ev)
 {
-  if (*view->evt) (*view->evt)(view, ev);
+  if (*view->eh) (*view->eh)(view, ev);
 }
 
 void view_tex(view_t* view)
 {
-  if (*view->tex) (*view->tex)(view);
+  if (*view->tg) (*view->tg)(view);
 }
 
 void view_setframe(view_t* view, vframe_t frame)
@@ -107,11 +99,6 @@ void view_setbmp(view_t* view, bm_t* bmp)
   RPL(view->bmp, bmp);
   view->bmp_state   = 2;
   view->bmp_changed = 1;
-}
-
-void view_setdata(view_t* view, void* data)
-{
-  view->data = data;
 }
 
 void view_add(view_t* view, view_t* subview)
