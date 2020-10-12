@@ -21,6 +21,13 @@ void wm_init(void (*init)(int, int), void (*update)(ev_t), void (*render)(), voi
 #include <stdio.h>
 #include <stdlib.h>
 
+#define SCROLL_RELEASED_DELAY 15         // if two scroll events arrive between this amount of millisecs scroll considered released
+#define SCROLL_RELEASED_SLOWDOWN 0.999   // slowdown ratio of released scrolling
+#define SCROLL_TOUCHED_SLOWDOWN 0.8      // slowdown ratio of touched scrolling
+#define SCROLL_TOUCHED_TIMEOUT 300       // when to stop scrolling after last pressed touch scroll event
+#define SCROLL_SLOWDOWN_MULTIPLIER 0.995 // slowdown ratio is multiplied by this value with every step to produce a parabolic slowdown
+#define SCROLL_MINIMUM_DELTA 0.1         // scroll events aren't dispatched under this scroll delta value
+
 void wm_init(void (*init)(int, int),
              void (*update)(ev_t),
              void (*render)(),
@@ -91,7 +98,7 @@ void wm_init(void (*init)(int, int),
         (*init)(width, height);
 
         char      quit = 0;
-        ev_t      ev; // zen event
+        ev_t      ev   = {0}; // zen event
         SDL_Event event;
         uint32_t  lastticks = SDL_GetTicks();
 
@@ -100,9 +107,10 @@ void wm_init(void (*init)(int, int),
           char     active;
           float    sx;
           float    sy;
+          float    slowdown;
           uint32_t time_to_stop;
           uint32_t time_last;
-        } scroll;
+        } scroll = {0};
 
         while (!quit)
         {
@@ -137,18 +145,17 @@ void wm_init(void (*init)(int, int),
             }
             else if (event.type == SDL_MOUSEWHEEL)
             {
+
               scroll.active = 1;
 
               uint32_t delta   = ev.time - scroll.time_last;
               scroll.time_last = ev.time;
 
-              int mindelta = 30 - delta;
-              if (mindelta < 0) mindelta = 0;
+              scroll.sx += (float)event.wheel.x * 2.0;
+              scroll.sy += (float)event.wheel.y * 2.0;
 
-              scroll.sx += (float)event.wheel.x * 2.0 * (float)mindelta / 30.0;
-              scroll.sy += (float)event.wheel.y * 2.0 * (float)mindelta / 30.0;
-
-              scroll.time_to_stop = delta < 15 ? UINT32_MAX : ev.time + 100;
+              scroll.time_to_stop = delta < SCROLL_RELEASED_DELAY ? UINT32_MAX : ev.time + SCROLL_TOUCHED_TIMEOUT;
+              scroll.slowdown     = delta < SCROLL_RELEASED_DELAY ? SCROLL_RELEASED_SLOWDOWN : SCROLL_TOUCHED_SLOWDOWN;
             }
             else if (event.type == SDL_QUIT)
             {
@@ -178,14 +185,15 @@ void wm_init(void (*init)(int, int),
           if (scroll.active)
           {
             if (ev.time < scroll.time_to_stop &&
-                (fabs(scroll.sx) > 0.1 ||
-                 fabs(scroll.sy) > 0.1))
+                (fabs(scroll.sx) > SCROLL_MINIMUM_DELTA ||
+                 fabs(scroll.sy) > SCROLL_MINIMUM_DELTA))
             {
               ev.type = EV_SCROLL;
               ev.dx   = scroll.sx;
               ev.dy   = scroll.sy;
-              scroll.sx *= 0.95;
-              scroll.sy *= 0.95;
+              scroll.slowdown *= SCROLL_SLOWDOWN_MULTIPLIER;
+              scroll.sx *= scroll.slowdown;
+              scroll.sy *= scroll.slowdown;
               (*update)(ev);
             }
             else
