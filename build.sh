@@ -46,6 +46,8 @@ clang \
     src/modules/player/stream.c \
     src/modules/player/video.c \
     src/modules/player/decoder.c \
+    src/modules/player/strcomm.c \
+    src/modules/player/render.c \
     src/mtlib/mtbitmap.c \
     src/mtlib/mttexmap.c \
     src/mtlib/mtchannel.c \
