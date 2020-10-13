@@ -20,14 +20,10 @@ void player_init()
 {
   VideoState* is;
 
-  /* file_iformat = av_find_input_format(); */
-  /* if (!file_iformat) */
-  /* { */
-  /*   av_log(NULL, AV_LOG_FATAL, "Unknown input format: %s\n", arg); */
-  /*   return AVERROR(EINVAL); */
-  /* } */
+  is = stream_open("res/marja.mp4", file_iformat);
 
-  is = stream_open("akarmi.mp3", file_iformat);
+  printf("videostate %xu\n", is);
+
   if (!is)
   {
     av_log(NULL, AV_LOG_FATAL, "Failed to initialize VideoState!\n");

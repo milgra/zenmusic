@@ -35,7 +35,7 @@ void wm_init(void (*init)(int, int),
 {
   SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0");
 
-  if (SDL_Init(SDL_INIT_VIDEO) < 0)
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) < 0)
   {
     printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
   }

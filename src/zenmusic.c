@@ -40,7 +40,7 @@ void init(int width, int height)
   ui_manager_add(header);
   ui_manager_add(songlist);
 
-  //player_init();
+  player_init();
 }
 
 void update(ev_t ev)
