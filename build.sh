@@ -5,6 +5,12 @@ clang \
     -lGLEW \
     -lSDL2 \
     -lavutil \
+    -lavcodec \
+    -lavdevice \
+    -lavformat \
+    -lavfilter \
+    -lswresample \
+    -lswscale \
     -I/usr/local/include \
     -I/usr/local/include/GL \
     -I/usr/local/include/SDL2 \
@@ -18,6 +24,7 @@ clang \
     -Isrc/modules/ui \
     -Isrc/modules/wm \
     -Isrc/modules/text \
+    -Isrc/modules/player \
     src/modules/gl/gl_connector.c \
     src/modules/gl/gl_floatbuffer.c \
     src/modules/ui/ui_manager.c \
@@ -31,6 +38,14 @@ clang \
     src/modules/wm/wm_connector.c \
     src/modules/text/font.c \
     src/modules/text/text.c \
+    src/modules/player/player.c \
+    src/modules/player/clock.c \
+    src/modules/player/codec.c \
+    src/modules/player/frame.c \
+    src/modules/player/packet.c \
+    src/modules/player/stream.c \
+    src/modules/player/video.c \
+    src/modules/player/decoder.c \
     src/mtlib/mtbitmap.c \
     src/mtlib/mttexmap.c \
     src/mtlib/mtchannel.c \
@@ -43,7 +58,6 @@ clang \
     src/mtlib/mtstring.c \
     src/mtlib/mtcstring.c \
     src/eh_songs.c \
-    src/player.c \
     src/zenmusic.c \
     src/common.c \
     -o bin/zenmusic

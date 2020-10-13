@@ -3,6 +3,7 @@
 #include "font.c"
 #include "mtcstring.c"
 #include "mtmath4.c"
+#include "player.c"
 #include "tg_color.c"
 #include "tg_text.c"
 #include "ui_manager.c"
@@ -27,22 +28,19 @@ void init(int width, int height)
 
   ui_manager_init(width, height);
 
-  // header_texture_generator = text_gen("Header",0x000000FF,0xFFFFFFFF );
-  // header_event_handler =
-  // musiclist_texture_generatpr = color_gen(0x000000FF)
-  // musiclist_event_handler = musiclist_ev_gen
-
   view_t* header = view_new("header", (vframe_t){0, 0, 600, 100});
 
-  tg_text_add(header, 0x000000FF, 0xFFFFFFFF, "Header");
+  tg_text_add(header, 0xFFFFFFFF, 0x000000FF, "Zen Music Player");
 
   view_t* songlist = view_new("songlist", (vframe_t){0, 100, 600, 600});
 
-  tg_color_add(songlist, 0x00FF00FF);
+  tg_color_add(songlist, 0x222222FF);
   eh_songs_add(songlist);
 
   ui_manager_add(header);
   ui_manager_add(songlist);
+
+  //player_init();
 }
 
 void update(ev_t ev)
