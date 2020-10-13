@@ -48,6 +48,7 @@ clang \
     src/modules/player/decoder.c \
     src/modules/player/strcomm.c \
     src/modules/player/render.c \
+    src/modules/player/options.c \
     src/mtlib/mtbitmap.c \
     src/mtlib/mttexmap.c \
     src/mtlib/mtchannel.c \
