@@ -6,6 +6,7 @@
 #define player_h
 
 void player_init();
+void player_draw();
 
 #endif
 
@@ -16,9 +17,11 @@ void player_init();
 
 static AVInputFormat* file_iformat;
 
+VideoState* is;
+double      remaining_time = 0.0;
+
 void player_init()
 {
-  VideoState* is;
 
   is = stream_open("res/marja.mp4", file_iformat);
 
@@ -28,6 +31,14 @@ void player_init()
   {
     av_log(NULL, AV_LOG_FATAL, "Failed to initialize VideoState!\n");
   }
+}
+
+void player_draw()
+{
+  if (is->show_mode != SHOW_MODE_NONE && (!is->paused || is->force_refresh))
+    video_refresh(is, &remaining_time);
+
+  printf("draw, remaining time %f\n", remaining_time);
 }
 
 #endif

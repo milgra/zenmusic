@@ -50,6 +50,7 @@ void update(ev_t ev)
 
 void render()
 {
+  player_draw();
   ui_manager_render();
 }
 
