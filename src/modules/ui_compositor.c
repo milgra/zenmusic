@@ -83,10 +83,17 @@ void ui_compositor_add(char* id, int x, int y, int w, int h, bm_t* bmp)
   v4_t     texc;
   crect_t* rect;
 
-  tm_put(tm, id, bmp);
+  if (bmp)
+  {
+    tm_put(tm, id, bmp);
 
-  texc = tm_get(tm, id);
-  rect = crect_new(id, x, y, w, h, texc.x, texc.y, texc.z, texc.w);
+    texc = tm_get(tm, id);
+    rect = crect_new(id, x, y, w, h, texc.x, texc.y, texc.z, texc.w);
+  }
+  else
+  {
+    rect = crect_new(id, x, y, w, h, 0.0, 0.0, 1.0, 1.0);
+  }
 
   VADD(rectv, rect);
   MPUT(rectm, id, rect);

@@ -32,6 +32,8 @@ clang \
     src/modules/ui/eh_drag.c \
     src/modules/ui/tg_text.c \
     src/modules/ui/tg_color.c \
+    src/modules/ui/tg_texmap.c \
+    src/modules/ui/tg_video.c \
     src/modules/ui_connector.c \
     src/modules/ui_compositor.c \
     src/modules/wm/wm_event.c \

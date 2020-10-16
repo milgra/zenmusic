@@ -1,3 +1,8 @@
+/*
+  Text texture generator
+  Shows text in view
+ */
+
 #ifndef texgen_text_h
 #define texgen_text_h
 

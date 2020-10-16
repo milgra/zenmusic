@@ -11,3 +11,6 @@ zen photo - offline photo viewer and library manager
 
 stencil, layer groups, space-autstart-stop files
 spectrum analyzer/bar in the background
+
+css based styling, layout, color
+create video texture

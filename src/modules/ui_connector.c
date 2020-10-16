@@ -84,7 +84,7 @@ void ui_connector_render()
       view->bmp_state = 1; /* pending */
       mtch_send(uich, view);
     }
-    if (view->bmp_state == 2) /* add rendered views to compositor */
+    if (view->bmp_state == 2 || view->bmp == NULL) /* add rendered views to compositor */
     {
       view->bmp_state   = 3; /* added to compositor */
       view->bmp_changed = 0;

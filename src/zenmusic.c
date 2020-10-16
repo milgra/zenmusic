@@ -5,7 +5,9 @@
 #include "mtmath4.c"
 #include "player.c"
 #include "tg_color.c"
+#include "tg_texmap.c"
 #include "tg_text.c"
+#include "tg_video.c"
 #include "ui_manager.c"
 #include "view.c"
 #include "wm_connector.c"
@@ -37,8 +39,18 @@ void init(int width, int height)
   tg_color_add(songlist, 0x222222FF);
   eh_songs_add(songlist);
 
+  view_t* videoview = view_new("videoview", (vframe_t){400, 400, 320, 240});
+
+  tg_video_add(videoview);
+
+  view_t* texmapview = view_new("texmapview", (vframe_t){50, 500, 400, 400});
+
+  tg_texmap_add(texmapview);
+
   ui_manager_add(header);
   ui_manager_add(songlist);
+  ui_manager_add(videoview);
+  ui_manager_add(texmapview);
 
   player_init();
 }

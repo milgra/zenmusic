@@ -1,3 +1,8 @@
+/*
+  Solid color texture generator
+  Shows color in view
+ */
+
 #ifndef texgen_color_h
 #define texgen_color_h
 
