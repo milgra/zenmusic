@@ -12,6 +12,7 @@ void video_refresh(void* opaque, double* remaining_time);
 #include "libavutil/time.h"
 #include "strcomm.c"
 #include "video.c"
+#include <GL/glew.h>
 
 /* no AV sync correction is done if below the minimum AV sync threshold */
 #define AV_SYNC_THRESHOLD_MIN 0.04
@@ -302,100 +303,272 @@ void check_external_clock_speed(VideoState* is)
 /*   } */
 /* } */
 
-/* static void video_image_display(VideoState* is) */
+/* static int GL_UpdateTexture(SDL_Renderer* renderer, SDL_Texture* texture, const SDL_Rect* rect, const void* pixels, int pitch) */
 /* { */
-/*   Frame*   vp; */
-/*   Frame*   sp = NULL; */
-/*   SDL_Rect rect; */
+/*   GL_RenderData*  renderdata = (GL_RenderData*)renderer->driverdata; */
+/*   GL_TextureData* data       = (GL_TextureData*)texture->driverdata; */
 
-/*   vp = frame_queue_peek_last(&is->pictq); */
-/*   if (is->subtitle_st) */
+/*   GL_ActivateRenderer(renderer); */
+
+/*   GL_CheckError("", renderer); */
+/*   renderdata->glEnable(data->type); */
+/*   renderdata->glBindTexture(data->type, data->texture); */
+/*   renderdata->glPixelStorei(GL_UNPACK_ALIGNMENT, 1); */
+/*   renderdata->glPixelStorei(GL_UNPACK_ROW_LENGTH, */
+/*                             (pitch / SDL_BYTESPERPIXEL(texture->format))); */
+/*   renderdata->glTexSubImage2D(data->type, 0, rect->x, rect->y, rect->w, */
+/*                               rect->h, data->format, data->formattype, */
+/*                               pixels); */
+/*   if (data->yuv) */
 /*   { */
-/*     if (frame_queue_nb_remaining(&is->subpq) > 0) */
+/*     renderdata->glPixelStorei(GL_UNPACK_ROW_LENGTH, (pitch / 2)); */
+
+/*     /\* Skip to the correct offset into the next texture *\/ */
+/*     pixels = (const void*)((const Uint8*)pixels + rect->h * pitch); */
+/*     if (texture->format == SDL_PIXELFORMAT_YV12) */
 /*     { */
-/*       sp = frame_queue_peek(&is->subpq); */
-
-/*       if (vp->pts >= sp->pts + ((float)sp->sub.start_display_time / 1000)) */
-/*       { */
-/*         if (!sp->uploaded) */
-/*         { */
-/*           uint8_t* pixels[4]; */
-/*           int      pitch[4]; */
-/*           int      i; */
-/*           if (!sp->width || !sp->height) */
-/*           { */
-/*             sp->width  = vp->width; */
-/*             sp->height = vp->height; */
-/*           } */
-/*           if (realloc_texture(&is->sub_texture, SDL_PIXELFORMAT_ARGB8888, sp->width, sp->height, SDL_BLENDMODE_BLEND, 1) < 0) */
-/*             return; */
-
-/*           for (i = 0; i < sp->sub.num_rects; i++) */
-/*           { */
-/*             AVSubtitleRect* sub_rect = sp->sub.rects[i]; */
-
-/*             sub_rect->x = av_clip(sub_rect->x, 0, sp->width); */
-/*             sub_rect->y = av_clip(sub_rect->y, 0, sp->height); */
-/*             sub_rect->w = av_clip(sub_rect->w, 0, sp->width - sub_rect->x); */
-/*             sub_rect->h = av_clip(sub_rect->h, 0, sp->height - sub_rect->y); */
-
-/*             is->sub_convert_ctx = sws_getCachedContext(is->sub_convert_ctx, */
-/*                                                        sub_rect->w, sub_rect->h, AV_PIX_FMT_PAL8, */
-/*                                                        sub_rect->w, sub_rect->h, AV_PIX_FMT_BGRA, */
-/*                                                        0, NULL, NULL, NULL); */
-/*             if (!is->sub_convert_ctx) */
-/*             { */
-/*               av_log(NULL, AV_LOG_FATAL, "Cannot initialize the conversion context\n"); */
-/*               return; */
-/*             } */
-/*             if (!SDL_LockTexture(is->sub_texture, (SDL_Rect*)sub_rect, (void**)pixels, pitch)) */
-/*             { */
-/*               sws_scale(is->sub_convert_ctx, (const uint8_t* const*)sub_rect->data, sub_rect->linesize, */
-/*                         0, sub_rect->h, pixels, pitch); */
-/*               SDL_UnlockTexture(is->sub_texture); */
-/*             } */
-/*           } */
-/*           sp->uploaded = 1; */
-/*         } */
-/*       } */
-/*       else */
-/*         sp = NULL; */
+/*       renderdata->glBindTexture(data->type, data->vtexture); */
 /*     } */
-/*   } */
-
-/*   calculate_display_rect(&rect, is->xleft, is->ytop, is->width, is->height, vp->width, vp->height, vp->sar); */
-
-/*   if (!vp->uploaded) */
-/*   { */
-/*     if (upload_texture(&is->vid_texture, vp->frame, &is->img_convert_ctx) < 0) */
-/*       return; */
-/*     vp->uploaded = 1; */
-/*     vp->flip_v   = vp->frame->linesize[0] < 0; */
-/*   } */
-
-/*   set_sdl_yuv_conversion_mode(vp->frame); */
-/*   SDL_RenderCopyEx(renderer, is->vid_texture, NULL, &rect, 0, NULL, vp->flip_v ? SDL_FLIP_VERTICAL : 0); */
-/*   set_sdl_yuv_conversion_mode(NULL); */
-/*   if (sp) */
-/*   { */
-/* #if USE_ONEPASS_SUBTITLE_RENDER */
-/*     SDL_RenderCopy(renderer, is->sub_texture, NULL, &rect); */
-/* #else */
-/*     int    i; */
-/*     double xratio = (double)rect.w / (double)sp->width; */
-/*     double yratio = (double)rect.h / (double)sp->height; */
-/*     for (i = 0; i < sp->sub.num_rects; i++) */
+/*     else */
 /*     { */
-/*       SDL_Rect* sub_rect = (SDL_Rect*)sp->sub.rects[i]; */
-/*       SDL_Rect  target   = {.x = rect.x + sub_rect->x * xratio, */
-/*                          .y = rect.y + sub_rect->y * yratio, */
-/*                          .w = sub_rect->w * xratio, */
-/*                          .h = sub_rect->h * yratio}; */
-/*       SDL_RenderCopy(renderer, is->sub_texture, sub_rect, &target); */
+/*       renderdata->glBindTexture(data->type, data->utexture); */
 /*     } */
-/* #endif */
+/*     renderdata->glTexSubImage2D(data->type, 0, rect->x / 2, rect->y / 2, */
+/*                                 rect->w / 2, rect->h / 2, */
+/*                                 data->format, data->formattype, pixels); */
+
+/*     /\* Skip to the correct offset into the next texture *\/ */
+/*     pixels = (const void*)((const Uint8*)pixels + (rect->h * pitch) / 4); */
+/*     if (texture->format == SDL_PIXELFORMAT_YV12) */
+/*     { */
+/*       renderdata->glBindTexture(data->type, data->utexture); */
+/*     } */
+/*     else */
+/*     { */
+/*       renderdata->glBindTexture(data->type, data->vtexture); */
+/*     } */
+/*     renderdata->glTexSubImage2D(data->type, 0, rect->x / 2, rect->y / 2, */
+/*                                 rect->w / 2, rect->h / 2, */
+/*                                 data->format, data->formattype, pixels); */
 /*   } */
+/*   renderdata->glDisable(data->type); */
+/*   if (GL_CheckError("glTexSubImage2D()", renderer) > 0) */
+/*   { */
+/*     return -1; */
+/*   } */
+/*   return 0; */
 /* } */
+
+static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, struct SwsContext** img_convert_ctx)
+{
+  int ret = 0;
+  /*   Uint32        sdl_pix_fmt; */
+  /*   SDL_BlendMode sdl_blendmode; */
+  /*   get_sdl_pix_fmt_and_blendmode(frame->format, &sdl_pix_fmt, &sdl_blendmode); */
+  /*   if (realloc_texture(tex, sdl_pix_fmt == SDL_PIXELFORMAT_UNKNOWN ? SDL_PIXELFORMAT_ARGB8888 : sdl_pix_fmt, */
+  /*                       frame->width, frame->height, sdl_blendmode, 0) < 0) */
+  /*     return -1; */
+  /*   switch (sdl_pix_fmt) */
+  /*   { */
+  /*   case SDL_PIXELFORMAT_UNKNOWN: */
+  /*     /\* This should only happen if we are not using avfilter... *\/ */
+  /*     *img_convert_ctx = sws_getCachedContext(*img_convert_ctx, */
+  /*                                             frame->width, frame->height, frame->format, frame->width, frame->height, */
+  /*                                             AV_PIX_FMT_BGRA, sws_flags, NULL, NULL, NULL); */
+  /*     if (*img_convert_ctx != NULL) */
+  /*     { */
+  /*       uint8_t* pixels[4]; */
+  /*       int      pitch[4]; */
+  /*       if (!SDL_LockTexture(*tex, NULL, (void**)pixels, pitch)) */
+  /*       { */
+  /*         sws_scale(*img_convert_ctx, (const uint8_t* const*)frame->data, frame->linesize, */
+  /*                   0, frame->height, pixels, pitch); */
+  /*         SDL_UnlockTexture(*tex); */
+  /*       } */
+  /*     } */
+  /*     else */
+  /*     { */
+  /*       av_log(NULL, AV_LOG_FATAL, "Cannot initialize the conversion context\n"); */
+  /*       ret = -1; */
+  /*     } */
+  /*     break; */
+  /*   case SDL_PIXELFORMAT_IYUV: */
+  /*     if (frame->linesize[0] > 0 && frame->linesize[1] > 0 && frame->linesize[2] > 0) */
+  /*     { */
+  /*       ret = SDL_UpdateYUVTexture(*tex, NULL, frame->data[0], frame->linesize[0], */
+  /*                                  frame->data[1], frame->linesize[1], */
+  /*                                  frame->data[2], frame->linesize[2]); */
+  /*     } */
+  /*     else if (frame->linesize[0] < 0 && frame->linesize[1] < 0 && frame->linesize[2] < 0) */
+  /*     { */
+  /*       ret = SDL_UpdateYUVTexture(*tex, NULL, frame->data[0] + frame->linesize[0] * (frame->hei\ */
+  /* ght - 1), */
+  /*                                  -frame->linesize[0], */
+  /*                                  frame->data[1] + frame->linesize[1] * (AV_CEIL_RSHIFT(frame->height, 1) - 1), */
+  /*                                  -frame->linesize[1], */
+  /*                                  frame->data[2] + frame->linesize[2] * (AV_CEIL_RSHIFT(frame->height, 1) - 1), */
+  /*                                  -frame->linesize[2]); */
+  /*     } */
+  /*     else */
+  /*     { */
+  /*       av_log(NULL, AV_LOG_ERROR, "Mixed negative and positive linesizes are not supported.\n"); */
+  /*       return -1; */
+  /*     } */
+  /*     break; */
+  /*   default: */
+
+  if (frame->linesize[0] < 0)
+  {
+    printf("SMALLER\n");
+    void* pixels = frame->data[0] + frame->linesize[0] * (frame->height - 1);
+    int   pitch  = -frame->linesize[0];
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glPixelStorei(GL_UNPACK_ROW_LENGTH, (pitch / 4));
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 2048, 2048, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+  }
+  else
+  {
+    void* pixels = frame->data[0];
+    int   pitch  = frame->linesize[0];
+
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glPixelStorei(GL_UNPACK_ROW_LENGTH, pitch / 4);
+
+    //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, frame->width, frame->height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+  }
+  /*     break; */
+  /*   } */
+  return ret;
+}
+
+static void calculate_display_rect(SDL_Rect*  rect,
+                                   int        scr_xleft,
+                                   int        scr_ytop,
+                                   int        scr_width,
+                                   int        scr_height,
+                                   int        pic_width,
+                                   int        pic_height,
+                                   AVRational pic_sar)
+{
+  AVRational aspect_ratio = pic_sar;
+  int64_t    width, height, x, y;
+
+  if (av_cmp_q(aspect_ratio, av_make_q(0, 1)) <= 0)
+    aspect_ratio = av_make_q(1, 1);
+
+  aspect_ratio = av_mul_q(aspect_ratio, av_make_q(pic_width, pic_height));
+
+  /* XXX: we suppose the screen has a 1.0 pixel ratio */
+  height = scr_height;
+  width  = av_rescale(height, aspect_ratio.num, aspect_ratio.den) & ~1;
+  if (width > scr_width)
+  {
+    width  = scr_width;
+    height = av_rescale(width, aspect_ratio.den, aspect_ratio.num) & ~1;
+  }
+  x       = (scr_width - width) / 2;
+  y       = (scr_height - height) / 2;
+  rect->x = scr_xleft + x;
+  rect->y = scr_ytop + y;
+  rect->w = FFMAX((int)width, 1);
+  rect->h = FFMAX((int)height, 1);
+}
+
+static void video_image_display(VideoState* is)
+{
+  Frame*   vp;
+  Frame*   sp = NULL;
+  SDL_Rect rect;
+
+  vp = frame_queue_peek_last(&is->pictq);
+  if (is->subtitle_st)
+  {
+    if (frame_queue_nb_remaining(&is->subpq) > 0)
+    {
+      sp = frame_queue_peek(&is->subpq);
+
+      if (vp->pts >= sp->pts + ((float)sp->sub.start_display_time / 1000))
+      {
+        if (!sp->uploaded)
+        {
+          /*           uint8_t* pixels[4]; */
+          /*           int      pitch[4]; */
+          /*           int      i; */
+          /*           if (!sp->width || !sp->height) */
+          /*           { */
+          /*             sp->width  = vp->width; */
+          /*             sp->height = vp->height; */
+          /*           } */
+          /*           if (realloc_texture(&is->sub_texture, SDL_PIXELFORMAT_ARGB8888, sp->width, sp->height, SDL_BLENDMODE_BLEND, 1) < 0) */
+          /*             return; */
+
+          /*           for (i = 0; i < sp->sub.num_rects; i++) */
+          /*           { */
+          /*             AVSubtitleRect* sub_rect = sp->sub.rects[i]; */
+
+          /*             sub_rect->x = av_clip(sub_rect->x, 0, sp->width); */
+          /*             sub_rect->y = av_clip(sub_rect->y, 0, sp->height); */
+          /*             sub_rect->w = av_clip(sub_rect->w, 0, sp->width - sub_rect->x); */
+          /*             sub_rect->h = av_clip(sub_rect->h, 0, sp->height - sub_rect->y); */
+
+          /*             is->sub_convert_ctx = sws_getCachedContext(is->sub_convert_ctx, */
+          /*                                                        sub_rect->w, sub_rect->h, AV_PIX_FMT_PAL8, */
+          /*                                                        sub_rect->w, sub_rect->h, AV_PIX_FMT_BGRA, */
+          /*                                                        0, NULL, NULL, NULL); */
+          /*             if (!is->sub_convert_ctx) */
+          /*             { */
+          /*               av_log(NULL, AV_LOG_FATAL, "Cannot initialize the conversion context\n"); */
+          /*               return; */
+          /*             } */
+          /*             if (!SDL_LockTexture(is->sub_texture, (SDL_Rect*)sub_rect, (void**)pixels, pitch)) */
+          /*             { */
+          /*               sws_scale(is->sub_convert_ctx, (const uint8_t* const*)sub_rect->data, sub_rect->linesize, */
+          /*                         0, sub_rect->h, pixels, pitch); */
+          /*               SDL_UnlockTexture(is->sub_texture); */
+          /*             } */
+          /*           } */
+          sp->uploaded = 1;
+        }
+      }
+      else
+        sp = NULL;
+    }
+  }
+
+  calculate_display_rect(&rect, is->xleft, is->ytop, is->width, is->height, vp->width, vp->height, vp->sar);
+
+  if (!vp->uploaded)
+  {
+    if (upload_texture(&is->vid_texture, vp->frame, rect, &is->img_convert_ctx) < 0)
+      return;
+    vp->uploaded = 1;
+    vp->flip_v   = vp->frame->linesize[0] < 0;
+  }
+
+  /*   set_sdl_yuv_conversion_mode(vp->frame); */
+  /*   SDL_RenderCopyEx(renderer, is->vid_texture, NULL, &rect, 0, NULL, vp->flip_v ? SDL_FLIP_VERTICAL : 0); */
+  /*   set_sdl_yuv_conversion_mode(NULL); */
+  /*   if (sp) */
+  /*   { */
+  /* #if USE_ONEPASS_SUBTITLE_RENDER */
+  /*     SDL_RenderCopy(renderer, is->sub_texture, NULL, &rect); */
+  /* #else */
+  /*     int    i; */
+  /*     double xratio = (double)rect.w / (double)sp->width; */
+  /*     double yratio = (double)rect.h / (double)sp->height; */
+  /*     for (i = 0; i < sp->sub.num_rects; i++) */
+  /*     { */
+  /*       SDL_Rect* sub_rect = (SDL_Rect*)sp->sub.rects[i]; */
+  /*       SDL_Rect  target   = {.x = rect.x + sub_rect->x * xratio, */
+  /*                          .y = rect.y + sub_rect->y * yratio, */
+  /*                          .w = sub_rect->w * xratio, */
+  /*                          .h = sub_rect->h * yratio}; */
+  /*       SDL_RenderCopy(renderer, is->sub_texture, sub_rect, &target); */
+  /*     } */
+  /* #endif */
+  /*   } */
+}
 
 static int video_open(VideoState* is)
 {
@@ -423,15 +596,14 @@ static int video_open(VideoState* is)
 /* display the current picture, if any */
 static void video_display(VideoState* is)
 {
-  if (!is->width)
-    video_open(is);
+  if (!is->width) video_open(is);
 
   //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
   //SDL_RenderClear(renderer);
   /* if (is->audio_st && is->show_mode != SHOW_MODE_VIDEO) */
   /*   video_audio_display(is); */
   /* else if (is->video_st) */
-  /*   video_image_display(is); */
+  video_image_display(is);
   //SDL_RenderPresent(renderer);
 }
 
@@ -582,12 +754,9 @@ void video_refresh(void* opaque, double* remaining_time)
       aqsize = 0;
       vqsize = 0;
       sqsize = 0;
-      if (is->audio_st)
-        aqsize = is->audioq.size;
-      if (is->video_st)
-        vqsize = is->videoq.size;
-      if (is->subtitle_st)
-        sqsize = is->subtitleq.size;
+      if (is->audio_st) aqsize = is->audioq.size;
+      if (is->video_st) vqsize = is->videoq.size;
+      if (is->subtitle_st) sqsize = is->subtitleq.size;
       av_diff = 0;
       if (is->audio_st && is->video_st)
         av_diff = get_clock(&is->audclk) - get_clock(&is->vidclk);
@@ -596,26 +765,26 @@ void video_refresh(void* opaque, double* remaining_time)
       else if (is->audio_st)
         av_diff = get_master_clock(is) - get_clock(&is->audclk);
 
-      av_bprint_init(&buf, 0, AV_BPRINT_SIZE_AUTOMATIC);
-      av_bprintf(&buf,
-                 "%7.2f %s:%7.3f fd=%4d aq=%5dKB vq=%5dKB sq=%5dB f=%" PRId64 "/%" PRId64 "   \r",
-                 get_master_clock(is),
-                 (is->audio_st && is->video_st) ? "A-V" : (is->video_st ? "M-V" : (is->audio_st ? "M-A" : "   ")),
-                 av_diff,
-                 is->frame_drops_early + is->frame_drops_late,
-                 aqsize / 1024,
-                 vqsize / 1024,
-                 sqsize,
-                 is->video_st ? is->viddec.avctx->pts_correction_num_faulty_dts : 0,
-                 is->video_st ? is->viddec.avctx->pts_correction_num_faulty_pts : 0);
+      /* av_bprint_init(&buf, 0, AV_BPRINT_SIZE_AUTOMATIC); */
+      /* av_bprintf(&buf, */
+      /*            "%7.2f %s:%7.3f fd=%4d aq=%5dKB vq=%5dKB sq=%5dB f=%" PRId64 "/%" PRId64 "   \r", */
+      /*            get_master_clock(is), */
+      /*            (is->audio_st && is->video_st) ? "A-V" : (is->video_st ? "M-V" : (is->audio_st ? "M-A" : "   ")), */
+      /*            av_diff, */
+      /*            is->frame_drops_early + is->frame_drops_late, */
+      /*            aqsize / 1024, */
+      /*            vqsize / 1024, */
+      /*            sqsize, */
+      /*            is->video_st ? is->viddec.avctx->pts_correction_num_faulty_dts : 0, */
+      /*            is->video_st ? is->viddec.avctx->pts_correction_num_faulty_pts : 0); */
 
-      if (show_status == 1 && AV_LOG_INFO > av_log_get_level())
-        fprintf(stderr, "%s", buf.str);
-      else
-        av_log(NULL, AV_LOG_INFO, "%s", buf.str);
+      /* if (show_status == 1 && AV_LOG_INFO > av_log_get_level()) */
+      /*   fprintf(stderr, "%s", buf.str); */
+      /* else */
+      /*   av_log(NULL, AV_LOG_INFO, "%s", buf.str); */
 
-      fflush(stderr);
-      av_bprint_finalize(&buf, NULL);
+      /* fflush(stderr); */
+      /* av_bprint_finalize(&buf, NULL); */
 
       last_time = cur_time;
     }
