@@ -1,0 +1,21 @@
+clang \
+    -L/usr/local/lib \
+    -I/usr/ports/multimedia/ffmpeg/work/ffmpeg-4.3.1 \
+    -I/usr/ports/multimedia/ffmpeg/work/ffmpeg-4.3.1/fftools \
+    -lm \
+    -lSDL2 \
+    -lavutil \
+    -lavcodec \
+    -lavdevice \
+    -lavformat \
+    -lavfilter \
+    -lavresample \
+    -lpostproc \
+    -lswresample \
+    -lswscale \
+    -I/usr/local/include \
+    -I/usr/local/include/GL \
+    -I/usr/local/include/SDL2 \
+    ffp/cmdutils.c \
+    ffp/ffplay.c \
+    -o bin/play

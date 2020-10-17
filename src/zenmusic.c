@@ -42,6 +42,7 @@ void init(int width, int height)
   view_t* videoview = view_new("videoview", (vframe_t){400, 400, 320, 240});
 
   tg_video_add(videoview);
+  eh_drag_add(videoview);
 
   view_t* texmapview = view_new("texmapview", (vframe_t){50, 500, 400, 400});
 

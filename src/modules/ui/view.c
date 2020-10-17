@@ -71,7 +71,6 @@ view_t* view_new(char*    id,    /* view id */
 {
   view_t* view = mtmem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
   view->id     = mtcstr_fromcstring(id);
-  view->bmp    = NULL;
   view->views  = VNEW();
   view->frame  = frame;
 
@@ -80,12 +79,12 @@ view_t* view_new(char*    id,    /* view id */
 
 void view_evt(view_t* view, ev_t ev)
 {
-  if (*view->eh) (*view->eh)(view, ev);
+  if (view->eh) (*view->eh)(view, ev);
 }
 
 void view_tex(view_t* view)
 {
-  if (*view->tg) (*view->tg)(view);
+  if (view->tg) (*view->tg)(view);
 }
 
 void view_setframe(view_t* view, vframe_t frame)

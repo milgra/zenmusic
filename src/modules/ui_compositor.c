@@ -53,7 +53,7 @@ void ui_compositor_init(int width, int height)
   gl_init(width, height);
 
   fb    = fb_new();
-  tm    = tm_new();
+  tm    = tm_new(2048, 2048);
   rectv = VNEW();
   rectm = MNEW();
 }

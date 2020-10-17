@@ -30,10 +30,10 @@ void  tm_upd(tm_t* tm, char* id, bm_t* bm);
 
 #include "mtmemory.c"
 
-tm_t* tm_new()
+tm_t* tm_new(int w, int h)
 {
   tm_t* tm   = mtmem_calloc(sizeof(tm_t), "tm_t", tm_del, NULL);
-  tm->bm     = bm_new(1024, 1024);
+  tm->bm     = bm_new(w, h);
   tm->coords = mtmap_alloc();
 
   return tm;

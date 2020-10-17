@@ -14,7 +14,6 @@ clang \
     -I/usr/local/include \
     -I/usr/local/include/GL \
     -I/usr/local/include/SDL2 \
-    -I/usr/local/include \
     -Isrc \
     -Isrc/ui \
     -Isrc/mtlib \
