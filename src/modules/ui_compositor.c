@@ -136,7 +136,8 @@ crect_t* crect_new(char* id,
                    float tx,
                    float ty,
                    float tz,
-                   float tw)
+                   float tw,
+                   float tu)
 {
   crect_t* r = mtmem_calloc(sizeof(crect_t), "crect_t", crect_del, NULL);
 

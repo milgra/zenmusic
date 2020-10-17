@@ -2,7 +2,6 @@
 attribute vec3 position;\
 attribute vec2 texcoord;\
 \
-uniform sampler2D texture;\
 uniform mat4 projection;\
 \
 varying vec2 vUv;\

@@ -18,3 +18,6 @@ spectrum analyzer/bar in the background
 
 css based styling, layout, color
 create video texture
+
+show split video/fullscreen/effects buttons on video hover, lower alpha
+zen ui renderer - modern ui/text renderer, can animate glyphs individually

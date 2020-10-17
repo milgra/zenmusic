@@ -166,12 +166,12 @@ char* blend_fsh =
 #include "blend.fsh"
     ;
 
-GLint uniform_name_a[2];
+GLint uniform_name_a[3];
 
 void gl_init(width, height)
 {
 
-  const char* uniforms_blend[]   = {"2", "projection", "texture"};
+  const char* uniforms_blend[]   = {"2", "projection", "tex0", "tex1"};
   const char* attributes_blend[] = {"2", "position", "texcoord"};
 
   glewInit();
@@ -200,20 +200,31 @@ void gl_init(width, height)
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 16, 0);
   glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 16, (const GLvoid*)8);
 
-  GLuint texture_name_u;
+  GLuint texture_name[2];
 
-  glGenTextures(1, &texture_name_u);
-  glBindTexture(GL_TEXTURE_2D, texture_name_u);
+  glGenTextures(2, texture_name);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, texture_name[0]);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2048, 2048, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-  glBindTexture(GL_TEXTURE_2D, 0);
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, texture_name_u);
+
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, texture_name[1]);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2048, 2048, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
   glUniform1i(uniform_name_a[1], 0);
+  glUniform1i(uniform_name_a[2], 1);
   glClearColor(0.5, 0.5, 0.5, 1.0);
+
+  glActiveTexture(GL_TEXTURE0);
 }
 
 void gl_resize(float width, float height)
