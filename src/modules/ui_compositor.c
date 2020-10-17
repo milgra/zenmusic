@@ -21,11 +21,11 @@ void ui_compositor_resize(float width, float height);
 
 typedef struct _crect_t
 {
-  float data[24];
+  float data[30];
   char* id;
 } crect_t;
 
-crect_t* crect_new(char* id, float x, float y, float w, float h, float tx, float ty, float tz, float tw);
+crect_t* crect_new(char* id, float x, float y, float w, float h, float tx, float ty, float tz, float tw, float tu);
 void     crect_del(void* rect);
 void     crect_desc(crect_t* rect);
 void     crect_set_dim(crect_t* rect, float x, float y, float w, float h);
@@ -73,7 +73,7 @@ void ui_compositor_render()
   fb_reset(fb);
 
   while ((rect = VNXT(rectv)))
-    fb_add(fb, rect->data, 24);
+    fb_add(fb, rect->data, 30);
 
   gl_render(fb, tm->bm);
 }
@@ -88,11 +88,11 @@ void ui_compositor_add(char* id, int x, int y, int w, int h, bm_t* bmp)
     tm_put(tm, id, bmp);
 
     texc = tm_get(tm, id);
-    rect = crect_new(id, x, y, w, h, texc.x, texc.y, texc.z, texc.w);
+    rect = crect_new(id, x, y, w, h, texc.x, texc.y, texc.z, texc.w, 0.0);
   }
   else
   {
-    rect = crect_new(id, x, y, w, h, 0.0, 0.0, 1.0, 1.0);
+    rect = crect_new(id, x, y, w, h, 0.0, 0.0, 1.0, 1.0, 1.0);
   }
 
   VADD(rectv, rect);
@@ -147,31 +147,37 @@ crect_t* crect_new(char* id,
   r->data[1] = y;
   r->data[2] = tx;
   r->data[3] = ty;
+  r->data[4] = tu;
 
-  r->data[4] = x + w;
-  r->data[5] = y + h;
-  r->data[6] = tz;
-  r->data[7] = tw;
+  r->data[5] = x + w;
+  r->data[6] = y + h;
+  r->data[7] = tz;
+  r->data[8] = tw;
+  r->data[9] = tu;
 
-  r->data[8]  = x;
-  r->data[9]  = y + h;
-  r->data[10] = tx;
-  r->data[11] = tw;
+  r->data[10] = x;
+  r->data[11] = y + h;
+  r->data[12] = tx;
+  r->data[13] = tw;
+  r->data[14] = tu;
 
-  r->data[12] = x + w;
-  r->data[13] = y;
-  r->data[14] = tz;
-  r->data[15] = ty;
+  r->data[15] = x + w;
+  r->data[16] = y;
+  r->data[17] = tz;
+  r->data[18] = ty;
+  r->data[19] = tu;
 
-  r->data[16] = x;
-  r->data[17] = y;
-  r->data[18] = tx;
-  r->data[19] = ty;
+  r->data[20] = x;
+  r->data[21] = y;
+  r->data[22] = tx;
+  r->data[23] = ty;
+  r->data[24] = tu;
 
-  r->data[20] = x + w;
-  r->data[21] = y + h;
-  r->data[22] = tz;
-  r->data[23] = tw;
+  r->data[25] = x + w;
+  r->data[26] = y + h;
+  r->data[27] = tz;
+  r->data[28] = tw;
+  r->data[29] = tu;
 
   return r;
 }
@@ -187,20 +193,20 @@ void crect_set_dim(crect_t* r, float x, float y, float w, float h)
   r->data[0] = x;
   r->data[1] = y;
 
-  r->data[4] = x + w;
-  r->data[5] = y + h;
+  r->data[5] = x + w;
+  r->data[6] = y + h;
 
-  r->data[8] = x;
-  r->data[9] = y + h;
+  r->data[10] = x;
+  r->data[11] = y + h;
 
-  r->data[12] = x + w;
-  r->data[13] = y;
+  r->data[15] = x + w;
+  r->data[16] = y;
 
-  r->data[16] = x;
-  r->data[17] = y;
+  r->data[20] = x;
+  r->data[21] = y;
 
-  r->data[20] = x + w;
-  r->data[21] = y + h;
+  r->data[25] = x + w;
+  r->data[26] = y + h;
 }
 
 void crect_set_tex(crect_t* r, float tx, float ty, float tz, float tw)
@@ -208,20 +214,20 @@ void crect_set_tex(crect_t* r, float tx, float ty, float tz, float tw)
   r->data[2] = tx;
   r->data[3] = ty;
 
-  r->data[6] = tz;
-  r->data[7] = tw;
+  r->data[7] = tz;
+  r->data[8] = tw;
 
-  r->data[10] = tx;
-  r->data[11] = tw;
+  r->data[12] = tx;
+  r->data[13] = tw;
 
-  r->data[14] = tz;
-  r->data[15] = ty;
+  r->data[17] = tz;
+  r->data[18] = ty;
 
-  r->data[18] = tx;
-  r->data[19] = ty;
+  r->data[22] = tx;
+  r->data[23] = ty;
 
-  r->data[22] = tz;
-  r->data[23] = tw;
+  r->data[27] = tz;
+  r->data[28] = tw;
 }
 
 void crect_desc(crect_t* r)

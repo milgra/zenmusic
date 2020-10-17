@@ -197,8 +197,8 @@ void gl_init(width, height)
   glBindBuffer(GL_ARRAY_BUFFER, vbuffer_name_u);
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 16, 0);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 16, (const GLvoid*)8);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 20, 0);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 20, (const GLvoid*)8);
 
   GLuint texture_name[2];
 
@@ -244,7 +244,7 @@ void gl_render(fb_t* fb, bm_t* bmp)
   //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, bmp->w, bmp->h, GL_RGBA, GL_UNSIGNED_BYTE, bmp->data);
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * fb->pos, fb->data, GL_DYNAMIC_DRAW);
   glClear(GL_COLOR_BUFFER_BIT);
-  glDrawArrays(GL_TRIANGLES, 0, fb->pos / 4);
+  glDrawArrays(GL_TRIANGLES, 0, fb->pos / 5);
 }
 
 #endif
