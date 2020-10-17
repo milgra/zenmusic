@@ -171,7 +171,7 @@ GLint uniform_name_a[3];
 void gl_init(width, height)
 {
 
-  const char* uniforms_blend[]   = {"2", "projection", "tex0", "tex1"};
+  const char* uniforms_blend[]   = {"3", "projection", "samplera", "samplerb"};
   const char* attributes_blend[] = {"2", "position", "texcoord"};
 
   glewInit();
@@ -200,20 +200,24 @@ void gl_init(width, height)
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 20, 0);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 20, (const GLvoid*)8);
 
-  GLuint texture_name[2];
+  GLuint texture_name_a;
 
-  glGenTextures(2, texture_name);
+  glGenTextures(1, &texture_name_a);
 
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, texture_name[0]);
+  glBindTexture(GL_TEXTURE_2D, texture_name_a);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2048, 2048, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
-  glActiveTexture(GL_TEXTURE1);
-  glBindTexture(GL_TEXTURE_2D, texture_name[1]);
+  GLuint texture_name_b;
+
+  glGenTextures(1, &texture_name_b);
+
+  glActiveTexture(GL_TEXTURE0 + 1);
+  glBindTexture(GL_TEXTURE_2D, texture_name_b);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -222,9 +226,8 @@ void gl_init(width, height)
 
   glUniform1i(uniform_name_a[1], 0);
   glUniform1i(uniform_name_a[2], 1);
-  glClearColor(0.5, 0.5, 0.5, 1.0);
 
-  glActiveTexture(GL_TEXTURE0);
+  glClearColor(0.5, 0.5, 0.5, 1.0);
 }
 
 void gl_resize(float width, float height)
@@ -241,8 +244,13 @@ void gl_resize(float width, float height)
 
 void gl_render(fb_t* fb, bm_t* bmp)
 {
-  //glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, bmp->w, bmp->h, GL_RGBA, GL_UNSIGNED_BYTE, bmp->data);
+  glActiveTexture(GL_TEXTURE0);
+  glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+  glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, bmp->w, bmp->h, GL_RGBA, GL_UNSIGNED_BYTE, bmp->data);
+
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * fb->pos, fb->data, GL_DYNAMIC_DRAW);
+
   glClear(GL_COLOR_BUFFER_BIT);
   glDrawArrays(GL_TRIANGLES, 0, fb->pos / 5);
 }

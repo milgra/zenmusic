@@ -1,4 +1,5 @@
 #include "common.c"
+#include "eh_drag.c"
 #include "eh_songs.c"
 #include "font.c"
 #include "mtcstring.c"

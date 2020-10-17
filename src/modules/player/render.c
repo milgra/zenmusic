@@ -423,6 +423,7 @@ static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, stru
     void* pixels = frame->data[0] + frame->linesize[0] * (frame->height - 1);
     int   pitch  = -frame->linesize[0];
 
+    glActiveTexture(GL_TEXTURE1);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, (pitch / 4));
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 2048, 2048, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
@@ -432,6 +433,7 @@ static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, stru
     void* pixels = frame->data[0];
     int   pitch  = frame->linesize[0];
 
+    glActiveTexture(GL_TEXTURE1);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glPixelStorei(GL_UNPACK_ROW_LENGTH, pitch / 4);
 

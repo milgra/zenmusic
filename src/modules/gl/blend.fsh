@@ -1,11 +1,18 @@
 "\
-uniform sampler2D tex0;\
-uniform sampler2D tex1;\
+uniform sampler2D samplera;\
+uniform sampler2D samplerb;\
 \
-varying vec2 vUv;\
+varying vec3 vUv;\
 \
 void main( )\
 {\
-	gl_FragColor = texture2D(tex1, vUv);\
+	if (vUv.z == 1.0)\
+	{\
+		gl_FragColor = texture2D(samplerb, vUv.xy);\
+	}\
+	else\
+	{\
+		gl_FragColor = texture2D(samplera, vUv.xy);\
+	}\
 }\
 "

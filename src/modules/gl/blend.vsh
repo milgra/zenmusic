@@ -1,10 +1,12 @@
 "\
 attribute vec3 position;\
-attribute vec2 texcoord;\
+attribute vec3 texcoord;\
 \
 uniform mat4 projection;\
+uniform sampler2D samplera;\
+uniform sampler2D samplerb;\
 \
-varying vec2 vUv;\
+varying vec3 vUv;\
 \
 void main ( )\
 {\
