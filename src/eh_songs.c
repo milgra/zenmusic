@@ -40,16 +40,6 @@ void eh_songs_evt(view_t* view, ev_t ev)
       view_setframe(sview, frame);
     }
   }
-  else if (ev.type == EV_MMOVE && ev.drag)
-  {
-    view_t* sview;
-    while ((sview = VNXT(view->views)))
-    {
-      vframe_t frame = sview->frame;
-      frame.y += (float)ev.dy;
-      view_setframe(sview, frame);
-    }
-  }
 }
 
 void eh_songs_del(void* p)
