@@ -10,6 +10,8 @@ void video_refresh(void* opaque, double* remaining_time);
 
 #include "libavutil/bprint.h"
 #include "libavutil/time.h"
+#include "libswresample/swresample.h"
+#include "libswscale/swscale.h"
 #include "strcomm.c"
 #include "video.c"
 #include <GL/glew.h>
@@ -359,88 +361,44 @@ void check_external_clock_speed(VideoState* is)
 /*   return 0; */
 /* } */
 
+uint8_t* scaledpixels[1];
+
+static unsigned sws_flags = SWS_BICUBIC;
+
 static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, struct SwsContext** img_convert_ctx)
 {
   int ret = 0;
-  /*   Uint32        sdl_pix_fmt; */
-  /*   SDL_BlendMode sdl_blendmode; */
-  /*   get_sdl_pix_fmt_and_blendmode(frame->format, &sdl_pix_fmt, &sdl_blendmode); */
-  /*   if (realloc_texture(tex, sdl_pix_fmt == SDL_PIXELFORMAT_UNKNOWN ? SDL_PIXELFORMAT_ARGB8888 : sdl_pix_fmt, */
-  /*                       frame->width, frame->height, sdl_blendmode, 0) < 0) */
-  /*     return -1; */
-  /*   switch (sdl_pix_fmt) */
-  /*   { */
-  /*   case SDL_PIXELFORMAT_UNKNOWN: */
-  /*     /\* This should only happen if we are not using avfilter... *\/ */
-  /*     *img_convert_ctx = sws_getCachedContext(*img_convert_ctx, */
-  /*                                             frame->width, frame->height, frame->format, frame->width, frame->height, */
-  /*                                             AV_PIX_FMT_BGRA, sws_flags, NULL, NULL, NULL); */
-  /*     if (*img_convert_ctx != NULL) */
-  /*     { */
-  /*       uint8_t* pixels[4]; */
-  /*       int      pitch[4]; */
-  /*       if (!SDL_LockTexture(*tex, NULL, (void**)pixels, pitch)) */
-  /*       { */
-  /*         sws_scale(*img_convert_ctx, (const uint8_t* const*)frame->data, frame->linesize, */
-  /*                   0, frame->height, pixels, pitch); */
-  /*         SDL_UnlockTexture(*tex); */
-  /*       } */
-  /*     } */
-  /*     else */
-  /*     { */
-  /*       av_log(NULL, AV_LOG_FATAL, "Cannot initialize the conversion context\n"); */
-  /*       ret = -1; */
-  /*     } */
-  /*     break; */
-  /*   case SDL_PIXELFORMAT_IYUV: */
-  /*     if (frame->linesize[0] > 0 && frame->linesize[1] > 0 && frame->linesize[2] > 0) */
-  /*     { */
-  /*       ret = SDL_UpdateYUVTexture(*tex, NULL, frame->data[0], frame->linesize[0], */
-  /*                                  frame->data[1], frame->linesize[1], */
-  /*                                  frame->data[2], frame->linesize[2]); */
-  /*     } */
-  /*     else if (frame->linesize[0] < 0 && frame->linesize[1] < 0 && frame->linesize[2] < 0) */
-  /*     { */
-  /*       ret = SDL_UpdateYUVTexture(*tex, NULL, frame->data[0] + frame->linesize[0] * (frame->hei\ */
-  /* ght - 1), */
-  /*                                  -frame->linesize[0], */
-  /*                                  frame->data[1] + frame->linesize[1] * (AV_CEIL_RSHIFT(frame->height, 1) - 1), */
-  /*                                  -frame->linesize[1], */
-  /*                                  frame->data[2] + frame->linesize[2] * (AV_CEIL_RSHIFT(frame->height, 1) - 1), */
-  /*                                  -frame->linesize[2]); */
-  /*     } */
-  /*     else */
-  /*     { */
-  /*       av_log(NULL, AV_LOG_ERROR, "Mixed negative and positive linesizes are not supported.\n"); */
-  /*       return -1; */
-  /*     } */
-  /*     break; */
-  /*   default: */
 
-  if (frame->linesize[0] < 0)
+  *img_convert_ctx = sws_getCachedContext(*img_convert_ctx,
+                                          frame->width,
+                                          frame->height,
+                                          frame->format,
+                                          frame->width,
+                                          frame->height,
+                                          AV_PIX_FMT_BGRA,
+                                          sws_flags,
+                                          NULL,
+                                          NULL,
+                                          NULL);
+
+  if (*img_convert_ctx != NULL)
   {
-    printf("SMALLER\n");
-    void* pixels = frame->data[0] + frame->linesize[0] * (frame->height - 1);
-    int   pitch  = -frame->linesize[0];
+    uint8_t* pixels[4];
+    int      pitch[4];
+
+    pitch[0] = 1280 * 4;
+    sws_scale(*img_convert_ctx,
+              (const uint8_t* const*)frame->data,
+              frame->linesize,
+              0,
+              frame->height,
+              scaledpixels,
+              pitch);
 
     glActiveTexture(GL_TEXTURE1);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, (pitch / 4));
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 2048, 2048, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-  }
-  else
-  {
-    void* pixels = frame->data[0];
-    int   pitch  = frame->linesize[0];
 
-    glActiveTexture(GL_TEXTURE1);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, pitch / 4);
-
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, frame->width, frame->height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, frame->width, frame->height, GL_BGRA, GL_UNSIGNED_BYTE, scaledpixels[0]);
   }
-  /*     break; */
-  /*   } */
   return ret;
 }
 
@@ -574,7 +532,7 @@ static void video_image_display(VideoState* is)
 
 static int video_open(VideoState* is)
 {
-  /* int w, h; */
+  int w, h;
 
   /* w = screen_width ? screen_width : default_width; */
   /* h = screen_height ? screen_height : default_height; */
@@ -589,8 +547,12 @@ static int video_open(VideoState* is)
   /*   SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP); */
   /* SDL_ShowWindow(window); */
 
-  /* is->width  = w; */
-  /* is->height = h; */
+  is->width  = 1280;
+  is->height = 720;
+
+  printf("video open\n");
+
+  scaledpixels[0] = malloc(1280 * 720 * 4);
 
   return 0;
 }

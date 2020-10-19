@@ -40,7 +40,7 @@ void init(int width, int height)
   tg_color_add(songlist, 0x222222FF);
   eh_songs_add(songlist);
 
-  view_t* videoview = view_new("videoview", (vframe_t){400, 400, 320, 240});
+  view_t* videoview = view_new("videoview", (vframe_t){400, 400, 800, 600});
 
   tg_video_add(videoview);
   eh_drag_add(videoview);
