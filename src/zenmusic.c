@@ -14,13 +14,29 @@
 #include "wm_connector.c"
 #include "wm_event.c"
 #include <SDL.h>
+#include <ftw.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
+static int
+display_info(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
+{
+  printf("%-3s %2d %7jd   %-40s %d %s\n",
+         (tflag == FTW_D) ? "d" : (tflag == FTW_DNR) ? "dnr" : (tflag == FTW_DP) ? "dp" : (tflag == FTW_F) ? "f" : (tflag == FTW_NS) ? "ns" : (tflag == FTW_SL) ? "sl" : (tflag == FTW_SLN) ? "sln" : "???",
+         ftwbuf->level, (intmax_t)sb->st_size,
+         fpath, ftwbuf->base, fpath + ftwbuf->base);
+  return 0; /* To tell nftw() to continue */
+}
+
 void init(int width, int height)
 {
   printf("zenmusic init %i %i\n", width, height);
+
+  int flags = 0;
+  //flags |= FTW_DEPTH;
+  flags |= FTW_PHYS;
+  nftw("/usr/home/milgra/Music", display_info, 20, flags);
 
   srand((unsigned int)time(NULL));
 

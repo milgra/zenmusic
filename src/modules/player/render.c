@@ -150,7 +150,7 @@ void check_external_clock_speed(VideoState* is)
 
 static void video_audio_display(VideoState* s)
 {
-  int     i, i_start, x, y1, y, ys, delay, n, nb_display_channels;
+  int     i, i_start, x, y1, y2, y, ys, delay, n, nb_display_channels;
   int     ch, channels, h, h2;
   int64_t time_diff;
   int     rdft_bits, nb_freq;
@@ -159,7 +159,7 @@ static void video_audio_display(VideoState* s)
     ;
   nb_freq = 1 << (rdft_bits - 1);
 
-  s->show_mode = SHOW_MODE_RDFT;
+  s->show_mode = SHOW_MODE_WAVES;
 
   /* compute display index : center on currently output samples */
   channels            = s->audio_tgt.channels;
@@ -223,6 +223,7 @@ static void video_audio_display(VideoState* s)
     {
       i  = i_start + ch;
       y1 = s->ytop + ch * h + (h / 2); /* position of center line */
+
       for (x = 0; x < s->width; x++)
       {
         y = (s->sample_array[i] * h2) >> 15;
@@ -230,12 +231,14 @@ static void video_audio_display(VideoState* s)
         {
           y  = -y;
           ys = y1 - y;
+          y2 = ys;
         }
         else
         {
           ys = y1;
+          y2 = ys + y;
         }
-        bm_fill(wavemap, s->xleft + x, ys, s->xleft + x + 10, ys + y, 0xFFFFFFFF);
+        bm_fill(wavemap, s->xleft + x, y2, s->xleft + x + 1, y2 + 2, 0xFFFFFFFF);
 
         i += channels;
         if (i >= SAMPLE_ARRAY_SIZE)

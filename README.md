@@ -10,14 +10,11 @@ zen photo and video - offline photo/video viewer and library manager / video/ima
 
 ---
 
-make video work in zen music
-different textures for video and ui, switch in shader
-
 stencil, layer groups, space-autstart-stop files
-spectrum analyzer/bar in the background
-
 css based styling, layout, color
-create video texture
 
 show split video/fullscreen/effects buttons on video hover, lower alpha
 zen ui renderer - modern ui/text renderer, can animate glyphs individually
+bar analyzer
+spectrum analyzer/bar in the background
+grid-based warping of video/album cover based on frequence ( bass in the center )

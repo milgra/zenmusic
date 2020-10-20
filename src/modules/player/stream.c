@@ -1189,6 +1189,11 @@ int read_thread(void* arg)
   }
   is->ic = ic;
 
+  printf("START METADATA");
+  AVDictionaryEntry* tag = NULL;
+  while ((tag = av_dict_get(ic->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
+    printf("%s=%s\n", tag->key, tag->value);
+
   if (genpts)
     ic->flags |= AVFMT_FLAG_GENPTS;
 
@@ -1213,7 +1218,6 @@ int read_thread(void* arg)
       goto fail;
     }
   }
-
   if (ic->pb)
     ic->pb->eof_reached = 0; // FIXME hack, ffplay maybe should not use avio_feof() to test for the end
 

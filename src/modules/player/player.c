@@ -20,10 +20,17 @@ static AVInputFormat* file_iformat;
 VideoState* is;
 double      remaining_time = 0.0;
 
+void player_draw_video(int text_unit_both, int tex_unit_left, int tex_unit_right, int width, int height)
+{
+}
+
+void player_draw_spectrum(int text_unit_both, int tex_unit_left, int tex_unit_right, int width, int height)
+{
+}
+
 void player_init()
 {
-
-  is = stream_open("res/tomjones.mp4", file_iformat);
+  is = stream_open("res/restless.mp3", file_iformat);
 
   printf("videostate %xu\n", is);
 

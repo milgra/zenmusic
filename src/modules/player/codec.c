@@ -21,12 +21,11 @@ int check_stream_specifier(AVFormatContext* s, AVStream* st, const char* spec)
 
 AVDictionary* filter_codec_opts(AVDictionary* opts, enum AVCodecID codec_id, AVFormatContext* s, AVStream* st, AVCodec* codec)
 {
-  AVDictionary*      ret   = NULL;
-  AVDictionaryEntry* t     = NULL;
-  int                flags = s->oformat ? AV_OPT_FLAG_ENCODING_PARAM
-                         : AV_OPT_FLAG_DECODING_PARAM;
-  char           prefix = 0;
-  const AVClass* cc     = avcodec_get_class();
+  AVDictionary*      ret    = NULL;
+  AVDictionaryEntry* t      = NULL;
+  int                flags  = s->oformat ? AV_OPT_FLAG_ENCODING_PARAM : AV_OPT_FLAG_DECODING_PARAM;
+  char               prefix = 0;
+  const AVClass*     cc     = avcodec_get_class();
 
   if (!codec)
     codec = s->oformat ? avcodec_find_encoder(codec_id)
