@@ -37,7 +37,7 @@ void eh_songs_evt(view_t* view, ev_t ev)
     {
       vframe_t frame = sview->frame;
       frame.y        = round(eh->headpos);
-      view_setframe(sview, frame);
+      view_set_frame(sview, frame);
     }
   }
 }
@@ -56,8 +56,8 @@ void eh_songs_add(view_t* view)
   eh->items      = VNEW();
   eh->headpos    = 0;
 
-  view_t* item0 = view_new("list_item0", (vframe_t){0, 0, 350, 50});
-  view_t* item1 = view_new("list_item1", (vframe_t){0, 50, 350, 50});
+  view_t* item0 = view_new("list_item0", (vframe_t){0, 0, 350, 50}, 0);
+  view_t* item1 = view_new("list_item1", (vframe_t){0, 50, 350, 50}, 0);
 
   tg_text_add(item0, 0xFFFFFFFF, 0x000000FF, "ITEM0");
   tg_text_add(item1, 0xFFFFFFFF, 0x000000FF, "ITEM1");

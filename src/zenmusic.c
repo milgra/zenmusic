@@ -47,21 +47,21 @@ void init(int width, int height)
 
   ui_manager_init(width, height);
 
-  view_t* header = view_new("header", (vframe_t){0, 0, 600, 100});
+  view_t* header = view_new("header", (vframe_t){0, 0, 600, 100}, 0);
 
   tg_text_add(header, 0xFFFFFFFF, 0x000000FF, "Zen Music Player");
 
-  view_t* songlist = view_new("songlist", (vframe_t){0, 100, 600, 600});
+  view_t* songlist = view_new("songlist", (vframe_t){0, 100, 600, 600}, 0);
 
   tg_color_add(songlist, 0x222222FF);
   eh_songs_add(songlist);
 
-  view_t* videoview = view_new("videoview", (vframe_t){400, 400, 800, 600});
+  view_t* videoview = view_new("videoview", (vframe_t){400, 400, 800, 600}, 1);
 
   tg_video_add(videoview);
   eh_drag_add(videoview);
 
-  view_t* texmapview = view_new("texmapview", (vframe_t){50, 500, 400, 400});
+  view_t* texmapview = view_new("texmapview", (vframe_t){50, 500, 400, 400}, 0);
 
   tg_texmap_add(texmapview);
 

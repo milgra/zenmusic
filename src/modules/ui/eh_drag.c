@@ -17,7 +17,7 @@ void eh_drag_evt(view_t* view, ev_t ev)
     vframe_t frame = view->frame;
     frame.x        = ev.x;
     frame.y        = ev.y;
-    view_setframe(view, frame);
+    view_set_frame(view, frame);
   }
 }
 

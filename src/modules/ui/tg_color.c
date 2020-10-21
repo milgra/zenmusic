@@ -29,7 +29,7 @@ void tg_color_gen(view_t* view)
           200,
           200,
           0xFF0000FF);
-  view_setbmp(view, bmp);
+  view_set_texture(view, bmp);
 }
 
 void tg_color_add(view_t* view, uint32_t color)

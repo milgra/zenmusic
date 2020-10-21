@@ -17,7 +17,6 @@ void tg_texmap_add(view_t* view);
 void tg_texmap_add(view_t* view)
 {
   // force upload to compositor without bitmap
-  view->bmp_state = 2;
 }
 
 #endif

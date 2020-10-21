@@ -14,9 +14,10 @@
 void ui_compositor_init(int, int);
 void ui_compositor_render();
 void ui_compositor_reset();
-void ui_compositor_add(char* id, int x, int y, int w, int h, bm_t* bmp);
-void ui_compositor_upd(char* id, int x, int y, int w, int h, bm_t* bmp);
+void ui_compositor_add(char* id, int x, int y, int w, int h, int channel);
 void ui_compositor_rem(char* id);
+void ui_compositor_upd_dim(char* id, int x, int y, int w, int h);
+void ui_compositor_upd_tex(char* id, bm_t* bmp);
 void ui_compositor_resize(float width, float height);
 
 typedef struct _crect_t
@@ -25,7 +26,7 @@ typedef struct _crect_t
   char* id;
 } crect_t;
 
-crect_t* crect_new(char* id, float x, float y, float w, float h, float tx, float ty, float tz, float tw, float tu);
+crect_t* crect_new(char* id, float x, float y, float w, float h, float tx, float ty, float tz, float tw, float ch);
 void     crect_del(void* rect);
 void     crect_desc(crect_t* rect);
 void     crect_set_dim(crect_t* rect, float x, float y, float w, float h);
@@ -78,36 +79,17 @@ void ui_compositor_render()
   gl_render(fb, tm->bm);
 }
 
-void ui_compositor_add(char* id, int x, int y, int w, int h, bm_t* bmp)
+void ui_compositor_add(char* id, int x, int y, int w, int h, int ch)
 {
-  v4_t     texc;
   crect_t* rect;
 
-  if (bmp)
-  {
-    tm_put(tm, id, bmp);
-
-    texc = tm_get(tm, id);
-    rect = crect_new(id, x, y, w, h, texc.x, texc.y, texc.z, texc.w, 0.0);
-  }
+  if (ch == 0)
+    rect = crect_new(id, x, y, w, h, 0.0, 0.0, 0.0, 0.0, 0.0);
   else
-  {
-    rect = crect_new(id, x, y, w, h, 0.0, 0.0, 1280.0 / 2048.0, 720.0 / 2048.0, 1.0);
-  }
+    rect = crect_new(id, x, y, w, h, 0.0, 0.0, 1280.0 / 2048.0, 720.0 / 2048.0, ch);
 
   VADD(rectv, rect);
   MPUT(rectm, id, rect);
-}
-
-void ui_compositor_upd(char* id, int x, int y, int w, int h, bm_t* bmp)
-{
-  crect_t* rect;
-
-  if ((rect = MGET(rectm, id)))
-  {
-    crect_set_dim(rect, x, y, w, h);
-    if (bmp) tm_upd(tm, id, bmp);
-  }
 }
 
 void ui_compositor_rem(char* id)
@@ -117,6 +99,37 @@ void ui_compositor_rem(char* id)
   rect = mtmap_get(rectm, id);
   MDEL(rectm, id);
   VREM(rectv, rect);
+}
+
+void ui_compositor_upd_dim(char* id, int x, int y, int w, int h)
+{
+  crect_t* rect;
+
+  if ((rect = MGET(rectm, id)))
+  {
+    crect_set_dim(rect, x, y, w, h);
+  }
+}
+
+void ui_compositor_upd_tex(char* id, bm_t* tex)
+{
+  crect_t* rect;
+  v4_t     texc;
+
+  if ((rect = MGET(rectm, id)))
+  {
+    if (tm_has(tm, id))
+    {
+      tm_upd(tm, id, tex);
+    }
+    else
+    {
+      tm_put(tm, id, tex);
+    }
+
+    texc = tm_get(tm, id);
+    crect_set_tex(rect, texc.x, texc.y, texc.z, texc.w);
+  }
 }
 
 void ui_compositor_resize(float width, float height)
@@ -137,7 +150,7 @@ crect_t* crect_new(char* id,
                    float ty,
                    float tz,
                    float tw,
-                   float tu)
+                   float ch)
 {
   crect_t* r = mtmem_calloc(sizeof(crect_t), "crect_t", crect_del, NULL);
 
@@ -147,37 +160,37 @@ crect_t* crect_new(char* id,
   r->data[1] = y;
   r->data[2] = tx;
   r->data[3] = ty;
-  r->data[4] = tu;
+  r->data[4] = ch;
 
   r->data[5] = x + w;
   r->data[6] = y + h;
   r->data[7] = tz;
   r->data[8] = tw;
-  r->data[9] = tu;
+  r->data[9] = ch;
 
   r->data[10] = x;
   r->data[11] = y + h;
   r->data[12] = tx;
   r->data[13] = tw;
-  r->data[14] = tu;
+  r->data[14] = ch;
 
   r->data[15] = x + w;
   r->data[16] = y;
   r->data[17] = tz;
   r->data[18] = ty;
-  r->data[19] = tu;
+  r->data[19] = ch;
 
   r->data[20] = x;
   r->data[21] = y;
   r->data[22] = tx;
   r->data[23] = ty;
-  r->data[24] = tu;
+  r->data[24] = ch;
 
   r->data[25] = x + w;
   r->data[26] = y + h;
   r->data[27] = tz;
   r->data[28] = tw;
-  r->data[29] = tu;
+  r->data[29] = ch;
 
   return r;
 }

@@ -20,6 +20,7 @@ struct _tm_t
 tm_t* tm_new();
 void  tm_del(void* p);
 void  tm_reset(tm_t* tm);
+char  tm_has(tm_t* tm, char* id);
 v4_t  tm_get(tm_t* tm, char* id);
 char  tm_put(tm_t* tm, char* id, bm_t* bm);
 void  tm_upd(tm_t* tm, char* id, bm_t* bm);
@@ -55,6 +56,13 @@ void tm_reset(tm_t* tm)
   tm->ch         = 0;
   tm->is_full    = 0;
   tm->did_change = 0;
+}
+
+char tm_has(tm_t* tm, char* id)
+{
+  v4_t* coords = mtmap_get(tm->coords, id);
+  if (coords) return 1;
+  return 0;
 }
 
 v4_t tm_get(tm_t* tm, char* id)

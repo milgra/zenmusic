@@ -30,14 +30,9 @@ void player_draw_spectrum(int text_unit_both, int tex_unit_left, int tex_unit_ri
 
 void player_init()
 {
-  is = stream_open("res/restless.mp3", file_iformat);
+  is = stream_open("res/tomjones.mp4", file_iformat);
 
   printf("videostate %xu\n", is);
-
-  if (!is)
-  {
-    av_log(NULL, AV_LOG_FATAL, "Failed to initialize VideoState!\n");
-  }
 }
 
 void player_draw()

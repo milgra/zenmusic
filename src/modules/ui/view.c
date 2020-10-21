@@ -5,6 +5,13 @@
 #include "mtvector.c"
 #include "wm_event.c"
 
+typedef enum _texst_t
+{
+  TS_BLANK,
+  TS_PENDING,
+  TS_READY,
+} texst_t;
+
 typedef struct _vframe_t vframe_t;
 struct _vframe_t
 {
@@ -21,14 +28,13 @@ struct _view_t
   mtvec_t* views;  /* subviews */
   view_t*  parent; /* parent view */
 
-  char attached;
-
   vframe_t frame;         /* position and dimensions */
   char     frame_changed; /* frame changed */
 
-  bm_t* bmp;         /* bitmap of view */
-  char  bmp_changed; /* bitmap changed */
-  char  bmp_state;   /* 0 - blank , 1 - pending , 2 - ready to render, 3 - added to compositor */
+  bm_t*   tex;         /* texture of view */
+  texst_t tex_state;   /* texture state */
+  char    tex_changed; /* texture changed */
+  int     tex_channel; /* texture channel if texture is external */
 
   void (*eh)(view_t*, ev_t); /* event handler for view */
   void (*tg)(view_t*);       /* texture generator for view */
@@ -36,13 +42,13 @@ struct _view_t
   void* tgdata;              /* data for texture generator */
 };
 
-view_t* view_new(char* id, vframe_t frame);
-void    view_tex(view_t* view);
-void    view_evt(view_t* view, ev_t ev);
-void    view_setframe(view_t* view, vframe_t frame);
-void    view_setbmp(view_t* view, bm_t* bmp);
+view_t* view_new(char* id, vframe_t frame, int texture_channel);
 void    view_add(view_t* view, view_t* subview);
 void    view_rem(view_t* view, view_t* subview);
+void    view_evt(view_t* view, ev_t ev);
+void    view_set_frame(view_t* view, vframe_t frame);
+void    view_set_texture(view_t* view, bm_t* tex);
+void    view_gen_texture(view_t* view);
 void    view_desc(void* pointer);
 
 extern char view_needs_resend;
@@ -62,42 +68,22 @@ void view_del(void* pointer)
 {
   view_t* view = (view_t*)pointer;
   REL(view->id);
-  REL(view->bmp);
+  REL(view->tex);
   REL(view->views);
 }
 
-view_t* view_new(char*    id,    /* view id */
-                 vframe_t frame) /* view frame */
+view_t* view_new(char*    id, /* view id */
+                 vframe_t frame,
+                 int      texture_channel) /* view frame */
 {
-  view_t* view = mtmem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
-  view->id     = mtcstr_fromcstring(id);
-  view->views  = VNEW();
-  view->frame  = frame;
+  view_t* view      = mtmem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
+  view->id          = mtcstr_fromcstring(id);
+  view->views       = VNEW();
+  view->frame       = frame;
+  view->tex_channel = texture_channel;
+  view->tex_state   = texture_channel == 0 ? TS_BLANK : TS_READY;
 
   return view;
-}
-
-void view_evt(view_t* view, ev_t ev)
-{
-  if (view->eh) (*view->eh)(view, ev);
-}
-
-void view_tex(view_t* view)
-{
-  if (view->tg) (*view->tg)(view);
-}
-
-void view_setframe(view_t* view, vframe_t frame)
-{
-  view->frame         = frame;
-  view->frame_changed = 1;
-}
-
-void view_setbmp(view_t* view, bm_t* bmp)
-{
-  RPL(view->bmp, bmp);
-  view->bmp_state   = 2;
-  view->bmp_changed = 1;
 }
 
 void view_add(view_t* view, view_t* subview)
@@ -112,6 +98,29 @@ void view_rem(view_t* view, view_t* subview)
   VREM(view->views, subview);
   subview->parent   = NULL;
   view_needs_resend = 1;
+}
+
+void view_evt(view_t* view, ev_t ev)
+{
+  if (view->eh) (*view->eh)(view, ev);
+}
+
+void view_set_frame(view_t* view, vframe_t frame)
+{
+  view->frame         = frame;
+  view->frame_changed = 1;
+}
+
+void view_set_texture(view_t* view, bm_t* tex)
+{
+  RPL(view->tex, tex);
+  view->tex_state   = TS_READY;
+  view->tex_changed = 1;
+}
+
+void view_gen_texture(view_t* view)
+{
+  if (view->tg) (*view->tg)(view);
 }
 
 void view_desc(void* pointer)

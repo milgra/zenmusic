@@ -64,13 +64,18 @@ void ui_connector_add(view_t* view)
 {
   printf("add %s\n", view->id);
   VADD(uiv, view);
-  view->attached = 1;
+  ui_compositor_add(view->id,
+                    view->frame.x,
+                    view->frame.y,
+                    view->frame.w,
+                    view->frame.h,
+                    view->tex_channel);
 }
 
 void ui_connector_rem(view_t* view)
 {
   VREM(uiv, view);
-  view->attached = 0;
+  ui_compositor_rem(view->id);
 }
 
 void ui_connector_render()
@@ -79,31 +84,20 @@ void ui_connector_render()
 
   while ((view = VNXT(uiv)))
   {
-    if (view->bmp_state == 0) /* send unrendered views to renderer thread */
+    if (view->tex_state == TS_BLANK) /* send unrendered views to renderer thread */
     {
-      view->bmp_state = 1; /* pending */
+      view->tex_state = TS_PENDING;
       mtch_send(uich, view);
-    }
-    if (view->bmp_state == 2) /* add rendered views to compositor */
-    {
-      view->bmp_state   = 3; /* added to compositor */
-      view->bmp_changed = 0;
-      ui_compositor_add(view->id,
-                        view->frame.x,
-                        view->frame.y,
-                        view->frame.w,
-                        view->frame.h,
-                        view->bmp);
     }
     if (view->frame_changed) /* update dimension if needed */
     {
-      ui_compositor_upd(view->id, view->frame.x, view->frame.y, view->frame.w, view->frame.h, NULL);
+      ui_compositor_upd_dim(view->id, view->frame.x, view->frame.y, view->frame.w, view->frame.h);
       view->frame_changed = 0;
     }
-    if (view->bmp_changed) /* update bitmap if needed */
+    if (view->tex_changed) /* update bitmap if needed */
     {
-      ui_compositor_upd(view->id, view->frame.x, view->frame.y, view->frame.w, view->frame.h, view->bmp);
-      view->bmp_changed = 0;
+      ui_compositor_upd_tex(view->id, view->tex);
+      view->tex_changed = 0;
     }
   }
 
@@ -119,7 +113,7 @@ int ui_connector_workloop()
     if ((view = mtch_recv(uich)))
     {
       printf("generating bmp for %s\n", view->id);
-      view_tex(view);
+      view_gen_texture(view);
     }
     SDL_Delay(16);
   }

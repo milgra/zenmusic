@@ -51,7 +51,7 @@ void tg_text_gen(view_t* view)
       };
 
   bm_t* bmp = font_render_text((int)view->frame.w, (int)view->frame.h, str, common_font, ts, NULL, NULL);
-  view_setbmp(view, bmp);
+  view_set_texture(view, bmp);
 }
 
 void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text)
