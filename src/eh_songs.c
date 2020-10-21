@@ -24,10 +24,7 @@ void eh_songs_add(view_t* view);
 void eh_songs_evt(view_t* view, ev_t ev)
 {
   eh_songs_t* eh = view->ehdata;
-  if (ev.type == EV_TIME)
-  {
-  }
-  else if (ev.type == EV_SCROLL)
+  if (ev.type == EV_SCROLL)
   {
     eh->headpos += ev.dy;
     if (eh->headpos < 0.0) eh->headpos = 0.0;
@@ -38,6 +35,17 @@ void eh_songs_evt(view_t* view, ev_t ev)
       vframe_t frame = sview->frame;
       frame.y        = round(eh->headpos);
       view_set_frame(sview, frame);
+    }
+
+    // generate new views if needed
+    view_t* head = mtvec_head(view->views);
+    view_t* tail = mtvec_tail(view->views);
+
+    // list not empty or not one row
+    if (head != tail)
+    {
+      if (head->frame.y > 0.0) printf("needs head rows\n");
+      if (head->frame.y < view->frame.x + view->frame.h) printf("needs tail rows\n");
     }
   }
 }
