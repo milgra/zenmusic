@@ -5,6 +5,7 @@
 #include "mtcstring.c"
 #include "mtmath4.c"
 #include "player.c"
+#include "tg_bitmap.c"
 #include "tg_color.c"
 #include "tg_texmap.c"
 #include "tg_text.c"
@@ -43,6 +44,8 @@ void init(int width, int height)
   char* respath = SDL_GetBasePath();
   char* path    = mtcstr_fromformat("%s/../res/Terminus.ttf", respath, NULL);
 
+  char* playpath = mtcstr_fromformat("%s/../res/play.png", respath, NULL);
+
   common_font = font_alloc(path);
 
   ui_manager_init(width, height);
@@ -65,10 +68,15 @@ void init(int width, int height)
 
   tg_texmap_add(texmapview);
 
+  view_t* playbtnview = view_new("playbtnview", (vframe_t){50, 500, 90, 90}, 0);
+
+  tg_bitmap_add(playbtnview, playpath);
+
   ui_manager_add(header);
   ui_manager_add(songlist);
   ui_manager_add(videoview);
   ui_manager_add(texmapview);
+  ui_manager_add(playbtnview);
 
   player_init();
 }

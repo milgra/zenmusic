@@ -228,6 +228,9 @@ void gl_init(width, height)
   glUniform1i(uniform_name_a[2], 1);
 
   glClearColor(0.5, 0.5, 0.5, 1.0);
+
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 void gl_resize(float width, float height)

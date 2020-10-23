@@ -23,6 +23,7 @@ clang \
     -Isrc/modules/ui \
     -Isrc/modules/wm \
     -Isrc/modules/text \
+    -Isrc/modules/image \
     -Isrc/modules/player \
     src/modules/gl/gl_connector.c \
     src/modules/gl/gl_floatbuffer.c \
@@ -31,6 +32,7 @@ clang \
     src/modules/ui/eh_drag.c \
     src/modules/ui/tg_text.c \
     src/modules/ui/tg_color.c \
+    src/modules/ui/tg_bitmap.c \
     src/modules/ui/tg_texmap.c \
     src/modules/ui/tg_video.c \
     src/modules/ui_connector.c \
