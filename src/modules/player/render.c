@@ -212,8 +212,7 @@ static void video_audio_display(VideoState* s)
 
   if (s->show_mode == SHOW_MODE_WAVES)
   {
-    bm_reset(wavemap);
-    //SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    bm_fill(wavemap, 0, 0, wavemap->w, wavemap->h, 0xFF000000);
 
     /* total height for one channel */
     h = s->height / nb_display_channels;

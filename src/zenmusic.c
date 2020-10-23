@@ -50,9 +50,13 @@ void init(int width, int height)
 
   ui_manager_init(width, height);
 
-  view_t* header = view_new("header", (vframe_t){0, 0, 600, 100}, 0);
+  view_t* header = view_new("header", (vframe_t){0, 0, 1200, 100}, 0);
 
   tg_text_add(header, 0xFFFFFFFF, 0x000000FF, "Zen Music Player");
+
+  view_t* playbtnview = view_new("playbtnview", (vframe_t){5, 5, 90, 90}, 0);
+
+  tg_bitmap_add(playbtnview, playpath);
 
   view_t* songlist = view_new("songlist", (vframe_t){0, 100, 600, 600}, 0);
 
@@ -67,10 +71,6 @@ void init(int width, int height)
   view_t* texmapview = view_new("texmapview", (vframe_t){50, 500, 400, 400}, 0);
 
   tg_texmap_add(texmapview);
-
-  view_t* playbtnview = view_new("playbtnview", (vframe_t){50, 500, 90, 90}, 0);
-
-  tg_bitmap_add(playbtnview, playpath);
 
   ui_manager_add(header);
   ui_manager_add(songlist);

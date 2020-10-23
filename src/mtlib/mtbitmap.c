@@ -109,21 +109,13 @@ bm_t* bm_fill(bm_t*    bm,
   if (ex >= bm->w) ex = bm->w;
   if (ey >= bm->h) ey = bm->h;
 
-  int r = color >> 24 & 0xFF;
-  int g = color >> 16 & 0xFF;
-  int b = color >> 8 & 0xFF;
-  int a = color & 0xFF;
+  uint32_t* data = (uint32_t*)bm->data;
 
   for (int y = sy; y < ey; y++)
   {
     for (int x = sx; x < ex; x++)
     {
-      int p = (y * bm->w + x) * 4; // position
-
-      bm->data[p]     = r;
-      bm->data[p + 1] = g;
-      bm->data[p + 2] = b;
-      bm->data[p + 3] = a;
+      data[y * bm->w + x] = color;
     }
   }
 

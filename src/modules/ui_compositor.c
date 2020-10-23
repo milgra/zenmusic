@@ -84,7 +84,7 @@ void ui_compositor_add(char* id, int x, int y, int w, int h, int ch)
   crect_t* rect;
 
   if (ch == 0)
-    rect = crect_new(id, x, y, w, h, 0.0, 0.0, 0.0, 0.0, 0.0);
+    rect = crect_new(id, x, y, w, h, 0.0, 0.0, 1.0, 1.0, 0.0);
   else
     rect = crect_new(id, x, y, w, h, 0.0, 0.0, 1280.0 / 2048.0, 720.0 / 2048.0, ch);
 
