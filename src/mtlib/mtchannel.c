@@ -68,9 +68,9 @@ char mtch_send(mtch_t* ch, void* data)
 
   if (ch->flags[ch->wpos] == 0)
   {
-    ch->boxes[ch->wpos] = data;
     ch->flags[ch->wpos] = 1; // set flag, it doesn't have to be atomic, only the last bit counts
-    ch->wpos += 1;           // increment write index, doesn't have to be atomic, this thread uses it only
+    ch->boxes[ch->wpos] = data;
+    ch->wpos += 1; // increment write index, doesn't have to be atomic, this thread uses it only
     if (ch->wpos == ch->size) ch->wpos = 0;
 
     return 1;

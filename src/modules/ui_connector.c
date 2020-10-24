@@ -86,8 +86,10 @@ void ui_connector_render()
   {
     if (view->tex_state == TS_BLANK) /* send unrendered views to renderer thread */
     {
-      view->tex_state = TS_PENDING;
-      mtch_send(uich, view);
+      if (mtch_send(uich, view))
+      {
+        view->tex_state = TS_PENDING;
+      }
     }
     if (view->frame_changed) /* update dimension if needed */
     {

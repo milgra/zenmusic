@@ -20,13 +20,20 @@
 #include <stdlib.h>
 #include <time.h>
 
-static int
-display_info(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
+mtvec_t* files;
+
+static int display_info(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
 {
   printf("%-3s %2d %7jd   %-40s %d %s\n",
          (tflag == FTW_D) ? "d" : (tflag == FTW_DNR) ? "dnr" : (tflag == FTW_DP) ? "dp" : (tflag == FTW_F) ? "f" : (tflag == FTW_NS) ? "ns" : (tflag == FTW_SL) ? "sl" : (tflag == FTW_SLN) ? "sln" : "???",
-         ftwbuf->level, (intmax_t)sb->st_size,
-         fpath, ftwbuf->base, fpath + ftwbuf->base);
+         ftwbuf->level,
+         (intmax_t)sb->st_size,
+         fpath,
+         ftwbuf->base,
+         fpath + ftwbuf->base);
+
+  mtvec_add(files, mtcstr_fromcstring((char*)(fpath + ftwbuf->base)));
+
   return 0; /* To tell nftw() to continue */
 }
 
@@ -34,10 +41,14 @@ void init(int width, int height)
 {
   printf("zenmusic init %i %i\n", width, height);
 
+  files = mtvec_alloc();
+
   int flags = 0;
   //flags |= FTW_DEPTH;
   flags |= FTW_PHYS;
   nftw("/usr/home/milgra/Music", display_info, 20, flags);
+
+  printf("file count %i\n", files->length);
 
   srand((unsigned int)time(NULL));
 
@@ -61,7 +72,7 @@ void init(int width, int height)
   view_t* songlist = view_new("songlist", (vframe_t){0, 100, 600, 600}, 0);
 
   tg_color_add(songlist, 0x222222FF);
-  eh_songs_add(songlist);
+  eh_songs_add(songlist, files);
 
   view_t* videoview = view_new("videoview", (vframe_t){400, 400, 800, 600}, 1);
 
@@ -78,7 +89,7 @@ void init(int width, int height)
   ui_manager_add(texmapview);
   ui_manager_add(playbtnview);
 
-  player_init();
+  //player_init();
 }
 
 void update(ev_t ev)
@@ -88,7 +99,7 @@ void update(ev_t ev)
 
 void render()
 {
-  player_draw();
+  //player_draw();
   ui_manager_render();
 }
 

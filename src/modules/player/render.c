@@ -311,7 +311,7 @@ static void video_audio_display(VideoState* s)
         a = FFMIN(a, 255);
         b = FFMIN(b, 255);
         pixels -= pitch;
-        uint32_t color = (a << 16) + (b << 8) + ((a + b) >> 1);
+        uint32_t color = (0xff << 24) + (a << 16) + (b << 8) + ((a + b) >> 1);
 
         bm_fill(wavemap, s->xpos, y, s->xpos + 1, y + 1, color);
         /*}*/
