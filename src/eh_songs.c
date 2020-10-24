@@ -7,7 +7,6 @@
 
 typedef struct _eh_songs_t
 {
-  float    headpos;
   mtvec_t* items;
   mtvec_t* files;
 } eh_songs_t;
@@ -34,7 +33,7 @@ void eh_songs_evt(view_t* view, ev_t ev)
       {
         char idbuffer[100];
         snprintf(idbuffer, 100, "list_item%i", i);
-        view_t* item = view_new(idbuffer, (vframe_t){0, i * 50.0, 900, 50}, 0);
+        view_t* item = view_new(idbuffer, (vframe_t){0, i * 41, 900, 40}, 0);
 
         tg_text_add(item, 0xFFFFFFFF, 0x000000FF, eh->files->data[i]);
         view_add(view, item);
@@ -45,14 +44,12 @@ void eh_songs_evt(view_t* view, ev_t ev)
   }
   else if (ev.type == EV_SCROLL)
   {
-    eh->headpos += ev.dy;
-    if (eh->headpos < 0.0) eh->headpos = 0.0;
 
     view_t* sview;
     while ((sview = VNXT(view->views)))
     {
       vframe_t frame = sview->frame;
-      frame.y        = round(eh->headpos);
+      frame.y += ev.dy;
       view_set_frame(sview, frame);
     }
 
@@ -86,7 +83,6 @@ void eh_songs_add(view_t* view, mtvec_t* files)
   eh_songs_t* eh = mtmem_alloc(sizeof(eh_songs_t), "eh_songs", eh_songs_del, NULL);
   eh->files      = files;
   eh->items      = VNEW();
-  eh->headpos    = 0;
 
   view->ehdata = eh;
   view->eh     = eh_songs_evt;

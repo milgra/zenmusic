@@ -25,7 +25,7 @@ void wm_init(void (*init)(int, int), void (*update)(ev_t), void (*render)(), voi
 #define SCROLL_RELEASED_SLOWDOWN 0.999   // slowdown ratio of released scrolling
 #define SCROLL_TOUCHED_SLOWDOWN 0.8      // slowdown ratio of touched scrolling
 #define SCROLL_TOUCHED_TIMEOUT 300       // when to stop scrolling after last pressed touch scroll event
-#define SCROLL_SLOWDOWN_MULTIPLIER 0.995 // slowdown ratio is multiplied by this value with every step to produce a parabolic slowdown
+#define SCROLL_SLOWDOWN_MULTIPLIER 0.998 // slowdown ratio is multiplied by this value with every step to produce a parabolic slowdown
 #define SCROLL_MINIMUM_DELTA 0.1         // scroll events aren't dispatched under this scroll delta value
 
 void wm_init(void (*init)(int, int),
@@ -151,8 +151,8 @@ void wm_init(void (*init)(int, int),
               uint32_t delta   = ev.time - scroll.time_last;
               scroll.time_last = ev.time;
 
-              scroll.sx += (float)event.wheel.x * 2.0;
-              scroll.sy += (float)event.wheel.y * 2.0;
+              scroll.sx += (float)event.wheel.x * 4.0;
+              scroll.sy += (float)event.wheel.y * 4.0;
 
               scroll.time_to_stop = delta < SCROLL_RELEASED_DELAY ? UINT32_MAX : ev.time + SCROLL_TOUCHED_TIMEOUT;
               scroll.slowdown     = delta < SCROLL_RELEASED_DELAY ? SCROLL_RELEASED_SLOWDOWN : SCROLL_TOUCHED_SLOWDOWN;

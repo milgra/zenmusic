@@ -15,10 +15,10 @@ typedef enum _texst_t
 typedef struct _vframe_t vframe_t;
 struct _vframe_t
 {
-  int x;
-  int y;
-  int w;
-  int h;
+  float x;
+  float y;
+  float w;
+  float h;
 };
 
 typedef struct _view_t view_t;
@@ -126,7 +126,7 @@ void view_gen_texture(view_t* view)
 void view_desc(void* pointer)
 {
   view_t* view = (view_t*)pointer;
-  printf("id %s frame %i %i %i %i\n", view->id, view->frame.x, view->frame.y, view->frame.w, view->frame.h);
+  printf("id %s frame %f %f %f %f\n", view->id, view->frame.x, view->frame.y, view->frame.w, view->frame.h);
 }
 
 #endif
