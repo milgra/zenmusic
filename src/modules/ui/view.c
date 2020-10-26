@@ -45,6 +45,7 @@ struct _view_t
 
 view_t* view_new(char* id, vframe_t frame, int texture_channel);
 void    view_add(view_t* view, view_t* subview);
+void    view_insert(view_t* view, view_t* subview, uint32_t index);
 void    view_remove(view_t* view, view_t* subview);
 void    view_evt(view_t* view, ev_t ev);
 void    view_set_frame(view_t* view, vframe_t frame);
@@ -88,6 +89,12 @@ view_t* view_new(char*    id, /* view id */
 void view_add(view_t* view, view_t* subview)
 {
   VADD(view->views, subview);
+  subview->parent = view;
+}
+
+void view_insert(view_t* view, view_t* subview, uint32_t index)
+{
+  mtvec_addatindex(view->views, subview, index);
   subview->parent = view;
 }
 

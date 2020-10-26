@@ -72,10 +72,10 @@ void eh_songs_evt(view_t* view, ev_t ev)
           char idbuffer[100];
           int  i = eh->head_index - 1;
           snprintf(idbuffer, 100, "list_item%i", i);
-          view_t*  item  = view_new(idbuffer, (vframe_t){0, tail->frame.y + tail->frame.h, 900, 41}, 0);
+          view_t*  item  = view_new(idbuffer, (vframe_t){0, head->frame.y - 41, 900, 41}, 0);
           uint32_t color = (i % 2 == 0) ? 0xEFEFEFFF : 0xDEDEDEFF;
           tg_text_add(item, color, 0x000000FF, eh->files->data[i]);
-          view_add(view, item);
+          view_insert(view, item, 0);
           mtvec_addatindex(eh->items, item, 0);
           eh->head_index = i;
           //REL(item);
