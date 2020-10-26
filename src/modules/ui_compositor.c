@@ -145,21 +145,18 @@ void ui_compositor_set_texture(char* id, bm_t* tex)
 {
   printf("ui_compositor_set_texture %s\n", id);
 
-  crect_t* rect;
-  v4_t     texc;
+  crect_t*    rect;
+  tm_coords_t coords;
 
   if ((rect = MGET(rectm, id)))
   {
-    texc   = tm_get(tm, id);
-    int tw = (int)(texc.z - texc.x);
-    int th = (int)(texc.w - texc.y);
+    coords = tm_get(tm, id);
 
-    if (tw != tex->w || th != tex->h)
+    if (coords.w != tex->w || coords.h != tex->h)
     {
-      printf("ui_compositor texture size mismatch, adding as new %s %i %i %i %i\n", id, tw, tex->w, th, tex->h);
+      printf("ui_compositor texture size mismatch, adding as new %s %i %i %i %i\n", id, coords.w, tex->w, coords.h, tex->h);
       tm_put(tm, id, tex);
-      texc = tm_get(tm, id);
-      printf("COORDS %f %f %f %f\n", texc.x, texc.y, texc.z, texc.w);
+      coords = tm_get(tm, id);
     }
     else
     {
@@ -167,7 +164,7 @@ void ui_compositor_set_texture(char* id, bm_t* tex)
       tm_upd(tm, id, tex);
     }
 
-    crect_set_texture(rect, texc.x, texc.y, texc.z, texc.w);
+    crect_set_texture(rect, coords.ltx, coords.lty, coords.rbx, coords.rby);
     ui_compositor_update();
   }
 }
