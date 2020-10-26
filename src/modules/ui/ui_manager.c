@@ -13,7 +13,7 @@
 void ui_manager_init(int width, int height);
 void ui_manager_event(ev_t event);
 void ui_manager_add(view_t* view);
-void ui_manager_rem(view_t* view);
+void ui_manager_remove(view_t* view);
 void ui_manager_render();
 
 #endif
@@ -26,6 +26,7 @@ void ui_manager_render();
 
 mtmap_t* viewm; /* view map */
 mtvec_t* viewv; /* view vector */
+char     reindex = 0;
 
 void ui_manager_init(int width, int height)
 {
@@ -52,34 +53,45 @@ void ui_manager_event(ev_t ev)
 void ui_manager_add(view_t* view)
 {
   VADD(viewv, view);
+  ui_connector_add(view);
+  reindex = 1;
 }
 
-void ui_manager_rem(view_t* view)
+void ui_manager_remove(view_t* view)
 {
   VREM(viewv, view);
+  ui_connector_remove(view);
+  reindex = 1;
 }
 
-void ui_manager_add_recursively(view_t* view)
+void ui_manager_reindex(view_t* view, uint32_t* index)
 {
-  ui_connector_add(view);
+  if (view->index != *index)
+  {
+    view->index = *index;
+    ui_connector_set_index(view);
+  }
+
+  *index += 1;
+
   view_t* v;
   while ((v = VNXT(view->views)))
   {
-    ui_manager_add_recursively(v);
+    ui_manager_reindex(v, index);
   }
 }
 
 void ui_manager_render()
 {
-  if (view_needs_resend)
+  if (reindex)
   {
-    ui_connector_reset();
-    view_t* v;
+    uint32_t index = 0;
+    view_t*  v;
     while ((v = VNXT(viewv)))
     {
-      ui_manager_add_recursively(v);
+      ui_manager_reindex(v, &index);
     }
-    view_needs_resend = 0;
+    reindex = 0;
   }
   ui_connector_render();
 }

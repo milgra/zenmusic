@@ -27,14 +27,15 @@ struct _view_t
   char*    id;     /* identifier for handling view */
   mtvec_t* views;  /* subviews */
   view_t*  parent; /* parent view */
+  uint32_t index;  /* depth */
 
   vframe_t frame;         /* position and dimensions */
   char     frame_changed; /* frame changed */
 
   bm_t*   tex;         /* texture of view */
   texst_t tex_state;   /* texture state */
-  char    tex_changed; /* texture changed */
   int     tex_channel; /* texture channel if texture is external */
+  char    tex_changed; /* texture changed */
 
   void (*eh)(view_t*, ev_t); /* event handler for view */
   void (*tg)(view_t*);       /* texture generator for view */
@@ -44,14 +45,12 @@ struct _view_t
 
 view_t* view_new(char* id, vframe_t frame, int texture_channel);
 void    view_add(view_t* view, view_t* subview);
-void    view_rem(view_t* view, view_t* subview);
+void    view_remove(view_t* view, view_t* subview);
 void    view_evt(view_t* view, ev_t ev);
 void    view_set_frame(view_t* view, vframe_t frame);
 void    view_set_texture(view_t* view, bm_t* tex);
 void    view_gen_texture(view_t* view);
 void    view_desc(void* pointer);
-
-extern char view_needs_resend;
 
 #endif
 
@@ -62,7 +61,7 @@ extern char view_needs_resend;
 #include "mtmemory.c"
 #include "text.c"
 
-char view_needs_resend = 1;
+char view_upload = 1;
 
 void view_del(void* pointer)
 {
@@ -89,15 +88,13 @@ view_t* view_new(char*    id, /* view id */
 void view_add(view_t* view, view_t* subview)
 {
   VADD(view->views, subview);
-  subview->parent   = view;
-  view_needs_resend = 1;
+  subview->parent = view;
 }
 
-void view_rem(view_t* view, view_t* subview)
+void view_remove(view_t* view, view_t* subview)
 {
   VREM(view->views, subview);
-  subview->parent   = NULL;
-  view_needs_resend = 1;
+  subview->parent = NULL;
 }
 
 void view_evt(view_t* view, ev_t ev)

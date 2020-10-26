@@ -38,7 +38,7 @@ void tg_text_gen(view_t* view)
           .align      = 0,
           .editable   = 0,
           .selectable = 0,
-          .multiline  = 0,
+          .multiline  = 1,
           .autosize   = 1,
           .uppercase  = 0,
 

@@ -14,23 +14,26 @@
 void ui_compositor_init(int, int);
 void ui_compositor_render();
 void ui_compositor_reset();
-void ui_compositor_add(char* id, int x, int y, int w, int h, int channel);
+void ui_compositor_add(char* id, uint32_t index, int channel, int x, int y, int w, int h);
 void ui_compositor_rem(char* id);
-void ui_compositor_upd_dim(char* id, int x, int y, int w, int h);
-void ui_compositor_upd_tex(char* id, bm_t* bmp);
+void ui_compositor_set_index(char* id, uint32_t index);
+void ui_compositor_set_frame(char* id, int x, int y, int w, int h);
+void ui_compositor_set_texture(char* id, bm_t* bmp);
 void ui_compositor_resize(float width, float height);
 
 typedef struct _crect_t
 {
-  float data[30];
-  char* id;
+  char*    id;
+  float    data[30];
+  uint32_t index;
 } crect_t;
 
-crect_t* crect_new(char* id, float x, float y, float w, float h, float tx, float ty, float tz, float tw, float ch);
+crect_t* crect_new(char* id, uint32_t index, uint32_t channel, float x, float y, float w, float h, float tx, float ty, float tz, float tw);
 void     crect_del(void* rect);
 void     crect_desc(crect_t* rect);
-void     crect_set_dim(crect_t* rect, float x, float y, float w, float h);
-void     crect_set_tex(crect_t* rect, float tx, float ty, float tz, float tw);
+void     crect_set_index(crect_t* rest, uint32_t index);
+void     crect_set_frame(crect_t* rect, float x, float y, float w, float h);
+void     crect_set_texture(crect_t* rect, float tx, float ty, float tz, float tw);
 
 #endif
 
@@ -69,66 +72,100 @@ void ui_compositor_reset()
 
 void ui_compositor_render()
 {
+  gl_render(fb, tm->bm);
+}
+
+void ui_compositor_update()
+{
   crect_t* rect;
 
   fb_reset(fb);
 
   while ((rect = VNXT(rectv)))
     fb_add(fb, rect->data, 30);
-
-  gl_render(fb, tm->bm);
 }
 
-void ui_compositor_add(char* id, int x, int y, int w, int h, int ch)
+void ui_compositor_add(char* id, uint32_t index, int channel, int x, int y, int w, int h)
 {
-  crect_t* rect;
-
-  if (ch == 0)
-    rect = crect_new(id, x, y, w, h, 0.0, 0.0, 1.0, 1.0, 0.0);
-  else
-    rect = crect_new(id, x, y, w, h, 0.0, 0.0, 1280.0 / 2048.0, 720.0 / 2048.0, ch);
+  printf("ui_compositor_add %s\n", id);
+  crect_t* rect = crect_new(id, index, channel, x, y, w, h, 0.0, 0.0, 1.0, 1.0);
 
   VADD(rectv, rect);
   MPUT(rectm, id, rect);
+
+  ui_compositor_update();
 }
 
 void ui_compositor_rem(char* id)
 {
+  printf("ui_compositor_rem %s\n", id);
   crect_t* rect;
 
   rect = mtmap_get(rectm, id);
   MDEL(rectm, id);
   VREM(rectv, rect);
+
+  ui_compositor_update();
 }
 
-void ui_compositor_upd_dim(char* id, int x, int y, int w, int h)
+void ui_compositor_set_index(char* id, uint32_t index)
+{
+  //printf("ui_compositor_set_index %s %i\n", id, index);
+
+  crect_t* rect;
+
+  if ((rect = MGET(rectm, id)))
+  {
+    uint32_t oldindex = mtvec_indexofdata(rectv, rect);
+    //printf("%s old index %i new index %i\n", id, oldindex, index);
+    if (oldindex != index)
+    {
+      mtvec_rem(rectv, rect);
+      mtvec_addatindex(rectv, rect, index);
+      rect->index = index;
+      ui_compositor_update();
+    }
+  }
+}
+
+void ui_compositor_set_frame(char* id, int x, int y, int w, int h)
 {
   crect_t* rect;
 
   if ((rect = MGET(rectm, id)))
   {
-    crect_set_dim(rect, x, y, w, h);
+    crect_set_frame(rect, x, y, w, h);
   }
+
+  ui_compositor_update();
 }
 
-void ui_compositor_upd_tex(char* id, bm_t* tex)
+void ui_compositor_set_texture(char* id, bm_t* tex)
 {
+  printf("ui_compositor_set_texture %s\n", id);
+
   crect_t* rect;
   v4_t     texc;
 
   if ((rect = MGET(rectm, id)))
   {
-    if (tm_has(tm, id))
+    texc = tm_get(tm, id);
+
+    if ((int)texc.z != tex->w ||
+        (int)texc.w != tex->h)
     {
-      tm_upd(tm, id, tex);
+      printf("ui_compositor texture size mismatch, adding as new %s\n", id);
+      tm_put(tm, id, tex);
+      texc = tm_get(tm, id);
     }
     else
     {
-      tm_put(tm, id, tex);
+      printf("ui_compositor updating texture in place %s\n", id);
+      tm_upd(tm, id, tex);
     }
 
-    texc = tm_get(tm, id);
-    crect_set_tex(rect, texc.x, texc.y, texc.z, texc.w);
+    crect_set_texture(rect, texc.x, texc.y, texc.z, texc.w);
+    ui_compositor_update();
   }
 }
 
@@ -141,56 +178,58 @@ void ui_compositor_resize(float width, float height)
 // Compositor Rect
 //
 
-crect_t* crect_new(char* id,
-                   float x,
-                   float y,
-                   float w,
-                   float h,
-                   float tx,
-                   float ty,
-                   float tz,
-                   float tw,
-                   float ch)
+crect_t* crect_new(char*    id,
+                   uint32_t index,
+                   uint32_t channel,
+                   float    x,
+                   float    y,
+                   float    w,
+                   float    h,
+                   float    tx,
+                   float    ty,
+                   float    tz,
+                   float    tw)
 {
   crect_t* r = mtmem_calloc(sizeof(crect_t), "crect_t", crect_del, NULL);
 
-  r->id = mtcstr_fromcstring(id);
+  r->id    = mtcstr_fromcstring(id);
+  r->index = index;
 
   r->data[0] = x;
   r->data[1] = y;
   r->data[2] = tx;
   r->data[3] = ty;
-  r->data[4] = ch;
+  r->data[4] = (float)channel;
 
   r->data[5] = x + w;
   r->data[6] = y + h;
   r->data[7] = tz;
   r->data[8] = tw;
-  r->data[9] = ch;
+  r->data[9] = (float)channel;
 
   r->data[10] = x;
   r->data[11] = y + h;
   r->data[12] = tx;
   r->data[13] = tw;
-  r->data[14] = ch;
+  r->data[14] = (float)channel;
 
   r->data[15] = x + w;
   r->data[16] = y;
   r->data[17] = tz;
   r->data[18] = ty;
-  r->data[19] = ch;
+  r->data[19] = (float)channel;
 
   r->data[20] = x;
   r->data[21] = y;
   r->data[22] = tx;
   r->data[23] = ty;
-  r->data[24] = ch;
+  r->data[24] = (float)channel;
 
   r->data[25] = x + w;
   r->data[26] = y + h;
   r->data[27] = tz;
   r->data[28] = tw;
-  r->data[29] = ch;
+  r->data[29] = (float)channel;
 
   return r;
 }
@@ -201,7 +240,7 @@ void crect_del(void* pointer)
   REL(r->id);
 }
 
-void crect_set_dim(crect_t* r, float x, float y, float w, float h)
+void crect_set_frame(crect_t* r, float x, float y, float w, float h)
 {
   r->data[0] = x;
   r->data[1] = y;
@@ -222,7 +261,7 @@ void crect_set_dim(crect_t* r, float x, float y, float w, float h)
   r->data[26] = y + h;
 }
 
-void crect_set_tex(crect_t* r, float tx, float ty, float tz, float tw)
+void crect_set_texture(crect_t* r, float tx, float ty, float tz, float tw)
 {
   r->data[2] = tx;
   r->data[3] = ty;

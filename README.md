@@ -10,6 +10,9 @@ zen photo and video - offline photo/video viewer and library manager / video/ima
 
 ---
 
+eh_list.c
+
+
 stencil, layer groups, space-autstart-stop files
 css based styling, layout, color
 
@@ -18,3 +21,5 @@ zen ui renderer - modern ui/text renderer, can animate glyphs individually
 bar analyzer
 spectrum analyzer/bar in the background
 grid-based warping of video/album cover based on frequence ( bass in the center )
+
+about page with module playing in the background, 3d dot animation?

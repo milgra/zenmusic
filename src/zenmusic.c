@@ -24,13 +24,13 @@ mtvec_t* files;
 
 static int display_info(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
 {
-  printf("%-3s %2d %7jd   %-40s %d %s\n",
-         (tflag == FTW_D) ? "d" : (tflag == FTW_DNR) ? "dnr" : (tflag == FTW_DP) ? "dp" : (tflag == FTW_F) ? "f" : (tflag == FTW_NS) ? "ns" : (tflag == FTW_SL) ? "sl" : (tflag == FTW_SLN) ? "sln" : "???",
-         ftwbuf->level,
-         (intmax_t)sb->st_size,
-         fpath,
-         ftwbuf->base,
-         fpath + ftwbuf->base);
+  /* printf("%-3s %2d %7jd   %-40s %d %s\n", */
+  /*        (tflag == FTW_D) ? "d" : (tflag == FTW_DNR) ? "dnr" : (tflag == FTW_DP) ? "dp" : (tflag == FTW_F) ? "f" : (tflag == FTW_NS) ? "ns" : (tflag == FTW_SL) ? "sl" : (tflag == FTW_SLN) ? "sln" : "???", */
+  /*        ftwbuf->level, */
+  /*        (intmax_t)sb->st_size, */
+  /*        fpath, */
+  /*        ftwbuf->base, */
+  /*        fpath + ftwbuf->base); */
 
   mtvec_add(files, mtcstr_fromcstring((char*)(fpath + ftwbuf->base)));
 
