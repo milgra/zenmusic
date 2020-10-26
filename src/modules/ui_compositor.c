@@ -64,6 +64,7 @@ void ui_compositor_init(int width, int height)
 
 void ui_compositor_reset()
 {
+  printf("RESET\n");
   fb_reset(fb);
   tm_reset(tm);
   mtvec_reset(rectv);
@@ -149,14 +150,16 @@ void ui_compositor_set_texture(char* id, bm_t* tex)
 
   if ((rect = MGET(rectm, id)))
   {
-    texc = tm_get(tm, id);
+    texc   = tm_get(tm, id);
+    int tw = (int)(texc.z - texc.x);
+    int th = (int)(texc.w - texc.y);
 
-    if ((int)texc.z != tex->w ||
-        (int)texc.w != tex->h)
+    if (tw != tex->w || th != tex->h)
     {
-      printf("ui_compositor texture size mismatch, adding as new %s\n", id);
+      printf("ui_compositor texture size mismatch, adding as new %s %i %i %i %i\n", id, tw, tex->w, th, tex->h);
       tm_put(tm, id, tex);
       texc = tm_get(tm, id);
+      printf("COORDS %f %f %f %f\n", texc.x, texc.y, texc.z, texc.w);
     }
     else
     {

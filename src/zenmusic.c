@@ -37,6 +37,19 @@ static int display_info(const char* fpath, const struct stat* sb, int tflag, str
   return 0; /* To tell nftw() to continue */
 }
 
+char row_generator(view_t* listview, view_t* rowview, int index)
+{
+  printf("row generator %i\n", index);
+
+  if (index < 0) return 0; // no items over 0
+
+  view_set_frame(rowview, (vframe_t){0, 0, 900, 40});
+  uint32_t color = (index % 2 == 0) ? 0xEFEFEFFF : 0xDEDEDEFF;
+  tg_text_add(rowview, color, 0x000000FF, files->data[index]);
+
+  return 1;
+}
+
 void init(int width, int height)
 {
   printf("zenmusic init %i %i\n", width, height);
@@ -72,7 +85,7 @@ void init(int width, int height)
   view_t* songlist = view_new("songlist", (vframe_t){0, 100, 600, 600}, 0);
 
   tg_color_add(songlist, 0x222222FF);
-  eh_songs_add(songlist, files);
+  eh_songs_add(songlist, files, row_generator);
 
   view_t* videoview = view_new("videoview", (vframe_t){400, 400, 800, 600}, 1);
 

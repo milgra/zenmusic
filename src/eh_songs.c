@@ -8,13 +8,17 @@
 typedef struct _eh_songs_t
 {
   mtvec_t* items;
+  mtvec_t* cache;
   mtvec_t* files;
 
+  int index;
   int head_index;
   int tail_index;
+
+  char (*row_generator)(view_t* listview, view_t* rowview, int index); /* event handler for view */
 } eh_songs_t;
 
-void eh_songs_add(view_t* view, mtvec_t* files);
+void eh_songs_add(view_t* view, mtvec_t* files, char (*row_generator)(view_t* listview, view_t* rowview, int index));
 
 #endif
 
@@ -26,6 +30,37 @@ void eh_songs_add(view_t* view, mtvec_t* files);
 #include "ui_manager.c"
 #include <math.h>
 
+view_t* eh_songs_gen_item(view_t* view)
+{
+  eh_songs_t* eh = view->ehdata;
+  view_t*     item;
+
+  if (eh->cache->length > 0)
+  {
+    item = eh->cache->data[0];
+  }
+  else
+  {
+    char idbuffer[100];
+    snprintf(idbuffer, 100, "list_item%i", eh->index++);
+    item = view_new(idbuffer, (vframe_t){0, 0, 0, 0}, 0);
+    VADD(eh->cache, item);
+  }
+  return item;
+}
+
+void eh_songs_cache_item(view_t* view, view_t* rowitem)
+{
+  eh_songs_t* eh = view->ehdata;
+  VADD(eh->cache, rowitem);
+
+  rowitem->tex_state = TS_BLANK;
+  rowitem->eh        = NULL;
+  rowitem->tg        = NULL;
+  rowitem->ehdata    = NULL;
+  rowitem->tgdata    = NULL;
+}
+
 void eh_songs_evt(view_t* view, ev_t ev)
 {
   eh_songs_t* eh = view->ehdata;
@@ -33,18 +68,16 @@ void eh_songs_evt(view_t* view, ev_t ev)
   {
     if (eh->items->length == 0 && eh->files->length > 0)
     {
-      // create first item
-      char idbuffer[100];
-      int  i = 0;
-      snprintf(idbuffer, 100, "list_item%i", i);
-      view_t*  item  = view_new(idbuffer, (vframe_t){0, i * 40, 900, 41}, 0);
-      uint32_t color = (i % 2 == 0) ? 0xEFEFEFFF : 0xDEDEDEFF;
-      tg_text_add(item, color, 0x000000FF, eh->files->data[i]);
-      view_add(view, item);
-      VADD(eh->items, item);
+      view_t* rowitem = eh_songs_gen_item(view);
+      char    success = (*eh->row_generator)(view, rowitem, 0);
 
-      eh->head_index = 0;
-      eh->tail_index = 0;
+      if (success)
+      {
+        VREM(eh->cache, rowitem);
+        view_add(view, rowitem);
+        VADD(eh->items, rowitem);
+        ui_manager_add(rowitem);
+      }
     }
   }
   else if (ev.type == EV_SCROLL)
@@ -65,62 +98,60 @@ void eh_songs_evt(view_t* view, ev_t ev)
       if (head->frame.y > 0.0)
       {
         // add new head
-        printf("adding head\n");
+        view_t* rowitem = eh_songs_gen_item(view);
+        char    success = (*eh->row_generator)(view, rowitem, eh->head_index - 1);
 
-        if (eh->head_index > 0)
+        if (success)
         {
-          char idbuffer[100];
-          int  i = eh->head_index - 1;
-          snprintf(idbuffer, 100, "list_item%i", i);
-          view_t*  item  = view_new(idbuffer, (vframe_t){0, head->frame.y - 41, 900, 41}, 0);
-          uint32_t color = (i % 2 == 0) ? 0xEFEFEFFF : 0xDEDEDEFF;
-          tg_text_add(item, color, 0x000000FF, eh->files->data[i]);
-          view_insert(view, item, 0);
-          mtvec_addatindex(eh->items, item, 0);
-          eh->head_index = i;
-          //REL(item);
+          VREM(eh->cache, rowitem);
+          mtvec_addatindex(eh->items, rowitem, 0);
 
-          ui_manager_add(item);
+          view_insert(view, rowitem, 0);
+          view_set_frame(rowitem, (vframe_t){0, head->frame.y - rowitem->frame.h, rowitem->frame.w, rowitem->frame.h});
+
+          eh->head_index -= 1;
+          ui_manager_add(rowitem);
         }
       }
       else if (head->frame.y + head->frame.h < 0.0)
       {
         // remove head
-        printf("adding head\n");
-        ui_manager_remove(head);
+        eh_songs_cache_item(view, head);
 
         VREM(eh->items, head);
+        ui_manager_remove(head);
         view_remove(view, head);
+
         eh->head_index += 1;
       }
 
       if (tail->frame.y + tail->frame.h < view->frame.h)
       {
         // add new tail
-        if (eh->files->length > eh->tail_index)
+        view_t* rowitem = eh_songs_gen_item(view);
+        char    success = (*eh->row_generator)(view, rowitem, eh->tail_index + 1);
+
+        if (success)
         {
-          char idbuffer[100];
-          int  i = eh->tail_index + 1;
-          snprintf(idbuffer, 100, "list_item%i", i);
-          view_t*  item  = view_new(idbuffer, (vframe_t){0, tail->frame.y + tail->frame.h, 900, 41}, 0);
-          uint32_t color = (i % 2 == 0) ? 0xEFEFEFFF : 0xDEDEDEFF;
-          tg_text_add(item, color, 0x000000FF, eh->files->data[i]);
-          view_add(view, item);
-          VADD(eh->items, item);
+          VREM(eh->cache, rowitem);
+          VADD(eh->items, rowitem);
 
-          ui_manager_add(item);
+          view_add(view, rowitem);
+          view_set_frame(rowitem, (vframe_t){0, tail->frame.y + tail->frame.h, rowitem->frame.w, rowitem->frame.h});
 
-          eh->tail_index = i;
-          //REL(item);
+          eh->tail_index += 1;
+          ui_manager_add(rowitem);
         }
       }
       else if (tail->frame.y > view->frame.h)
       {
         // remove tail
-        ui_manager_remove(tail);
+        eh_songs_cache_item(view, tail);
 
         VREM(eh->items, tail);
+        ui_manager_remove(tail);
         view_remove(view, tail);
+
         eh->tail_index -= 1;
       }
     }
@@ -133,13 +164,15 @@ void eh_songs_del(void* p)
   REL(eh->items);
 }
 
-void eh_songs_add(view_t* view, mtvec_t* files)
+void eh_songs_add(view_t* view, mtvec_t* files, char (*row_generator)(view_t* listview, view_t* rowview, int index))
 {
   printf("eh_songs new\n");
 
-  eh_songs_t* eh = mtmem_alloc(sizeof(eh_songs_t), "eh_songs", eh_songs_del, NULL);
-  eh->files      = files;
-  eh->items      = VNEW();
+  eh_songs_t* eh    = mtmem_calloc(sizeof(eh_songs_t), "eh_songs", eh_songs_del, NULL);
+  eh->files         = files;
+  eh->items         = VNEW();
+  eh->cache         = VNEW();
+  eh->row_generator = row_generator;
 
   view->ehdata = eh;
   view->eh     = eh_songs_evt;
