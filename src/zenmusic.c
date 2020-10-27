@@ -39,7 +39,6 @@ static int display_info(const char* fpath, const struct stat* sb, int tflag, str
 
 char row_generator(view_t* listview, view_t* rowview, int index)
 {
-  printf("row generator %i\n", index);
 
   if (index < 0) return 0; // no items over 0
 
@@ -74,7 +73,7 @@ void init(int width, int height)
 
   ui_manager_init(width, height);
 
-  view_t* header = view_new("header", (vframe_t){0, 0, 1200, 100}, 0);
+  view_t* header = view_new("header", (vframe_t){0, 900, 1200, 100}, 0);
 
   tg_text_add(header, 0xFFFFFFFF, 0x000000FF, "Zen Music Player");
 
@@ -90,17 +89,19 @@ void init(int width, int height)
   view_t* videoview = view_new("videoview", (vframe_t){400, 400, 800, 600}, 1);
 
   tg_video_add(videoview);
-  eh_drag_add(videoview);
+
+  eh_drag_add(header);
 
   view_t* texmapview = view_new("texmapview", (vframe_t){50, 500, 400, 400}, 0);
 
   tg_texmap_add(texmapview);
 
-  ui_manager_add(header);
+  view_add(header, playbtnview);
+
   ui_manager_add(songlist);
   ui_manager_add(videoview);
   ui_manager_add(texmapview);
-  ui_manager_add(playbtnview);
+  ui_manager_add(header);
 
   //player_init();
 }

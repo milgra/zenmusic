@@ -1,6 +1,7 @@
 /*
   UI Connector Module for Zen Multimedia Desktop System 
   Monitors views for changes, renders their content in the background, updates compositor state based on view state.
+  All views have to be added to ui_connector, hierarchy is not handled.
 
   views  ->
   events -> ui_connector -> ui_compositor -> gl_connector -> GPU
@@ -14,6 +15,7 @@
 
 int  ui_connector_init(int, int);
 void ui_connector_reset();
+void ui_connector_cleanup();
 void ui_connector_render();
 void ui_connector_add(view_t* view);
 void ui_connector_remove(view_t* view);
@@ -32,19 +34,19 @@ void ui_connector_resize(float width, float height);
 #include <SDL.h>
 #include <unistd.h>
 
-mtmap_t*  uim;
 mtvec_t*  uiv;
 mtch_t*   uich;
 pthread_t uibgth;
+mtvec_t*  trash;
 int       ui_connector_workloop(void* mypointer);
 
 int ui_connector_init(int width, int height)
 {
   ui_compositor_init(width, height);
 
-  uim  = MNEW();
-  uiv  = VNEW();
-  uich = mtch_new(10);
+  uiv   = VNEW();
+  uich  = mtch_new(10);
+  trash = VNEW();
 
   // TODO SDL_CreateThread
   SDL_Thread* thread = SDL_CreateThread(ui_connector_workloop,
@@ -58,7 +60,6 @@ void ui_connector_reset()
 {
   ui_compositor_reset();
   mtvec_reset(uiv);
-  mtmap_reset(uim);
 }
 
 void ui_connector_add(view_t* view)
@@ -67,16 +68,30 @@ void ui_connector_add(view_t* view)
   ui_compositor_add(view->id,
                     view->index,
                     view->tex_channel,
-                    view->frame.x,
-                    view->frame.y,
-                    view->frame.w,
-                    view->frame.h);
+                    view->frame_global.x,
+                    view->frame_global.y,
+                    view->frame_global.w,
+                    view->frame_global.h);
+  view->connected = 1;
 }
 
-void ui_connector_remove(view_t* view)
+void ui_connector_cleanup()
 {
-  VREM(uiv, view);
-  ui_compositor_rem(view->id);
+  // remove views without parents
+  view_t* v;
+
+  while ((v = VNXT(uiv)))
+  {
+    if (v->parent == NULL)
+    {
+      ui_compositor_rem(v->id);
+      v->connected = 0;
+      VADD(trash, v);
+    }
+  }
+
+  mtvec_reminvector(uiv, trash);
+  mtvec_reset(trash);
 }
 
 void ui_connector_set_index(view_t* view)
@@ -99,7 +114,11 @@ void ui_connector_render()
     }
     if (view->frame_changed) /* update dimension if needed */
     {
-      ui_compositor_set_frame(view->id, view->frame.x, view->frame.y, view->frame.w, view->frame.h);
+      ui_compositor_set_frame(view->id,
+                              view->frame_global.x,
+                              view->frame_global.y,
+                              view->frame_global.w,
+                              view->frame_global.h);
       view->frame_changed = 0;
     }
     if (view->tex_changed) /* update bitmap if needed */
@@ -120,7 +139,7 @@ int ui_connector_workloop()
   {
     while ((view = mtch_recv(uich)))
     {
-      printf("generating bmp for %s\n", view->id);
+      // printf("generating bmp for %s\n", view->id);
       view_gen_texture(view);
     }
     SDL_Delay(16);

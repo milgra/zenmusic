@@ -27,7 +27,7 @@ void eh_list_add(view_t* view, char (*row_generator)(view_t* listview, view_t* r
 #include "mtcstring.c"
 #include "mtstring.c"
 #include "tg_text.c"
-#include "ui_manager.c"
+#include "ui_connector.c"
 #include <math.h>
 
 view_t* eh_list_gen_item(view_t* view)
@@ -76,9 +76,8 @@ void eh_list_evt(view_t* view, ev_t ev)
         if (success)
         {
           VREM(eh->cache, rowitem);
-          view_add(view, rowitem);
           VADD(eh->items, rowitem);
-          ui_manager_add(rowitem);
+          view_add(view, rowitem);
         }
         else
           eh->filled = 1;
@@ -106,7 +105,6 @@ void eh_list_evt(view_t* view, ev_t ev)
             view_set_frame(rowitem, (vframe_t){0, head->frame.y - rowitem->frame.h, rowitem->frame.w, rowitem->frame.h});
 
             eh->head_index -= 1;
-            ui_manager_add(rowitem);
           }
           else
             eh->filled = 1;
@@ -130,7 +128,6 @@ void eh_list_evt(view_t* view, ev_t ev)
             view_set_frame(rowitem, (vframe_t){0, tail->frame.y + tail->frame.h, rowitem->frame.w, rowitem->frame.h});
 
             eh->tail_index += 1;
-            ui_manager_add(rowitem);
           }
           else
             eh->filled &= 1;
@@ -145,7 +142,6 @@ void eh_list_evt(view_t* view, ev_t ev)
           eh_list_cache_item(view, head);
 
           VREM(eh->items, head);
-          ui_manager_remove(head);
           view_remove(view, head);
 
           eh->head_index += 1;
@@ -156,7 +152,6 @@ void eh_list_evt(view_t* view, ev_t ev)
           eh_list_cache_item(view, tail);
 
           VREM(eh->items, tail);
-          ui_manager_remove(tail);
           view_remove(view, tail);
 
           eh->tail_index -= 1;

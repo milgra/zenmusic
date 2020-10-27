@@ -64,7 +64,6 @@ void ui_compositor_init(int width, int height)
 
 void ui_compositor_reset()
 {
-  printf("RESET\n");
   fb_reset(fb);
   tm_reset(tm);
   mtvec_reset(rectv);
@@ -111,14 +110,14 @@ void ui_compositor_rem(char* id)
 
 void ui_compositor_set_index(char* id, uint32_t index)
 {
-  //printf("ui_compositor_set_index %s %i\n", id, index);
+  printf("ui_compositor_set_index %s %i\n", id, index);
 
   crect_t* rect;
 
   if ((rect = MGET(rectm, id)))
   {
     uint32_t oldindex = mtvec_indexofdata(rectv, rect);
-    //printf("%s old index %i new index %i\n", id, oldindex, index);
+    printf("%s old index %i new index %i\n", id, oldindex, index);
     if (oldindex != index)
     {
       mtvec_rem(rectv, rect);
@@ -133,6 +132,8 @@ void ui_compositor_set_frame(char* id, int x, int y, int w, int h)
 {
   crect_t* rect;
 
+  // printf("ui_compositor_set_frame %s %i %i %i %i\n", id, x, y, w, h);
+
   if ((rect = MGET(rectm, id)))
   {
     crect_set_frame(rect, x, y, w, h);
@@ -143,7 +144,7 @@ void ui_compositor_set_frame(char* id, int x, int y, int w, int h)
 
 void ui_compositor_set_texture(char* id, bm_t* tex)
 {
-  printf("ui_compositor_set_texture %s\n", id);
+  // printf("ui_compositor_set_texture %s\n", id);
 
   crect_t*    rect;
   tm_coords_t coords;
@@ -154,13 +155,13 @@ void ui_compositor_set_texture(char* id, bm_t* tex)
 
     if (coords.w != tex->w || coords.h != tex->h)
     {
-      printf("ui_compositor texture size mismatch, adding as new %s %i %i %i %i\n", id, coords.w, tex->w, coords.h, tex->h);
+      // printf("ui_compositor texture size mismatch, adding as new %s %i %i %i %i\n", id, coords.w, tex->w, coords.h, tex->h);
       tm_put(tm, id, tex);
       coords = tm_get(tm, id);
     }
     else
     {
-      printf("ui_compositor updating texture in place %s\n", id);
+      // printf("ui_compositor updating texture in place %s\n", id);
       tm_upd(tm, id, tex);
     }
 
