@@ -118,7 +118,7 @@ int ui_connector_workloop()
 
   while (1)
   {
-    if ((view = mtch_recv(uich)))
+    while ((view = mtch_recv(uich)))
     {
       printf("generating bmp for %s\n", view->id);
       view_gen_texture(view);

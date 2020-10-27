@@ -10,9 +10,10 @@ typedef struct _eh_list_t
   mtvec_t* items;
   mtvec_t* cache;
 
-  int index;
-  int head_index;
-  int tail_index;
+  int  index;
+  int  head_index;
+  int  tail_index;
+  char filled;
 
   char (*row_generator)(view_t* listview, view_t* rowview, int index); /* event handler for view */
 } eh_list_t;
@@ -65,82 +66,101 @@ void eh_list_evt(view_t* view, ev_t ev)
   eh_list_t* eh = view->ehdata;
   if (ev.type == EV_TIME)
   {
-    if (eh->items->length == 0)
+    while (eh->filled == 0)
     {
-      view_t* rowitem = eh_list_gen_item(view);
-      char    success = (*eh->row_generator)(view, rowitem, 0);
-
-      if (success)
+      if (eh->items->length == 0)
       {
-        VREM(eh->cache, rowitem);
-        view_add(view, rowitem);
-        VADD(eh->items, rowitem);
-        ui_manager_add(rowitem);
-      }
-    }
-    else
-    {
-      view_t* head = mtvec_head(eh->items);
-      view_t* tail = mtvec_tail(eh->items);
-
-      if (head->frame.y > 0.0)
-      {
-        // add new head
         view_t* rowitem = eh_list_gen_item(view);
-        char    success = (*eh->row_generator)(view, rowitem, eh->head_index - 1);
+        char    success = (*eh->row_generator)(view, rowitem, 0);
 
         if (success)
         {
           VREM(eh->cache, rowitem);
-          mtvec_addatindex(eh->items, rowitem, 0);
-
-          view_insert(view, rowitem, 0);
-          view_set_frame(rowitem, (vframe_t){0, head->frame.y - rowitem->frame.h, rowitem->frame.w, rowitem->frame.h});
-
-          eh->head_index -= 1;
-          ui_manager_add(rowitem);
-        }
-      }
-      else if (head->frame.y + head->frame.h < 0.0)
-      {
-        // remove head
-        eh_list_cache_item(view, head);
-
-        VREM(eh->items, head);
-        ui_manager_remove(head);
-        view_remove(view, head);
-
-        eh->head_index += 1;
-      }
-
-      if (tail->frame.y + tail->frame.h < view->frame.h)
-      {
-        // add new tail
-        view_t* rowitem = eh_list_gen_item(view);
-        char    success = (*eh->row_generator)(view, rowitem, eh->tail_index + 1);
-
-        if (success)
-        {
-          VREM(eh->cache, rowitem);
-          VADD(eh->items, rowitem);
-
           view_add(view, rowitem);
-          view_set_frame(rowitem, (vframe_t){0, tail->frame.y + tail->frame.h, rowitem->frame.w, rowitem->frame.h});
-
-          eh->tail_index += 1;
+          VADD(eh->items, rowitem);
           ui_manager_add(rowitem);
         }
+        else
+          eh->filled = 1;
       }
-      else if (tail->frame.y > view->frame.h)
+      else
       {
-        // remove tail
-        eh_list_cache_item(view, tail);
+        view_t* head = mtvec_head(eh->items);
+        view_t* tail = mtvec_tail(eh->items);
 
-        VREM(eh->items, tail);
-        ui_manager_remove(tail);
-        view_remove(view, tail);
+        // add items if needed
 
-        eh->tail_index -= 1;
+        if (head->frame.y > 0.0)
+        {
+          view_t* rowitem = eh_list_gen_item(view);
+          char    success = (*eh->row_generator)(view, rowitem, eh->head_index - 1);
+
+          if (success)
+          {
+            eh->filled = 0; // there is probably more to come
+
+            VREM(eh->cache, rowitem);
+            mtvec_addatindex(eh->items, rowitem, 0);
+
+            view_insert(view, rowitem, 0);
+            view_set_frame(rowitem, (vframe_t){0, head->frame.y - rowitem->frame.h, rowitem->frame.w, rowitem->frame.h});
+
+            eh->head_index -= 1;
+            ui_manager_add(rowitem);
+          }
+          else
+            eh->filled = 1;
+        }
+        else
+          eh->filled = 1;
+
+        if (tail->frame.y + tail->frame.h < view->frame.h)
+        {
+          view_t* rowitem = eh_list_gen_item(view);
+          char    success = (*eh->row_generator)(view, rowitem, eh->tail_index + 1);
+
+          if (success)
+          {
+            eh->filled = 0; // there is probably more to come
+
+            VREM(eh->cache, rowitem);
+            VADD(eh->items, rowitem);
+
+            view_add(view, rowitem);
+            view_set_frame(rowitem, (vframe_t){0, tail->frame.y + tail->frame.h, rowitem->frame.w, rowitem->frame.h});
+
+            eh->tail_index += 1;
+            ui_manager_add(rowitem);
+          }
+          else
+            eh->filled &= 1;
+        }
+        else
+          eh->filled &= 1;
+
+        // remove items if needed
+
+        if (head->frame.y + head->frame.h < 0.0 && eh->items->length > 1)
+        {
+          eh_list_cache_item(view, head);
+
+          VREM(eh->items, head);
+          ui_manager_remove(head);
+          view_remove(view, head);
+
+          eh->head_index += 1;
+        }
+
+        if (tail->frame.y > view->frame.h && eh->items->length > 1)
+        {
+          eh_list_cache_item(view, tail);
+
+          VREM(eh->items, tail);
+          ui_manager_remove(tail);
+          view_remove(view, tail);
+
+          eh->tail_index -= 1;
+        }
       }
     }
   }
@@ -152,6 +172,7 @@ void eh_list_evt(view_t* view, ev_t ev)
       vframe_t frame = sview->frame;
       frame.y += ev.dy;
       view_set_frame(sview, frame);
+      eh->filled = 0;
     }
   }
 }

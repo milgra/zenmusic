@@ -10,6 +10,8 @@ zen photo and video - offline photo/video viewer and library manager / video/ima
 
 ---
 
+real frames, resize
+
 eh_list.c
 
 
@@ -23,3 +25,6 @@ spectrum analyzer/bar in the background
 grid-based warping of video/album cover based on frequence ( bass in the center )
 
 about page with module playing in the background, 3d dot animation?
+
+zold/piros listitem background play/pausre, animalt!!!
+unshift bmp - spectrum analyzer shift left
