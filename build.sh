@@ -30,6 +30,7 @@ clang \
     src/modules/ui/ui_manager.c \
     src/modules/ui/view.c \
     src/modules/ui/eh_drag.c \
+    src/modules/ui/eh_list.c \
     src/modules/ui/tg_text.c \
     src/modules/ui/tg_color.c \
     src/modules/ui/tg_bitmap.c \
@@ -63,7 +64,6 @@ clang \
     src/mtlib/mtvector.c \
     src/mtlib/mtstring.c \
     src/mtlib/mtcstring.c \
-    src/eh_songs.c \
     src/zenmusic.c \
     src/common.c \
     -o bin/zenmusic

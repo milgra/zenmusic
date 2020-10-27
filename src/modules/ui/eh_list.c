@@ -1,11 +1,11 @@
-#ifndef eh_songs_h
-#define eh_songs_h
+#ifndef eh_list_h
+#define eh_list_h
 
 #include "mtvector.c"
 #include "view.c"
 #include "wm_event.c"
 
-typedef struct _eh_songs_t
+typedef struct _eh_list_t
 {
   mtvec_t* items;
   mtvec_t* cache;
@@ -16,9 +16,9 @@ typedef struct _eh_songs_t
   int tail_index;
 
   char (*row_generator)(view_t* listview, view_t* rowview, int index); /* event handler for view */
-} eh_songs_t;
+} eh_list_t;
 
-void eh_songs_add(view_t* view, mtvec_t* files, char (*row_generator)(view_t* listview, view_t* rowview, int index));
+void eh_list_add(view_t* view, mtvec_t* files, char (*row_generator)(view_t* listview, view_t* rowview, int index));
 
 #endif
 
@@ -30,10 +30,10 @@ void eh_songs_add(view_t* view, mtvec_t* files, char (*row_generator)(view_t* li
 #include "ui_manager.c"
 #include <math.h>
 
-view_t* eh_songs_gen_item(view_t* view)
+view_t* eh_list_gen_item(view_t* view)
 {
-  eh_songs_t* eh = view->ehdata;
-  view_t*     item;
+  eh_list_t* eh = view->ehdata;
+  view_t*    item;
 
   if (eh->cache->length > 0)
   {
@@ -49,9 +49,9 @@ view_t* eh_songs_gen_item(view_t* view)
   return item;
 }
 
-void eh_songs_cache_item(view_t* view, view_t* rowitem)
+void eh_list_cache_item(view_t* view, view_t* rowitem)
 {
-  eh_songs_t* eh = view->ehdata;
+  eh_list_t* eh = view->ehdata;
   VADD(eh->cache, rowitem);
 
   rowitem->tex_state = TS_BLANK;
@@ -61,14 +61,14 @@ void eh_songs_cache_item(view_t* view, view_t* rowitem)
   rowitem->tgdata    = NULL;
 }
 
-void eh_songs_evt(view_t* view, ev_t ev)
+void eh_list_evt(view_t* view, ev_t ev)
 {
-  eh_songs_t* eh = view->ehdata;
+  eh_list_t* eh = view->ehdata;
   if (ev.type == EV_TIME)
   {
     if (eh->items->length == 0 && eh->files->length > 0)
     {
-      view_t* rowitem = eh_songs_gen_item(view);
+      view_t* rowitem = eh_list_gen_item(view);
       char    success = (*eh->row_generator)(view, rowitem, 0);
 
       if (success)
@@ -98,7 +98,7 @@ void eh_songs_evt(view_t* view, ev_t ev)
       if (head->frame.y > 0.0)
       {
         // add new head
-        view_t* rowitem = eh_songs_gen_item(view);
+        view_t* rowitem = eh_list_gen_item(view);
         char    success = (*eh->row_generator)(view, rowitem, eh->head_index - 1);
 
         if (success)
@@ -116,7 +116,7 @@ void eh_songs_evt(view_t* view, ev_t ev)
       else if (head->frame.y + head->frame.h < 0.0)
       {
         // remove head
-        eh_songs_cache_item(view, head);
+        eh_list_cache_item(view, head);
 
         VREM(eh->items, head);
         ui_manager_remove(head);
@@ -128,7 +128,7 @@ void eh_songs_evt(view_t* view, ev_t ev)
       if (tail->frame.y + tail->frame.h < view->frame.h)
       {
         // add new tail
-        view_t* rowitem = eh_songs_gen_item(view);
+        view_t* rowitem = eh_list_gen_item(view);
         char    success = (*eh->row_generator)(view, rowitem, eh->tail_index + 1);
 
         if (success)
@@ -146,7 +146,7 @@ void eh_songs_evt(view_t* view, ev_t ev)
       else if (tail->frame.y > view->frame.h)
       {
         // remove tail
-        eh_songs_cache_item(view, tail);
+        eh_list_cache_item(view, tail);
 
         VREM(eh->items, tail);
         ui_manager_remove(tail);
@@ -158,24 +158,24 @@ void eh_songs_evt(view_t* view, ev_t ev)
   }
 }
 
-void eh_songs_del(void* p)
+void eh_list_del(void* p)
 {
-  eh_songs_t* eh = (eh_songs_t*)p;
+  eh_list_t* eh = (eh_list_t*)p;
   REL(eh->items);
 }
 
-void eh_songs_add(view_t* view, mtvec_t* files, char (*row_generator)(view_t* listview, view_t* rowview, int index))
+void eh_list_add(view_t* view, mtvec_t* files, char (*row_generator)(view_t* listview, view_t* rowview, int index))
 {
-  printf("eh_songs new\n");
+  printf("eh_list new\n");
 
-  eh_songs_t* eh    = mtmem_calloc(sizeof(eh_songs_t), "eh_songs", eh_songs_del, NULL);
+  eh_list_t* eh     = mtmem_calloc(sizeof(eh_list_t), "eh_list", eh_list_del, NULL);
   eh->files         = files;
   eh->items         = VNEW();
   eh->cache         = VNEW();
   eh->row_generator = row_generator;
 
   view->ehdata = eh;
-  view->eh     = eh_songs_evt;
+  view->eh     = eh_list_evt;
 }
 
 #endif
