@@ -9,7 +9,6 @@ typedef struct _eh_list_t
 {
   mtvec_t* items;
   mtvec_t* cache;
-  mtvec_t* files;
 
   int index;
   int head_index;
@@ -18,7 +17,7 @@ typedef struct _eh_list_t
   char (*row_generator)(view_t* listview, view_t* rowview, int index); /* event handler for view */
 } eh_list_t;
 
-void eh_list_add(view_t* view, mtvec_t* files, char (*row_generator)(view_t* listview, view_t* rowview, int index));
+void eh_list_add(view_t* view, char (*row_generator)(view_t* listview, view_t* rowview, int index));
 
 #endif
 
@@ -66,7 +65,7 @@ void eh_list_evt(view_t* view, ev_t ev)
   eh_list_t* eh = view->ehdata;
   if (ev.type == EV_TIME)
   {
-    if (eh->items->length == 0 && eh->files->length > 0)
+    if (eh->items->length == 0)
     {
       view_t* rowitem = eh_list_gen_item(view);
       char    success = (*eh->row_generator)(view, rowitem, 0);
@@ -164,12 +163,11 @@ void eh_list_del(void* p)
   REL(eh->items);
 }
 
-void eh_list_add(view_t* view, mtvec_t* files, char (*row_generator)(view_t* listview, view_t* rowview, int index))
+void eh_list_add(view_t* view, char (*row_generator)(view_t* listview, view_t* rowview, int index))
 {
   printf("eh_list new\n");
 
   eh_list_t* eh     = mtmem_calloc(sizeof(eh_list_t), "eh_list", eh_list_del, NULL);
-  eh->files         = files;
   eh->items         = VNEW();
   eh->cache         = VNEW();
   eh->row_generator = row_generator;

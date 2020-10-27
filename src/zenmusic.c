@@ -85,7 +85,7 @@ void init(int width, int height)
   view_t* songlist = view_new("songlist", (vframe_t){0, 100, 600, 600}, 0);
 
   tg_color_add(songlist, 0x222222FF);
-  eh_list_add(songlist, files, row_generator);
+  eh_list_add(songlist, row_generator);
 
   view_t* videoview = view_new("videoview", (vframe_t){400, 400, 800, 600}, 1);
 
