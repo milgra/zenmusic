@@ -78,18 +78,7 @@ void eh_list_evt(view_t* view, ev_t ev)
         ui_manager_add(rowitem);
       }
     }
-  }
-  else if (ev.type == EV_SCROLL)
-  {
-    view_t* sview;
-    while ((sview = VNXT(view->views)))
-    {
-      vframe_t frame = sview->frame;
-      frame.y += ev.dy;
-      view_set_frame(sview, frame);
-    }
-
-    if (eh->items->length > 0)
+    else
     {
       view_t* head = mtvec_head(eh->items);
       view_t* tail = mtvec_tail(eh->items);
@@ -153,6 +142,16 @@ void eh_list_evt(view_t* view, ev_t ev)
 
         eh->tail_index -= 1;
       }
+    }
+  }
+  else if (ev.type == EV_SCROLL)
+  {
+    view_t* sview;
+    while ((sview = VNXT(view->views)))
+    {
+      vframe_t frame = sview->frame;
+      frame.y += ev.dy;
+      view_set_frame(sview, frame);
     }
   }
 }

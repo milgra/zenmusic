@@ -82,7 +82,7 @@ void init(int width, int height)
 
   tg_bitmap_add(playbtnview, playpath);
 
-  view_t* songlist = view_new("songlist", (vframe_t){0, 100, 600, 600}, 0);
+  view_t* songlist = view_new("songlist", (vframe_t){0, 0, 1200, 800}, 0);
 
   tg_color_add(songlist, 0x222222FF);
   eh_list_add(songlist, row_generator);
