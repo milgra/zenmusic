@@ -87,7 +87,7 @@ void ui_compositor_update()
 
 void ui_compositor_add(char* id, uint32_t index, int channel, int x, int y, int w, int h)
 {
-  printf("ui_compositor_add %s\n", id);
+  // printf("ui_compositor_add %s\n", id);
   crect_t* rect = crect_new(id, index, channel, x, y, w, h, 0.0, 0.0, 1.0, 1.0);
 
   VADD(rectv, rect);
@@ -98,7 +98,7 @@ void ui_compositor_add(char* id, uint32_t index, int channel, int x, int y, int 
 
 void ui_compositor_rem(char* id)
 {
-  printf("ui_compositor_rem %s\n", id);
+  // printf("ui_compositor_rem %s\n", id);
   crect_t* rect;
 
   rect = mtmap_get(rectm, id);
@@ -110,14 +110,14 @@ void ui_compositor_rem(char* id)
 
 void ui_compositor_set_index(char* id, uint32_t index)
 {
-  printf("ui_compositor_set_index %s %i\n", id, index);
+  // printf("ui_compositor_set_index %s %i\n", id, index);
 
   crect_t* rect;
 
   if ((rect = MGET(rectm, id)))
   {
     uint32_t oldindex = mtvec_indexofdata(rectv, rect);
-    printf("%s old index %i new index %i\n", id, oldindex, index);
+    // printf("%s old index %i new index %i\n", id, oldindex, index);
     if (oldindex != index)
     {
       mtvec_rem(rectv, rect);

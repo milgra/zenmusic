@@ -27,7 +27,6 @@ void eh_list_add(view_t* view, char (*row_generator)(view_t* listview, view_t* r
 #include "mtcstring.c"
 #include "mtstring.c"
 #include "tg_text.c"
-#include "ui_connector.c"
 #include <math.h>
 
 view_t* eh_list_gen_item(view_t* view)

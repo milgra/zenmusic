@@ -1,26 +1,26 @@
 /*
-  UI Connector Module for Zen Multimedia Desktop System 
+  UI Generator Module for Zen Multimedia Desktop System 
   Monitors views for changes, renders their content in the background, updates compositor state based on view state.
-  All views have to be added to ui_connector, hierarchy is not handled.
+  All views have to be added to ui_generator, hierarchy is not handled.
 
   views  ->
-  events -> ui_connector -> ui_compositor -> gl_connector -> GPU
+  events -> ui_generator -> ui_compositor -> gl_connector -> GPU
 
  */
 
-#ifndef ui_connector_h
-#define ui_connector_h
+#ifndef ui_generator_h
+#define ui_generator_h
 
 #include "view.c"
 
-int  ui_connector_init(int, int);
-void ui_connector_reset();
-void ui_connector_cleanup();
-void ui_connector_render();
-void ui_connector_add(view_t* view);
-void ui_connector_remove(view_t* view);
-void ui_connector_set_index(view_t* view);
-void ui_connector_resize(float width, float height);
+int  ui_generator_init(int, int);
+void ui_generator_reset();
+void ui_generator_cleanup();
+void ui_generator_render();
+void ui_generator_add(view_t* view);
+void ui_generator_remove(view_t* view);
+void ui_generator_set_index(view_t* view);
+void ui_generator_resize(float width, float height);
 
 #endif
 
@@ -38,9 +38,9 @@ mtvec_t*  uiv;
 mtch_t*   uich;
 pthread_t uibgth;
 mtvec_t*  trash;
-int       ui_connector_workloop(void* mypointer);
+int       ui_generator_workloop(void* mypointer);
 
-int ui_connector_init(int width, int height)
+int ui_generator_init(int width, int height)
 {
   ui_compositor_init(width, height);
 
@@ -49,20 +49,20 @@ int ui_connector_init(int width, int height)
   trash = VNEW();
 
   // TODO SDL_CreateThread
-  SDL_Thread* thread = SDL_CreateThread(ui_connector_workloop,
-                                        "connector",
+  SDL_Thread* thread = SDL_CreateThread(ui_generator_workloop,
+                                        "generator",
                                         NULL);
 
   return (thread != NULL);
 }
 
-void ui_connector_reset()
+void ui_generator_reset()
 {
   ui_compositor_reset();
   mtvec_reset(uiv);
 }
 
-void ui_connector_add(view_t* view)
+void ui_generator_add(view_t* view)
 {
   VADD(uiv, view);
   ui_compositor_add(view->id,
@@ -75,7 +75,7 @@ void ui_connector_add(view_t* view)
   view->connected = 1;
 }
 
-void ui_connector_cleanup()
+void ui_generator_cleanup()
 {
   // remove views without parents
   view_t* v;
@@ -94,12 +94,12 @@ void ui_connector_cleanup()
   mtvec_reset(trash);
 }
 
-void ui_connector_set_index(view_t* view)
+void ui_generator_set_index(view_t* view)
 {
   ui_compositor_set_index(view->id, view->index);
 }
 
-void ui_connector_render()
+void ui_generator_render()
 {
   view_t* view;
 
@@ -131,7 +131,7 @@ void ui_connector_render()
   ui_compositor_render();
 }
 
-int ui_connector_workloop()
+int ui_generator_workloop()
 {
   view_t* view;
 
@@ -146,7 +146,7 @@ int ui_connector_workloop()
   }
 }
 
-void ui_connector_resize(float width, float height)
+void ui_generator_resize(float width, float height)
 {
   ui_compositor_resize(width, height);
 }

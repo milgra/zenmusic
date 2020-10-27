@@ -1,6 +1,6 @@
 /*
   UI Manager Module for Zen Multimedia Desktop System
-  Collects root windows, dispatches events to them, readds them to UI Connector is view chain is changed.
+  Collects root windows, dispatches events to them, readds them to UI Generator is view chain is changed.
   
  */
 
@@ -22,13 +22,13 @@ void ui_manager_render();
 
 #include "mtmap.c"
 #include "mtvector.c"
-#include "ui_connector.c"
+#include "ui_generator.c"
 
 view_t* root;
 
 void ui_manager_init(int width, int height)
 {
-  ui_connector_init(width, height);
+  ui_generator_init(width, height);
 
   root = view_new("root", (vframe_t){0, 0, width, height}, 0);
 }
@@ -41,7 +41,7 @@ void ui_manager_event(ev_t ev)
   if (ev.type == EV_RESIZE)
   {
     view_set_frame(root, (vframe_t){0, 0, ev.w, ev.h});
-    ui_connector_resize(ev.w, ev.h);
+    ui_generator_resize(ev.w, ev.h);
   }
 }
 
@@ -63,10 +63,10 @@ void ui_manager_reindex(view_t* view, uint32_t* index)
     view->index = *index;
     if (view->connected == 0)
     {
-      ui_connector_add(view);
+      ui_generator_add(view);
     }
 
-    ui_connector_set_index(view);
+    ui_generator_set_index(view);
   }
 
   *index += 1;
@@ -82,12 +82,12 @@ void ui_manager_render()
 {
   if (reindex)
   {
-    ui_connector_cleanup();
+    ui_generator_cleanup();
     uint32_t index = 0;
     ui_manager_reindex(root, &index);
     reindex = 0;
   }
-  ui_connector_render();
+  ui_generator_render();
 }
 
 #endif

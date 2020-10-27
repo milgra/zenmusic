@@ -36,7 +36,7 @@ clang \
     src/modules/ui/tg_bitmap.c \
     src/modules/ui/tg_texmap.c \
     src/modules/ui/tg_video.c \
-    src/modules/ui_connector.c \
+    src/modules/ui_generator.c \
     src/modules/ui_compositor.c \
     src/modules/wm/wm_event.c \
     src/modules/wm/wm_connector.c \
