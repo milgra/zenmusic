@@ -12,6 +12,8 @@ struct _tm_coords_t
   float lty;
   float rbx;
   float rby;
+  int   x;
+  int   y;
   int   w;
   int   h;
 };
@@ -126,6 +128,8 @@ char tm_put(tm_t* tm, char* id, bm_t* bm)
                                             .lty = (float)ncy / (float)tm->bm->h,
                                             .rbx = (float)rbx / (float)tm->bm->w,
                                             .rby = (float)rby / (float)tm->bm->h,
+                                            .x   = ncx,
+                                            .y   = ncy,
                                             .w   = bm->w,
                                             .h   = bm->h}),
                              "float*");
@@ -141,17 +145,13 @@ char tm_put(tm_t* tm, char* id, bm_t* bm)
 
 void tm_upd(tm_t* tm, char* id, bm_t* bm)
 {
-  v4_t* coords = mtmap_get(tm->coords, id);
+  tm_coords_t* coords = mtmap_get(tm->coords, id);
 
   if (coords)
   {
-    v4_t c = *coords;
-    int  w = c.z - c.x;
-    int  h = c.w - c.y;
-
-    if (bm->w == w && bm->h == h)
+    if (bm->w == coords->w && bm->h == coords->h)
     {
-      bm_insert(tm->bm, bm, c.x, c.y);
+      bm_insert(tm->bm, bm, coords->x, coords->y);
     }
   }
 }
