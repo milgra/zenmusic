@@ -224,7 +224,7 @@ bm_t* font_render_text(int width, int height, mtstr_t* string, font_t* the_font,
 
     /* create empty bitmap */
 
-    bm_t* result = bm_new(dimensions.x, dimensions.y);
+    bm_t* result = bm_new(width, height);
     bm_fill(result, 0, 0, result->w, result->h, text.backcolor);
 
     if (glyphmetrics == NULL) mtmem_release(metrics);
@@ -315,7 +315,7 @@ bm_t* font_render_text(int width, int height, mtstr_t* string, font_t* the_font,
 
   /* draw all glyphs, create the base bitmap first */
 
-  bm_t* result = bm_new(dimensions.x < width ? width : dimensions.x, dimensions.y < height ? height : dimensions.y);
+  bm_t* result = bm_new(width, height);
 
   bm_fill(result, 0, 0, result->w, result->h, text.backcolor);
 

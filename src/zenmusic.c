@@ -5,6 +5,7 @@
 #include "mtcstring.c"
 #include "mtmath4.c"
 #include "player.c"
+#include "songitem.c"
 #include "tg_bitmap.c"
 #include "tg_color.c"
 #include "tg_texmap.c"
@@ -37,38 +38,20 @@ static int display_info(const char* fpath, const struct stat* sb, int tflag, str
   return 0; /* To tell nftw() to continue */
 }
 
-view_t* row_generator(view_t* listview, view_t* rowview, int index)
+view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index)
 {
-
-  if (index < 0) return NULL; // no items over 0
-
-  if (rowview == NULL)
+  if (files == NULL)
   {
-    char idbuffer[100] = {0};
-    snprintf(idbuffer, 100, "list_item%i", index);
-
-    rowview = view_new(idbuffer, (vframe_t){0, 0, 1500, 40}, 0);
-
-    snprintf(idbuffer, 100, "index_item%i", index);
-    view_t* indexview = view_new(idbuffer, (vframe_t){0, 0, 50, 40}, 0);
-
-    view_add(rowview, indexview);
-
-    snprintf(idbuffer, 100, "name_item%i", index);
-    view_t* nameview = view_new(idbuffer, (vframe_t){50, 0, 500, 40}, 0);
-
-    view_add(rowview, nameview);
+    files     = mtvec_alloc();
+    int flags = 0;
+    //flags |= FTW_DEPTH;
+    flags |= FTW_PHYS;
+    nftw("/usr/home/milgra/Music", display_info, 20, flags);
+    printf("file count %i\n", files->length);
   }
-
-  uint32_t color1 = (index % 2 == 0) ? 0xEFEFEFFF : 0xDEDEDEFF;
-  uint32_t color2 = (index % 2 == 0) ? 0xE1E1E1FF : 0xD1D1D1FF;
-
-  char indbuffer[3];
-  snprintf(indbuffer, 3, "%i.", index);
-  tg_text_add(rowview->views->data[0], color2, 0x000000FF, indbuffer);
-
-  tg_text_add(rowview->views->data[1], color1, 0x000000FF, files->data[index]);
-
+  if (index < 0) return NULL; // no items over 0
+  if (rowview == NULL) rowview = songitem_new();
+  songitem_update(rowview, index, files->data[index]);
   return rowview;
 }
 
@@ -76,19 +59,10 @@ void init(int width, int height)
 {
   printf("zenmusic init %i %i\n", width, height);
 
-  files = mtvec_alloc();
-
-  int flags = 0;
-  //flags |= FTW_DEPTH;
-  flags |= FTW_PHYS;
-  nftw("/usr/home/milgra/Music", display_info, 20, flags);
-
-  printf("file count %i\n", files->length);
-
   srand((unsigned int)time(NULL));
 
   char* respath = SDL_GetBasePath();
-  char* path    = mtcstr_fromformat("%s/../res/Avenir.ttc", respath, NULL);
+  char* path    = mtcstr_fromformat("%s/../res/Ubuntu-Regular.ttf", respath, NULL);
 
   common_font = font_alloc(path);
 
@@ -102,9 +76,13 @@ void init(int width, int height)
   tg_text_add(header, 0xFFFFFFFF, 0x000000FF, "Zen Music Player");
   view_add(header, playbtnview);
 
-  view_t* songlist = view_new("songlist", (vframe_t){0, 0, 1500, 1000}, 0);
+  view_t* songlist = view_new("songlist", (vframe_t){0, 0, 500, 500}, 0);
   tg_color_add(songlist, 0x222222FF);
-  eh_list_add(songlist, row_generator);
+  eh_list_add(songlist, songlist_item_generator);
+
+  view_set_layout(songlist, (vlayout_t){
+                                .w_per = 1.0,
+                                .h_per = 1.0});
 
   view_t* videoview = view_new("videoview", (vframe_t){400, 400, 800, 600}, 1);
   tg_video_add(videoview);
@@ -130,8 +108,8 @@ void init(int width, int height)
 
   ui_manager_add(songlist);
   ui_manager_add(videoview);
-  ui_manager_add(texmapview);
   ui_manager_add(header);
+  //ui_manager_add(texmapview);
   //ui_manager_add(chessview);
 
   //player_init();

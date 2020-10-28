@@ -12,6 +12,14 @@ typedef enum _texst_t
   TS_READY,
 } texst_t;
 
+typedef struct _vlayout_t vlayout_t;
+struct _vlayout_t
+{
+  float w_per;
+  float h_per;
+  float margin;
+};
+
 typedef struct _vframe_t vframe_t;
 struct _vframe_t
 {
@@ -24,10 +32,11 @@ struct _vframe_t
 typedef struct _view_t view_t;
 struct _view_t
 {
-  char*    id;     /* identifier for handling view */
-  mtvec_t* views;  /* subviews */
-  view_t*  parent; /* parent view */
-  uint32_t index;  /* depth */
+  char*     id;     /* identifier for handling view */
+  mtvec_t*  views;  /* subviews */
+  view_t*   parent; /* parent view */
+  uint32_t  index;  /* depth */
+  vlayout_t layout;
 
   vframe_t frame;         /* parent local position and dimensions */
   vframe_t frame_global;  /* global position and dimensions */
@@ -52,6 +61,7 @@ void    view_insert(view_t* view, view_t* subview, uint32_t index);
 void    view_remove(view_t* view, view_t* subview);
 void    view_evt(view_t* view, ev_t ev);
 void    view_set_frame(view_t* view, vframe_t frame);
+void    view_set_layout(view_t* view, vlayout_t layout);
 void    view_set_texture(view_t* view, bm_t* tex);
 void    view_gen_texture(view_t* view);
 void    view_desc(void* pointer);
@@ -164,6 +174,11 @@ void view_set_texture(view_t* view, bm_t* tex)
   RPL(view->tex, tex);
   view->tex_state   = TS_READY;
   view->tex_changed = 1;
+}
+
+void view_set_layout(view_t* view, vlayout_t layout)
+{
+  view->layout = layout;
 }
 
 void view_gen_texture(view_t* view)

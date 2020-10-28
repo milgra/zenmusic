@@ -28,6 +28,8 @@ void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t
 #include "tg_text.c"
 #include <math.h>
 
+#define PRELOAD_DISTANCE 100.0
+
 void eh_list_evt(view_t* view, ev_t ev)
 {
   eh_list_t* eh = view->ehdata;
@@ -56,7 +58,7 @@ void eh_list_evt(view_t* view, ev_t ev)
 
         // add items if needed
 
-        if (head->frame.y > 0.0)
+        if (head->frame.y > 0.0 - PRELOAD_DISTANCE)
         {
           view_t* cacheitem = mtvec_head(eh->cache);
           view_t* rowitem   = (*eh->row_generator)(view, cacheitem, eh->head_index - 1);
@@ -68,7 +70,7 @@ void eh_list_evt(view_t* view, ev_t ev)
             VREM(eh->cache, rowitem);
             mtvec_addatindex(eh->items, rowitem, 0);
 
-            view_insert(view, rowitem, 0);
+            if (rowitem->parent == NULL) view_insert(view, rowitem, 0);
             view_set_frame(rowitem, (vframe_t){0, head->frame.y - rowitem->frame.h, rowitem->frame.w, rowitem->frame.h});
 
             eh->head_index -= 1;
@@ -79,7 +81,7 @@ void eh_list_evt(view_t* view, ev_t ev)
         else
           eh->filled = 1;
 
-        if (tail->frame.y + tail->frame.h < view->frame.h)
+        if (tail->frame.y + tail->frame.h < view->frame.h + PRELOAD_DISTANCE)
         {
           view_t* cacheitem = mtvec_head(eh->cache);
           view_t* rowitem   = (*eh->row_generator)(view, cacheitem, eh->tail_index + 1);
@@ -91,7 +93,7 @@ void eh_list_evt(view_t* view, ev_t ev)
             VREM(eh->cache, rowitem);
             VADD(eh->items, rowitem);
 
-            view_add(view, rowitem);
+            if (rowitem->parent == NULL) view_add(view, rowitem);
             view_set_frame(rowitem, (vframe_t){0, tail->frame.y + tail->frame.h, rowitem->frame.w, rowitem->frame.h});
 
             eh->tail_index += 1;
@@ -104,22 +106,22 @@ void eh_list_evt(view_t* view, ev_t ev)
 
         // remove items if needed
 
-        if (head->frame.y + head->frame.h < 0.0 && eh->items->length > 1)
+        if (head->frame.y + head->frame.h < 0.0 - PRELOAD_DISTANCE && eh->items->length > 1)
         {
           VADD(eh->cache, head);
 
           VREM(eh->items, head);
-          view_remove(view, head);
+          //view_remove(view, head);
 
           eh->head_index += 1;
         }
 
-        if (tail->frame.y > view->frame.h && eh->items->length > 1)
+        if (tail->frame.y > view->frame.h + PRELOAD_DISTANCE && eh->items->length > 1)
         {
           VADD(eh->cache, tail);
 
           VREM(eh->items, tail);
-          view_remove(view, tail);
+          //view_remove(view, tail);
 
           eh->tail_index -= 1;
         }

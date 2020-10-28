@@ -15,6 +15,8 @@ scrollbar
 text anim
 basic layout
 css styling
+database, reordering
+reuse view bitmaps, only recreate on resize!!!
 
 stencil, layer groups, space-autstart-stop files
 css based styling, layout, color

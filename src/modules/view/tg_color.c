@@ -24,12 +24,12 @@ void tg_color_gen(view_t* view)
 {
   tg_color_t* gen = view->tgdata;
 
-  bm_t* bmp = bm_new(view->frame.w, view->frame.h);
+  bm_t* bmp = bm_new(10, 10);
   bm_fill(bmp,
           0,
           0,
-          view->frame.w,
-          view->frame.h,
+          10,
+          10,
           gen->color);
   view_set_texture(view, bmp);
 }

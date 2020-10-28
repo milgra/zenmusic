@@ -65,5 +65,6 @@ clang \
     src/mtlib/mtstring.c \
     src/mtlib/mtcstring.c \
     src/zenmusic.c \
+    src/songitem.c \
     src/common.c \
     -o bin/zenmusic

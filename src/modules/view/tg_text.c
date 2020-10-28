@@ -43,8 +43,8 @@ void tg_text_gen(view_t* view)
           .autosize   = 0,
           .uppercase  = 0,
 
-          .textsize   = 26.0,
-          .marginsize = 10.0,
+          .textsize   = 20.0,
+          .marginsize = 5.0,
           .cursorsize = 15.0,
 
           .textcolor = gen->fc,
