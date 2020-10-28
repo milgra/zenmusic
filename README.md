@@ -10,7 +10,11 @@ zen photo and video - offline photo/video viewer and library manager / video/ima
 
 ---
 
-resize, row subviews
+resize,
+scrollbar
+text anim
+basic layout
+css styling
 
 stencil, layer groups, space-autstart-stop files
 css based styling, layout, color

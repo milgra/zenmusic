@@ -37,16 +37,38 @@ static int display_info(const char* fpath, const struct stat* sb, int tflag, str
   return 0; /* To tell nftw() to continue */
 }
 
-char row_generator(view_t* listview, view_t* rowview, int index)
+view_t* row_generator(view_t* listview, view_t* rowview, int index)
 {
 
-  if (index < 0) return 0; // no items over 0
+  if (index < 0) return NULL; // no items over 0
 
-  view_set_frame(rowview, (vframe_t){0, 0, 900, 40});
-  uint32_t color = (index % 2 == 0) ? 0xEFEFEFFF : 0xDEDEDEFF;
+  if (rowview == NULL)
+  {
+    char idbuffer[100];
+    snprintf(idbuffer, 100, "list_item%i", index);
+    rowview = view_new(idbuffer, (vframe_t){0, 0, 1500, 40}, 0);
+
+    snprintf(idbuffer, 100, "index_item%i", index);
+    view_t* indexview = view_new(idbuffer, (vframe_t){0, 0, 50, 40}, 0);
+    snprintf(idbuffer, 100, "%i", index);
+    tg_text_add(indexview, 0xFF004400, 0x000000FF, idbuffer);
+
+    view_add(rowview, indexview);
+  }
+  else
+  {
+    view_set_frame(rowview, (vframe_t){0, 0, 1500, 40});
+
+    rowview->tgdata = NULL;
+    rowview->tg     = NULL;
+    rowview->ehdata = NULL;
+    rowview->eh     = NULL;
+  }
+
+  uint32_t color = (index % 2 == 0) ? 0xFFEFEFEF : 0xFFDEDEDE;
   tg_text_add(rowview, color, 0x000000FF, files->data[index]);
 
-  return 1;
+  return rowview;
 }
 
 void init(int width, int height)
@@ -67,33 +89,28 @@ void init(int width, int height)
   char* respath = SDL_GetBasePath();
   char* path    = mtcstr_fromformat("%s/../res/Avenir.ttc", respath, NULL);
 
-  char* playpath = mtcstr_fromformat("%s/../res/play.png", respath, NULL);
-
   common_font = font_alloc(path);
 
   ui_manager_init(width, height);
 
-  view_t* header = view_new("header", (vframe_t){0, 900, 1200, 100}, 0);
-
-  tg_text_add(header, 0xFFFFFFFF, 0x000000FF, "Zen Music Player");
-
+  char*   playpath    = mtcstr_fromformat("%s/../res/play.png", respath, NULL);
   view_t* playbtnview = view_new("playbtnview", (vframe_t){5, 5, 90, 90}, 0);
-
   tg_bitmap_add(playbtnview, playpath);
 
-  view_t* songlist = view_new("songlist", (vframe_t){100, 100, 1200, 800}, 0);
+  view_t* header = view_new("header", (vframe_t){0, 900, 1200, 100}, 0);
+  tg_text_add(header, 0xFFFFFFFF, 0x000000FF, "Zen Music Player");
+  view_add(header, playbtnview);
 
-  tg_color_add(songlist, 0x222222FF);
+  view_t* songlist = view_new("songlist", (vframe_t){0, 0, 1500, 1000}, 0);
+  tg_color_add(songlist, 0xFF222222);
   eh_list_add(songlist, row_generator);
 
   view_t* videoview = view_new("videoview", (vframe_t){400, 400, 800, 600}, 1);
-
   tg_video_add(videoview);
 
-  view_t* chessview = view_new("chessview", (vframe_t){100, 100, 300, 300}, 0);
-
-  bm_t*     chessbmp = bm_new(300, 300);
-  uint32_t* data     = (uint32_t*)chessbmp->data;
+  view_t*   chessview = view_new("chessview", (vframe_t){100, 100, 300, 300}, 0);
+  bm_t*     chessbmp  = bm_new(300, 300);
+  uint32_t* data      = (uint32_t*)chessbmp->data;
   for (int col = 0; col < 300; col++)
   {
     for (int row = 0; row < 300; row++)
@@ -103,22 +120,18 @@ void init(int width, int height)
       data[index]    = color;
     }
   }
-
   view_set_texture(chessview, chessbmp);
+  eh_drag_add(chessview);
 
-  eh_drag_add(header);
-
-  view_t* texmapview = view_new("texmapview", (vframe_t){50, 500, 400, 400}, 0);
-
+  view_t* texmapview = view_new("texmapview", (vframe_t){50, 500, 200, 200}, 0);
+  eh_drag_add(texmapview);
   tg_texmap_add(texmapview);
-
-  view_add(header, playbtnview);
 
   ui_manager_add(songlist);
   ui_manager_add(videoview);
   ui_manager_add(texmapview);
   ui_manager_add(header);
-  ui_manager_add(chessview);
+  //ui_manager_add(chessview);
 
   //player_init();
 }

@@ -46,8 +46,9 @@ void tg_bitmap_add(view_t* view, char* filepath)
 {
   char* path = mtcstr_fromcstring(filepath);
 
-  view->tgdata = path;
-  view->tg     = tg_bitmap_gen;
+  view->tex_state = TS_BLANK;
+  view->tgdata    = path;
+  view->tg        = tg_bitmap_gen;
 }
 
 #endif

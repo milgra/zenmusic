@@ -10,15 +10,14 @@ typedef struct _eh_list_t
   mtvec_t* items;
   mtvec_t* cache;
 
-  int  index;
   int  head_index;
   int  tail_index;
   char filled;
 
-  char (*row_generator)(view_t* listview, view_t* rowview, int index); /* event handler for view */
+  view_t* (*row_generator)(view_t* listview, view_t* rowview, int index); /* event handler for view */
 } eh_list_t;
 
-void eh_list_add(view_t* view, char (*row_generator)(view_t* listview, view_t* rowview, int index));
+void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t* rowview, int index));
 
 #endif
 
@@ -29,37 +28,6 @@ void eh_list_add(view_t* view, char (*row_generator)(view_t* listview, view_t* r
 #include "tg_text.c"
 #include <math.h>
 
-view_t* eh_list_gen_item(view_t* view)
-{
-  eh_list_t* eh = view->ehdata;
-  view_t*    item;
-
-  if (eh->cache->length > 0)
-  {
-    item = eh->cache->data[0];
-  }
-  else
-  {
-    char idbuffer[100];
-    snprintf(idbuffer, 100, "list_item%i", eh->index++);
-    item = view_new(idbuffer, (vframe_t){0, 0, 0, 0}, 0);
-    VADD(eh->cache, item);
-  }
-  return item;
-}
-
-void eh_list_cache_item(view_t* view, view_t* rowitem)
-{
-  eh_list_t* eh = view->ehdata;
-  VADD(eh->cache, rowitem);
-
-  rowitem->tex_state = TS_BLANK;
-  rowitem->eh        = NULL;
-  rowitem->tg        = NULL;
-  rowitem->ehdata    = NULL;
-  rowitem->tgdata    = NULL;
-}
-
 void eh_list_evt(view_t* view, ev_t ev)
 {
   eh_list_t* eh = view->ehdata;
@@ -69,10 +37,10 @@ void eh_list_evt(view_t* view, ev_t ev)
     {
       if (eh->items->length == 0)
       {
-        view_t* rowitem = eh_list_gen_item(view);
-        char    success = (*eh->row_generator)(view, rowitem, 0);
+        view_t* cacheitem = mtvec_head(eh->cache);
+        view_t* rowitem   = (*eh->row_generator)(view, cacheitem, 0);
 
-        if (success)
+        if (rowitem)
         {
           VREM(eh->cache, rowitem);
           VADD(eh->items, rowitem);
@@ -90,10 +58,10 @@ void eh_list_evt(view_t* view, ev_t ev)
 
         if (head->frame.y > 0.0)
         {
-          view_t* rowitem = eh_list_gen_item(view);
-          char    success = (*eh->row_generator)(view, rowitem, eh->head_index - 1);
+          view_t* cacheitem = mtvec_head(eh->cache);
+          view_t* rowitem   = (*eh->row_generator)(view, cacheitem, eh->head_index - 1);
 
-          if (success)
+          if (rowitem)
           {
             eh->filled = 0; // there is probably more to come
 
@@ -113,10 +81,10 @@ void eh_list_evt(view_t* view, ev_t ev)
 
         if (tail->frame.y + tail->frame.h < view->frame.h)
         {
-          view_t* rowitem = eh_list_gen_item(view);
-          char    success = (*eh->row_generator)(view, rowitem, eh->tail_index + 1);
+          view_t* cacheitem = mtvec_head(eh->cache);
+          view_t* rowitem   = (*eh->row_generator)(view, cacheitem, eh->tail_index + 1);
 
-          if (success)
+          if (rowitem)
           {
             eh->filled = 0; // there is probably more to come
 
@@ -138,7 +106,7 @@ void eh_list_evt(view_t* view, ev_t ev)
 
         if (head->frame.y + head->frame.h < 0.0 && eh->items->length > 1)
         {
-          eh_list_cache_item(view, head);
+          VADD(eh->cache, head);
 
           VREM(eh->items, head);
           view_remove(view, head);
@@ -148,7 +116,7 @@ void eh_list_evt(view_t* view, ev_t ev)
 
         if (tail->frame.y > view->frame.h && eh->items->length > 1)
         {
-          eh_list_cache_item(view, tail);
+          VADD(eh->cache, tail);
 
           VREM(eh->items, tail);
           view_remove(view, tail);
@@ -177,7 +145,7 @@ void eh_list_del(void* p)
   REL(eh->items);
 }
 
-void eh_list_add(view_t* view, char (*row_generator)(view_t* listview, view_t* rowview, int index))
+void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t* rowview, int index))
 {
   printf("eh_list new\n");
 

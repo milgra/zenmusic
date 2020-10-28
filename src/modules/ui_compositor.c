@@ -57,7 +57,7 @@ void ui_compositor_init(int width, int height)
   gl_init(width, height);
 
   fb    = fb_new();
-  tm    = tm_new(2048, 2048);
+  tm    = tm_new(4096, 4096);
   rectv = VNEW();
   rectm = MNEW();
 }
@@ -139,7 +139,7 @@ void ui_compositor_set_frame(char* id, int x, int y, int w, int h)
 {
   crect_t* rect;
 
-  // printf("ui_compositor_set_frame %s %i %i %i %i\n", id, x, y, w, h);
+  printf("ui_compositor_set_frame %s %i %i %i %i\n", id, x, y, w, h);
 
   if ((rect = MGET(rectm, id)))
   {

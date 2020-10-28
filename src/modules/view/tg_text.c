@@ -61,8 +61,9 @@ void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text)
   gen->bc        = bc;
   gen->text      = text;
 
-  view->tgdata = gen;
-  view->tg     = tg_text_gen;
+  view->tex_state = TS_BLANK;
+  view->tgdata    = gen;
+  view->tg        = tg_text_gen;
 }
 
 #endif

@@ -117,12 +117,13 @@ void view_remove(view_t* view, view_t* subview)
 {
   reindex = 1;
 
+  // TODO!!!
   // remove all subviews recursively so ui_connector will know what to cleanup
-  view_t* v;
-  while ((v = VNXT(subview->views)))
-  {
-    view_remove(subview, v);
-  }
+  /* view_t* v; */
+  /* while ((v = VNXT(subview->views))) */
+  /* { */
+  /*   view_remove(subview, v); */
+  /* } */
 
   VREM(view->views, subview);
   subview->parent = NULL;
