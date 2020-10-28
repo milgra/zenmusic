@@ -252,6 +252,9 @@ void gl_render(fb_t* fb, bm_t* bmp)
 
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * fb->pos, fb->data, GL_DYNAMIC_DRAW);
 
+  //glScissor(200, 200, 100, 100);
+  //glEnable(GL_SCISSOR_TEST);
+
   glClear(GL_COLOR_BUFFER_BIT);
   glDrawArrays(GL_TRIANGLES, 0, fb->pos / 5);
 }

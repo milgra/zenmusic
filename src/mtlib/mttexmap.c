@@ -50,7 +50,7 @@ tm_t* tm_new(int w, int h)
   tm->bm     = bm_new(w, h);
   tm->coords = mtmap_alloc();
 
-  bm_fill(tm->bm, 0, 0, w, h, 0xFF000000);
+  bm_fill(tm->bm, 0, 0, w, h, 0x000000FF);
 
   return tm;
 }

@@ -25,6 +25,7 @@ void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text);
 #include "common.c"
 #include "font.c"
 #include "mtbitmap.c"
+#include "mtcstring.c"
 #include "mtstring.c"
 
 void tg_text_gen(view_t* view)
@@ -59,7 +60,7 @@ void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text)
   tg_text_t* gen = mtmem_alloc(sizeof(tg_text_t), "tg_text_t", NULL, NULL);
   gen->fc        = fc;
   gen->bc        = bc;
-  gen->text      = text;
+  gen->text      = mtcstr_fromcstring(text);
 
   view->tex_state = TS_BLANK;
   view->tgdata    = gen;

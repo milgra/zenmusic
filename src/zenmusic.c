@@ -44,29 +44,30 @@ view_t* row_generator(view_t* listview, view_t* rowview, int index)
 
   if (rowview == NULL)
   {
-    char idbuffer[100];
+    char idbuffer[100] = {0};
     snprintf(idbuffer, 100, "list_item%i", index);
+
     rowview = view_new(idbuffer, (vframe_t){0, 0, 1500, 40}, 0);
 
     snprintf(idbuffer, 100, "index_item%i", index);
     view_t* indexview = view_new(idbuffer, (vframe_t){0, 0, 50, 40}, 0);
-    snprintf(idbuffer, 100, "%i", index);
-    tg_text_add(indexview, 0xFF004400, 0x000000FF, idbuffer);
 
     view_add(rowview, indexview);
-  }
-  else
-  {
-    view_set_frame(rowview, (vframe_t){0, 0, 1500, 40});
 
-    rowview->tgdata = NULL;
-    rowview->tg     = NULL;
-    rowview->ehdata = NULL;
-    rowview->eh     = NULL;
+    snprintf(idbuffer, 100, "name_item%i", index);
+    view_t* nameview = view_new(idbuffer, (vframe_t){50, 0, 500, 40}, 0);
+
+    view_add(rowview, nameview);
   }
 
-  uint32_t color = (index % 2 == 0) ? 0xFFEFEFEF : 0xFFDEDEDE;
-  tg_text_add(rowview, color, 0x000000FF, files->data[index]);
+  uint32_t color1 = (index % 2 == 0) ? 0xEFEFEFFF : 0xDEDEDEFF;
+  uint32_t color2 = (index % 2 == 0) ? 0xE1E1E1FF : 0xD1D1D1FF;
+
+  char indbuffer[3];
+  snprintf(indbuffer, 3, "%i.", index);
+  tg_text_add(rowview->views->data[0], color2, 0x000000FF, indbuffer);
+
+  tg_text_add(rowview->views->data[1], color1, 0x000000FF, files->data[index]);
 
   return rowview;
 }
@@ -102,7 +103,7 @@ void init(int width, int height)
   view_add(header, playbtnview);
 
   view_t* songlist = view_new("songlist", (vframe_t){0, 0, 1500, 1000}, 0);
-  tg_color_add(songlist, 0xFF222222);
+  tg_color_add(songlist, 0x222222FF);
   eh_list_add(songlist, row_generator);
 
   view_t* videoview = view_new("videoview", (vframe_t){400, 400, 800, 600}, 1);
@@ -116,7 +117,7 @@ void init(int width, int height)
     for (int row = 0; row < 300; row++)
     {
       uint32_t index = row * 300 + col;
-      uint32_t color = (row % 2 == 0 && col % 2 == 0) ? 0xFFFFFFFF : 0xFF000000;
+      uint32_t color = (row % 2 == 0 && col % 2 == 0) ? 0xFFFFFFFF : 0x000000FF;
       data[index]    = color;
     }
   }
