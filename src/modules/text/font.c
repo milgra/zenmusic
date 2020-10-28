@@ -45,8 +45,7 @@ int font_lineheight(font_t* the_font, float textsize);
 
 /* alloc font */
 
-font_t*
-font_alloc(char* font_path)
+font_t* font_alloc(char* font_path)
 {
   struct stat filestat;
   char        success = stat(font_path, &filestat);
@@ -112,7 +111,6 @@ int font_desc(font_t* the_font, float textsize)
 
 int font_lineheight(font_t* the_font, float textsize)
 {
-
   float scale = stbtt_ScaleForPixelHeight(&(the_font->info), textsize);
   float desc  = the_font->descent * scale;
   float asc   = the_font->ascent * scale;
@@ -127,7 +125,6 @@ int font_kerning(
     uint32_t codepoint_a,
     uint32_t codepoint_b)
 {
-
   float scale = stbtt_ScaleForPixelHeight(&(the_font->info), textsize);
 
   int result = stbtt_GetCodepointKernAdvance(

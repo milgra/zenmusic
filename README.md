@@ -10,10 +10,7 @@ zen photo and video - offline photo/video viewer and library manager / video/ima
 
 ---
 
-real frames, resize
-
-eh_list.c
-
+resize, row subviews
 
 stencil, layer groups, space-autstart-stop files
 css based styling, layout, color

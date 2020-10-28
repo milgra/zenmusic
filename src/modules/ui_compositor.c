@@ -82,12 +82,19 @@ void ui_compositor_update()
   fb_reset(fb);
 
   while ((rect = VNXT(rectv)))
+  {
+    /* if (strcmp(rect->id, "chessview") == 0) */
+    /* { */
+    /*   printf("adding vertexs for %s index %i\n", rect->id, rect->index); */
+    /*   crect_desc(rect); */
+    /* } */
     fb_add(fb, rect->data, 30);
+  }
 }
 
 void ui_compositor_add(char* id, uint32_t index, int channel, int x, int y, int w, int h)
 {
-  // printf("ui_compositor_add %s\n", id);
+  // printf("ui_compositor_add %s index %i channel %i %i %i %i %i\n", id, index, channel, x, y, w, h);
   crect_t* rect = crect_new(id, index, channel, x, y, w, h, 0.0, 0.0, 1.0, 1.0);
 
   VADD(rectv, rect);
@@ -155,9 +162,10 @@ void ui_compositor_set_texture(char* id, bm_t* tex)
 
     if (coords.w != tex->w || coords.h != tex->h)
     {
-      // printf("ui_compositor texture size mismatch, adding as new %s %i %i %i %i\n", id, coords.w, tex->w, coords.h, tex->h);
+      // printf("ui_compositor text2ure size mismatch, adding as new %s %i %i %i %i\n", id, coords.w, tex->w, coords.h, tex->h);
       tm_put(tm, id, tex);
       coords = tm_get(tm, id);
+      // printf("new coords %f %f %f %f\n", coords.ltx, coords.lty, coords.rbx, coords.rby);
     }
     else
     {
@@ -285,9 +293,9 @@ void crect_set_texture(crect_t* r, float tx, float ty, float tz, float tw)
 
 void crect_desc(crect_t* r)
 {
-  for (int index = 0; index < 24; index++)
+  for (int index = 0; index < 30; index++)
   {
-    if (index % 4 == 0) printf("\n");
+    if (index % 5 == 0) printf("\n");
     printf("%f ", r->data[index]);
   }
   printf("\n");

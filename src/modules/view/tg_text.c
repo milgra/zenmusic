@@ -39,10 +39,10 @@ void tg_text_gen(view_t* view)
           .editable   = 0,
           .selectable = 0,
           .multiline  = 1,
-          .autosize   = 1,
+          .autosize   = 0,
           .uppercase  = 0,
 
-          .textsize   = 18.0,
+          .textsize   = 26.0,
           .marginsize = 10.0,
           .cursorsize = 15.0,
 

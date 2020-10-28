@@ -57,7 +57,6 @@ void ui_manager_remove(view_t* view)
 
 void ui_manager_reindex(view_t* view, uint32_t* index)
 {
-  printf("reindex %s\n", view->id);
   if (view->index != *index)
   {
     view->index = *index;

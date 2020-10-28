@@ -95,8 +95,6 @@ view_t* view_new(char*    id, /* view id */
 
 void view_add(view_t* view, view_t* subview)
 {
-  printf("%s add %s\n", view->id, subview->id);
-
   reindex = 1;
 
   VADD(view->views, subview);

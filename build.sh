@@ -20,22 +20,22 @@ clang \
     -Isrc/views \
     -Isrc/modules \
     -Isrc/modules/gl \
-    -Isrc/modules/ui \
     -Isrc/modules/wm \
     -Isrc/modules/text \
+    -Isrc/modules/view \
     -Isrc/modules/image \
     -Isrc/modules/player \
     src/modules/gl/gl_connector.c \
     src/modules/gl/gl_floatbuffer.c \
-    src/modules/ui/ui_manager.c \
-    src/modules/ui/view.c \
-    src/modules/ui/eh_drag.c \
-    src/modules/ui/eh_list.c \
-    src/modules/ui/tg_text.c \
-    src/modules/ui/tg_color.c \
-    src/modules/ui/tg_bitmap.c \
-    src/modules/ui/tg_texmap.c \
-    src/modules/ui/tg_video.c \
+    src/modules/view/view.c \
+    src/modules/view/eh_drag.c \
+    src/modules/view/eh_list.c \
+    src/modules/view/tg_text.c \
+    src/modules/view/tg_color.c \
+    src/modules/view/tg_bitmap.c \
+    src/modules/view/tg_texmap.c \
+    src/modules/view/tg_video.c \
+    src/modules/ui_manager.c \
     src/modules/ui_generator.c \
     src/modules/ui_compositor.c \
     src/modules/wm/wm_event.c \

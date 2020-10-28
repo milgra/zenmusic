@@ -65,7 +65,7 @@ void init(int width, int height)
   srand((unsigned int)time(NULL));
 
   char* respath = SDL_GetBasePath();
-  char* path    = mtcstr_fromformat("%s/../res/Terminus.ttf", respath, NULL);
+  char* path    = mtcstr_fromformat("%s/../res/Avenir.ttc", respath, NULL);
 
   char* playpath = mtcstr_fromformat("%s/../res/play.png", respath, NULL);
 
@@ -81,7 +81,7 @@ void init(int width, int height)
 
   tg_bitmap_add(playbtnview, playpath);
 
-  view_t* songlist = view_new("songlist", (vframe_t){0, 0, 1200, 800}, 0);
+  view_t* songlist = view_new("songlist", (vframe_t){100, 100, 1200, 800}, 0);
 
   tg_color_add(songlist, 0x222222FF);
   eh_list_add(songlist, row_generator);
@@ -89,6 +89,22 @@ void init(int width, int height)
   view_t* videoview = view_new("videoview", (vframe_t){400, 400, 800, 600}, 1);
 
   tg_video_add(videoview);
+
+  view_t* chessview = view_new("chessview", (vframe_t){100, 100, 300, 300}, 0);
+
+  bm_t*     chessbmp = bm_new(300, 300);
+  uint32_t* data     = (uint32_t*)chessbmp->data;
+  for (int col = 0; col < 300; col++)
+  {
+    for (int row = 0; row < 300; row++)
+    {
+      uint32_t index = row * 300 + col;
+      uint32_t color = (row % 2 == 0 && col % 2 == 0) ? 0xFFFFFFFF : 0xFF000000;
+      data[index]    = color;
+    }
+  }
+
+  view_set_texture(chessview, chessbmp);
 
   eh_drag_add(header);
 
@@ -102,6 +118,7 @@ void init(int width, int height)
   ui_manager_add(videoview);
   ui_manager_add(texmapview);
   ui_manager_add(header);
+  ui_manager_add(chessview);
 
   //player_init();
 }
