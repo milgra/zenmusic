@@ -12,12 +12,33 @@ typedef enum _texst_t
   TS_READY,
 } texst_t;
 
+typedef enum _laypos_t
+{
+  LP_STATIC = 0,
+  LP_FIXED,
+  LP_ABSOLUTE,
+} laypos_t;
+
+typedef enum _laydis_t
+{
+  LD_NONE = 0,
+  LD_FLEX,
+} laydis_t;
+
 typedef struct _vlayout_t vlayout_t;
 struct _vlayout_t
 {
-  float w_per;
-  float h_per;
-  float margin;
+  laypos_t position;
+  laydis_t display;
+  float    w_per;
+  float    h_per;
+  int      width;
+  int      height;
+  int      margin;
+  int      margin_top;
+  int      margin_left;
+  int      margin_right;
+  int      margin_bottom;
 };
 
 typedef struct _vframe_t vframe_t;

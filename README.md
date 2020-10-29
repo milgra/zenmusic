@@ -10,13 +10,14 @@ zen photo and video - offline photo/video viewer and library manager / video/ima
 
 ---
 
-resize,
+album/song info/genres/artist tabok a jobb oldali panel aljan
 scrollbar
 text anim
 basic layout
 css styling
 database, reordering
 reuse view bitmaps, only recreate on resize!!!
+resizable header/songlist border
 
 stencil, layer groups, space-autstart-stop files
 css based styling, layout, color
@@ -31,3 +32,4 @@ about page with module playing in the background, 3d dot animation?
 
 zold/piros listitem background play/pausre, animalt!!!
 unshift bmp - spectrum analyzer shift left
+analog mutatos output meterek is visualizacioban
