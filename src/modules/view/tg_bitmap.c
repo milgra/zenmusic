@@ -11,10 +11,10 @@
 typedef struct _tg_bitmap_t
 {
   char* path;
-
+  char* data;
 } tg_bitmap_t;
 
-void tg_bitmap_add(view_t* view, char* path);
+void tg_bitmap_add(view_t* view, char* filepath, uint8_t* data);
 
 #endif
 
@@ -26,8 +26,9 @@ void tg_bitmap_add(view_t* view, char* path);
 
 void tg_bitmap_gen(view_t* view)
 {
+  tg_bitmap_t* tg = view->tgdata;
   // load png
-  char* path = view->tgdata;
+  char* path = tg->path;
 
   int components, w, h;
 
@@ -42,12 +43,14 @@ void tg_bitmap_gen(view_t* view)
   view_set_texture(view, bmp);
 }
 
-void tg_bitmap_add(view_t* view, char* filepath)
+void tg_bitmap_add(view_t* view, char* filepath, uint8_t* data)
 {
-  char* path = mtcstr_fromcstring(filepath);
+  tg_bitmap_t* tg = mtmem_calloc(sizeof(tg_bitmap_t), "tg_bitmap", NULL, NULL);
+  tg->path        = mtcstr_fromcstring(filepath);
+  tg->data        = data;
 
   view->tex_state = TS_BLANK;
-  view->tgdata    = path;
+  view->tgdata    = tg;
   view->tg        = tg_bitmap_gen;
 }
 

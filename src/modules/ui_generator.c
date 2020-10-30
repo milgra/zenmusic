@@ -65,13 +65,34 @@ void ui_generator_reset()
 void ui_generator_add(view_t* view)
 {
   VADD(uiv, view);
-  ui_compositor_add(view->id,
-                    view->index,
-                    view->tex_channel,
-                    view->frame_global.x,
-                    view->frame_global.y,
-                    view->frame_global.w,
-                    view->frame_global.h);
+  if (view->tex_channel == 0)
+  {
+    ui_compositor_add(view->id,
+                      view->index,
+                      view->tex_channel,
+                      view->frame_global.x,
+                      view->frame_global.y,
+                      view->frame_global.w,
+                      view->frame_global.h,
+                      0.0,
+                      0.0,
+                      1.0,
+                      1.0);
+  }
+  else
+  {
+    ui_compositor_add(view->id,
+                      view->index,
+                      view->tex_channel,
+                      view->frame_global.x,
+                      view->frame_global.y,
+                      view->frame_global.w,
+                      view->frame_global.h,
+                      0.0,
+                      0.0,
+                      1280.0 / 4096.0,
+                      720.0 / 4096.0);
+  }
   view->connected = 1;
 }
 

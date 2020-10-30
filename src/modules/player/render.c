@@ -212,7 +212,7 @@ static void video_audio_display(VideoState* s)
 
   if (s->show_mode == SHOW_MODE_WAVES)
   {
-    bm_fill(wavemap, 0, 0, wavemap->w, wavemap->h, 0xFF000000);
+    bm_fill(wavemap, 0, 0, wavemap->w, wavemap->h, 0x000000FF);
 
     /* total height for one channel */
     h = s->height / nb_display_channels;
@@ -250,7 +250,7 @@ static void video_audio_display(VideoState* s)
     for (ch = 1; ch < nb_display_channels; ch++)
     {
       y = s->ytop + ch * h;
-      bm_fill(wavemap, s->xleft, y, s->xleft + s->width, y + 1, 0x00FFFFFF);
+      bm_fill(wavemap, s->xleft, y, s->xleft + s->width, y + 1, 0xFFFFFF55);
       //fill_rectangle(s->xleft, y, s->width, 1);
     }
   }

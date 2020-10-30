@@ -30,6 +30,7 @@ clang \
     src/modules/view/view.c \
     src/modules/view/eh_drag.c \
     src/modules/view/eh_list.c \
+    src/modules/view/eh_touch.c \
     src/modules/view/tg_text.c \
     src/modules/view/tg_color.c \
     src/modules/view/tg_bitmap.c \

@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+
 mtvec_t* files;
 
 static int display_info(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
@@ -34,9 +35,27 @@ static int display_info(const char* fpath, const struct stat* sb, int tflag, str
   /*        ftwbuf->base, */
   /*        fpath + ftwbuf->base); */
 
-  mtvec_add(files, mtcstr_fromcstring((char*)(fpath + ftwbuf->base)));
+  mtvec_add(files, mtcstr_fromcstring((char*)fpath));
 
   return 0; /* To tell nftw() to continue */
+}
+
+void songitem_event(ev_t ev, void* data)
+{
+  if (ev.type == EV_MDOWN)
+  {
+    int index = (int)data;
+    printf("songitem event %i %i %s\n", ev.type, index, (char*)files->data[index]);
+    player_play(files->data[index]);
+  }
+}
+
+void playbtn_event(ev_t ev, void* data)
+{
+  if (ev.type == EV_MDOWN)
+  {
+    player_stop();
+  }
 }
 
 view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index)
@@ -52,7 +71,7 @@ view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index)
   }
   if (index < 0) return NULL; // no items over 0
   if (rowview == NULL) rowview = songitem_new();
-  songitem_update(rowview, index, files->data[index]);
+  songitem_update(rowview, index, files->data[index], songitem_event);
   return rowview;
 }
 
@@ -99,14 +118,14 @@ void init(int width, int height)
                                .margin_top = 20.0,
                                .margin     = INT_MAX});
 
-  view_t* videoview_left = view_new("videoviewleft", (vframe_t){0, 50, 300, 150}, 0);
-  tg_color_add(videoview_left, 0x000000FF);
+  view_t* videoview_left = view_new("videoviewleft", (vframe_t){0, 50, 300, 150}, 1);
+  tg_video_add(videoview_left, 1280, 720);
   view_set_layout(videoview_left, (vlayout_t){
                                       .margin_top  = 44.0,
                                       .margin_left = 2.0});
 
-  view_t* videoview_right = view_new("videoviewright", (vframe_t){0, 50, 300, 150}, 0);
-  tg_color_add(videoview_right, 0x000000FF);
+  view_t* videoview_right = view_new("videoviewright", (vframe_t){0, 50, 300, 150}, 1);
+  tg_video_add(videoview_right, 1280, 720);
   view_set_layout(videoview_right, (vlayout_t){
                                        .margin_top   = 44.0,
                                        .margin_right = 2.0});
@@ -125,26 +144,28 @@ void init(int width, int height)
 
   char*   playpath = mtcstr_fromformat("%s/../res/play.png", respath, NULL);
   view_t* playbtn  = view_new("playbtnview", (vframe_t){0, 40, 80, 80}, 0);
-  tg_bitmap_add(playbtn, playpath);
+  tg_bitmap_add(playbtn, playpath, NULL);
   view_set_layout(playbtn, (vlayout_t){
                                .margin = INT_MAX});
+
+  eh_touch_add(playbtn, NULL, playbtn_event);
 
   view_add(coverview, playbtn);
 
   view_t* nextbtn = view_new("nextbtnview", (vframe_t){0, 60, 45, 45}, 0);
-  tg_bitmap_add(nextbtn, playpath);
+  tg_bitmap_add(nextbtn, playpath, NULL);
   view_add(coverview, nextbtn);
 
   view_t* prevbtn = view_new("prevbtnview", (vframe_t){110, 60, 45, 45}, 0);
-  tg_bitmap_add(prevbtn, playpath);
+  tg_bitmap_add(prevbtn, playpath, NULL);
   view_add(coverview, prevbtn);
 
   view_t* repeatbtn = view_new("repeatbtnview", (vframe_t){0, 0, 45, 45}, 0);
-  tg_bitmap_add(repeatbtn, playpath);
+  tg_bitmap_add(repeatbtn, playpath, NULL);
   view_add(coverview, repeatbtn);
 
   view_t* shufflebtn = view_new("shufflebtnview", (vframe_t){110, 0, 45, 45}, 0);
-  tg_bitmap_add(shufflebtn, playpath);
+  tg_bitmap_add(shufflebtn, playpath, NULL);
   view_add(coverview, shufflebtn);
 
   // seek bar
@@ -190,8 +211,6 @@ void init(int width, int height)
 
   //ui_manager_add(texmapview);
   //ui_manager_add(chessview);
-
-  //player_init();
 }
 
 void update(ev_t ev)
@@ -201,7 +220,7 @@ void update(ev_t ev)
 
 void render()
 {
-  //player_draw();
+  player_draw();
   ui_manager_render();
 }
 

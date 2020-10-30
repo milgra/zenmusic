@@ -14,7 +14,7 @@
 void ui_compositor_init(int, int);
 void ui_compositor_render();
 void ui_compositor_reset();
-void ui_compositor_add(char* id, uint32_t index, int channel, int x, int y, int w, int h);
+void ui_compositor_add(char* id, uint32_t index, int channel, int x, int y, int w, int h, float tx, float ty, float tz, float tw);
 void ui_compositor_rem(char* id);
 void ui_compositor_set_index(char* id, uint32_t index);
 void ui_compositor_set_frame(char* id, int x, int y, int w, int h);
@@ -92,10 +92,10 @@ void ui_compositor_update()
   }
 }
 
-void ui_compositor_add(char* id, uint32_t index, int channel, int x, int y, int w, int h)
+void ui_compositor_add(char* id, uint32_t index, int channel, int x, int y, int w, int h, float tx, float ty, float tz, float tw)
 {
   // printf("ui_compositor_add %s index %i channel %i %i %i %i %i\n", id, index, channel, x, y, w, h);
-  crect_t* rect = crect_new(id, index, channel, x, y, w, h, 0.0, 0.0, 1.0, 1.0);
+  crect_t* rect = crect_new(id, index, channel, x, y, w, h, tx, ty, tz, tw);
 
   VADD(rectv, rect);
   MPUT(rectm, id, rect);

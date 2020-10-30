@@ -10,6 +10,7 @@ zen photo and video - offline photo/video viewer and library manager / video/ima
 
 ---
 
+show album art
 search bar over songlist on top / song count, song duration at the end of bar
 album/song info/genres/artist tabok a jobb oldali panel aljan
 play gomb hideolodjon ha szol a zene es mutassa a cover artot

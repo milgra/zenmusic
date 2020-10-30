@@ -1,10 +1,11 @@
 #ifndef songitem_h
 #define songitem_h
 
+#include "eh_touch.c"
 #include "view.c"
 
 view_t* songitem_new();
-void    songitem_update(view_t* rowitem, int index, char* filename);
+void    songitem_update(view_t* rowview, int index, char* filename, void (*event)(ev_t ev, void* data));
 
 #endif
 
@@ -44,10 +45,12 @@ view_t* songitem_new()
   return rowview;
 }
 
-void songitem_update(view_t* rowview, int index, char* filename)
+void songitem_update(view_t* rowview, int index, char* filename, void (*event)(ev_t ev, void* data))
 {
   uint32_t color1 = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
   uint32_t color2 = (index % 2 == 0) ? 0xE5E5E5FF : 0xEFEFEFFF;
+
+  eh_touch_add(rowview, (void*)index, event);
 
   char indbuffer[6];
   snprintf(indbuffer, 6, "%i.", index);
