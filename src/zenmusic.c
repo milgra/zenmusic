@@ -24,6 +24,7 @@
 #include <time.h>
 
 mtvec_t* files;
+view_t*  coverview;
 
 static int display_info(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
 {
@@ -46,6 +47,10 @@ void songitem_event(ev_t ev, void* data)
   {
     int index = (int)data;
     printf("songitem event %i %i %s\n", ev.type, index, (char*)files->data[index]);
+
+    bm_t* bitmap = player_get_album(files->data[index]);
+    tg_bitmap_add(coverview, NULL, bitmap);
+
     player_play(files->data[index]);
   }
 }
@@ -130,8 +135,8 @@ void init(int width, int height)
                                        .margin_top   = 44.0,
                                        .margin_right = 2.0});
 
-  view_t* coverview = view_new("coverview", (vframe_t){0, 44, 150, 150}, 0);
-  tg_color_add(coverview, 0xAAAAAAFF);
+  coverview = view_new("coverview", (vframe_t){0, 44, 150, 150}, 0);
+  //tg_color_add(coverview, 0xAAAAAAFF);
   view_set_layout(coverview, (vlayout_t){
                                  .margin_top  = 44.0,
                                  .margin_left = 304.0});

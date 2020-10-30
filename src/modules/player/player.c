@@ -5,16 +5,20 @@
 #ifndef player_h
 #define player_h
 
-void player_play(char* path);
-void player_stop();
-void player_draw();
-void player_get_album(const char* path);
+#include "mtbitmap.c"
+
+void  player_play(char* path);
+void  player_stop();
+void  player_draw();
+bm_t* player_get_album(const char* path);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "SDL_image.h"
 #include "libavformat/avformat.h"
+#include "libavutil/imgutils.h"
 #include "stream.c"
 
 static AVInputFormat* file_iformat;
@@ -35,8 +39,6 @@ void player_play(char* path)
   if (is == NULL)
   {
     printf("player play %s\n", path);
-
-    player_get_album(path);
 
     is = stream_open(path, file_iformat);
 
@@ -63,14 +65,14 @@ void player_draw()
   }
 }
 
-void player_get_album(const char* path)
+bm_t* player_get_album(const char* path)
 {
   int i, ret = 0;
 
   if (!path)
   {
     printf("Path is NULL\n");
-    return;
+    return NULL;
   }
 
   AVFormatContext* pFormatCtx = avformat_alloc_context();
@@ -91,16 +93,39 @@ void player_get_album(const char* path)
     goto fail;
   }
 
+  bm_t* result = NULL;
+
   // find the first attached picture, if available
   for (i = 0; i < pFormatCtx->nb_streams; i++)
     if (pFormatCtx->streams[i]->disposition & AV_DISPOSITION_ATTACHED_PIC)
     {
       AVPacket pkt = pFormatCtx->streams[i]->attached_pic;
       printf("ALBUM ART SIZE %i\n", pkt.size);
-      //ret = fwrite(pkt.data, pkt.size, 1, album_art);
+
+      SDL_RWops*   rw = SDL_RWFromMem(pkt.data, pkt.size);
+      SDL_Surface* image;
+      image = IMG_Load_RW(rw, 1);
+      if (!image)
+      {
+        printf("IMG_Load_RW: %s\n", IMG_GetError());
+        // handle error
+      }
+      else
+        printf("IMG SUCCESS %i %i %i\n", image->format->BytesPerPixel, image->w, image->h);
+
+      /* int            components, w, h; */
+      /* unsigned char* bytes = stbi_load_from_memory(pkt.data, pkt.size, &w, &h, &components, 4); */
+
+      result = bm_new(image->w, image->h);
+      bm_from3(result, image->pixels);
+      //memcpy(result->data, image->pixels, image->w * image->h * 4);
+
       av_free_packet(&pkt);
       break;
     }
+
+  printf("returning\n");
+  return result;
 
 fail:
   av_free(pFormatCtx);

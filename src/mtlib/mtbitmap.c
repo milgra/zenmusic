@@ -18,6 +18,8 @@ struct _bm_t
 bm_t* bm_new(int the_w, int the_h);
 bm_t* bm_new_from_bm(bm_t* bm);
 bm_t* bm_new_from_grayscale(int the_w, int the_h, uint32_t backcolor, uint32_t fontcolor, unsigned char* bm);
+bm_t* bm_from3(bm_t*    bm,
+               uint8_t* src);
 bm_t* bm_fill(bm_t* bm, int the_sx, int the_sy, int the_ex, int the_ey, uint32_t color);
 void  bm_del(void* bm);
 void  bm_reset(bm_t* bm);
@@ -60,6 +62,26 @@ bm_t* bm_new_from_bm(bm_t* the_bm)
 {
   bm_t* bm = bm_new(the_bm->w, the_bm->h);
   memcpy(bm->data, the_bm->data, the_bm->size);
+  return bm;
+}
+
+bm_t* bm_from3(bm_t*    bm,
+               uint8_t* src)
+{
+  for (int y = 0; y < bm->h; y++)
+  {
+    for (int x = 0; x < bm->w; x++)
+    {
+      int sposition = (y * bm->w + x) * 3;
+      int tposition = (y * bm->w + x) * 4;
+
+      bm->data[tposition]     = src[sposition];
+      bm->data[tposition + 1] = src[sposition + 1];
+      bm->data[tposition + 2] = src[sposition + 2];
+      bm->data[tposition + 3] = 0xFF;
+    }
+  }
+
   return bm;
 }
 

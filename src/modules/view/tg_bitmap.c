@@ -6,15 +6,16 @@
 #ifndef texgen_bitmap_h
 #define texgen_bitmap_h
 
+#include "mtbitmap.c"
 #include "view.c"
 
 typedef struct _tg_bitmap_t
 {
   char* path;
-  char* data;
+  bm_t* bitmap;
 } tg_bitmap_t;
 
-void tg_bitmap_add(view_t* view, char* filepath, uint8_t* data);
+void tg_bitmap_add(view_t* view, char* filepath, bm_t* bitmap);
 
 #endif
 
@@ -27,27 +28,35 @@ void tg_bitmap_add(view_t* view, char* filepath, uint8_t* data);
 void tg_bitmap_gen(view_t* view)
 {
   tg_bitmap_t* tg = view->tgdata;
-  // load png
-  char* path = tg->path;
 
-  int components, w, h;
+  if (tg->path)
+  {
+    char* path = tg->path;
 
-  unsigned char* bytes = stbi_load(path, &w, &h, &components, 4);
+    int components, w, h;
 
-  bm_t* bmp = bm_new(w, h);
+    unsigned char* bytes = stbi_load(path, &w, &h, &components, 4);
 
-  memcpy(bmp->data, bytes, bmp->size);
+    bm_t* bmp = bm_new(w, h);
 
-  stbi_image_free(bytes);
+    memcpy(bmp->data, bytes, bmp->size);
 
-  view_set_texture(view, bmp);
+    stbi_image_free(bytes);
+
+    view_set_texture(view, bmp);
+  }
+
+  if (tg->bitmap)
+  {
+    view_set_texture(view, tg->bitmap);
+  }
 }
 
-void tg_bitmap_add(view_t* view, char* filepath, uint8_t* data)
+void tg_bitmap_add(view_t* view, char* filepath, bm_t* bitmap)
 {
   tg_bitmap_t* tg = mtmem_calloc(sizeof(tg_bitmap_t), "tg_bitmap", NULL, NULL);
   tg->path        = mtcstr_fromcstring(filepath);
-  tg->data        = data;
+  tg->bitmap      = bitmap;
 
   view->tex_state = TS_BLANK;
   view->tgdata    = tg;
