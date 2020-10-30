@@ -10,7 +10,9 @@ zen photo and video - offline photo/video viewer and library manager / video/ima
 
 ---
 
+search bar over songlist on top / song count, song duration at the end of bar
 album/song info/genres/artist tabok a jobb oldali panel aljan
+play gomb hideolodjon ha szol a zene es mutassa a cover artot
 scrollbar
 text anim
 basic layout
@@ -33,3 +35,9 @@ about page with module playing in the background, 3d dot animation?
 zold/piros listitem background play/pausre, animalt!!!
 unshift bmp - spectrum analyzer shift left
 analog mutatos output meterek is visualizacioban
+
+shuffle ikon egy dobokocka legyen, hover-re animaljon 3-6-2
+repeat ikon egy gyurus nyil legyen
+listitemek side panel ala, glossy effekt a panelen
+
+scroll-ra lehessen novelni/csokkenteni visuals meretet

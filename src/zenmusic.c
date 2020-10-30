@@ -77,56 +77,97 @@ void init(int width, int height)
   eh_list_add(songlist, songlist_item_generator);
 
   view_set_layout(songlist, (vlayout_t){
-                                .margin_right = 350.0,
+                                .margin_right = 300.0,
                                 .w_per        = 1.0,
                                 .h_per        = 1.0});
 
-  // header view
-  view_t* header = view_new("header", (vframe_t){0, 0, 600, 100}, 0);
-  tg_color_add(header, 0xCDCDCDFF);
-  view_set_layout(header, (vlayout_t){
-                              .h_per        = 1.0,
-                              .margin_right = 1.0});
-
-  char*   playpath    = mtcstr_fromformat("%s/../res/play.png", respath, NULL);
-  view_t* playbtnview = view_new("playbtnview", (vframe_t){0, 210, 90, 90}, 0);
-  tg_bitmap_add(playbtnview, playpath);
-  view_set_layout(playbtnview, (vlayout_t){
-                                   .margin = INT_MAX});
-
-  view_add(header, playbtnview);
-
-  view_t* seekview = view_new("seekview", (vframe_t){0, 160, 580, 10}, 0);
+  view_t* seekview = view_new("seekview", (vframe_t){0, 305, 290, 15}, 0);
   view_set_layout(seekview, (vlayout_t){
                                 .margin = INT_MAX});
   tg_color_add(seekview, 0xFFFFFF66);
 
-  view_t* volview = view_new("volview", (vframe_t){0, 178, 400, 10}, 0);
+  view_t* volview = view_new("volview", (vframe_t){0, 325, 290, 15}, 0);
   view_set_layout(volview, (vlayout_t){
                                .margin = INT_MAX});
   tg_color_add(volview, 0xFFFFFF66);
 
-  // video views
-  view_t* videoview_left = view_new("videoviewleft", (vframe_t){0, 0, 296, 150}, 0);
-  tg_color_add(videoview_left, 0xDDDDDDFF);
+  // visualization views
+
+  view_t* visuals = view_new("visuals", (vframe_t){0, 0, 758, 238}, 0);
+  tg_color_add(visuals, 0x99999955);
+  view_set_layout(visuals, (vlayout_t){
+                               .margin_top = 20.0,
+                               .margin     = INT_MAX});
+
+  view_t* videoview_left = view_new("videoviewleft", (vframe_t){0, 50, 300, 150}, 0);
+  tg_color_add(videoview_left, 0x000000FF);
   view_set_layout(videoview_left, (vlayout_t){
-                                      .margin_top  = 2.0,
+                                      .margin_top  = 44.0,
                                       .margin_left = 2.0});
 
-  view_t* videoview_right = view_new("videoviewright", (vframe_t){0, 0, 296, 150}, 0);
-  tg_color_add(videoview_right, 0xDDDDDDFF);
+  view_t* videoview_right = view_new("videoviewright", (vframe_t){0, 50, 300, 150}, 0);
+  tg_color_add(videoview_right, 0x000000FF);
   view_set_layout(videoview_right, (vlayout_t){
-                                       .margin_top   = 2.0,
+                                       .margin_top   = 44.0,
                                        .margin_right = 2.0});
 
-  view_add(header, videoview_left);
-  view_add(header, videoview_right);
+  view_t* coverview = view_new("coverview", (vframe_t){0, 44, 150, 150}, 0);
+  tg_color_add(coverview, 0xAAAAAAFF);
+  view_set_layout(coverview, (vlayout_t){
+                                 .margin_top  = 44.0,
+                                 .margin_left = 304.0});
 
-  view_add(header, seekview);
-  view_add(header, volview);
+  view_add(visuals, videoview_left);
+  view_add(visuals, videoview_right);
+  view_add(visuals, coverview);
+
+  // buttons
+
+  char*   playpath = mtcstr_fromformat("%s/../res/play.png", respath, NULL);
+  view_t* playbtn  = view_new("playbtnview", (vframe_t){0, 40, 80, 80}, 0);
+  tg_bitmap_add(playbtn, playpath);
+  view_set_layout(playbtn, (vlayout_t){
+                               .margin = INT_MAX});
+
+  view_add(coverview, playbtn);
+
+  view_t* nextbtn = view_new("nextbtnview", (vframe_t){0, 60, 45, 45}, 0);
+  tg_bitmap_add(nextbtn, playpath);
+  view_add(coverview, nextbtn);
+
+  view_t* prevbtn = view_new("prevbtnview", (vframe_t){110, 60, 45, 45}, 0);
+  tg_bitmap_add(prevbtn, playpath);
+  view_add(coverview, prevbtn);
+
+  view_t* repeatbtn = view_new("repeatbtnview", (vframe_t){0, 0, 45, 45}, 0);
+  tg_bitmap_add(repeatbtn, playpath);
+  view_add(coverview, repeatbtn);
+
+  view_t* shufflebtn = view_new("shufflebtnview", (vframe_t){110, 0, 45, 45}, 0);
+  tg_bitmap_add(shufflebtn, playpath);
+  view_add(coverview, shufflebtn);
+
+  // seek bar
+
+  view_t* seekbar = view_new("seekbar", (vframe_t){2, 2, 754, 40}, 0);
+  tg_text_add(seekbar, 0xFEFEFEFF, 0x000000FF, "1:56 ----|-- 3:21");
+
+  view_add(visuals, seekbar);
+
+  // search bar
+
+  view_t* searchbar = view_new("searchbar", (vframe_t){2, 196, 376, 40}, 0);
+  tg_text_add(searchbar, 0xFEFEFEFF, 0x000000FF, "Search...");
+  view_add(visuals, searchbar);
+
+  // evets bar
+
+  view_t* eventbar = view_new("eventbar", (vframe_t){380, 196, 376, 40}, 0);
+  tg_text_add(eventbar, 0xFEFEFEFF, 0x000000FF, "Event log");
+  view_add(visuals, eventbar);
 
   ui_manager_add(songlist);
-  ui_manager_add(header);
+  ui_manager_add(visuals);
 
   /* view_t*   chessview = view_new("chessview", (vframe_t){100, 100, 300, 300}, 0); */
   /* bm_t*     chessbmp  = bm_new(300, 300); */

@@ -47,15 +47,15 @@ view_t* songitem_new()
 void songitem_update(view_t* rowview, int index, char* filename)
 {
   uint32_t color1 = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
-  uint32_t color2 = (index % 2 == 0) ? 0xE5E5E5FF : 0xDFDFDFFF;
+  uint32_t color2 = (index % 2 == 0) ? 0xE5E5E5FF : 0xEFEFEFFF;
 
   char indbuffer[6];
   snprintf(indbuffer, 6, "%i.", index);
-  tg_text_add(rowview->views->data[0], color2, 0x000000FF, indbuffer);
+  tg_text_add(rowview->views->data[0], color1, 0x000000FF, indbuffer);
 
   tg_text_add(rowview->views->data[1], color1, 0x000000FF, filename);
 
-  tg_text_add(rowview->views->data[2], color2, 0x000000FF, "mp3");
+  tg_text_add(rowview->views->data[2], color1, 0x000000FF, "mp3");
 }
 
 #endif
