@@ -10,9 +10,12 @@ zen photo and video - offline photo/video viewer and library manager / video/ima
 
 ---
 
-show album art
-search bar over songlist on top / song count, song duration at the end of bar
+mukodjon a position/seekbar
+input text a search barra
+search bar click hozza elo genre/artist listat
+
 album/song info/genres/artist tabok a jobb oldali panel aljan
+ha az egeret a lista item jobb oldalara viszed popupban mutassa id3/song infokat es album artot
 play gomb hideolodjon ha szol a zene es mutassa a cover artot
 scrollbar
 text anim
@@ -25,7 +28,6 @@ resizable header/songlist border
 stencil, layer groups, space-autstart-stop files
 css based styling, layout, color
 
-show split video/fullscreen/effects buttons on video hover, lower alpha
 zen ui renderer - modern ui/text renderer, can animate glyphs individually
 bar analyzer
 spectrum analyzer/bar in the background

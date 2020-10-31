@@ -159,7 +159,7 @@ static void video_audio_display(VideoState* s)
     ;
   nb_freq = 1 << (rdft_bits - 1);
 
-  s->show_mode = SHOW_MODE_WAVES;
+  s->show_mode = SHOW_MODE_RDFT;
 
   /* compute display index : center on currently output samples */
   channels            = s->audio_tgt.channels;
@@ -311,7 +311,7 @@ static void video_audio_display(VideoState* s)
         a = FFMIN(a, 255);
         b = FFMIN(b, 255);
         pixels -= pitch;
-        uint32_t color = (0xff << 24) + (a << 16) + (b << 8) + ((a + b) >> 1);
+        uint32_t color = ((a << 16) + (b << 8) + ((a + b) >> 1)) << 8 | 0xFF;
 
         bm_fill(wavemap, s->xpos, y, s->xpos + 1, y + 1, color);
         /*}*/
