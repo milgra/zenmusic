@@ -17,7 +17,7 @@ void eh_touch_add(view_t* view, void* data, void (*event)(ev_t event, void* data
 
 void eh_touch_evt(view_t* view, ev_t ev)
 {
-  eh_touch_t* eh = view->ehdata;
+  eh_touch_t* eh = view->evt_han_data;
   if (ev.type == EV_MDOWN)
   {
     if (ev.x < view->frame_global.x + view->frame_global.w &&
@@ -36,8 +36,8 @@ void eh_touch_add(view_t* view, void* data, void (*event)(ev_t ev, void* data))
   eh->data       = data;
   eh->event      = event;
 
-  view->eh     = eh_touch_evt;
-  view->ehdata = eh;
+  view->evt_han      = eh_touch_evt;
+  view->evt_han_data = eh;
 }
 
 #endif

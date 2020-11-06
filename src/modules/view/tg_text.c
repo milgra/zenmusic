@@ -30,7 +30,7 @@ void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text);
 
 void tg_text_gen(view_t* view)
 {
-  tg_text_t* gen = view->tgdata;
+  tg_text_t* gen = view->tex_gen_data;
 
   mtstr_t* str = mtstr_frombytes(gen->text);
 
@@ -62,9 +62,9 @@ void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text)
   gen->bc        = bc;
   gen->text      = mtcstr_fromcstring(text);
 
-  view->tex_state = TS_BLANK;
-  view->tgdata    = gen;
-  view->tg        = tg_text_gen;
+  view->tex_state    = TS_BLANK;
+  view->tex_gen_data = gen;
+  view->tex_gen      = tg_text_gen;
 }
 
 #endif

@@ -32,7 +32,7 @@ void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t
 
 void eh_list_evt(view_t* view, ev_t ev)
 {
-  eh_list_t* eh = view->ehdata;
+  eh_list_t* eh = view->evt_han_data;
   if (ev.type == EV_TIME)
   {
     while (eh->filled == 0)
@@ -140,9 +140,9 @@ void eh_list_evt(view_t* view, ev_t ev)
     }
   }
   else if (ev.type == EV_RESIZE)
-    {
-      eh->filled= 0;
-    }
+  {
+    eh->filled = 0;
+  }
 }
 
 void eh_list_del(void* p)
@@ -160,8 +160,8 @@ void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t
   eh->cache         = VNEW();
   eh->row_generator = row_generator;
 
-  view->ehdata = eh;
-  view->eh     = eh_list_evt;
+  view->evt_han_data = eh;
+  view->evt_han      = eh_list_evt;
 }
 
 #endif

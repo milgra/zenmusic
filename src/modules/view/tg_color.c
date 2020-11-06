@@ -22,7 +22,7 @@ void tg_color_add(view_t* view, uint32_t color);
 
 void tg_color_gen(view_t* view)
 {
-  tg_color_t* gen = view->tgdata;
+  tg_color_t* gen = view->tex_gen_data;
 
   bm_t* bmp = bm_new(10, 10);
   bm_fill(bmp,
@@ -39,9 +39,9 @@ void tg_color_add(view_t* view, uint32_t color)
   tg_color_t* gen = mtmem_alloc(sizeof(tg_color_t), "tg_color_t", NULL, NULL);
   gen->color      = color;
 
-  view->tex_state = TS_BLANK;
-  view->tgdata    = gen;
-  view->tg        = tg_color_gen;
+  view->tex_state    = TS_BLANK;
+  view->tex_gen_data = gen;
+  view->tex_gen      = tg_color_gen;
 }
 
 #endif

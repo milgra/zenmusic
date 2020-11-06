@@ -53,6 +53,8 @@ struct _vframe_t
 typedef struct _view_t view_t;
 struct _view_t
 {
+  char connected; /* view is added to connector */
+
   char*     id;     /* identifier for handling view */
   mtvec_t*  views;  /* subviews */
   view_t*   parent; /* parent view */
@@ -63,17 +65,15 @@ struct _view_t
   vframe_t frame_global;  /* global position and dimensions */
   char     frame_changed; /* frame changed */
 
-  char connected; /* view is added to connector */
-
   bm_t*   tex;         /* texture of view */
   texst_t tex_state;   /* texture state */
   int     tex_channel; /* texture channel if texture is external */
   char    tex_changed; /* texture changed */
 
-  void (*eh)(view_t*, ev_t); /* event handler for view */
-  void (*tg)(view_t*);       /* texture generator for view */
-  void* ehdata;              /* data for event handler */
-  void* tgdata;              /* data for texture generator */
+  void (*evt_han)(view_t*, ev_t); /* event handler for view */
+  void (*tex_gen)(view_t*);       /* texture generator for view */
+  void* evt_han_data;             /* data for event handler */
+  void* tex_gen_data;             /* data for texture generator */
 };
 
 view_t* view_new(char* id, vframe_t frame, int texture_channel);
@@ -166,7 +166,7 @@ void view_evt(view_t* view, ev_t ev)
   while ((v = VNXT(view->views)))
     view_evt(v, ev);
 
-  if (view->eh) (*view->eh)(view, ev);
+  if (view->evt_han) (*view->evt_han)(view, ev);
 }
 
 void view_calc_global(view_t* view)
@@ -204,7 +204,7 @@ void view_set_layout(view_t* view, vlayout_t layout)
 
 void view_gen_texture(view_t* view)
 {
-  if (view->tg) (*view->tg)(view);
+  if (view->tex_gen) (*view->tex_gen)(view);
 }
 
 void view_desc(void* pointer)
