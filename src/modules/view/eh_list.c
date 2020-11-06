@@ -139,6 +139,10 @@ void eh_list_evt(view_t* view, ev_t ev)
       eh->filled = 0;
     }
   }
+  else if (ev.type == EV_RESIZE)
+    {
+      eh->filled= 0;
+    }
 }
 
 void eh_list_del(void* p)

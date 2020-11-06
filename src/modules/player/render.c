@@ -159,7 +159,7 @@ static void video_audio_display(VideoState* s)
     ;
   nb_freq = 1 << (rdft_bits - 1);
 
-  s->show_mode = SHOW_MODE_RDFT;
+  s->show_mode = SHOW_MODE_WAVES;
 
   /* compute display index : center on currently output samples */
   channels            = s->audio_tgt.channels;

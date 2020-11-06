@@ -45,10 +45,9 @@ int ui_generator_init(int width, int height)
   ui_compositor_init(width, height);
 
   uiv   = VNEW();
-  uich  = mtch_new(10);
+  uich  = mtch_new(50);
   trash = VNEW();
 
-  // TODO SDL_CreateThread
   SDL_Thread* thread = SDL_CreateThread(ui_generator_workloop,
                                         "generator",
                                         NULL);

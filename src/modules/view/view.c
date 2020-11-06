@@ -5,27 +5,27 @@
 #include "mtvector.c"
 #include "wm_event.c"
 
-typedef enum _texst_t
+typedef enum _texst_t // texture loading state
 {
   TS_BLANK,
   TS_PENDING,
   TS_READY,
 } texst_t;
 
-typedef enum _laypos_t
+typedef enum _laypos_t // layout position
 {
   LP_STATIC = 0,
   LP_FIXED,
   LP_ABSOLUTE,
 } laypos_t;
 
-typedef enum _laydis_t
+typedef enum _laydis_t // layout display
 {
   LD_NONE = 0,
   LD_FLEX,
 } laydis_t;
 
-typedef struct _vlayout_t vlayout_t;
+typedef struct _vlayout_t vlayout_t; // view layout
 struct _vlayout_t
 {
   laypos_t position;
@@ -41,7 +41,7 @@ struct _vlayout_t
   int      margin_bottom;
 };
 
-typedef struct _vframe_t vframe_t;
+typedef struct _vframe_t vframe_t; // view frame
 struct _vframe_t
 {
   float x;

@@ -10,8 +10,15 @@ zen photo and video - offline photo/video viewer and library manager / video/ima
 
 ---
 
+ev tg rename
+view id es texture id fuggetlen legyen, lehessen tobb view ugyanazzal a texturaval
+shadow & blur kulon layerre gl_rendererben
+
+flex - vertical, horizontal auto-layout
+lehessen teljes szelessegu a vizualization bar
+check leaks
+
 mukodjon a position/seekbar
-input text a search barra
 search bar click hozza elo genre/artist listat
 
 album/song info/genres/artist tabok a jobb oldali panel aljan

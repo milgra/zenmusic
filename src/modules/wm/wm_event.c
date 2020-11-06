@@ -1,6 +1,7 @@
 #ifndef event_h
 #define event_h
 
+#include <SDL.h>
 #include <stdint.h>
 
 enum evtype
@@ -9,6 +10,8 @@ enum evtype
   EV_MDOWN,
   EV_MUP,
   EV_MMOVE,
+  EV_KDOWN,
+  EV_KUP,
   EV_SCROLL,
   EV_TEXT,
   EV_RESIZE,
@@ -28,6 +31,7 @@ typedef struct _ev_t
   char        drag;
   uint32_t    time;
   uint32_t    dtime;
+  SDL_KeyCode keycode;
 } ev_t;
 
 #endif

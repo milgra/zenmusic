@@ -1,6 +1,7 @@
 #include "common.c"
 #include "eh_drag.c"
 #include "eh_list.c"
+#include "eh_text.c"
 #include "font.c"
 #include "mtcstring.c"
 #include "mtmath4.c"
@@ -105,41 +106,31 @@ void init(int width, int height)
                                 .w_per        = 1.0,
                                 .h_per        = 1.0});
 
-  view_t* seekview = view_new("seekview", (vframe_t){0, 305, 290, 15}, 0);
-  view_set_layout(seekview, (vlayout_t){
-                                .margin = INT_MAX});
-  tg_color_add(seekview, 0xFFFFFF66);
-
-  view_t* volview = view_new("volview", (vframe_t){0, 325, 290, 15}, 0);
-  view_set_layout(volview, (vlayout_t){
-                               .margin = INT_MAX});
-  tg_color_add(volview, 0xFFFFFF66);
-
   // visualization views
 
-  view_t* visuals = view_new("visuals", (vframe_t){0, 0, 758, 238}, 0);
-  tg_color_add(visuals, 0x99999955);
+  view_t* visuals = view_new("visuals", (vframe_t){0, 0, 754, 223}, 0);
+  tg_color_add(visuals, 0xFFFFFF00);
   view_set_layout(visuals, (vlayout_t){
                                .margin_top = 20.0,
                                .margin     = INT_MAX});
 
-  view_t* videoview_left = view_new("videoviewleft", (vframe_t){0, 50, 300, 150}, 1);
+  view_t* videoview_left = view_new("videoviewleft", (vframe_t){0, 37, 300, 150}, 1);
   tg_video_add(videoview_left, 1280, 720);
   view_set_layout(videoview_left, (vlayout_t){
-                                      .margin_top  = 44.0,
-                                      .margin_left = 2.0});
+                                      .margin_top  = 37.0,
+                                      .margin_left = 0.0});
 
-  view_t* videoview_right = view_new("videoviewright", (vframe_t){0, 50, 300, 150}, 1);
+  view_t* videoview_right = view_new("videoviewright", (vframe_t){0, 37, 300, 150}, 1);
   tg_video_add(videoview_right, 1280, 720);
   view_set_layout(videoview_right, (vlayout_t){
-                                       .margin_top   = 44.0,
-                                       .margin_right = 2.0});
+                                       .margin_top   = 37.0,
+                                       .margin_right = 4.0});
 
-  coverview = view_new("coverview", (vframe_t){0, 44, 150, 150}, 0);
+  coverview = view_new("coverview", (vframe_t){0, 37, 150, 150}, 0);
   //tg_color_add(coverview, 0xAAAAAAFF);
   view_set_layout(coverview, (vlayout_t){
-                                 .margin_top  = 44.0,
-                                 .margin_left = 304.0});
+                                 .margin_top  = 37.0,
+                                 .margin_left = 300.0});
 
   view_add(visuals, videoview_left);
   view_add(visuals, videoview_right);
@@ -175,20 +166,20 @@ void init(int width, int height)
 
   // seek bar
 
-  view_t* seekbar = view_new("seekbar", (vframe_t){2, 2, 754, 40}, 0);
+  view_t* seekbar = view_new("seekbar", (vframe_t){1, -10, 752, 30}, 0);
   tg_text_add(seekbar, 0xFEFEFEFF, 0x000000FF, "1:56 ----|-- 3:21");
 
   view_add(visuals, seekbar);
 
   // search bar
 
-  view_t* searchbar = view_new("searchbar", (vframe_t){2, 196, 376, 40}, 0);
-  tg_text_add(searchbar, 0xFEFEFEFF, 0x000000FF, "Search...");
+  view_t* searchbar = view_new("searchbar", (vframe_t){1, 197, 375, 30}, 0);
+  eh_text_add(searchbar, "placeholder");
   view_add(visuals, searchbar);
 
   // evets bar
 
-  view_t* eventbar = view_new("eventbar", (vframe_t){380, 196, 376, 40}, 0);
+  view_t* eventbar = view_new("eventbar", (vframe_t){377, 197, 375, 30}, 0);
   tg_text_add(eventbar, 0xFEFEFEFF, 0x000000FF, "Event log");
   view_add(visuals, eventbar);
 

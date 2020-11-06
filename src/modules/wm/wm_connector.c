@@ -119,6 +119,7 @@ void wm_init(void (*init)(int, int),
 
           while (SDL_PollEvent(&event) != 0)
           {
+
             if (event.type == SDL_MOUSEBUTTONDOWN ||
                 event.type == SDL_MOUSEBUTTONUP ||
                 event.type == SDL_MOUSEMOTION)
@@ -172,9 +173,19 @@ void wm_init(void (*init)(int, int),
             }
             else if (event.type == SDL_KEYDOWN)
             {
+              //printf("Scancode: 0x%02X", event.key.keysym.scancode);
+              //printf(", Name: %s\n", SDL_GetKeyName(event.key.keysym.sym));
+              ev.type    = EV_KDOWN;
+              ev.keycode = event.key.keysym.sym;
             }
             else if (event.type == SDL_TEXTINPUT)
             {
+              ev.type = EV_TEXT;
+              ev.text = event.text.text;
+            }
+            else if (event.type == SDL_TEXTEDITING)
+            {
+              printf("TEXTEDIT\n");
               ev.type = EV_TEXT;
               ev.text = event.text.text;
             }
