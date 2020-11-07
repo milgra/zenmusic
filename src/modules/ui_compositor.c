@@ -72,7 +72,10 @@ void ui_compositor_reset()
 
 void ui_compositor_render()
 {
-  gl_render(fb, tm->bm);
+  gl_update_vertexes(fb);
+  gl_update_textures(tm->bm);
+  gl_draw_into_renderbuffer(0, ((v4_t){0}));
+  gl_render();
 }
 
 void ui_compositor_update()

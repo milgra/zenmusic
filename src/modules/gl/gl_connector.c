@@ -9,6 +9,9 @@
 #ifndef gl_connector_h
 #define gl_connector_h
 
+#include "gl_floatbuffer.c"
+#include "mtbitmap.c"
+#include "mtmath4.c"
 #include <GL/glew.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,18 +19,20 @@
 void gl_init();
 void gl_render();
 void gl_resize(float width, float height);
+void gl_update_vertexes(fb_t* fb);
+void gl_update_textures(bm_t* bmp);
+void gl_draw_into_renderbuffer(int framebuffer, v4_t region);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "gl_floatbuffer.c"
-#include "mtbitmap.c"
 #include "mtmath2.c"
-#include "mtmath4.c"
 #include <GL/glew.h>
 #include <stdio.h>
 #include <stdlib.h>
+
+fb_t* floatbuffer;
 
 void gl_errors(const char* place)
 {
@@ -168,6 +173,9 @@ char* blend_fsh =
 
 GLint uniform_name_a[3];
 
+int contextFrameBuffer;
+int contextRenderBuffer;
+
 void gl_init(width, height)
 {
 
@@ -231,6 +239,14 @@ void gl_init(width, height)
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  glGetIntegerv(
+      GL_FRAMEBUFFER_BINDING,
+      &contextFrameBuffer);
+
+  glGetIntegerv(
+      GL_RENDERBUFFER_BINDING,
+      &contextRenderBuffer);
 }
 
 void gl_resize(float width, float height)
@@ -245,18 +261,44 @@ void gl_resize(float width, float height)
   glViewport(0, 0, width, height);
 }
 
-void gl_render(fb_t* fb, bm_t* bmp)
+// update vertexes
+void gl_update_vertexes(fb_t* fb)
+{
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * fb->pos, fb->data, GL_DYNAMIC_DRAW);
+  floatbuffer = fb;
+}
+
+// update texture map
+void gl_update_textures(bm_t* bmp)
 {
   glActiveTexture(GL_TEXTURE0);
   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, bmp->w, bmp->h, GL_RGBA, GL_UNSIGNED_BYTE, bmp->data);
+}
 
-  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * fb->pos, fb->data, GL_DYNAMIC_DRAW);
+// draw vertexes into selected framebuffer
+void gl_draw_into_framebuffer(int framebuffer, int start, int end)
+{
+}
+
+// blur selected framebuffer
+void gl_blur_framebuffer(int framebuffer)
+{
+}
+
+// draw selected framebuffer's region into render buffer
+void gl_draw_into_renderbuffer(int framebuffer, v4_t region)
+{
+  glBindRenderbuffer(GL_RENDERBUFFER, contextRenderBuffer);
+
+  glClear(GL_COLOR_BUFFER_BIT);
+  glDrawArrays(GL_TRIANGLES, 0, floatbuffer->pos / 5);
 
   //glScissor(200, 200, 100, 100);
   //glEnable(GL_SCISSOR_TEST);
+}
 
-  glClear(GL_COLOR_BUFFER_BIT);
-  glDrawArrays(GL_TRIANGLES, 0, fb->pos / 5);
+void gl_render()
+{
 }
 
 #endif

@@ -10,7 +10,6 @@ zen photo and video - offline photo/video viewer and library manager / video/ima
 
 ---
 
-ev tg rename
 view id es texture id fuggetlen legyen, lehessen tobb view ugyanazzal a texturaval
 shadow & blur kulon layerre gl_rendererben
 
