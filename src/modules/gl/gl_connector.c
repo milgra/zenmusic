@@ -16,12 +16,19 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef enum _glshader_t // texture loading state
+{
+  SH_BLACK,
+  SH_TEXTURE,
+  SH_BLUR
+} glshader_t;
+
 void gl_init();
-void gl_render();
 void gl_resize(float width, float height);
 void gl_update_vertexes(fb_t* fb);
 void gl_update_textures(bm_t* bmp);
-void gl_draw_into_renderbuffer(int framebuffer, v4_t region);
+void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region, glshader_t shader);
+void gl_clear_framebuffer(int index);
 
 #endif
 
@@ -31,8 +38,6 @@ void gl_draw_into_renderbuffer(int framebuffer, v4_t region);
 #include <GL/glew.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-fb_t* floatbuffer;
 
 void gl_errors(const char* place)
 {
@@ -164,30 +169,44 @@ GLuint gl_shader_create(const char*  vertex_source,
   return program;
 }
 
-char* blend_vsh =
-#include "blend.vsh"
+char* texture_vsh =
+#include "texture.vsh"
     ;
-char* blend_fsh =
-#include "blend.fsh"
+char* texture_fsh =
+#include "texture.fsh"
     ;
 
-GLint uniform_name_a[3];
+char* color_vsh =
+#include "color.vsh"
+    ;
+char* color_fsh =
+#include "color.fsh"
+    ;
 
-int contextFrameBuffer;
-int contextRenderBuffer;
+char* blur_vsh =
+#include "blur.vsh"
+    ;
+
+char* blur_fsh =
+#include "blur.fsh"
+    ;
+
+GLint unif_name_texture[3];
+GLint unif_name_color[1];
+GLint unif_name_blur[3];
+
+fb_t* floatbuffer;
+int   framebuffers[10];
 
 void gl_init(width, height)
 {
-
-  const char* uniforms_blend[]   = {"3", "projection", "samplera", "samplerb"};
-  const char* attributes_blend[] = {"2", "position", "texcoord"};
-
   glewInit();
 
-  GLuint shader_name_i = gl_shader_create(blend_vsh, blend_fsh,
-                                          uniforms_blend,
-                                          attributes_blend,
-                                          uniform_name_a);
+  GLuint shader_name_i = gl_shader_create(texture_vsh,
+                                          texture_fsh,
+                                          ((const char*[]){"projection", "samplera", "samplerb"}),
+                                          ((const char*[]){"position", "texcoord"}),
+                                          unif_name_texture);
 
   glUseProgram(shader_name_i);
 
@@ -196,7 +215,7 @@ void gl_init(width, height)
   matrix4array_t projection;
   projection.matrix = matrix;
 
-  glUniformMatrix4fv(uniform_name_a[0], 1, 0, projection.array);
+  glUniformMatrix4fv(unif_name_texture[0], 1, 0, projection.array);
 
   // create vertex buffer
   GLuint vbuffer_name_u;
@@ -232,13 +251,16 @@ void gl_init(width, height)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4096, 4096, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
-  glUniform1i(uniform_name_a[1], 0);
-  glUniform1i(uniform_name_a[2], 1);
+  glUniform1i(unif_name_texture[1], 0);
+  glUniform1i(unif_name_texture[2], 1);
 
   glClearColor(0.5, 0.5, 0.5, 1.0);
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  int contextFrameBuffer;
+  int contextRenderBuffer;
 
   glGetIntegerv(
       GL_FRAMEBUFFER_BINDING,
@@ -247,6 +269,8 @@ void gl_init(width, height)
   glGetIntegerv(
       GL_RENDERBUFFER_BINDING,
       &contextRenderBuffer);
+
+  framebuffers[0] = contextFrameBuffer;
 }
 
 void gl_resize(float width, float height)
@@ -257,7 +281,7 @@ void gl_resize(float width, float height)
   matrix4array_t projection;
   projection.matrix = matrix;
 
-  glUniformMatrix4fv(uniform_name_a[0], 1, 0, projection.array);
+  glUniformMatrix4fv(unif_name_texture[0], 1, 0, projection.array);
   glViewport(0, 0, width, height);
 }
 
@@ -275,29 +299,30 @@ void gl_update_textures(bm_t* bmp)
   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, bmp->w, bmp->h, GL_RGBA, GL_UNSIGNED_BYTE, bmp->data);
 }
 
+void gl_clear_framebuffer(int index)
+{
+  // 0 - context frame buffer
+  // > 1 - other frame buffers
+  glBindFramebuffer(GL_FRAMEBUFFER, framebuffers[index]);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 // draw vertexes into selected framebuffer
-void gl_draw_into_framebuffer(int framebuffer, int start, int end)
+void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region, glshader_t shader)
 {
-}
-
-// blur selected framebuffer
-void gl_blur_framebuffer(int framebuffer)
-{
-}
-
-// draw selected framebuffer's region into render buffer
-void gl_draw_into_renderbuffer(int framebuffer, v4_t region)
-{
-  glBindRenderbuffer(GL_RENDERBUFFER, contextRenderBuffer);
-
-  glClear(GL_COLOR_BUFFER_BIT);
+  glBindFramebuffer(GL_FRAMEBUFFER, framebuffers[index]);
   glDrawArrays(GL_TRIANGLES, 0, floatbuffer->pos / 5);
 
   //glScissor(200, 200, 100, 100);
   //glEnable(GL_SCISSOR_TEST);
 }
 
-void gl_render()
+void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glshader_t shader)
+{
+}
+
+// blur selected framebuffer
+void gl_blur_framebuffer(int index)
 {
 }
 
