@@ -19,7 +19,7 @@ void ui_compositor_rem(char* id);
 void ui_compositor_set_index(char* id, uint32_t index);
 void ui_compositor_set_frame(char* id, int x, int y, int w, int h);
 void ui_compositor_set_texture(char* id, bm_t* bmp);
-void ui_compositor_resize(float width, float height);
+void ui_compositor_resize(int width, int height);
 
 typedef struct _crect_t
 {
@@ -181,7 +181,7 @@ void ui_compositor_set_texture(char* id, bm_t* tex)
   }
 }
 
-void ui_compositor_resize(float width, float height)
+void ui_compositor_resize(int width, int height)
 {
   gl_resize(width, height);
 }

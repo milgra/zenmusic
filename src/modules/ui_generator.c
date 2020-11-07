@@ -20,7 +20,7 @@ void ui_generator_render();
 void ui_generator_add(view_t* view);
 void ui_generator_remove(view_t* view);
 void ui_generator_set_index(view_t* view);
-void ui_generator_resize(float width, float height);
+void ui_generator_resize(int width, int height);
 
 #endif
 
@@ -166,7 +166,7 @@ int ui_generator_workloop()
   }
 }
 
-void ui_generator_resize(float width, float height)
+void ui_generator_resize(int width, int height)
 {
   ui_compositor_resize(width, height);
 }

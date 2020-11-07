@@ -24,7 +24,7 @@ typedef enum _glshader_t // texture loading state
 } glshader_t;
 
 void gl_init();
-void gl_resize(float width, float height);
+void gl_resize(int width, int height);
 void gl_update_vertexes(fb_t* fb);
 void gl_update_textures(bm_t* bmp);
 void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region, glshader_t shader);
@@ -111,13 +111,12 @@ int gl_shader_link(GLuint program)
 
 GLuint gl_shader_create(const char*  vertex_source,
                         const char*  fragment_source,
-                        const char** uniform_structure,
+                        int          attribute_locations_length,
                         const char** attribute_structure,
+                        int          uniform_locations_length,
+                        const char** uniform_structure,
                         GLint*       uniform_locations)
 {
-
-  int uniform_locations_length   = atoi(uniform_structure[0]);
-  int attribute_locations_length = atoi(attribute_structure[0]);
 
   GLuint program = glCreateProgram();
 
@@ -132,7 +131,7 @@ GLuint gl_shader_create(const char*  vertex_source,
 
   for (int index = 0; index < attribute_locations_length; index++)
   {
-    const GLchar* name = attribute_structure[index + 1];
+    const GLchar* name = attribute_structure[index];
     glBindAttribLocation(program, index, name);
   }
 
@@ -142,7 +141,7 @@ GLuint gl_shader_create(const char*  vertex_source,
   {
     for (int index = 0; index < uniform_locations_length; index++)
     {
-      const GLchar* name       = uniform_structure[index + 1];
+      const GLchar* name       = uniform_structure[index];
       GLint         location   = glGetUniformLocation(program, name);
       uniform_locations[index] = location;
     }
@@ -195,6 +194,13 @@ GLint unif_name_texture[3];
 GLint unif_name_color[1];
 GLint unif_name_blur[3];
 
+GLuint texture_sh;
+GLuint color_sh;
+GLuint blur_sh;
+
+int context_w;
+int context_h;
+
 fb_t* floatbuffer;
 int   framebuffers[10];
 
@@ -202,20 +208,29 @@ void gl_init(width, height)
 {
   glewInit();
 
-  GLuint shader_name_i = gl_shader_create(texture_vsh,
-                                          texture_fsh,
-                                          ((const char*[]){"projection", "samplera", "samplerb"}),
-                                          ((const char*[]){"position", "texcoord"}),
-                                          unif_name_texture);
+  texture_sh = gl_shader_create(texture_vsh,
+                                texture_fsh,
+                                2,
+                                ((const char*[]){"position", "texcoord"}),
+                                3,
+                                ((const char*[]){"projection", "samplera", "samplerb"}),
+                                unif_name_texture);
 
-  glUseProgram(shader_name_i);
+  color_sh = gl_shader_create(color_vsh,
+                              color_fsh,
+                              2,
+                              ((const char*[]){"position", "texcoord"}),
+                              1,
+                              ((const char*[]){"projection"}),
+                              unif_name_color);
 
-  m4_t matrix = m4_defaultortho(0.0, width, height, 0, 0.0, 1.0);
-
-  matrix4array_t projection;
-  projection.matrix = matrix;
-
-  glUniformMatrix4fv(unif_name_texture[0], 1, 0, projection.array);
+  blur_sh = gl_shader_create(blur_vsh,
+                             blur_fsh,
+                             2,
+                             ((const char*[]){"position", "texcoord"}),
+                             1,
+                             ((const char*[]){"projection", "samplera"}),
+                             unif_name_blur);
 
   // create vertex buffer
   GLuint vbuffer_name_u;
@@ -251,9 +266,6 @@ void gl_init(width, height)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4096, 4096, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
-  glUniform1i(unif_name_texture[1], 0);
-  glUniform1i(unif_name_texture[2], 1);
-
   glClearColor(0.5, 0.5, 0.5, 1.0);
 
   glEnable(GL_BLEND);
@@ -273,16 +285,12 @@ void gl_init(width, height)
   framebuffers[0] = contextFrameBuffer;
 }
 
-void gl_resize(float width, float height)
+void gl_resize(int width, int height)
 {
-  printf("gl resize %f %f\n", width, height);
-  m4_t matrix = m4_defaultortho(0.0, width, height, 0, 0.0, 1.0);
+  printf("gl resize %i %i\n", width, height);
 
-  matrix4array_t projection;
-  projection.matrix = matrix;
-
-  glUniformMatrix4fv(unif_name_texture[0], 1, 0, projection.array);
-  glViewport(0, 0, width, height);
+  context_w = width;
+  context_h = height;
 }
 
 // update vertexes
@@ -310,11 +318,29 @@ void gl_clear_framebuffer(int index)
 // draw vertexes into selected framebuffer
 void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region, glshader_t shader)
 {
+
+  if (shader == SH_TEXTURE)
+  {
+    // use full context for projection
+    matrix4array_t projection;
+    projection.matrix = m4_defaultortho(0.0, context_w, context_h, 0, 0.0, 1.0);
+
+    glUseProgram(texture_sh);
+
+    // set projection and viewport
+    glUniformMatrix4fv(unif_name_texture[0], 1, 0, projection.array);
+    glViewport(0, 0, context_w, context_h);
+
+    //glScissor(200, 200, 100, 100);
+    //glEnable(GL_SCISSOR_TEST);
+
+    // set textures
+    glUniform1i(unif_name_texture[1], 0);
+    glUniform1i(unif_name_texture[2], 1);
+  }
+
   glBindFramebuffer(GL_FRAMEBUFFER, framebuffers[index]);
   glDrawArrays(GL_TRIANGLES, 0, floatbuffer->pos / 5);
-
-  //glScissor(200, 200, 100, 100);
-  //glEnable(GL_SCISSOR_TEST);
 }
 
 void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glshader_t shader)
