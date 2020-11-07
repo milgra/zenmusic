@@ -51,3 +51,5 @@ listitemek side panel ala, glossy effekt a panelen
 
 scroll-ra lehessen novelni/csokkenteni visuals meretet
 statisztikak - top 10 leghallgatottabb, milyen genre-t hallgatsz foleg elmult 1 honap, stb
+
+glFragaCoord ?

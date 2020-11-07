@@ -168,6 +168,46 @@ GLuint gl_shader_create(const char*  vertex_source,
   return program;
 }
 
+typedef struct _gltex_t
+{
+  GLuint tx;
+  GLuint fb;
+} gltex_t;
+
+int tex_index = 0;
+
+gltex_t gl_create_texture()
+{
+  gltex_t tex;
+
+  glGenTextures(1, &tex.tx);
+
+  glActiveTexture(GL_TEXTURE0 + tex_index);
+  glBindTexture(GL_TEXTURE_2D, tex.tx);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4096, 4096, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+  tex_index += 1;
+
+  return tex;
+
+  glGenFramebuffers(1, &tex.fb);
+  glBindFramebuffer(GL_FRAMEBUFFER, tex.fb);
+
+  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex.tx, 0);
+
+  printf("create texture %i %i\n", tex.tx, tex.fb);
+
+  return tex;
+}
+
+void gl_delete_texture(gltex_t texture)
+{
+}
+
 char* texture_vsh =
 #include "texture.vsh"
     ;
@@ -187,8 +227,20 @@ char* blur_vsh =
     ;
 
 char* blur_fsh =
-#include "blur.fsh"
-    ;
+    "#version 120\n"
+    "uniform sampler2D samplera;\n"
+    "varying vec3 vUv;\n"
+    "uniform float offset[3] = float[](0.0, 1.3846153846, 3.2307692308);\n"
+    "uniform float weight[3] = float[](0.2270270270, 0.3162162162, 0.0702702703);\n"
+    "void main( )\n"
+    "{\n"
+    "gl_FragColor = texture2D(samplera, vUv.xy / 1024.0) * weight[0];\n"
+    "for (int i=1; i<3; i++)\n"
+    "{\n"
+    "gl_FragColor += texture2D(samplera, (vUv.xy + vec2(0.0, offset[i])) / 1024.0) * weight[i];\n"
+    "gl_FragColor += texture2D(samplera, (vUv.xy - vec2(0.0, offset[i])) / 1024.0) * weight[i];\n"
+    "}\n"
+    "}\n";
 
 GLint unif_name_texture[3];
 GLint unif_name_color[1];
@@ -201,8 +253,8 @@ GLuint blur_sh;
 int context_w;
 int context_h;
 
-fb_t* floatbuffer;
-int   framebuffers[10];
+fb_t*   floatbuffer;
+gltex_t textures[10] = {0};
 
 void gl_init(width, height)
 {
@@ -242,47 +294,18 @@ void gl_init(width, height)
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 20, 0);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 20, (const GLvoid*)8);
 
-  GLuint texture_name_a;
-
-  glGenTextures(1, &texture_name_a);
-
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, texture_name_a);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4096, 4096, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-
-  GLuint texture_name_b;
-
-  glGenTextures(1, &texture_name_b);
-
-  glActiveTexture(GL_TEXTURE0 + 1);
-  glBindTexture(GL_TEXTURE_2D, texture_name_b);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4096, 4096, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-
   glClearColor(0.5, 0.5, 0.5, 1.0);
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-  int contextFrameBuffer;
-  int contextRenderBuffer;
+  int context_fb;
+  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &context_fb);
+  // glGetIntegerv(GL_RENDERBUFFER_BINDING, &contextRenderBuffer);
 
-  glGetIntegerv(
-      GL_FRAMEBUFFER_BINDING,
-      &contextFrameBuffer);
-
-  glGetIntegerv(
-      GL_RENDERBUFFER_BINDING,
-      &contextRenderBuffer);
-
-  framebuffers[0] = contextFrameBuffer;
+  textures[0].fb = context_fb;
+  textures[1]    = gl_create_texture();
+  textures[2]    = gl_create_texture();
 }
 
 void gl_resize(int width, int height)
@@ -311,7 +334,7 @@ void gl_clear_framebuffer(int index)
 {
   // 0 - context frame buffer
   // > 1 - other frame buffers
-  glBindFramebuffer(GL_FRAMEBUFFER, framebuffers[index]);
+  glBindFramebuffer(GL_FRAMEBUFFER, textures[index].fb);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
@@ -339,12 +362,22 @@ void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region,
     glUniform1i(unif_name_texture[2], 1);
   }
 
-  glBindFramebuffer(GL_FRAMEBUFFER, framebuffers[index]);
+  glBindFramebuffer(GL_FRAMEBUFFER, textures[index].fb);
   glDrawArrays(GL_TRIANGLES, 0, floatbuffer->pos / 5);
 }
 
 void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glshader_t shader)
 {
+
+  glBindFramebuffer(GL_FRAMEBUFFER, textures[tgt_ind].fb);
+
+  if (shader == SH_TEXTURE)
+  {
+    glUseProgram(blur_sh);
+    glUniform1i(unif_name_texture[1], src_ind);
+  }
+
+  glViewport(0.0, 0.0, 2048, 2048);
 }
 
 // blur selected framebuffer
