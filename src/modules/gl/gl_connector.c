@@ -29,6 +29,7 @@ void gl_update_vertexes(fb_t* fb);
 void gl_update_textures(bm_t* bmp);
 void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region, glshader_t shader);
 void gl_clear_framebuffer(int index);
+void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glshader_t shader);
 
 #endif
 
@@ -166,6 +167,11 @@ int context_fb;
 fb_t*   floatbuffer;
 gltex_t textures[10] = {0};
 
+GLuint ver_arr_a;
+GLuint ver_arr_b;
+GLuint ver_buf_a;
+GLuint ver_buf_b;
+
 void gl_init(width, height)
 {
   glewInit();
@@ -180,30 +186,36 @@ void gl_init(width, height)
 
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &context_fb);
 
-  textures[0].fb = context_fb;
-  textures[1]    = gl_create_texture(4096, 4096);
-  textures[2]    = gl_create_texture(4096, 4096);
+  textures[0].fb = context_fb;                    // context's buffer for drawing
+  textures[1]    = gl_create_texture(4096, 4096); // texture map
+  textures[2]    = gl_create_texture(4096, 4096); // video texture
+  textures[3]    = gl_create_texture(4096, 4096); // offscreen buffer
 
-  // create vertex buffer
-  GLuint vbuffer_name_u;
-  GLuint varray_name_u;
+  // create vertex buffers
 
-  glGenBuffers(1, &vbuffer_name_u);
-  glBindBuffer(GL_ARRAY_BUFFER, vbuffer_name_u);
-
-  glGenVertexArrays(1, &varray_name_u);
-  glBindVertexArray(varray_name_u);
-
+  glGenBuffers(1, &ver_buf_a);
+  glBindBuffer(GL_ARRAY_BUFFER, ver_buf_a);
+  glGenVertexArrays(1, &ver_arr_a);
+  glBindVertexArray(ver_arr_a);
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 20, 0);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 20, (const GLvoid*)8);
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  glClearColor(0.5, 0.5, 0.5, 1.0);
+  glGenBuffers(1, &ver_buf_b);
+  glBindBuffer(GL_ARRAY_BUFFER, ver_buf_b);
+  glGenVertexArrays(1, &ver_arr_b);
+  glBindVertexArray(ver_arr_b);
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 20, 0);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 20, (const GLvoid*)8);
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-  glEnable(GL_BLEND);
-
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  glClearColor(0.0, 0.0, 0.0, 1.0);
 }
 
 void gl_resize(int width, int height)
@@ -217,6 +229,7 @@ void gl_resize(int width, int height)
 // update vertexes
 void gl_update_vertexes(fb_t* fb)
 {
+  glBindBuffer(GL_ARRAY_BUFFER, ver_buf_a);
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * fb->pos, fb->data, GL_DYNAMIC_DRAW);
   floatbuffer = fb;
 }
@@ -243,6 +256,8 @@ void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region,
   if (shader == SH_TEXTURE)
   {
     glUseProgram(texture_sh);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // use full context for projection
     matrix4array_t projection;
     projection.matrix = m4_defaultortho(0.0, context_w, context_h, 0, 0.0, 1.0);
@@ -287,8 +302,12 @@ void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region,
   //glScissor(200, 200, 100, 100);
   //glEnable(GL_SCISSOR_TEST);
 
+  glBindVertexArray(ver_arr_a);
+
   glBindFramebuffer(GL_FRAMEBUFFER, textures[index].fb);
   glDrawArrays(GL_TRIANGLES, 0, floatbuffer->pos / 5);
+
+  glBindVertexArray(0);
 }
 
 void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glshader_t shader)
