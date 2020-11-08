@@ -186,18 +186,30 @@ void gl_init(width, height)
 
   // create vertex buffer
   GLuint vbuffer_name_u;
+  GLuint varray_name_u;
 
   glGenBuffers(1, &vbuffer_name_u);
   glBindBuffer(GL_ARRAY_BUFFER, vbuffer_name_u);
+
+  glGenVertexArrays(1, &varray_name_u);
+  glBindVertexArray(varray_name_u);
+
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 20, 0);
+  gl_errors("gl_init 1");
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 20, (const GLvoid*)8);
+  gl_errors("gl_init 2");
 
   glClearColor(0.5, 0.5, 0.5, 1.0);
 
+  gl_errors("gl_init 3");
+
   glEnable(GL_BLEND);
+
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+  gl_errors("gl_init 4");
 }
 
 void gl_resize(int width, int height)
@@ -256,6 +268,8 @@ void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region,
 
   glBindFramebuffer(GL_FRAMEBUFFER, textures[index].fb);
   glDrawArrays(GL_TRIANGLES, 0, floatbuffer->pos / 5);
+
+  gl_errors("gl_draw_vertexes_in_framebuffer");
 }
 
 void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glshader_t shader)

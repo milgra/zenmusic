@@ -12,11 +12,13 @@ zen photo and video - offline photo/video viewer and library manager / video/ima
 
 view id es texture id fuggetlen legyen, lehessen tobb view ugyanazzal a texturaval
 shadow & blur kulon layerre gl_rendererben
+resize textures on window change if needed
 
 flex - vertical, horizontal auto-layout
 lehessen teljes szelessegu a vizualization bar
 check leaks
 
+cortex-et berakni mini game-nek
 mukodjon a position/seekbar
 search bar click hozza elo genre/artist listat
 

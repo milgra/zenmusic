@@ -18,6 +18,7 @@ GLuint gl_shader_create(const char*  vertex_source,
                         GLint*       uniform_locations);
 
 gltex_t gl_create_texture();
+void    gl_errors(const char* place);
 
 #endif
 
