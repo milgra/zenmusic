@@ -18,8 +18,8 @@
 
 typedef enum _glshader_t // texture loading state
 {
-  SH_BLACK,
   SH_TEXTURE,
+  SH_COLOR,
   SH_BLUR
 } glshader_t;
 
@@ -98,7 +98,7 @@ GLuint create_color_shader(GLint* uniforms)
       "#version 120\n"
       "void main( )"
       "{"
-      "  gl_FragColor = vec4(1.0,1.0,1.0,1.0);"
+      "  gl_FragColor = vec4(0.0,0.0,0.0,1.0);"
       "}";
 
   return gl_shader_create(vsh,
@@ -197,19 +197,13 @@ void gl_init(width, height)
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
   glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 20, 0);
-  gl_errors("gl_init 1");
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 20, (const GLvoid*)8);
-  gl_errors("gl_init 2");
 
   glClearColor(0.5, 0.5, 0.5, 1.0);
-
-  gl_errors("gl_init 3");
 
   glEnable(GL_BLEND);
 
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-  gl_errors("gl_init 4");
 }
 
 void gl_resize(int width, int height)
@@ -248,11 +242,10 @@ void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region,
 
   if (shader == SH_TEXTURE)
   {
+    glUseProgram(texture_sh);
     // use full context for projection
     matrix4array_t projection;
     projection.matrix = m4_defaultortho(0.0, context_w, context_h, 0, 0.0, 1.0);
-
-    glUseProgram(texture_sh);
 
     // set projection and viewport
     glUniformMatrix4fv(unif_name_texture[0], 1, 0, projection.array);
@@ -265,11 +258,37 @@ void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region,
     glUniform1i(unif_name_texture[1], 0);
     glUniform1i(unif_name_texture[2], 1);
   }
+  else if (shader == SH_COLOR)
+  {
+    glUseProgram(color_sh);
+    // use full context for projection
+    matrix4array_t projection;
+    projection.matrix = m4_defaultortho(0.0, context_w, context_h, 0, 0.0, 1.0);
+
+    // set projection and viewport
+    glUniformMatrix4fv(unif_name_color[0], 1, 0, projection.array);
+    glViewport(0, 0, context_w, context_h);
+  }
+  else if (shader == SH_BLUR)
+  {
+    glUseProgram(blur_sh);
+    // use full context for projection
+    matrix4array_t projection;
+    projection.matrix = m4_defaultortho(0.0, context_w, context_h, 0, 0.0, 1.0);
+
+    // set projection and viewport
+    glUniformMatrix4fv(unif_name_blur[0], 1, 0, projection.array);
+    glViewport(0, 0, context_w, context_h);
+
+    // set textures
+    glUniform1i(unif_name_blur[1], 0);
+  }
+
+  //glScissor(200, 200, 100, 100);
+  //glEnable(GL_SCISSOR_TEST);
 
   glBindFramebuffer(GL_FRAMEBUFFER, textures[index].fb);
   glDrawArrays(GL_TRIANGLES, 0, floatbuffer->pos / 5);
-
-  gl_errors("gl_draw_vertexes_in_framebuffer");
 }
 
 void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glshader_t shader)
