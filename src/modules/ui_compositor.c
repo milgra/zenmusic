@@ -76,7 +76,7 @@ void ui_compositor_render()
 {
   gl_update_vertexes(fb);
   gl_update_textures(tm->bm);
-  gl_clear_framebuffer(3, 1.0, 0.0, 0.0, 1.0);
+  gl_clear_framebuffer(3, 0.0, 0.0, 0.0, 1.0);
   gl_draw_vertexes_in_framebuffer(3,
                                   0,
                                   0,
@@ -88,7 +88,7 @@ void ui_compositor_render()
                                      0,
                                      comp_width,
                                      comp_height,
-                                     SH_TEXTURE);
+                                     SH_BLUR);
 }
 
 void ui_compositor_update()

@@ -145,16 +145,30 @@ glsha_t create_blur_shader()
       "#version 120\n"
       "uniform sampler2D samplera;\n"
       "varying vec3 vUv;"
-      "uniform float offset[3] = float[](0.0, 1.3846153846, 3.2307692308) ;"
-      "uniform float weight[3] = float[](0.2270270270, 0.3162162162, 0.0702702703) ;"
-      "void main( )"
+
+      "void main()"
       "{"
-      "  gl_FragColor = texture2D(samplera, vUv.xy / 1024.0) * weight[0] ;"
-      "  for (int i=1; i<3; i++)"
+      " float Pi = 6.28318530718;" // pi * 2
+
+      " float Directions = 16.0;" // BLUR DIRECTIONS (Default 16.0 - More is better but slower)
+      " float Quality    = 6.0;"  // BLUR QUALITY (Default 4.0 - More is better but slower)
+      " float Size       = 16.0;" // BLUR SIZE (Radius)
+      " vec2 Radius = Size / vec2(4096,4096);"
+
+      // Pixel colour
+      " vec4 Color = texture2D(samplera, vUv.xy);"
+
+      // Blur calculations
+      " for (float d = 0.0; d < Pi; d += Pi / Directions)"
+      " {"
+      "  for (float i = 1.0 / Quality; i <= 1.0; i += 1.0 / Quality)"
       "  {"
-      "  gl_FragColor += texture2D(samplera, (vUv.xy + vec2(0.0, offset[i])) / 1024.0) * weight[i];"
-      "  gl_FragColor += texture2D(samplera, (vUv.xy - vec2(0.0, offset[i])) / 1024.0) * weight[i];"
+      "   Color += texture2D(samplera, vUv.xy + vec2(cos(d), sin(d)) * Radius * i);"
       "  }"
+      " }"
+      // Output to screen
+      " Color /= Quality * Directions - 15.0;"
+      " gl_FragColor = Color;"
       "}";
 
   return gl_shader_create(vsh,
@@ -329,6 +343,11 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
   {
     glUseProgram(texture_sh.name);
     glUniform1i(texture_sh.uni_loc[1], textures[src_ind].index);
+  }
+  else if (shader == SH_BLUR)
+  {
+    glUseProgram(blur_sh.name);
+    glUniform1i(blur_sh.uni_loc[1], textures[src_ind].index);
   }
 
   GLfloat data[] = {
