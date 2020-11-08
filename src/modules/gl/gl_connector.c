@@ -34,260 +34,126 @@ void gl_clear_framebuffer(int index);
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "gl_utils.c"
 #include "mtmath2.c"
 #include <GL/glew.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-void gl_errors(const char* place)
+GLuint create_texture_shader(GLint* uniforms)
 {
-  GLenum error = 0;
-  do
-  {
-    GLenum error = glGetError();
-    if (error > GL_NO_ERROR)
-      printf("GL Error at %s : %i\n", place, error);
-  } while (error > GL_NO_ERROR);
+  char* vsh =
+      "#version 120\n"
+      "attribute vec3 position;"
+      "attribute vec3 texcoord;"
+      "uniform mat4 projection;"
+      "uniform sampler2D samplera;"
+      "uniform sampler2D samplerb;"
+      "varying vec3 vUv;"
+      "void main ( )"
+      "{"
+      "    gl_Position = projection * vec4(position,1.0);"
+      "    vUv = texcoord;"
+      "}";
+
+  char* fsh =
+      "#version 120\n"
+      "uniform sampler2D samplera;"
+      "uniform sampler2D samplerb;"
+      "varying vec3 vUv;"
+      "void main( )"
+      "{"
+      "	if (vUv.z == 1.0)"
+      "	{"
+      "		gl_FragColor = texture2D(samplerb, vUv.xy);"
+      "	}"
+      "	else"
+      "	{"
+      "		gl_FragColor = texture2D(samplera, vUv.xy);"
+      "	}"
+      "}";
+
+  return gl_shader_create(vsh,
+                          fsh,
+                          2,
+                          ((const char*[]){"position", "texcoord"}),
+                          3,
+                          ((const char*[]){"projection", "samplera", "samplerb"}),
+                          uniforms);
 }
 
-GLuint gl_shader_compile(GLenum type, const GLchar* source)
+GLuint create_color_shader(GLint* uniforms)
 {
-  GLint  status, logLength, realLength;
-  GLuint shader = 0;
+  char* vsh =
+      "#version 120\n"
+      "attribute vec3 position;"
+      "attribute vec3 texcoord;"
+      "uniform mat4 projection;"
+      "void main ( )"
+      "{"
+      "  gl_Position = projection * vec4(position,1.0);"
+      "}";
 
-  status = 0;
-  shader = glCreateShader(type);
+  char* fsh =
+      "#version 120\n"
+      "void main( )"
+      "{"
+      "  gl_FragColor = vec4(1.0,1.0,1.0,1.0);"
+      "}";
 
-  if (shader > 0)
-  {
-    glShaderSource(shader, 1, &source, NULL);
-    glCompileShader(shader);
-    glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logLength);
-
-    if (logLength > 0)
-    {
-      GLchar log[logLength];
-
-      glGetShaderInfoLog(shader,
-                         logLength,
-                         &realLength,
-                         log);
-
-      printf("Shader compile log: %s\n", log);
-    }
-
-    glGetShaderiv(shader,
-                  GL_COMPILE_STATUS,
-                  &status);
-
-    if (status != GL_TRUE)
-      return 0;
-  }
-  else
-    printf("Cannot create shader\n");
-
-  return shader;
+  return gl_shader_create(vsh,
+                          fsh,
+                          2,
+                          ((const char*[]){"position", "texcoord"}),
+                          1,
+                          ((const char*[]){"projection"}),
+                          uniforms);
 }
 
-int gl_shader_link(GLuint program)
+GLuint create_blur_shader(GLint* uniforms)
 {
-  GLint status, logLength, realLength;
 
-  glLinkProgram(program);
-  glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLength);
+  char* vsh =
+      "#version 120\n"
+      "attribute vec3 position;"
+      "attribute vec3 texcoord;"
+      "uniform mat4 projection;"
+      "uniform sampler2D samplera;"
+      "varying vec3 vUv;"
+      "void main ( )"
+      "{"
+      "  gl_Position = projection * vec4(position,1.0);"
+      "  vUv = texcoord;"
+      "}";
 
-  if (logLength > 0)
-  {
-    GLchar log[logLength];
-    glGetProgramInfoLog(program, logLength, &realLength, log);
-    printf("Program link log : %i %s\n", realLength, log);
-  }
+  char* fsh =
+      "#version 120\n"
+      "uniform sampler2D samplera;\n"
+      "varying vec3 vUv;"
+      "uniform float offset[3] = float[](0.0, 1.3846153846, 3.2307692308) ;"
+      "uniform float weight[3] = float[](0.2270270270, 0.3162162162, 0.0702702703) ;"
+      "void main( )"
+      "{"
+      "  gl_FragColor = texture2D(samplera, vUv.xy / 1024.0) * weight[0] ;"
+      "  for (int i=1; i<3; i++)"
+      "  {"
+      "  gl_FragColor += texture2D(samplera, (vUv.xy + vec2(0.0, offset[i])) / 1024.0) * weight[i];"
+      "  gl_FragColor += texture2D(samplera, (vUv.xy - vec2(0.0, offset[i])) / 1024.0) * weight[i];"
+      "  }"
+      "}";
 
-  glGetProgramiv(program, GL_LINK_STATUS, &status);
-  if (status == GL_TRUE)
-    return 1;
-  return 0;
+  return gl_shader_create(vsh,
+                          fsh,
+                          2,
+                          ((const char*[]){"position", "texcoord"}),
+                          2,
+                          ((const char*[]){"projection", "samplera"}),
+                          uniforms);
 }
-
-GLuint gl_shader_create(const char*  vertex_source,
-                        const char*  fragment_source,
-                        int          attribute_locations_length,
-                        const char** attribute_structure,
-                        int          uniform_locations_length,
-                        const char** uniform_structure,
-                        GLint*       uniform_locations)
-{
-
-  GLuint program = glCreateProgram();
-
-  GLuint vertex_shader = gl_shader_compile(GL_VERTEX_SHADER, vertex_source);
-  if (vertex_shader == 0) printf("Failed to compile vertex shader : %s\n", vertex_source);
-
-  GLuint fragment_shader = gl_shader_compile(GL_FRAGMENT_SHADER, fragment_source);
-  if (fragment_shader == 0) printf("Failed to compile fragment shader : %s\n", fragment_source);
-
-  glAttachShader(program, vertex_shader);
-  glAttachShader(program, fragment_shader);
-
-  for (int index = 0; index < attribute_locations_length; index++)
-  {
-    const GLchar* name = attribute_structure[index];
-    glBindAttribLocation(program, index, name);
-  }
-
-  int success = gl_shader_link(program);
-
-  if (success == 1)
-  {
-    for (int index = 0; index < uniform_locations_length; index++)
-    {
-      const GLchar* name       = uniform_structure[index];
-      GLint         location   = glGetUniformLocation(program, name);
-      uniform_locations[index] = location;
-    }
-  }
-  else
-    printf("Failed to link shader program\n");
-
-  if (vertex_shader > 0)
-  {
-    glDetachShader(program, vertex_shader);
-    glDeleteShader(vertex_shader);
-  }
-
-  if (fragment_shader > 0)
-  {
-    glDetachShader(program, fragment_shader);
-    glDeleteShader(fragment_shader);
-  }
-
-#ifdef DEBUG
-  gl_errors("after gl_shader_create\n");
-#endif
-
-  return program;
-}
-
-typedef struct _gltex_t
-{
-  GLuint tx;
-  GLuint fb;
-} gltex_t;
-
-int tex_index = 0;
-
-gltex_t gl_create_texture()
-{
-  gltex_t tex;
-
-  glGenTextures(1, &tex.tx);
-
-  glActiveTexture(GL_TEXTURE0 + tex_index);
-  glBindTexture(GL_TEXTURE_2D, tex.tx);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4096, 4096, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-
-  tex_index += 1;
-
-  return tex;
-
-  glGenFramebuffers(1, &tex.fb);
-  glBindFramebuffer(GL_FRAMEBUFFER, tex.fb);
-
-  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex.tx, 0);
-
-  printf("create texture %i %i\n", tex.tx, tex.fb);
-
-  return tex;
-}
-
-void gl_delete_texture(gltex_t texture)
-{
-}
-
-char* texture_vsh =
-    "#version 120\n"
-    "attribute vec3 position;"
-    "attribute vec3 texcoord;"
-    "uniform mat4 projection;"
-    "uniform sampler2D samplera;"
-    "uniform sampler2D samplerb;"
-    "varying vec3 vUv;"
-    "void main ( )"
-    "{"
-    "    gl_Position = projection * vec4(position,1.0);"
-    "    vUv = texcoord;"
-    "}";
-
-char* texture_fsh =
-    "#version 120\n"
-    "uniform sampler2D samplera;"
-    "uniform sampler2D samplerb;"
-    "varying vec3 vUv;"
-    "void main( )"
-    "{"
-    "	if (vUv.z == 1.0)"
-    "	{"
-    "		gl_FragColor = texture2D(samplerb, vUv.xy);"
-    "	}"
-    "	else"
-    "	{"
-    "		gl_FragColor = texture2D(samplera, vUv.xy);"
-    "	}"
-    "}";
-
-char* color_vsh =
-    "#version 120\n"
-    "attribute vec3 position;"
-    "attribute vec3 texcoord;"
-    "uniform mat4 projection;"
-    "void main ( )"
-    "{"
-    "  gl_Position = projection * vec4(position,1.0);"
-    "}";
-
-char* color_fsh =
-    "#version 120\n"
-    "void main( )"
-    "{"
-    "  gl_FragColor = vec4(1.0,1.0,1.0,1.0);"
-    "}";
-
-char* blur_vsh =
-    "#version 120\n"
-    "attribute vec3 position;"
-    "attribute vec3 texcoord;"
-    "uniform mat4 projection;"
-    "uniform sampler2D samplera;"
-    "varying vec3 vUv;"
-    "void main ( )"
-    "{"
-    "  gl_Position = projection * vec4(position,1.0);"
-    "  vUv = texcoord;"
-    "}";
-
-char* blur_fsh =
-    "#version 120\n"
-    "uniform sampler2D samplera;\n"
-    "varying vec3 vUv;"
-    "uniform float offset[3] = float[](0.0, 1.3846153846, 3.2307692308) ;"
-    "uniform float weight[3] = float[](0.2270270270, 0.3162162162, 0.0702702703) ;"
-    "void main( )"
-    "{"
-    "  gl_FragColor = texture2D(samplera, vUv.xy / 1024.0) * weight[0] ;"
-    "  for (int i=1; i<3; i++)"
-    "  {"
-    "  gl_FragColor += texture2D(samplera, (vUv.xy + vec2(0.0, offset[i])) / 1024.0) * weight[i];"
-    "  gl_FragColor += texture2D(samplera, (vUv.xy - vec2(0.0, offset[i])) / 1024.0) * weight[i];"
-    "  }"
-    "}";
 
 GLint unif_name_texture[3];
 GLint unif_name_color[1];
-GLint unif_name_blur[3];
+GLint unif_name_blur[2];
 
 GLuint texture_sh;
 GLuint color_sh;
@@ -303,29 +169,9 @@ void gl_init(width, height)
 {
   glewInit();
 
-  texture_sh = gl_shader_create(texture_vsh,
-                                texture_fsh,
-                                2,
-                                ((const char*[]){"position", "texcoord"}),
-                                3,
-                                ((const char*[]){"projection", "samplera", "samplerb"}),
-                                unif_name_texture);
-
-  color_sh = gl_shader_create(color_vsh,
-                              color_fsh,
-                              2,
-                              ((const char*[]){"position", "texcoord"}),
-                              1,
-                              ((const char*[]){"projection"}),
-                              unif_name_color);
-
-  blur_sh = gl_shader_create(blur_vsh,
-                             blur_fsh,
-                             2,
-                             ((const char*[]){"position", "texcoord"}),
-                             1,
-                             ((const char*[]){"projection", "samplera"}),
-                             unif_name_blur);
+  texture_sh = create_texture_shader(unif_name_texture);
+  color_sh   = create_color_shader(unif_name_color);
+  blur_sh    = create_blur_shader(unif_name_blur);
 
   // create vertex buffer
   GLuint vbuffer_name_u;

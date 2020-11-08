@@ -26,6 +26,7 @@ clang \
     -Isrc/modules/view \
     -Isrc/modules/image \
     -Isrc/modules/player \
+    src/modules/gl/gl_utils.c \
     src/modules/gl/gl_connector.c \
     src/modules/gl/gl_floatbuffer.c \
     src/modules/view/view.c \
