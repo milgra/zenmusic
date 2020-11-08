@@ -1,6 +1,7 @@
 /*
   OpenGL Connector Module for Zen Multimedia Desktop System
   Renders incoming triangles and textures to screen
+  Composes framebuffers together
 
   gl_connector -> GPU
   
@@ -337,34 +338,34 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
       0.0,
       0.0,
 
-      1024.0,
-      1024.0,
-      1.0,
-      1.0,
+      width,
+      height,
+      (float)width / 4096,
+      (float)height / 4096,
       0.0,
 
       0.0,
-      1024.0,
+      height,
       0.0,
-      1.0,
-      0.0,
-
-      0.0,
-      0.0,
-      0.0,
-      0.0,
+      (float)height / 4096,
       0.0,
 
-      1024.0,
       0.0,
-      1.0,
+      0.0,
+      0.0,
       0.0,
       0.0,
 
-      1024.0,
-      1024.0,
-      1.0,
-      1.0,
+      width,
+      0.0,
+      (float)width / 4096,
+      0.0,
+      0.0,
+
+      width,
+      height,
+      (float)width / 4096,
+      (float)height / 4096,
       0.0,
   };
 
@@ -372,7 +373,7 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 5, data, GL_DYNAMIC_DRAW);
 
   matrix4array_t projection;
-  projection.matrix = m4_defaultortho(0.0, width, height, 0, 0.0, 1.0);
+  projection.matrix = m4_defaultortho(0.0, width, 0, height, 0.0, 1.0);
   glUniformMatrix4fv(texture_sh.uni_loc[0], 1, 0, projection.array);
 
   glViewport(0, 0, width, height);
