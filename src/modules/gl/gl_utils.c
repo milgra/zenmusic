@@ -10,13 +10,18 @@ typedef struct _gltex_t
   GLuint index;
 } gltex_t;
 
-GLuint gl_shader_create(const char*  vertex_source,
-                        const char*  fragment_source,
-                        int          attribute_locations_length,
-                        const char** attribute_structure,
-                        int          uniform_locations_length,
-                        const char** uniform_structure,
-                        GLint*       uniform_locations);
+typedef struct _glsha_t
+{
+  GLuint name;
+  GLint  uni_loc[10];
+} glsha_t;
+
+glsha_t gl_shader_create(const char*  vertex_source,
+                         const char*  fragment_source,
+                         int          attribute_locations_length,
+                         const char** attribute_structure,
+                         int          uniform_locations_length,
+                         const char** uniform_structure);
 
 gltex_t gl_create_texture();
 void    gl_errors(const char* place);
@@ -99,16 +104,16 @@ int gl_shader_link(GLuint program)
   return 0;
 }
 
-GLuint gl_shader_create(const char*  vertex_source,
-                        const char*  fragment_source,
-                        int          attribute_locations_length,
-                        const char** attribute_structure,
-                        int          uniform_locations_length,
-                        const char** uniform_structure,
-                        GLint*       uniform_locations)
+glsha_t gl_shader_create(const char*  vertex_source,
+                         const char*  fragment_source,
+                         int          attribute_locations_length,
+                         const char** attribute_structure,
+                         int          uniform_locations_length,
+                         const char** uniform_structure)
 {
+  glsha_t sh = {0};
 
-  GLuint program = glCreateProgram();
+  sh.name = glCreateProgram();
 
   GLuint vertex_shader = gl_shader_compile(GL_VERTEX_SHADER, vertex_source);
   if (vertex_shader == 0) printf("Failed to compile vertex shader : %s\n", vertex_source);
@@ -116,24 +121,24 @@ GLuint gl_shader_create(const char*  vertex_source,
   GLuint fragment_shader = gl_shader_compile(GL_FRAGMENT_SHADER, fragment_source);
   if (fragment_shader == 0) printf("Failed to compile fragment shader : %s\n", fragment_source);
 
-  glAttachShader(program, vertex_shader);
-  glAttachShader(program, fragment_shader);
+  glAttachShader(sh.name, vertex_shader);
+  glAttachShader(sh.name, fragment_shader);
 
   for (int index = 0; index < attribute_locations_length; index++)
   {
     const GLchar* name = attribute_structure[index];
-    glBindAttribLocation(program, index, name);
+    glBindAttribLocation(sh.name, index, name);
   }
 
-  int success = gl_shader_link(program);
+  int success = gl_shader_link(sh.name);
 
   if (success == 1)
   {
     for (int index = 0; index < uniform_locations_length; index++)
     {
-      const GLchar* name       = uniform_structure[index];
-      GLint         location   = glGetUniformLocation(program, name);
-      uniform_locations[index] = location;
+      const GLchar* name     = uniform_structure[index];
+      GLint         location = glGetUniformLocation(sh.name, name);
+      sh.uni_loc[index]      = location;
     }
   }
   else
@@ -141,17 +146,17 @@ GLuint gl_shader_create(const char*  vertex_source,
 
   if (vertex_shader > 0)
   {
-    glDetachShader(program, vertex_shader);
+    glDetachShader(sh.name, vertex_shader);
     glDeleteShader(vertex_shader);
   }
 
   if (fragment_shader > 0)
   {
-    glDetachShader(program, fragment_shader);
+    glDetachShader(sh.name, fragment_shader);
     glDeleteShader(fragment_shader);
   }
 
-  return program;
+  return sh;
 }
 
 gltex_t gl_create_texture(int w, int h)
