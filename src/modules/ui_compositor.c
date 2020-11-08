@@ -51,6 +51,8 @@ fb_t*    fb;    // float buffer
 tm_t*    tm;    // texture map
 mtvec_t* rectv; // rectangle vector
 mtmap_t* rectm; // rectangle map
+int      comp_width;
+int      comp_height;
 
 void ui_compositor_init(int width, int height)
 {
@@ -75,8 +77,18 @@ void ui_compositor_render()
   gl_update_vertexes(fb);
   gl_update_textures(tm->bm);
   gl_clear_framebuffer(3, 1.0, 0.0, 0.0, 1.0);
-  gl_draw_vertexes_in_framebuffer(3, 0, 0, ((v4_t){0}), SH_TEXTURE);
-  gl_draw_framebuffer_in_framebuffer(3, 0, SH_TEXTURE);
+  gl_draw_vertexes_in_framebuffer(3,
+                                  0,
+                                  0,
+                                  comp_width,
+                                  comp_height,
+                                  ((v4_t){0}),
+                                  SH_TEXTURE);
+  gl_draw_framebuffer_in_framebuffer(3,
+                                     0,
+                                     comp_width,
+                                     comp_height,
+                                     SH_TEXTURE);
 }
 
 void ui_compositor_update()
@@ -184,7 +196,8 @@ void ui_compositor_set_texture(char* id, bm_t* tex)
 
 void ui_compositor_resize(int width, int height)
 {
-  gl_resize(width, height);
+  comp_width  = width;
+  comp_height = height;
 }
 
 //

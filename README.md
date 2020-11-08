@@ -14,6 +14,7 @@ view id es texture id fuggetlen legyen, lehessen tobb view ugyanazzal a texturav
 shadow & blur kulon layerre gl_rendererben
 resize textures on window change if needed
 
+unit teszter gl_compositorhoz
 flex - vertical, horizontal auto-layout
 lehessen teljes szelessegu a vizualization bar
 check leaks

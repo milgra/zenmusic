@@ -31,12 +31,21 @@ typedef struct _ver_buf_t
 } ver_buf_t;
 
 void gl_init();
-void gl_resize(int width, int height);
 void gl_update_vertexes(fb_t* fb);
 void gl_update_textures(bm_t* bmp);
-void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region, glshader_t shader);
 void gl_clear_framebuffer(int index, float r, float g, float b, float a);
-void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glshader_t shader);
+void gl_draw_vertexes_in_framebuffer(int        index,
+                                     int        start,
+                                     int        end,
+                                     int        width,
+                                     int        height,
+                                     v4_t       region,
+                                     glshader_t shader);
+void gl_draw_framebuffer_in_framebuffer(int        src_ind,
+                                        int        tgt_ind,
+                                        int        width,
+                                        int        height,
+                                        glshader_t shader);
 
 #endif
 
@@ -177,10 +186,6 @@ glsha_t texture_sh;
 glsha_t color_sh;
 glsha_t blur_sh;
 
-int context_w;
-int context_h;
-int context_fb;
-
 gltex_t textures[10] = {0};
 
 ver_buf_t ver_buf_a;
@@ -198,9 +203,10 @@ void gl_init(width, height)
 
   // create textures
 
-  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &context_fb);
+  GLint def_fb;
+  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &def_fb);
 
-  textures[0].fb = context_fb;          // context's buffer for drawing
+  textures[0].fb = def_fb;              // context's buffer for drawing
   textures[1]    = gl_create_texture(); // texture map
   textures[2]    = gl_create_texture(); // video texture
   textures[3]    = gl_create_texture(); // offscreen buffer
@@ -209,14 +215,6 @@ void gl_init(width, height)
 
   ver_buf_a = create_vertex_buffer();
   ver_buf_b = create_vertex_buffer();
-}
-
-void gl_resize(int width, int height)
-{
-  printf("gl resize %i %i\n", width, height);
-
-  context_w = width;
-  context_h = height;
 }
 
 // update vertexes
@@ -252,7 +250,13 @@ void gl_clear_framebuffer(int index, float r, float g, float b, float a)
 }
 
 // draw vertexes into selected framebuffer
-void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region, glshader_t shader)
+void gl_draw_vertexes_in_framebuffer(int        index,
+                                     int        start,
+                                     int        end,
+                                     int        width,
+                                     int        height,
+                                     v4_t       region,
+                                     glshader_t shader)
 {
 
   if (shader == SH_TEXTURE)
@@ -262,11 +266,11 @@ void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region,
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     // use full context for projection
     matrix4array_t projection;
-    projection.matrix = m4_defaultortho(0.0, context_w, context_h, 0, 0.0, 1.0);
+    projection.matrix = m4_defaultortho(0.0, width, height, 0, 0.0, 1.0);
 
     // set projection and viewport
     glUniformMatrix4fv(texture_sh.uni_loc[0], 1, 0, projection.array);
-    glViewport(0, 0, context_w, context_h);
+    glViewport(0, 0, width, height);
 
     //glScissor(200, 200, 100, 100);
     //glEnable(GL_SCISSOR_TEST);
@@ -280,22 +284,22 @@ void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region,
     glUseProgram(color_sh.name);
     // use full context for projection
     matrix4array_t projection;
-    projection.matrix = m4_defaultortho(0.0, context_w, context_h, 0, 0.0, 1.0);
+    projection.matrix = m4_defaultortho(0.0, width, height, 0, 0.0, 1.0);
 
     // set projection and viewport
     glUniformMatrix4fv(color_sh.uni_loc[0], 1, 0, projection.array);
-    glViewport(0, 0, context_w, context_h);
+    glViewport(0, 0, width, height);
   }
   else if (shader == SH_BLUR)
   {
     glUseProgram(blur_sh.name);
     // use full context for projection
     matrix4array_t projection;
-    projection.matrix = m4_defaultortho(0.0, context_w, context_h, 0, 0.0, 1.0);
+    projection.matrix = m4_defaultortho(0.0, width, height, 0, 0.0, 1.0);
 
     // set projection and viewport
     glUniformMatrix4fv(blur_sh.uni_loc[0], 1, 0, projection.array);
-    glViewport(0, 0, context_w, context_h);
+    glViewport(0, 0, width, height);
 
     // set textures
     glUniform1i(blur_sh.uni_loc[1], 0);
@@ -313,7 +317,11 @@ void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region,
   glBindVertexArray(0);
 }
 
-void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glshader_t shader)
+void gl_draw_framebuffer_in_framebuffer(int        src_ind,
+                                        int        tgt_ind,
+                                        int        width,
+                                        int        height,
+                                        glshader_t shader)
 {
 
   if (shader == SH_TEXTURE)
@@ -364,10 +372,10 @@ void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glshader_t sha
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 5, data, GL_DYNAMIC_DRAW);
 
   matrix4array_t projection;
-  projection.matrix = m4_defaultortho(0.0, context_w, context_h, 0, 0.0, 1.0);
+  projection.matrix = m4_defaultortho(0.0, width, height, 0, 0.0, 1.0);
   glUniformMatrix4fv(texture_sh.uni_loc[0], 1, 0, projection.array);
 
-  glViewport(0, 0, context_w, context_h);
+  glViewport(0, 0, width, height);
 
   glBindFramebuffer(GL_FRAMEBUFFER, textures[tgt_ind].fb);
   glBindVertexArray(ver_buf_b.vao);
