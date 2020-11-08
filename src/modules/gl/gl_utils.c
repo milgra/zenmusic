@@ -7,6 +7,7 @@ typedef struct _gltex_t
 {
   GLuint tx;
   GLuint fb;
+  GLuint index;
 } gltex_t;
 
 GLuint gl_shader_create(const char*  vertex_source,
@@ -157,9 +158,11 @@ gltex_t gl_create_texture(int w, int h)
 {
   gltex_t tex;
 
+  tex.index = tex_index++;
+
   glGenTextures(1, &tex.tx);
 
-  glActiveTexture(GL_TEXTURE0 + tex_index);
+  glActiveTexture(GL_TEXTURE0 + tex.index);
   glBindTexture(GL_TEXTURE_2D, tex.tx);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -167,16 +170,10 @@ gltex_t gl_create_texture(int w, int h)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
-  tex_index += 1;
-
-  return tex;
-
   glGenFramebuffers(1, &tex.fb);
   glBindFramebuffer(GL_FRAMEBUFFER, tex.fb);
 
   glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex.tx, 0);
-
-  printf("create texture %i %i\n", tex.tx, tex.fb);
 
   return tex;
 }

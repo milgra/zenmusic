@@ -247,6 +247,7 @@ void gl_clear_framebuffer(int index)
   // > 1 - other frame buffers
   glBindFramebuffer(GL_FRAMEBUFFER, textures[index].fb);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 // draw vertexes into selected framebuffer
@@ -303,25 +304,76 @@ void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region,
   //glEnable(GL_SCISSOR_TEST);
 
   glBindVertexArray(ver_arr_a);
-
   glBindFramebuffer(GL_FRAMEBUFFER, textures[index].fb);
+
   glDrawArrays(GL_TRIANGLES, 0, floatbuffer->pos / 5);
 
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glBindVertexArray(0);
 }
 
 void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glshader_t shader)
 {
 
-  glBindFramebuffer(GL_FRAMEBUFFER, textures[tgt_ind].fb);
-
   if (shader == SH_TEXTURE)
   {
-    glUseProgram(blur_sh);
-    glUniform1i(unif_name_texture[1], src_ind);
+    glUseProgram(texture_sh);
+    glUniform1i(unif_name_texture[1], textures[src_ind].index);
   }
 
-  glViewport(0.0, 0.0, 2048, 2048);
+  GLfloat data[] = {
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+
+      1024.0,
+      1024.0,
+      1.0,
+      1.0,
+      0.0,
+
+      0.0,
+      1024.0,
+      0.0,
+      1.0,
+      0.0,
+
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+
+      1024.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0,
+
+      1024.0,
+      1024.0,
+      1.0,
+      1.0,
+      0.0,
+  };
+
+  glBindBuffer(GL_ARRAY_BUFFER, ver_buf_b);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 5, data, GL_DYNAMIC_DRAW);
+
+  matrix4array_t projection;
+  projection.matrix = m4_defaultortho(0.0, context_w, context_h, 0, 0.0, 1.0);
+  glUniformMatrix4fv(unif_name_texture[0], 1, 0, projection.array);
+
+  glViewport(0, 0, context_w, context_h);
+
+  glBindFramebuffer(GL_FRAMEBUFFER, textures[tgt_ind].fb);
+  glBindVertexArray(ver_arr_b);
+
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 // blur selected framebuffer
