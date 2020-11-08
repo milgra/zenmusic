@@ -23,6 +23,13 @@ typedef enum _glshader_t // texture loading state
   SH_BLUR
 } glshader_t;
 
+typedef struct _ver_buf_t
+{
+  GLuint vbo;
+  GLuint vao;
+  fb_t*  flo_buf;
+} ver_buf_t;
+
 void gl_init();
 void gl_resize(int width, int height);
 void gl_update_vertexes(fb_t* fb);
@@ -37,7 +44,6 @@ void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glshader_t sha
 
 #include "gl_utils.c"
 #include "mtmath2.c"
-#include <GL/glew.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -149,6 +155,24 @@ glsha_t create_blur_shader()
                           ((const char*[]){"projection", "samplera"}));
 }
 
+ver_buf_t create_vertex_buffer()
+{
+  ver_buf_t vb = {0};
+
+  glGenBuffers(1, &vb.vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vb.vbo);
+  glGenVertexArrays(1, &vb.vao);
+  glBindVertexArray(vb.vao);
+  glEnableVertexAttribArray(0);
+  glEnableVertexAttribArray(1);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 20, 0);
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 20, (const GLvoid*)8);
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  return vb;
+}
+
 glsha_t texture_sh;
 glsha_t color_sh;
 glsha_t blur_sh;
@@ -157,13 +181,10 @@ int context_w;
 int context_h;
 int context_fb;
 
-fb_t*   floatbuffer;
 gltex_t textures[10] = {0};
 
-GLuint ver_arr_a;
-GLuint ver_arr_b;
-GLuint ver_buf_a;
-GLuint ver_buf_b;
+ver_buf_t ver_buf_a;
+ver_buf_t ver_buf_b;
 
 void gl_init(width, height)
 {
@@ -179,34 +200,15 @@ void gl_init(width, height)
 
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &context_fb);
 
-  textures[0].fb = context_fb;                    // context's buffer for drawing
-  textures[1]    = gl_create_texture(4096, 4096); // texture map
-  textures[2]    = gl_create_texture(4096, 4096); // video texture
-  textures[3]    = gl_create_texture(4096, 4096); // offscreen buffer
+  textures[0].fb = context_fb;          // context's buffer for drawing
+  textures[1]    = gl_create_texture(); // texture map
+  textures[2]    = gl_create_texture(); // video texture
+  textures[3]    = gl_create_texture(); // offscreen buffer
 
   // create vertex buffers
 
-  glGenBuffers(1, &ver_buf_a);
-  glBindBuffer(GL_ARRAY_BUFFER, ver_buf_a);
-  glGenVertexArrays(1, &ver_arr_a);
-  glBindVertexArray(ver_arr_a);
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 20, 0);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 20, (const GLvoid*)8);
-  glBindVertexArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-  glGenBuffers(1, &ver_buf_b);
-  glBindBuffer(GL_ARRAY_BUFFER, ver_buf_b);
-  glGenVertexArrays(1, &ver_arr_b);
-  glBindVertexArray(ver_arr_b);
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 20, 0);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 20, (const GLvoid*)8);
-  glBindVertexArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  ver_buf_a = create_vertex_buffer();
+  ver_buf_b = create_vertex_buffer();
 }
 
 void gl_resize(int width, int height)
@@ -220,15 +222,22 @@ void gl_resize(int width, int height)
 // update vertexes
 void gl_update_vertexes(fb_t* fb)
 {
-  glBindBuffer(GL_ARRAY_BUFFER, ver_buf_a);
+  glBindBuffer(GL_ARRAY_BUFFER, ver_buf_a.vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * fb->pos, fb->data, GL_DYNAMIC_DRAW);
-  floatbuffer = fb;
+  ver_buf_a.flo_buf = fb;
 }
 
 // update texture map
 void gl_update_textures(bm_t* bmp)
 {
   glActiveTexture(GL_TEXTURE0);
+
+  if (bmp->w != textures[1].w || bmp->h != textures[1].h)
+  {
+    // resize texture and framebuffer
+  }
+
+  // when size is the same use subimage for speed
   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, bmp->w, bmp->h, GL_RGBA, GL_UNSIGNED_BYTE, bmp->data);
 }
 
@@ -295,10 +304,10 @@ void gl_draw_vertexes_in_framebuffer(int index, int start, int end, v4_t region,
   //glScissor(200, 200, 100, 100);
   //glEnable(GL_SCISSOR_TEST);
 
-  glBindVertexArray(ver_arr_a);
+  glBindVertexArray(ver_buf_a.vao);
   glBindFramebuffer(GL_FRAMEBUFFER, textures[index].fb);
 
-  glDrawArrays(GL_TRIANGLES, 0, floatbuffer->pos / 5);
+  glDrawArrays(GL_TRIANGLES, 0, ver_buf_a.flo_buf->pos / 5);
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glBindVertexArray(0);
@@ -351,7 +360,7 @@ void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glshader_t sha
       0.0,
   };
 
-  glBindBuffer(GL_ARRAY_BUFFER, ver_buf_b);
+  glBindBuffer(GL_ARRAY_BUFFER, ver_buf_b.vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 5, data, GL_DYNAMIC_DRAW);
 
   matrix4array_t projection;
@@ -361,7 +370,7 @@ void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glshader_t sha
   glViewport(0, 0, context_w, context_h);
 
   glBindFramebuffer(GL_FRAMEBUFFER, textures[tgt_ind].fb);
-  glBindVertexArray(ver_arr_b);
+  glBindVertexArray(ver_buf_b.vao);
 
   glDrawArrays(GL_TRIANGLES, 0, 6);
 
