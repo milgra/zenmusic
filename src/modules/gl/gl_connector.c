@@ -161,6 +161,7 @@ GLuint blur_sh;
 
 int context_w;
 int context_h;
+int context_fb;
 
 fb_t*   floatbuffer;
 gltex_t textures[10] = {0};
@@ -169,9 +170,19 @@ void gl_init(width, height)
 {
   glewInit();
 
+  // create shaders
+
   texture_sh = create_texture_shader(unif_name_texture);
   color_sh   = create_color_shader(unif_name_color);
   blur_sh    = create_blur_shader(unif_name_blur);
+
+  // create textures
+
+  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &context_fb);
+
+  textures[0].fb = context_fb;
+  textures[1]    = gl_create_texture(4096, 4096);
+  textures[2]    = gl_create_texture(4096, 4096);
 
   // create vertex buffer
   GLuint vbuffer_name_u;
@@ -187,14 +198,6 @@ void gl_init(width, height)
 
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-  int context_fb;
-  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &context_fb);
-  // glGetIntegerv(GL_RENDERBUFFER_BINDING, &contextRenderBuffer);
-
-  textures[0].fb = context_fb;
-  textures[1]    = gl_create_texture();
-  textures[2]    = gl_create_texture();
 }
 
 void gl_resize(int width, int height)
