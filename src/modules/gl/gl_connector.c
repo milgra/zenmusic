@@ -209,38 +209,81 @@ void gl_delete_texture(gltex_t texture)
 }
 
 char* texture_vsh =
-#include "texture.vsh"
-    ;
+    "#version 120\n"
+    "attribute vec3 position;"
+    "attribute vec3 texcoord;"
+    "uniform mat4 projection;"
+    "uniform sampler2D samplera;"
+    "uniform sampler2D samplerb;"
+    "varying vec3 vUv;"
+    "void main ( )"
+    "{"
+    "    gl_Position = projection * vec4(position,1.0);"
+    "    vUv = texcoord;"
+    "}";
+
 char* texture_fsh =
-#include "texture.fsh"
-    ;
+    "#version 120\n"
+    "uniform sampler2D samplera;"
+    "uniform sampler2D samplerb;"
+    "varying vec3 vUv;"
+    "void main( )"
+    "{"
+    "	if (vUv.z == 1.0)"
+    "	{"
+    "		gl_FragColor = texture2D(samplerb, vUv.xy);"
+    "	}"
+    "	else"
+    "	{"
+    "		gl_FragColor = texture2D(samplera, vUv.xy);"
+    "	}"
+    "}";
 
 char* color_vsh =
-#include "color.vsh"
-    ;
+    "#version 120\n"
+    "attribute vec3 position;"
+    "attribute vec3 texcoord;"
+    "uniform mat4 projection;"
+    "void main ( )"
+    "{"
+    "  gl_Position = projection * vec4(position,1.0);"
+    "}";
+
 char* color_fsh =
-#include "color.fsh"
-    ;
+    "#version 120\n"
+    "void main( )"
+    "{"
+    "  gl_FragColor = vec4(1.0,1.0,1.0,1.0);"
+    "}";
 
 char* blur_vsh =
-#include "blur.vsh"
-    ;
+    "#version 120\n"
+    "attribute vec3 position;"
+    "attribute vec3 texcoord;"
+    "uniform mat4 projection;"
+    "uniform sampler2D samplera;"
+    "varying vec3 vUv;"
+    "void main ( )"
+    "{"
+    "  gl_Position = projection * vec4(position,1.0);"
+    "  vUv = texcoord;"
+    "}";
 
 char* blur_fsh =
     "#version 120\n"
     "uniform sampler2D samplera;\n"
-    "varying vec3 vUv;\n"
-    "uniform float offset[3] = float[](0.0, 1.3846153846, 3.2307692308);\n"
-    "uniform float weight[3] = float[](0.2270270270, 0.3162162162, 0.0702702703);\n"
-    "void main( )\n"
-    "{\n"
-    "gl_FragColor = texture2D(samplera, vUv.xy / 1024.0) * weight[0];\n"
-    "for (int i=1; i<3; i++)\n"
-    "{\n"
-    "gl_FragColor += texture2D(samplera, (vUv.xy + vec2(0.0, offset[i])) / 1024.0) * weight[i];\n"
-    "gl_FragColor += texture2D(samplera, (vUv.xy - vec2(0.0, offset[i])) / 1024.0) * weight[i];\n"
-    "}\n"
-    "}\n";
+    "varying vec3 vUv;"
+    "uniform float offset[3] = float[](0.0, 1.3846153846, 3.2307692308) ;"
+    "uniform float weight[3] = float[](0.2270270270, 0.3162162162, 0.0702702703) ;"
+    "void main( )"
+    "{"
+    "  gl_FragColor = texture2D(samplera, vUv.xy / 1024.0) * weight[0] ;"
+    "  for (int i=1; i<3; i++)"
+    "  {"
+    "  gl_FragColor += texture2D(samplera, (vUv.xy + vec2(0.0, offset[i])) / 1024.0) * weight[i];"
+    "  gl_FragColor += texture2D(samplera, (vUv.xy - vec2(0.0, offset[i])) / 1024.0) * weight[i];"
+    "  }"
+    "}";
 
 GLint unif_name_texture[3];
 GLint unif_name_color[1];
