@@ -40,10 +40,14 @@ void gl_draw_vertexes_in_framebuffer(int        index,
                                      int        end,
                                      int        width,
                                      int        height,
+                                     int        tgt_w,
+                                     int        tht_h,
                                      v4_t       region,
                                      glshader_t shader);
 void gl_draw_framebuffer_in_framebuffer(int        src_ind,
                                         int        tgt_ind,
+                                        int        src_w,
+                                        int        src_h,
                                         int        width,
                                         int        height,
                                         glshader_t shader);
@@ -151,8 +155,8 @@ glsha_t create_blur_shader()
       " float Pi = 6.28318530718;" // pi * 2
 
       " float Directions = 16.0;" // BLUR DIRECTIONS (Default 16.0 - More is better but slower)
-      " float Quality    = 6.0;"  // BLUR QUALITY (Default 4.0 - More is better but slower)
-      " float Size       = 16.0;" // BLUR SIZE (Radius)
+      " float Quality    = 4.0;"  // BLUR QUALITY (Default 4.0 - More is better but slower)
+      " float Size       = 8.0;"  // BLUR SIZE (Radius)
       " vec2 Radius = Size / vec2(4096,4096);"
 
       // Pixel colour
@@ -270,6 +274,8 @@ void gl_draw_vertexes_in_framebuffer(int        index,
                                      int        end,
                                      int        width,
                                      int        height,
+                                     int        tgt_w,
+                                     int        tgt_h,
                                      v4_t       region,
                                      glshader_t shader)
 {
@@ -285,7 +291,7 @@ void gl_draw_vertexes_in_framebuffer(int        index,
 
     // set projection and viewport
     glUniformMatrix4fv(texture_sh.uni_loc[0], 1, 0, projection.array);
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, tgt_w, tgt_h);
 
     //glScissor(200, 200, 100, 100);
     //glEnable(GL_SCISSOR_TEST);
@@ -303,7 +309,7 @@ void gl_draw_vertexes_in_framebuffer(int        index,
 
     // set projection and viewport
     glUniformMatrix4fv(color_sh.uni_loc[0], 1, 0, projection.array);
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, tgt_w, tgt_h);
   }
   else if (shader == SH_BLUR)
   {
@@ -314,7 +320,7 @@ void gl_draw_vertexes_in_framebuffer(int        index,
 
     // set projection and viewport
     glUniformMatrix4fv(blur_sh.uni_loc[0], 1, 0, projection.array);
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, tgt_w, tgt_h);
 
     // set textures
     glUniform1i(blur_sh.uni_loc[1], 0);
@@ -334,6 +340,8 @@ void gl_draw_vertexes_in_framebuffer(int        index,
 
 void gl_draw_framebuffer_in_framebuffer(int        src_ind,
                                         int        tgt_ind,
+                                        int        src_w,
+                                        int        src_h,
                                         int        width,
                                         int        height,
                                         glshader_t shader)
@@ -359,14 +367,14 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
 
       width,
       height,
-      (float)width / 4096,
-      (float)height / 4096,
+      (float)src_w / 4096,
+      (float)src_h / 4096,
       0.0,
 
       0.0,
       height,
       0.0,
-      (float)height / 4096,
+      (float)src_h / 4096,
       0.0,
 
       0.0,
@@ -377,14 +385,14 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
 
       width,
       0.0,
-      (float)width / 4096,
+      (float)src_w / 4096,
       0.0,
       0.0,
 
       width,
       height,
-      (float)width / 4096,
-      (float)height / 4096,
+      (float)src_w / 4096,
+      (float)src_h / 4096,
       0.0,
   };
 

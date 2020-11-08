@@ -77,15 +77,22 @@ void ui_compositor_render()
   gl_update_vertexes(fb);
   gl_update_textures(tm->bm);
   gl_clear_framebuffer(3, 0.0, 0.0, 0.0, 1.0);
+
   gl_draw_vertexes_in_framebuffer(3,
                                   0,
                                   0,
                                   comp_width,
                                   comp_height,
+                                  512,
+                                  512,
                                   ((v4_t){0}),
                                   SH_TEXTURE);
+
+  // first blur from small fb to small fb to speed up
   gl_draw_framebuffer_in_framebuffer(3,
                                      0,
+                                     512,
+                                     512,
                                      comp_width,
                                      comp_height,
                                      SH_BLUR);
