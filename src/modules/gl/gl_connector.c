@@ -46,19 +46,14 @@ void gl_clear_framebuffer(int index, float r, float g, float b, float a);
 void gl_draw_vertexes_in_framebuffer(int        index,
                                      int        start,
                                      int        end,
-                                     int        width,
-                                     int        height,
-                                     int        tgt_w,
-                                     int        tht_h,
-                                     region_t   region,
+                                     region_t   source_region,
+                                     region_t   target_region,
                                      glshader_t shader);
 void gl_draw_framebuffer_in_framebuffer(int        src_ind,
                                         int        tgt_ind,
-                                        int        src_w,
-                                        int        src_h,
-                                        int        width,
-                                        int        height,
-                                        region_t   region,
+                                        region_t   source_region,
+                                        region_t   target_region,
+                                        region_t   window,
                                         glshader_t shader);
 
 #endif
@@ -279,14 +274,12 @@ void gl_clear_framebuffer(int index, float r, float g, float b, float a)
 }
 
 // draw vertexes into selected framebuffer
+
 void gl_draw_vertexes_in_framebuffer(int        index,
                                      int        start,
                                      int        end,
-                                     int        width,
-                                     int        height,
-                                     int        tgt_w,
-                                     int        tgt_h,
-                                     region_t   region,
+                                     region_t   reg_src,
+                                     region_t   reg_tgt,
                                      glshader_t shader)
 {
 
@@ -295,42 +288,32 @@ void gl_draw_vertexes_in_framebuffer(int        index,
     glUseProgram(texture_sh.name);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    // use full context for projection
+
     matrix4array_t projection;
-    projection.matrix = m4_defaultortho(0.0, width, height, 0, 0.0, 1.0);
-
-    // set projection and viewport
+    projection.matrix = m4_defaultortho(0.0, reg_src.w, reg_src.h, 0, 0.0, 1.0);
     glUniformMatrix4fv(texture_sh.uni_loc[0], 1, 0, projection.array);
-    glViewport(0, 0, tgt_w, tgt_h);
+    glViewport(0, 0, reg_tgt.w, reg_tgt.h);
 
-    //glScissor(200, 200, 100, 100);
-    //glEnable(GL_SCISSOR_TEST);
-
-    // set textures
     glUniform1i(texture_sh.uni_loc[1], 0);
     glUniform1i(texture_sh.uni_loc[2], 1);
   }
   else if (shader == SH_COLOR)
   {
     glUseProgram(color_sh.name);
-    // use full context for projection
-    matrix4array_t projection;
-    projection.matrix = m4_defaultortho(0.0, width, height, 0, 0.0, 1.0);
 
-    // set projection and viewport
+    matrix4array_t projection;
+    projection.matrix = m4_defaultortho(0.0, reg_src.w, reg_src.h, 0, 0.0, 1.0);
     glUniformMatrix4fv(color_sh.uni_loc[0], 1, 0, projection.array);
-    glViewport(0, 0, tgt_w, tgt_h);
+    glViewport(0, 0, reg_tgt.w, reg_tgt.h);
   }
   else if (shader == SH_BLUR)
   {
     glUseProgram(blur_sh.name);
-    // use full context for projection
-    matrix4array_t projection;
-    projection.matrix = m4_defaultortho(0.0, width, height, 0, 0.0, 1.0);
 
-    // set projection and viewport
+    matrix4array_t projection;
+    projection.matrix = m4_defaultortho(0.0, reg_src.w, reg_src.h, 0, 0.0, 1.0);
     glUniformMatrix4fv(blur_sh.uni_loc[0], 1, 0, projection.array);
-    glViewport(0, 0, tgt_w, tgt_h);
+    glViewport(0, 0, reg_tgt.w, reg_tgt.h);
 
     // set textures
     glUniform1i(blur_sh.uni_loc[1], 0);
@@ -347,11 +330,9 @@ void gl_draw_vertexes_in_framebuffer(int        index,
 
 void gl_draw_framebuffer_in_framebuffer(int        src_ind,
                                         int        tgt_ind,
-                                        int        src_w,
-                                        int        src_h,
-                                        int        width,
-                                        int        height,
-                                        region_t   region,
+                                        region_t   src_reg,
+                                        region_t   tgt_reg,
+                                        region_t   window,
                                         glshader_t shader)
 {
 
@@ -370,36 +351,36 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
       0.0,
       0.0,
       0.0,
-      (float)src_h / 4096,
+      (float)src_reg.h / 4096,
       0.0,
 
-      width,
-      height,
-      (float)src_w / 4096,
-      0.0,
-      0.0,
-
-      0.0,
-      height,
-      0.0,
+      tgt_reg.w,
+      tgt_reg.h,
+      (float)src_reg.w / 4096,
       0.0,
       0.0,
 
       0.0,
+      tgt_reg.h,
       0.0,
       0.0,
-      (float)src_h / 4096,
-      0.0,
-
-      width,
-      0.0,
-      (float)src_w / 4096,
-      (float)src_h / 4096,
       0.0,
 
-      width,
-      height,
-      (float)src_w / 4096,
+      0.0,
+      0.0,
+      0.0,
+      (float)src_reg.h / 4096,
+      0.0,
+
+      tgt_reg.w,
+      0.0,
+      (float)src_reg.w / 4096,
+      (float)src_reg.h / 4096,
+      0.0,
+
+      tgt_reg.w,
+      tgt_reg.h,
+      (float)src_reg.w / 4096,
       0.0,
       0.0,
   };
@@ -408,19 +389,19 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 5, data, GL_DYNAMIC_DRAW);
 
   matrix4array_t projection;
-  projection.matrix = m4_defaultortho(0.0, width, height, 0.0, 0.0, 1.0);
+  projection.matrix = m4_defaultortho(0.0, tgt_reg.w, tgt_reg.h, 0.0, 0.0, 1.0);
   glUniformMatrix4fv(texture_sh.uni_loc[0], 1, 0, projection.array);
 
-  glViewport(0, 0, width, height);
+  glViewport(0, 0, tgt_reg.w, tgt_reg.h);
 
   glBindFramebuffer(GL_FRAMEBUFFER, textures[tgt_ind].fb);
   glBindVertexArray(vertexes[1].vao);
 
-  if (region.w > 0)
+  if (window.w > 0)
   {
     glEnable(GL_SCISSOR_TEST);
     // upside down
-    glScissor(region.x, height - region.y - region.h, region.w, region.h);
+    glScissor(window.x, tgt_reg.h - window.y - window.h, window.w, window.h);
   }
 
   glDrawArrays(GL_TRIANGLES, 0, 6);
