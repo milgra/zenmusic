@@ -50,7 +50,7 @@ void gl_draw_vertexes_in_framebuffer(int        index,
                                      int        height,
                                      int        tgt_w,
                                      int        tht_h,
-                                     v4_t       region,
+                                     region_t   region,
                                      glshader_t shader);
 void gl_draw_framebuffer_in_framebuffer(int        src_ind,
                                         int        tgt_ind,
@@ -165,7 +165,7 @@ glsha_t create_blur_shader()
 
       " float Directions = 16.0;" // BLUR DIRECTIONS (Default 16.0 - More is better but slower)
       " float Quality    = 4.0;"  // BLUR QUALITY (Default 4.0 - More is better but slower)
-      " float Size       = 8.0;"  // BLUR SIZE (Radius)
+      " float Size       = 10.0;" // BLUR SIZE (Radius)
       " vec2 Radius = Size / vec2(4096,4096);"
 
       // Pixel colour
@@ -285,7 +285,7 @@ void gl_draw_vertexes_in_framebuffer(int        index,
                                      int        height,
                                      int        tgt_w,
                                      int        tgt_h,
-                                     v4_t       region,
+                                     region_t   region,
                                      glshader_t shader)
 {
 

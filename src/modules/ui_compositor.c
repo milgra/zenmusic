@@ -97,7 +97,7 @@ void ui_compositor_render()
                                       comp_height,
                                       comp_width,
                                       comp_height,
-                                      ((v4_t){0}),
+                                      ((region_t){0}),
                                       SH_TEXTURE);
       last = index;
 
@@ -113,7 +113,7 @@ void ui_compositor_render()
                                         comp_height,
                                         comp_width / 2,
                                         comp_height / 2,
-                                        ((v4_t){0}),
+                                        ((region_t){0}),
                                         SH_COLOR);
         // blur offscreen buffer for soft shadows
         gl_draw_framebuffer_in_framebuffer(4,
@@ -122,7 +122,7 @@ void ui_compositor_render()
                                            comp_height / 2,
                                            comp_width / 2,
                                            comp_height / 2,
-                                           ((region_t){.x = 0, .y = 0, .w = 0, .h = 0}),
+                                           ((region_t){0}),
                                            SH_BLUR);
         // draw offscreen buffer on final buffer
         gl_draw_framebuffer_in_framebuffer(5,
@@ -131,7 +131,7 @@ void ui_compositor_render()
                                            comp_height / 2,
                                            comp_width,
                                            comp_height,
-                                           ((region_t){.x = 0, .y = 0, .w = 0, .h = 0}),
+                                           ((region_t){0}),
                                            SH_TEXTURE);
       }
       if (rect->blur)
@@ -146,7 +146,7 @@ void ui_compositor_render()
                                            comp_height,
                                            comp_width / 2,
                                            comp_height / 2,
-                                           ((region_t){.x = 0, .y = 0, .w = 0, .h = 0}),
+                                           ((region_t){0}),
                                            SH_BLUR);
         // blur offscreen buffer for soft shadows
         gl_draw_framebuffer_in_framebuffer(4,
@@ -155,7 +155,7 @@ void ui_compositor_render()
                                            comp_height / 2,
                                            comp_width / 2,
                                            comp_height / 2,
-                                           ((region_t){.x = 0, .y = 0, .w = 0, .h = 0}),
+                                           ((region_t){0}),
                                            SH_BLUR);
         // draw blurred buffer on final buffer inside the view
         gl_draw_framebuffer_in_framebuffer(5,
@@ -180,7 +180,7 @@ void ui_compositor_render()
                                     comp_height,
                                     comp_width,
                                     comp_height,
-                                    ((v4_t){0}),
+                                    ((region_t){0}),
                                     SH_TEXTURE);
   }
 
@@ -191,7 +191,7 @@ void ui_compositor_render()
                                      comp_height,
                                      comp_width,
                                      comp_height,
-                                     ((region_t){.x = 0, .y = 0, .w = 0, .h = 0}),
+                                     ((region_t){0}),
                                      SH_TEXTURE);
 }
 
