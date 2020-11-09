@@ -14,7 +14,7 @@
 void ui_compositor_init(int, int);
 void ui_compositor_render();
 void ui_compositor_reset();
-void ui_compositor_add(char* id, uint32_t index, int channel, int x, int y, int w, int h, float tx, float ty, float tz, float tw);
+void ui_compositor_add(char* id, uint32_t index, int channel, int x, int y, int w, int h, float tx, float ty, float tz, float tw, char shadow, char blurred);
 void ui_compositor_rem(char* id);
 void ui_compositor_set_index(char* id, uint32_t index);
 void ui_compositor_set_frame(char* id, int x, int y, int w, int h);
@@ -26,6 +26,8 @@ typedef struct _crect_t
   char*    id;
   float    data[30];
   uint32_t index;
+  char     shadow;
+  char     blurred;
 } crect_t;
 
 crect_t* crect_new(char* id, uint32_t index, uint32_t channel, float x, float y, float w, float h, float tx, float ty, float tz, float tw);
@@ -76,26 +78,36 @@ void ui_compositor_render()
 {
   gl_update_vertexes(fb);
   gl_update_textures(tm->bm);
-  gl_clear_framebuffer(3, 0.0, 0.0, 0.0, 1.0);
+  gl_clear_framebuffer(0, 0.0, 0.0, 0.0, 1.0);
 
+  // draw in smaller buffer for fast blur
   gl_draw_vertexes_in_framebuffer(3,
                                   0,
                                   0,
                                   comp_width,
                                   comp_height,
-                                  512,
-                                  512,
+                                  comp_width / 2,
+                                  comp_height / 2,
                                   ((v4_t){0}),
                                   SH_TEXTURE);
 
-  // first blur from small fb to small fb to speed up
+  // blur to same size
   gl_draw_framebuffer_in_framebuffer(3,
+                                     4,
+                                     comp_width / 2,
+                                     comp_height / 2,
+                                     comp_width / 2,
+                                     comp_height / 2,
+                                     SH_BLUR);
+
+  // first blur from small fb to small fb to speed up
+  gl_draw_framebuffer_in_framebuffer(4,
                                      0,
-                                     512,
-                                     512,
+                                     comp_width / 2,
+                                     comp_height / 2,
                                      comp_width,
                                      comp_height,
-                                     SH_BLUR);
+                                     SH_TEXTURE);
 }
 
 void ui_compositor_update()
@@ -115,7 +127,19 @@ void ui_compositor_update()
   }
 }
 
-void ui_compositor_add(char* id, uint32_t index, int channel, int x, int y, int w, int h, float tx, float ty, float tz, float tw)
+void ui_compositor_add(char*    id,
+                       uint32_t index,
+                       int      channel,
+                       int      x,
+                       int      y,
+                       int      w,
+                       int      h,
+                       float    tx,
+                       float    ty,
+                       float    tz,
+                       float    tw,
+                       char     shadow,
+                       char     blurred)
 {
   // printf("ui_compositor_add %s index %i channel %i %i %i %i %i\n", id, index, channel, x, y, w, h);
   crect_t* rect = crect_new(id, index, channel, x, y, w, h, tx, ty, tz, tw);

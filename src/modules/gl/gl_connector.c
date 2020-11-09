@@ -205,10 +205,8 @@ glsha_t texture_sh;
 glsha_t color_sh;
 glsha_t blur_sh;
 
-gltex_t textures[10] = {0};
-
-ver_buf_t ver_buf_a;
-ver_buf_t ver_buf_b;
+gltex_t   textures[10] = {0};
+ver_buf_t vertexes[10] = {0};
 
 void gl_init(width, height)
 {
@@ -229,19 +227,20 @@ void gl_init(width, height)
   textures[1]    = gl_create_texture(); // texture map
   textures[2]    = gl_create_texture(); // video texture
   textures[3]    = gl_create_texture(); // offscreen buffer
+  textures[4]    = gl_create_texture(); // offscreen buffer
 
   // create vertex buffers
 
-  ver_buf_a = create_vertex_buffer();
-  ver_buf_b = create_vertex_buffer();
+  vertexes[0] = create_vertex_buffer();
+  vertexes[1] = create_vertex_buffer();
 }
 
 // update vertexes
 void gl_update_vertexes(fb_t* fb)
 {
-  glBindBuffer(GL_ARRAY_BUFFER, ver_buf_a.vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexes[0].vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * fb->pos, fb->data, GL_DYNAMIC_DRAW);
-  ver_buf_a.flo_buf = fb;
+  vertexes[0].flo_buf = fb;
 }
 
 // update texture map
@@ -329,10 +328,10 @@ void gl_draw_vertexes_in_framebuffer(int        index,
   //glScissor(200, 200, 100, 100);
   //glEnable(GL_SCISSOR_TEST);
 
-  glBindVertexArray(ver_buf_a.vao);
+  glBindVertexArray(vertexes[0].vao);
   glBindFramebuffer(GL_FRAMEBUFFER, textures[index].fb);
 
-  glDrawArrays(GL_TRIANGLES, 0, ver_buf_a.flo_buf->pos / 5);
+  glDrawArrays(GL_TRIANGLES, 0, vertexes[0].flo_buf->pos / 5);
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glBindVertexArray(0);
@@ -396,7 +395,7 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
       0.0,
   };
 
-  glBindBuffer(GL_ARRAY_BUFFER, ver_buf_b.vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexes[1].vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 5, data, GL_DYNAMIC_DRAW);
 
   matrix4array_t projection;
@@ -406,7 +405,7 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
   glViewport(0, 0, width, height);
 
   glBindFramebuffer(GL_FRAMEBUFFER, textures[tgt_ind].fb);
-  glBindVertexArray(ver_buf_b.vao);
+  glBindVertexArray(vertexes[1].vao);
 
   glDrawArrays(GL_TRIANGLES, 0, 6);
 

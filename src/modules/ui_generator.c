@@ -76,7 +76,9 @@ void ui_generator_add(view_t* view)
                       0.0,
                       0.0,
                       1.0,
-                      1.0);
+                      1.0,
+                      0,
+                      0);
   }
   else
   {
@@ -90,7 +92,9 @@ void ui_generator_add(view_t* view)
                       0.0,
                       0.0,
                       1280.0 / 4096.0,
-                      720.0 / 4096.0);
+                      720.0 / 4096.0,
+                      0,
+                      0);
   }
   view->connected = 1;
 }
