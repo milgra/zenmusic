@@ -168,10 +168,16 @@ void init(int width, int height)
 
   // seek bar
 
-  view_t* seekbar = view_new("seekbar", (vframe_t){1, -50, 752, 30}, 0);
-  tg_text_add(seekbar, 0xFEFEFEFF, 0x000000FF, "1:56 ----|-- 3:21");
+  view_t* seekbarbase = view_new("seekbarbase", (vframe_t){1, -50, 752, 30}, 0);
 
-  view_add(visuals, seekbar);
+  seekbarbase->blur   = 1;
+  seekbarbase->shadow = 1;
+
+  view_t* seekbar = view_new("seekbar", (vframe_t){0, 0, 752, 30}, 0);
+  tg_text_add(seekbar, 0xFFFFFF00, 0x000000FF, "1:56 ----|-- 3:21");
+
+  view_add(seekbarbase, seekbar);
+  view_add(visuals, seekbarbase);
 
   // search bar
 
@@ -185,15 +191,8 @@ void init(int width, int height)
   tg_text_add(eventbar, 0xFEFEFEFF, 0x000000FF, "Event log");
   view_add(visuals, eventbar);
 
-  // blur test
-  view_t* blurred = view_new("blurred", (vframe_t){50, 500, 500, 150}, 0);
-  tg_color_add(blurred, 0x00000000);
-
-  blurred->blur = 1;
-
   ui_manager_add(songlist);
   ui_manager_add(visuals);
-  ui_manager_add(blurred);
 
   /* view_t*   chessview = view_new("chessview", (vframe_t){100, 100, 300, 300}, 0); */
   /* bm_t*     chessbmp  = bm_new(300, 300); */

@@ -165,7 +165,7 @@ glsha_t create_blur_shader()
 
       " float Directions = 16.0;" // BLUR DIRECTIONS (Default 16.0 - More is better but slower)
       " float Quality    = 4.0;"  // BLUR QUALITY (Default 4.0 - More is better but slower)
-      " float Size       = 10.0;" // BLUR SIZE (Radius)
+      " float Size       = 8.0;"  // BLUR SIZE (Radius)
       " vec2 Radius = Size / vec2(4096,4096);"
 
       // Pixel colour
@@ -180,7 +180,7 @@ glsha_t create_blur_shader()
       "  }"
       " }"
       // Output to screen
-      " Color /= Quality * Directions - 15.0;"
+      " Color /= Quality * Directions;"
       " gl_FragColor = Color;"
       "}";
 
@@ -238,6 +238,7 @@ void gl_init(width, height)
   textures[3]    = gl_create_texture(); // offscreen buffer
   textures[4]    = gl_create_texture(); // offscreen buffer
   textures[5]    = gl_create_texture(); // offscreen buffer
+  textures[6]    = gl_create_texture(); // offscreen buffer
 
   // create vertex buffers
 
@@ -369,37 +370,37 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
       0.0,
       0.0,
       0.0,
-      0.0,
+      (float)src_h / 4096,
       0.0,
 
       width,
       height,
       (float)src_w / 4096,
-      (float)src_h / 4096,
+      0.0,
       0.0,
 
       0.0,
       height,
       0.0,
-      (float)src_h / 4096,
+      0.0,
       0.0,
 
       0.0,
       0.0,
       0.0,
-      0.0,
+      (float)src_h / 4096,
       0.0,
 
       width,
       0.0,
       (float)src_w / 4096,
-      0.0,
+      (float)src_h / 4096,
       0.0,
 
       width,
       height,
       (float)src_w / 4096,
-      (float)src_h / 4096,
+      0.0,
       0.0,
   };
 
@@ -407,7 +408,7 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 5, data, GL_DYNAMIC_DRAW);
 
   matrix4array_t projection;
-  projection.matrix = m4_defaultortho(0.0, width, 0, height, 0.0, 1.0);
+  projection.matrix = m4_defaultortho(0.0, width, height, 0.0, 0.0, 1.0);
   glUniformMatrix4fv(texture_sh.uni_loc[0], 1, 0, projection.array);
 
   glViewport(0, 0, width, height);
@@ -418,7 +419,8 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
   if (region.w > 0)
   {
     glEnable(GL_SCISSOR_TEST);
-    glScissor(region.x, region.y, region.w, region.h);
+    // upside down
+    glScissor(region.x, height - region.y - region.h, region.w, region.h);
   }
 
   glDrawArrays(GL_TRIANGLES, 0, 6);

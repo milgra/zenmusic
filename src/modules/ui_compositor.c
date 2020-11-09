@@ -99,6 +99,7 @@ void ui_compositor_render()
                                       comp_height,
                                       ((region_t){0}),
                                       SH_TEXTURE);
+
       last = index;
 
       if (rect->shadow)
@@ -124,6 +125,25 @@ void ui_compositor_render()
                                            comp_height / 2,
                                            ((region_t){0}),
                                            SH_BLUR);
+      }
+
+      if (rect->blur)
+      {
+        // render current state with texture shader to an offscreen buffer
+        gl_clear_framebuffer(6, 0.0, 0.0, 0.0, 0.0);
+        // shrink current framebuffer for blur
+        gl_draw_framebuffer_in_framebuffer(3,
+                                           6,
+                                           comp_width,
+                                           comp_height,
+                                           comp_width / 2,
+                                           comp_height / 2,
+                                           ((region_t){0}),
+                                           SH_TEXTURE);
+      }
+
+      if (rect->shadow)
+      {
         // draw offscreen buffer on final buffer
         gl_draw_framebuffer_in_framebuffer(5,
                                            3,
@@ -134,22 +154,12 @@ void ui_compositor_render()
                                            ((region_t){0}),
                                            SH_TEXTURE);
       }
+
       if (rect->blur)
       {
-        // render current state with texture shader to an offscreen buffer
-        gl_clear_framebuffer(4, 0.0, 0.0, 0.0, 0.0);
-        gl_clear_framebuffer(5, 0.0, 0.0, 0.0, 0.0);
-        // shrink current framebuffer for blur
-        gl_draw_framebuffer_in_framebuffer(3,
-                                           4,
-                                           comp_width,
-                                           comp_height,
-                                           comp_width / 2,
-                                           comp_height / 2,
-                                           ((region_t){0}),
-                                           SH_BLUR);
+
         // blur offscreen buffer for soft shadows
-        gl_draw_framebuffer_in_framebuffer(4,
+        gl_draw_framebuffer_in_framebuffer(6,
                                            5,
                                            comp_width / 2,
                                            comp_height / 2,
@@ -157,6 +167,7 @@ void ui_compositor_render()
                                            comp_height / 2,
                                            ((region_t){0}),
                                            SH_BLUR);
+
         // draw blurred buffer on final buffer inside the view
         gl_draw_framebuffer_in_framebuffer(5,
                                            3,
@@ -166,6 +177,9 @@ void ui_compositor_render()
                                            comp_height,
                                            rect->region,
                                            SH_TEXTURE);
+
+        last++;
+        index++; // skip drawing actual rect
       }
     }
   }
