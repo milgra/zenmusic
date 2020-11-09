@@ -43,25 +43,14 @@ void gl_init();
 void gl_update_vertexes(fb_t* fb);
 void gl_update_textures(bm_t* bmp);
 void gl_clear_framebuffer(int index, float r, float g, float b, float a);
-void gl_draw_vertexes_in_framebuffer(int        index,
-                                     int        start,
-                                     int        end,
-                                     region_t   source_region,
-                                     region_t   target_region,
-                                     glshader_t shader);
-void gl_draw_framebuffer_in_framebuffer(int        src_ind,
-                                        int        tgt_ind,
-                                        region_t   source_region,
-                                        region_t   target_region,
-                                        region_t   window,
-                                        glshader_t shader);
+void gl_draw_vertexes_in_framebuffer(int index, int start, int end, region_t source_region, region_t target_region, glshader_t shader);
+void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, region_t source_region, region_t target_region, region_t window, glshader_t shader);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
 #include "gl_utils.c"
-#include "mtmath2.c"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -160,7 +149,7 @@ glsha_t create_blur_shader()
 
       " float Directions = 16.0;" // BLUR DIRECTIONS (Default 16.0 - More is better but slower)
       " float Quality    = 4.0;"  // BLUR QUALITY (Default 4.0 - More is better but slower)
-      " float Size       = 8.0;"  // BLUR SIZE (Radius)
+      " float Size       = 6.0;"  // BLUR SIZE (Radius)
       " vec2 Radius = Size / vec2(4096,4096);"
 
       // Pixel colour
@@ -205,10 +194,7 @@ ver_buf_t create_vertex_buffer()
   return vb;
 }
 
-glsha_t texture_sh;
-glsha_t color_sh;
-glsha_t blur_sh;
-
+glsha_t   shaders[3]   = {0};
 gltex_t   textures[10] = {0};
 ver_buf_t vertexes[10] = {0};
 
@@ -218,9 +204,9 @@ void gl_init(width, height)
 
   // create shaders
 
-  texture_sh = create_texture_shader();
-  color_sh   = create_color_shader();
-  blur_sh    = create_blur_shader();
+  shaders[SH_TEXTURE] = create_texture_shader();
+  shaders[SH_COLOR]   = create_color_shader();
+  shaders[SH_BLUR]    = create_blur_shader();
 
   // create textures
 
@@ -241,7 +227,6 @@ void gl_init(width, height)
   vertexes[1] = create_vertex_buffer();
 }
 
-// update vertexes
 void gl_update_vertexes(fb_t* fb)
 {
   glBindBuffer(GL_ARRAY_BUFFER, vertexes[0].vbo);
@@ -249,7 +234,6 @@ void gl_update_vertexes(fb_t* fb)
   vertexes[0].flo_buf = fb;
 }
 
-// update texture map
 void gl_update_textures(bm_t* bmp)
 {
   glActiveTexture(GL_TEXTURE0);
@@ -265,15 +249,11 @@ void gl_update_textures(bm_t* bmp)
 
 void gl_clear_framebuffer(int index, float r, float g, float b, float a)
 {
-  // 0 - context frame buffer
-  // > 1 - other frame buffers
   glBindFramebuffer(GL_FRAMEBUFFER, textures[index].fb);
   glClearColor(r, g, b, a);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
-
-// draw vertexes into selected framebuffer
 
 void gl_draw_vertexes_in_framebuffer(int        index,
                                      int        start,
@@ -282,41 +262,33 @@ void gl_draw_vertexes_in_framebuffer(int        index,
                                      region_t   reg_tgt,
                                      glshader_t shader)
 {
+  matrix4array_t projection;
+  projection.matrix = m4_defaultortho(0.0, reg_src.w, reg_src.h, 0, 0.0, 1.0);
+
+  glUseProgram(shaders[shader].name);
 
   if (shader == SH_TEXTURE)
   {
-    glUseProgram(texture_sh.name);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    matrix4array_t projection;
-    projection.matrix = m4_defaultortho(0.0, reg_src.w, reg_src.h, 0, 0.0, 1.0);
-    glUniformMatrix4fv(texture_sh.uni_loc[0], 1, 0, projection.array);
+    glUniformMatrix4fv(shaders[shader].uni_loc[0], 1, 0, projection.array);
     glViewport(0, 0, reg_tgt.w, reg_tgt.h);
 
-    glUniform1i(texture_sh.uni_loc[1], 0);
-    glUniform1i(texture_sh.uni_loc[2], 1);
+    glUniform1i(shaders[shader].uni_loc[1], 0);
+    glUniform1i(shaders[shader].uni_loc[2], 1);
   }
   else if (shader == SH_COLOR)
   {
-    glUseProgram(color_sh.name);
-
-    matrix4array_t projection;
-    projection.matrix = m4_defaultortho(0.0, reg_src.w, reg_src.h, 0, 0.0, 1.0);
-    glUniformMatrix4fv(color_sh.uni_loc[0], 1, 0, projection.array);
+    glUniformMatrix4fv(shaders[shader].uni_loc[0], 1, 0, projection.array);
     glViewport(0, 0, reg_tgt.w, reg_tgt.h);
   }
   else if (shader == SH_BLUR)
   {
-    glUseProgram(blur_sh.name);
-
-    matrix4array_t projection;
-    projection.matrix = m4_defaultortho(0.0, reg_src.w, reg_src.h, 0, 0.0, 1.0);
-    glUniformMatrix4fv(blur_sh.uni_loc[0], 1, 0, projection.array);
+    glUniformMatrix4fv(shaders[shader].uni_loc[0], 1, 0, projection.array);
     glViewport(0, 0, reg_tgt.w, reg_tgt.h);
 
-    // set textures
-    glUniform1i(blur_sh.uni_loc[1], 0);
+    glUniform1i(shaders[shader].uni_loc[1], 0);
   }
 
   glBindVertexArray(vertexes[0].vao);
@@ -335,28 +307,27 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
                                         region_t   window,
                                         glshader_t shader)
 {
+  glUseProgram(shaders[shader].name);
 
   if (shader == SH_TEXTURE)
   {
-    glUseProgram(texture_sh.name);
-    glUniform1i(texture_sh.uni_loc[1], textures[src_ind].index);
+    glUniform1i(shaders[shader].uni_loc[1], textures[src_ind].index);
   }
   else if (shader == SH_BLUR)
   {
-    glUseProgram(blur_sh.name);
-    glUniform1i(blur_sh.uni_loc[1], textures[src_ind].index);
+    glUniform1i(shaders[shader].uni_loc[1], textures[src_ind].index);
   }
 
   GLfloat data[] = {
       0.0,
       0.0,
       0.0,
-      (float)src_reg.h / 4096,
+      (float)src_reg.h / 4096.0,
       0.0,
 
       tgt_reg.w,
       tgt_reg.h,
-      (float)src_reg.w / 4096,
+      (float)src_reg.w / 4096.0,
       0.0,
       0.0,
 
@@ -369,18 +340,18 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
       0.0,
       0.0,
       0.0,
-      (float)src_reg.h / 4096,
+      (float)src_reg.h / 4096.0,
       0.0,
 
       tgt_reg.w,
       0.0,
-      (float)src_reg.w / 4096,
-      (float)src_reg.h / 4096,
+      (float)src_reg.w / 4096.0,
+      (float)src_reg.h / 4096.0,
       0.0,
 
       tgt_reg.w,
       tgt_reg.h,
-      (float)src_reg.w / 4096,
+      (float)src_reg.w / 4096.0,
       0.0,
       0.0,
   };
@@ -390,7 +361,7 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
 
   matrix4array_t projection;
   projection.matrix = m4_defaultortho(0.0, tgt_reg.w, tgt_reg.h, 0.0, 0.0, 1.0);
-  glUniformMatrix4fv(texture_sh.uni_loc[0], 1, 0, projection.array);
+  glUniformMatrix4fv(shaders[shader].uni_loc[0], 1, 0, projection.array);
 
   glViewport(0, 0, tgt_reg.w, tgt_reg.h);
 
@@ -400,19 +371,13 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
   if (window.w > 0)
   {
     glEnable(GL_SCISSOR_TEST);
-    // upside down
-    glScissor(window.x, tgt_reg.h - window.y - window.h, window.w, window.h);
+    glScissor(window.x, tgt_reg.h - window.y - window.h, window.w, window.h); // force upside down
   }
 
   glDrawArrays(GL_TRIANGLES, 0, 6);
 
   glDisable(GL_SCISSOR_TEST);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-// blur selected framebuffer
-void gl_blur_framebuffer(int index)
-{
 }
 
 #endif

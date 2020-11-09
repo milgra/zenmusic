@@ -98,7 +98,7 @@ void init(int width, int height)
 
   // songlist view
   view_t* songlist = view_new("songlist", (vframe_t){0, 0, 500, 500}, 0);
-  tg_color_add(songlist, 0x222222FF);
+  tg_color_add(songlist, 0xFFFFFFFF);
   eh_list_add(songlist, songlist_item_generator);
 
   view_set_layout(songlist, (vlayout_t){
@@ -108,35 +108,47 @@ void init(int width, int height)
 
   // visualization views
 
-  view_t* visuals = view_new("visuals", (vframe_t){0, 0, 754, 150}, 0);
-  //tg_color_add(visuals, 0xFFFFFF00);
+  view_t* visuals = view_new("visuals", (vframe_t){0, 0, 790, 170}, 0);
   view_set_layout(visuals, (vlayout_t){
                                .margin_top = 60.0,
                                .margin     = INT_MAX});
 
+  //visuals->blur   = 1;
   visuals->shadow = 1;
+
+  view_t* visualscolor = view_new("visualscolor", (vframe_t){0, 0, 790, 170}, 0);
+  tg_color_add(visualscolor, 0xFFFFFFFF);
+
+  view_t* videoview_left_base = view_new("videoviewleftbase", (vframe_t){10, 0, 300, 150}, 0);
+  tg_color_add(videoview_left_base, 0x000000FF);
+  view_set_layout(videoview_left_base, (vlayout_t){
+                                           .margin_top  = 10.0,
+                                           .margin_left = 10.0});
 
   view_t* videoview_left = view_new("videoviewleft", (vframe_t){0, 0, 300, 150}, 1);
   tg_video_add(videoview_left, 1280, 720);
-  view_set_layout(videoview_left, (vlayout_t){
-                                      .margin_top  = 0.0,
-                                      .margin_left = 0.0});
+  view_add(videoview_left_base, videoview_left);
+
+  view_t* videoview_right_base = view_new("videoviewrightbase", (vframe_t){0, 0, 300, 150}, 0);
+  tg_color_add(videoview_right_base, 0x000000FF);
+  view_set_layout(videoview_right_base, (vlayout_t){
+                                            .margin_top   = 10.0,
+                                            .margin_right = 10.0});
 
   view_t* videoview_right = view_new("videoviewright", (vframe_t){0, 0, 300, 150}, 1);
   tg_video_add(videoview_right, 1280, 720);
-  view_set_layout(videoview_right, (vlayout_t){
-                                       .margin_top   = 0.0,
-                                       .margin_right = 4.0});
+  view_add(videoview_right_base, videoview_right);
 
   coverview = view_new("coverview", (vframe_t){0, 0, 150, 150}, 0);
-  //tg_color_add(coverview, 0xAAAAAAFF);
+  tg_color_add(coverview, 0x000000FF);
   view_set_layout(coverview, (vlayout_t){
-                                 .margin_top  = 0.0,
-                                 .margin_left = 300.0});
+                                 .margin_top  = 10.0,
+                                 .margin_left = 320.0});
 
-  view_add(visuals, videoview_left);
-  view_add(visuals, videoview_right);
-  view_add(visuals, coverview);
+  view_add(visualscolor, videoview_left_base);
+  view_add(visualscolor, videoview_right_base);
+  view_add(visualscolor, coverview);
+  view_add(visuals, visualscolor);
 
   // buttons
 
@@ -169,8 +181,8 @@ void init(int width, int height)
   // seek bar
 
   view_t* seekbarbase = view_new("seekbarbase", (vframe_t){1, -50, 752, 30}, 0);
-
-  seekbarbase->blur   = 1;
+  tg_color_add(seekbarbase, 0xFFFFFFFF);
+  //seekbarbase->blur   = 1;
   seekbarbase->shadow = 1;
 
   view_t* seekbar = view_new("seekbar", (vframe_t){0, 0, 752, 30}, 0);
