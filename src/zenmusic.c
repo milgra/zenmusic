@@ -108,28 +108,30 @@ void init(int width, int height)
 
   // visualization views
 
-  view_t* visuals = view_new("visuals", (vframe_t){0, 0, 754, 223}, 0);
-  tg_color_add(visuals, 0xFFFFFF00);
+  view_t* visuals = view_new("visuals", (vframe_t){0, 0, 754, 150}, 0);
+  //tg_color_add(visuals, 0xFFFFFF00);
   view_set_layout(visuals, (vlayout_t){
-                               .margin_top = 20.0,
+                               .margin_top = 60.0,
                                .margin     = INT_MAX});
 
-  view_t* videoview_left = view_new("videoviewleft", (vframe_t){0, 37, 300, 150}, 1);
+  visuals->shadow = 1;
+
+  view_t* videoview_left = view_new("videoviewleft", (vframe_t){0, 0, 300, 150}, 1);
   tg_video_add(videoview_left, 1280, 720);
   view_set_layout(videoview_left, (vlayout_t){
-                                      .margin_top  = 37.0,
+                                      .margin_top  = 0.0,
                                       .margin_left = 0.0});
 
-  view_t* videoview_right = view_new("videoviewright", (vframe_t){0, 37, 300, 150}, 1);
+  view_t* videoview_right = view_new("videoviewright", (vframe_t){0, 0, 300, 150}, 1);
   tg_video_add(videoview_right, 1280, 720);
   view_set_layout(videoview_right, (vlayout_t){
-                                       .margin_top   = 37.0,
+                                       .margin_top   = 0.0,
                                        .margin_right = 4.0});
 
-  coverview = view_new("coverview", (vframe_t){0, 37, 150, 150}, 0);
+  coverview = view_new("coverview", (vframe_t){0, 0, 150, 150}, 0);
   //tg_color_add(coverview, 0xAAAAAAFF);
   view_set_layout(coverview, (vlayout_t){
-                                 .margin_top  = 37.0,
+                                 .margin_top  = 0.0,
                                  .margin_left = 300.0});
 
   view_add(visuals, videoview_left);
@@ -166,25 +168,32 @@ void init(int width, int height)
 
   // seek bar
 
-  view_t* seekbar = view_new("seekbar", (vframe_t){1, -10, 752, 30}, 0);
+  view_t* seekbar = view_new("seekbar", (vframe_t){1, -50, 752, 30}, 0);
   tg_text_add(seekbar, 0xFEFEFEFF, 0x000000FF, "1:56 ----|-- 3:21");
 
   view_add(visuals, seekbar);
 
   // search bar
 
-  view_t* searchbar = view_new("searchbar", (vframe_t){1, 197, 375, 30}, 0);
+  view_t* searchbar = view_new("searchbar", (vframe_t){1, 180, 375, 30}, 0);
   eh_text_add(searchbar, "placeholder");
   view_add(visuals, searchbar);
 
-  // evets bar
+  // events bar
 
-  view_t* eventbar = view_new("eventbar", (vframe_t){377, 197, 375, 30}, 0);
+  view_t* eventbar = view_new("eventbar", (vframe_t){377, 180, 375, 30}, 0);
   tg_text_add(eventbar, 0xFEFEFEFF, 0x000000FF, "Event log");
   view_add(visuals, eventbar);
 
+  // blur test
+  view_t* blurred = view_new("blurred", (vframe_t){50, 500, 500, 150}, 0);
+  tg_color_add(blurred, 0x00000000);
+
+  blurred->blur = 1;
+
   ui_manager_add(songlist);
   ui_manager_add(visuals);
+  ui_manager_add(blurred);
 
   /* view_t*   chessview = view_new("chessview", (vframe_t){100, 100, 300, 300}, 0); */
   /* bm_t*     chessbmp  = bm_new(300, 300); */

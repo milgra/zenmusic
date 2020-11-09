@@ -9,6 +9,7 @@
 #ifndef ui_compositor_h
 #define ui_compositor_h
 
+#include "gl_connector.c"
 #include "mtbitmap.c"
 
 void ui_compositor_init(int, int);
@@ -27,7 +28,8 @@ typedef struct _crect_t
   float    data[30];
   uint32_t index;
   char     shadow;
-  char     blurred;
+  char     blur;
+  region_t region;
 } crect_t;
 
 crect_t* crect_new(char* id, uint32_t index, uint32_t channel, float x, float y, float w, float h, float tx, float ty, float tz, float tw);
@@ -41,7 +43,6 @@ void     crect_set_texture(crect_t* rect, float tx, float ty, float tz, float tw
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "gl_connector.c"
 #include "gl_floatbuffer.c"
 #include "mtcstring.c"
 #include "mtmap.c"
@@ -80,33 +81,117 @@ void ui_compositor_render()
   gl_update_textures(tm->bm);
   gl_clear_framebuffer(0, 0.0, 0.0, 0.0, 1.0);
 
-  // draw in smaller buffer for fast blur
-  gl_draw_vertexes_in_framebuffer(3,
-                                  0,
-                                  0,
-                                  comp_width,
-                                  comp_height,
-                                  comp_width / 2,
-                                  comp_height / 2,
-                                  ((v4_t){0}),
-                                  SH_TEXTURE);
+  crect_t* rect;
+  int      last  = 0;
+  int      index = 0;
+  for (index = 0; index < rectv->length; index++)
+  {
+    rect = rectv->data[index];
+    if (rect->shadow || rect->blur)
+    {
+      // render rects so far with simple texture renderer to offscreen buffer
+      gl_draw_vertexes_in_framebuffer(3,
+                                      last * 6,
+                                      index * 6,
+                                      comp_width,
+                                      comp_height,
+                                      comp_width,
+                                      comp_height,
+                                      ((v4_t){0}),
+                                      SH_TEXTURE);
+      last = index;
 
-  // blur to same size
+      if (rect->shadow)
+      {
+        // render current view with black color to an offscreen buffer
+        gl_clear_framebuffer(4, 0.0, 0.0, 0.0, 0.0);
+        gl_clear_framebuffer(5, 0.0, 0.0, 0.0, 0.0);
+        gl_draw_vertexes_in_framebuffer(4,
+                                        index * 6,
+                                        (index + 1) * 6,
+                                        comp_width,
+                                        comp_height,
+                                        comp_width / 2,
+                                        comp_height / 2,
+                                        ((v4_t){0}),
+                                        SH_COLOR);
+        // blur offscreen buffer for soft shadows
+        gl_draw_framebuffer_in_framebuffer(4,
+                                           5,
+                                           comp_width / 2,
+                                           comp_height / 2,
+                                           comp_width / 2,
+                                           comp_height / 2,
+                                           ((region_t){.x = 0, .y = 0, .w = 0, .h = 0}),
+                                           SH_BLUR);
+        // draw offscreen buffer on final buffer
+        gl_draw_framebuffer_in_framebuffer(5,
+                                           3,
+                                           comp_width / 2,
+                                           comp_height / 2,
+                                           comp_width,
+                                           comp_height,
+                                           ((region_t){.x = 0, .y = 0, .w = 0, .h = 0}),
+                                           SH_TEXTURE);
+      }
+      if (rect->blur)
+      {
+        // render current state with texture shader to an offscreen buffer
+        gl_clear_framebuffer(4, 0.0, 0.0, 0.0, 0.0);
+        gl_clear_framebuffer(5, 0.0, 0.0, 0.0, 0.0);
+        // shrink current framebuffer for blur
+        gl_draw_framebuffer_in_framebuffer(3,
+                                           4,
+                                           comp_width,
+                                           comp_height,
+                                           comp_width / 2,
+                                           comp_height / 2,
+                                           ((region_t){.x = 0, .y = 0, .w = 0, .h = 0}),
+                                           SH_BLUR);
+        // blur offscreen buffer for soft shadows
+        gl_draw_framebuffer_in_framebuffer(4,
+                                           5,
+                                           comp_width / 2,
+                                           comp_height / 2,
+                                           comp_width / 2,
+                                           comp_height / 2,
+                                           ((region_t){.x = 0, .y = 0, .w = 0, .h = 0}),
+                                           SH_BLUR);
+        // draw blurred buffer on final buffer inside the view
+        gl_draw_framebuffer_in_framebuffer(5,
+                                           3,
+                                           comp_width / 2,
+                                           comp_height / 2,
+                                           comp_width,
+                                           comp_height,
+                                           rect->region,
+                                           SH_TEXTURE);
+      }
+    }
+  }
+
+  if (last < index)
+  {
+    // render remaining
+    gl_draw_vertexes_in_framebuffer(3,
+                                    last * 6,
+                                    index * 6,
+                                    comp_width,
+                                    comp_height,
+                                    comp_width,
+                                    comp_height,
+                                    ((v4_t){0}),
+                                    SH_TEXTURE);
+  }
+
+  // finally draw offscreen buffer to screen buffer
   gl_draw_framebuffer_in_framebuffer(3,
-                                     4,
-                                     comp_width / 2,
-                                     comp_height / 2,
-                                     comp_width / 2,
-                                     comp_height / 2,
-                                     SH_BLUR);
-
-  // first blur from small fb to small fb to speed up
-  gl_draw_framebuffer_in_framebuffer(4,
                                      0,
-                                     comp_width / 2,
-                                     comp_height / 2,
                                      comp_width,
                                      comp_height,
+                                     comp_width,
+                                     comp_height,
+                                     ((region_t){.x = 0, .y = 0, .w = 0, .h = 0}),
                                      SH_TEXTURE);
 }
 
@@ -139,10 +224,12 @@ void ui_compositor_add(char*    id,
                        float    tz,
                        float    tw,
                        char     shadow,
-                       char     blurred)
+                       char     blur)
 {
   // printf("ui_compositor_add %s index %i channel %i %i %i %i %i\n", id, index, channel, x, y, w, h);
   crect_t* rect = crect_new(id, index, channel, x, y, w, h, tx, ty, tz, tw);
+  rect->shadow  = shadow;
+  rect->blur    = blur;
 
   VADD(rectv, rect);
   MPUT(rectm, id, rect);
@@ -252,6 +339,8 @@ crect_t* crect_new(char*    id,
   r->id    = mtcstr_fromcstring(id);
   r->index = index;
 
+  r->region = ((region_t){x, y, w, h});
+
   r->data[0] = x;
   r->data[1] = y;
   r->data[2] = tx;
@@ -299,6 +388,8 @@ void crect_del(void* pointer)
 
 void crect_set_frame(crect_t* r, float x, float y, float w, float h)
 {
+  r->region = ((region_t){x, y, w, h});
+
   r->data[0] = x;
   r->data[1] = y;
 

@@ -31,6 +31,14 @@ typedef struct _ver_buf_t
   fb_t*  flo_buf;
 } ver_buf_t;
 
+typedef struct _region_t
+{
+  int x;
+  int y;
+  int w;
+  int h;
+} region_t;
+
 void gl_init();
 void gl_update_vertexes(fb_t* fb);
 void gl_update_textures(bm_t* bmp);
@@ -50,6 +58,7 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
                                         int        src_h,
                                         int        width,
                                         int        height,
+                                        region_t   region,
                                         glshader_t shader);
 
 #endif
@@ -228,6 +237,7 @@ void gl_init(width, height)
   textures[2]    = gl_create_texture(); // video texture
   textures[3]    = gl_create_texture(); // offscreen buffer
   textures[4]    = gl_create_texture(); // offscreen buffer
+  textures[5]    = gl_create_texture(); // offscreen buffer
 
   // create vertex buffers
 
@@ -325,13 +335,10 @@ void gl_draw_vertexes_in_framebuffer(int        index,
     glUniform1i(blur_sh.uni_loc[1], 0);
   }
 
-  //glScissor(200, 200, 100, 100);
-  //glEnable(GL_SCISSOR_TEST);
-
   glBindVertexArray(vertexes[0].vao);
   glBindFramebuffer(GL_FRAMEBUFFER, textures[index].fb);
 
-  glDrawArrays(GL_TRIANGLES, 0, vertexes[0].flo_buf->pos / 5);
+  glDrawArrays(GL_TRIANGLES, start, end - start);
 
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   glBindVertexArray(0);
@@ -343,6 +350,7 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
                                         int        src_h,
                                         int        width,
                                         int        height,
+                                        region_t   region,
                                         glshader_t shader)
 {
 
@@ -407,8 +415,15 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
   glBindFramebuffer(GL_FRAMEBUFFER, textures[tgt_ind].fb);
   glBindVertexArray(vertexes[1].vao);
 
+  if (region.w > 0)
+  {
+    glEnable(GL_SCISSOR_TEST);
+    glScissor(region.x, region.y, region.w, region.h);
+  }
+
   glDrawArrays(GL_TRIANGLES, 0, 6);
 
+  glDisable(GL_SCISSOR_TEST);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 

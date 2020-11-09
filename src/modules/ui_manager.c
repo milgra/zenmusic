@@ -135,19 +135,23 @@ void ui_manager_set_layout(vlayout_t layout)
 
 void ui_manager_reindex(view_t* view, uint32_t* index)
 {
-  if (view->index != *index)
+  if (!view->hidden)
   {
-    view->index = *index;
-    if (view->connected == 0)
+
+    if (view->index != *index)
     {
-      //if (!(view->tg == NULL && view->tex == NULL)) //don't add empty views
-      ui_generator_add(view);
+      view->index = *index;
+      if (view->connected == 0)
+      {
+        //if (!(view->tg == NULL && view->tex == NULL)) //don't add empty views
+        ui_generator_add(view);
+      }
+
+      ui_generator_set_index(view);
     }
 
-    ui_generator_set_index(view);
+    *index += 1;
   }
-
-  *index += 1;
 
   view_t* v;
   while ((v = VNXT(view->views)))

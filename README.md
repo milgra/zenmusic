@@ -8,6 +8,8 @@ zen files - offline file/media viewer and manager / preview area, file info area
 zen music - offline music player and library manager / video/album area, two spectrum/freq analyzer for stereo channels
 zen photo and video - offline photo/video viewer and library manager / video/image area, location area, info area
 
+offline music player & manager
+
 ---
 
 view id es texture id fuggetlen legyen, lehessen tobb view ugyanazzal a texturaval
@@ -56,3 +58,7 @@ scroll-ra lehessen novelni/csokkenteni visuals meretet
 statisztikak - top 10 leghallgatottabb, milyen genre-t hallgatsz foleg elmult 1 honap, stb
 
 glFragaCoord ?
+
+optimize :
+only update vertexes when frame change
+only update shadow/blur when frame change

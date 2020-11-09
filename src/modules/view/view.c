@@ -70,6 +70,10 @@ struct _view_t
   int     tex_channel; /* texture channel if texture is external */
   char    tex_changed; /* texture changed */
 
+  char hidden;
+  char shadow;
+  char blur;
+
   void (*evt_han)(view_t*, ev_t); /* event handler for view */
   void (*tex_gen)(view_t*);       /* texture generator for view */
   void* evt_han_data;             /* data for event handler */
