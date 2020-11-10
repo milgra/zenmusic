@@ -64,6 +64,7 @@ clang \
     src/mtlib/mtmath2.c \
     src/mtlib/mtmath3.c \
     src/mtlib/mtmath4.c \
+    src/mtlib/mtdrawer.c \
     src/mtlib/mtmemory.c \
     src/mtlib/mtvector.c \
     src/mtlib/mtstring.c \

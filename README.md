@@ -12,8 +12,11 @@ offline music player & manager
 
 ---
 
+independent channels, scale down
+working time/seek
+search bar click hozza elo genre/artist listat
+
 view id es texture id fuggetlen legyen, lehessen tobb view ugyanazzal a texturaval
-shadow & blur kulon layerre gl_rendererben
 resize textures on window change if needed
 
 unit teszter gl_compositorhoz
@@ -22,8 +25,6 @@ lehessen teljes szelessegu a vizualization bar
 check leaks
 
 cortex-et berakni mini game-nek
-mukodjon a position/seekbar
-search bar click hozza elo genre/artist listat
 
 album/song info/genres/artist tabok a jobb oldali panel aljan
 ha az egeret a lista item jobb oldalara viszed popupban mutassa id3/song infokat es album artot

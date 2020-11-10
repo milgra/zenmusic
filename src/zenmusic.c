@@ -4,6 +4,7 @@
 #include "eh_text.c"
 #include "font.c"
 #include "mtcstring.c"
+#include "mtdrawer.c"
 #include "mtmath4.c"
 #include "player.c"
 #include "songitem.c"
@@ -206,20 +207,20 @@ void init(int width, int height)
   ui_manager_add(songlist);
   ui_manager_add(visuals);
 
-  /* view_t*   chessview = view_new("chessview", (vframe_t){100, 100, 300, 300}, 0); */
-  /* bm_t*     chessbmp  = bm_new(300, 300); */
-  /* uint32_t* data      = (uint32_t*)chessbmp->data; */
-  /* for (int col = 0; col < 300; col++) */
-  /* { */
-  /*   for (int row = 0; row < 300; row++) */
-  /*   { */
-  /*     uint32_t index = row * 300 + col; */
-  /*     uint32_t color = (row % 2 == 0 && col % 2 == 0) ? 0xFFFFFFFF : 0x000000FF; */
-  /*     data[index]    = color; */
-  /*   } */
-  /* } */
-  /* view_set_texture(chessview, chessbmp); */
-  /* eh_drag_add(chessview); */
+  bm_t* circle = bm_new(151, 151);
+  mtdrawer_circle(circle, 75.5, 75.5, 45.0, 0xFF0000FF);
+
+  view_t* circleview = view_new("circleview", (vframe_t){600, 600, 151, 151}, 0);
+  tg_bitmap_add(circleview, NULL, circle);
+
+  bm_t* chessbmp = bm_new(300, 300);
+  mtdrawer_tile(chessbmp);
+
+  view_t* chessview = view_new("chessview", (vframe_t){600, 800, 300, 300}, 0);
+  tg_bitmap_add(chessview, NULL, chessbmp);
+
+  ui_manager_add(circleview);
+  ui_manager_add(chessview);
 
   /* view_t* texmapview = view_new("texmapview", (vframe_t){50, 500, 200, 200}, 0); */
   /* eh_drag_add(texmapview); */
