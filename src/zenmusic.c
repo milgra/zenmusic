@@ -99,7 +99,7 @@ void init(int width, int height)
 
   // songlist view
   view_t* songlist = view_new("songlist", (vframe_t){0, 0, 500, 500}, 0);
-  tg_color_add(songlist, 0xFFFFFFFF);
+  tg_color_add(songlist, 0xFF0000FF);
   eh_list_add(songlist, songlist_item_generator);
 
   view_set_layout(songlist, (vlayout_t){
@@ -107,11 +107,18 @@ void init(int width, int height)
                                 .w_per        = 1.0,
                                 .h_per        = 1.0});
 
+  view_t* header = view_new("header", (vframe_t){0, 0, 700, 150}, 0);
+  tg_color_add(header, 0xFFFFFFEE);
+  view_set_layout(header, (vlayout_t){.w_per = 1.0});
+
+  //header->blur = 1;
+  header->shadow = 1;
+
   // visualization views
 
-  view_t* visuals = view_new("visuals", (vframe_t){0, 0, 790, 170}, 0);
+  view_t* visuals = view_new("visuals", (vframe_t){0, 0, 790, 600}, 0);
   view_set_layout(visuals, (vlayout_t){
-                               .margin_top = 60.0,
+                               .margin_top = 260.0,
                                .margin     = INT_MAX});
 
   //visuals->blur   = 1;
@@ -206,6 +213,7 @@ void init(int width, int height)
 
   ui_manager_add(songlist);
   ui_manager_add(visuals);
+  ui_manager_add(header);
 
   bm_t* circle = bm_new(151, 151);
   mtdrawer_circle(circle, 75.5, 75.5, 45.0, 0xFF0000FF);
@@ -213,14 +221,7 @@ void init(int width, int height)
   view_t* circleview = view_new("circleview", (vframe_t){600, 600, 151, 151}, 0);
   tg_bitmap_add(circleview, NULL, circle);
 
-  bm_t* chessbmp = bm_new(300, 300);
-  mtdrawer_tile(chessbmp);
-
-  view_t* chessview = view_new("chessview", (vframe_t){600, 800, 300, 300}, 0);
-  tg_bitmap_add(chessview, NULL, chessbmp);
-
   ui_manager_add(circleview);
-  ui_manager_add(chessview);
 
   /* view_t* texmapview = view_new("texmapview", (vframe_t){50, 500, 200, 200}, 0); */
   /* eh_drag_add(texmapview); */

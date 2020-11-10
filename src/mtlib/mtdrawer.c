@@ -47,8 +47,7 @@ void mtdrawer_tile(bm_t* bitmap)
     for (int row = 0; row < bitmap->h; row++)
     {
       uint32_t index = row * bitmap->w + col;
-      m
-          uint32_t color = (row % 2 == 0 && col % 2 == 1) ? 0xFFFFFFFF : 0x000000FF;
+      uint32_t color = (row % 2 == 0 && col % 2 == 1) ? 0xFFFFFFFF : 0x000000FF;
       bm_fill(bitmap, col, row, col + 1, row + 1, color);
     }
   }

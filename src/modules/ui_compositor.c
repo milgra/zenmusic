@@ -80,6 +80,7 @@ void ui_compositor_render()
   gl_update_vertexes(fb);
   gl_update_textures(tm->bm);
   gl_clear_framebuffer(0, 0.0, 0.0, 0.0, 1.0);
+  //gl_clear_framebuffer(3, 0.0, 0.0, 0.0, 1.0);
 
   region_t reg_full = {0, 0, comp_width, comp_height};
   region_t reg_half = {0, 0, comp_width / 2, comp_height / 2};
@@ -105,29 +106,24 @@ void ui_compositor_render()
         gl_draw_vertexes_in_framebuffer(4, index * 6, (index + 1) * 6, reg_full, reg_half, SH_COLOR);
         // blur offscreen buffer for soft shadows
         gl_draw_framebuffer_in_framebuffer(4, 5, reg_half, reg_half, ((region_t){0}), SH_BLUR);
-      }
-
-      if (rect->blur)
-      {
-        // render current state with texture shader to an offscreen buffer
-        gl_clear_framebuffer(6, 0.0, 0.0, 0.0, 0.0);
-        // shrink current framebuffer for blur
-        gl_draw_framebuffer_in_framebuffer(3, 6, reg_full, reg_half, ((region_t){0}), SH_TEXTURE);
-      }
-
-      if (rect->shadow)
-      {
         // draw offscreen buffer on final buffer
         gl_draw_framebuffer_in_framebuffer(5, 3, reg_half, reg_full, ((region_t){0}), SH_TEXTURE);
       }
 
       if (rect->blur)
       {
+        // render current state with texture shader to an offscreen buffer
+        gl_clear_framebuffer(6, 0.0, 0.0, 0.0, 0.0);
+        gl_clear_framebuffer(5, 0.0, 0.0, 0.0, 0.0);
+        // shrink current framebuffer for blur
+        gl_draw_framebuffer_in_framebuffer(3, 6, reg_full, reg_half, ((region_t){0}), SH_TEXTURE);
+
         // blur offscreen buffer for soft shadows
         gl_draw_framebuffer_in_framebuffer(6, 5, reg_half, reg_half, ((region_t){0}), SH_BLUR);
+        gl_draw_framebuffer_in_framebuffer(5, 6, reg_half, reg_half, ((region_t){0}), SH_BLUR);
 
         // draw blurred buffer on final buffer inside the view
-        gl_draw_framebuffer_in_framebuffer(5, 3, reg_half, reg_full, rect->region, SH_TEXTURE);
+        gl_draw_framebuffer_in_framebuffer(6, 3, reg_half, reg_full, rect->region, SH_TEXTURE);
 
         // skip drawing actual rect when blur
         last++;

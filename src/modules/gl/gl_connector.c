@@ -149,7 +149,7 @@ glsha_t create_blur_shader()
 
       " float Directions = 16.0;" // BLUR DIRECTIONS (Default 16.0 - More is better but slower)
       " float Quality    = 4.0;"  // BLUR QUALITY (Default 4.0 - More is better but slower)
-      " float Size       = 6.0;"  // BLUR SIZE (Radius)
+      " float Size       = 10.0;" // BLUR SIZE (Radius)
       " vec2 Radius = Size / vec2(4096,4096);"
 
       // Pixel colour
@@ -268,16 +268,17 @@ void gl_draw_vertexes_in_framebuffer(int        index,
   glUseProgram(shaders[shader].name);
 
   if (shader == SH_TEXTURE)
-  {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    `
+    {
+      glEnable(GL_BLEND);
+      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glUniformMatrix4fv(shaders[shader].uni_loc[0], 1, 0, projection.array);
-    glViewport(0, 0, reg_tgt.w, reg_tgt.h);
+      glUniformMatrix4fv(shaders[shader].uni_loc[0], 1, 0, projection.array);
+      glViewport(0, 0, reg_tgt.w, reg_tgt.h);
 
-    glUniform1i(shaders[shader].uni_loc[1], 0);
-    glUniform1i(shaders[shader].uni_loc[2], 1);
-  }
+      glUniform1i(shaders[shader].uni_loc[1], 0);
+      glUniform1i(shaders[shader].uni_loc[2], 1);
+    }
   else if (shader == SH_COLOR)
   {
     glUniformMatrix4fv(shaders[shader].uni_loc[0], 1, 0, projection.array);

@@ -31,12 +31,12 @@ view_t* songitem_new()
   view_add(rowview, indexview);
 
   snprintf(idbuffer, 100, "name_item%i", songitem_index);
-  view_t* nameview = view_new(idbuffer, (vframe_t){80, 0, 500, 35}, 0);
+  view_t* nameview = view_new(idbuffer, (vframe_t){80, 0, 1000, 35}, 0);
 
   view_add(rowview, nameview);
 
   snprintf(idbuffer, 100, "type_item%i", songitem_index);
-  view_t* typeview = view_new(idbuffer, (vframe_t){580, 0, 80, 35}, 0);
+  view_t* typeview = view_new(idbuffer, (vframe_t){1080, 0, 1000, 35}, 0);
 
   view_add(rowview, typeview);
 
