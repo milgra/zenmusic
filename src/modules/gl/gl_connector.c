@@ -2,6 +2,7 @@
   OpenGL Connector Module for Zen Multimedia Desktop System
   Renders incoming triangles and textures to screen
   Composes framebuffers together
+  Textures can be internal or external
 
   gl_connector -> GPU
   
@@ -268,17 +269,16 @@ void gl_draw_vertexes_in_framebuffer(int        index,
   glUseProgram(shaders[shader].name);
 
   if (shader == SH_TEXTURE)
-    `
-    {
-      glEnable(GL_BLEND);
-      glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-      glUniformMatrix4fv(shaders[shader].uni_loc[0], 1, 0, projection.array);
-      glViewport(0, 0, reg_tgt.w, reg_tgt.h);
+    glUniformMatrix4fv(shaders[shader].uni_loc[0], 1, 0, projection.array);
+    glViewport(0, 0, reg_tgt.w, reg_tgt.h);
 
-      glUniform1i(shaders[shader].uni_loc[1], 0);
-      glUniform1i(shaders[shader].uni_loc[2], 1);
-    }
+    glUniform1i(shaders[shader].uni_loc[1], 0);
+    glUniform1i(shaders[shader].uni_loc[2], 1);
+  }
   else if (shader == SH_COLOR)
   {
     glUniformMatrix4fv(shaders[shader].uni_loc[0], 1, 0, projection.array);

@@ -28,6 +28,15 @@
 mtvec_t* files;
 view_t*  coverview;
 
+typedef enum _audio_vis_t
+{
+  VIS_NONE,
+  VIS_WAVE,
+  VIS_RDFT
+} audio_vis_t;
+
+audio_vis_t audio_vis = VIS_WAVE;
+
 static int display_info(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
 {
   /* printf("%-3s %2d %7jd   %-40s %d %s\n", */
@@ -238,7 +247,14 @@ void update(ev_t ev)
 
 void render()
 {
-  player_draw();
+  if (audio_vis == VIS_WAVE)
+  {
+    player_draw();
+  }
+  else if (audio_vis == VIS_RDFT)
+  {
+    player_draw();
+  }
   ui_manager_render();
 }
 

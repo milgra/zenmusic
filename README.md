@@ -13,11 +13,14 @@ offline music player & manager
 ---
 
 independent channels, scale down
+view id es texture id fuggetlen legyen, lehessen tobb view ugyanazzal a texturaval
+
 working time/seek
 felul legyen egy view title-nek, alatta seek bar, jobbra search bar, alul maradjon a borito es a visualizer
+volume bar pedig play button korul legyen egy gyuru - kell arc mtdrawer-be
+tg_rounded_rect - mtdrawer rounded rect. eh_resize
 search bar click hozza elo genre/artist listat
 
-view id es texture id fuggetlen legyen, lehessen tobb view ugyanazzal a texturaval
 resize textures on window change if needed
 
 unit teszter gl_compositorhoz

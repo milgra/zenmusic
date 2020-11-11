@@ -7,9 +7,10 @@
 
 typedef enum _texst_t // texture loading state
 {
-  TS_BLANK,
-  TS_PENDING,
-  TS_READY,
+  TS_EXTERN,  /* texture is handled outside ui compositor */
+  TS_BLANK,   /* texture is empty */
+  TS_PENDING, /* texture is under generation */
+  TS_READY,   /* texture is generated */
 } texst_t;
 
 typedef enum _laypos_t // layout position
@@ -65,14 +66,16 @@ struct _view_t
   vframe_t frame_global;  /* global position and dimensions */
   char     frame_changed; /* frame changed */
 
+  int tex_channel;
+
   bm_t*   tex;         /* texture of view */
   texst_t tex_state;   /* texture state */
-  int     tex_channel; /* texture channel if texture is external */
   char    tex_changed; /* texture changed */
 
-  char hidden;
-  char shadow;
-  char blur;
+  char overflow; /* enable content outside frame */
+  char hidden;   /* exclude from rendering */
+  char shadow;   /* cast shadow? */
+  char blur;     /* blur background? */
 
   void (*evt_han)(view_t*, ev_t); /* event handler for view */
   void (*tex_gen)(view_t*);       /* texture generator for view */
