@@ -13,7 +13,6 @@ offline music player & manager
 ---
 
 independent channels, scale down
-view id es texture id fuggetlen legyen, lehessen tobb view ugyanazzal a texturaval
 
 working time/seek
 felul legyen egy view title-nek, alatta seek bar, jobbra search bar, alul maradjon a borito es a visualizer

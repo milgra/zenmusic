@@ -31,7 +31,7 @@ typedef struct _uitexc_t
 void ui_compositor_init(int, int);
 void ui_compositor_render();
 void ui_compositor_reset();
-void ui_compositor_add(char* id, uint32_t index, uirect_t uirect, int page, char shadow, char blurred);
+void ui_compositor_add(char* viewid, char* texid, uint32_t index, uirect_t uirect, int page, char shadow, char blur);
 void ui_compositor_rem(char* id);
 void ui_compositor_set_index(char* id, uint32_t index);
 void ui_compositor_set_frame(char* id, uirect_t rect);
@@ -179,20 +179,34 @@ void ui_compositor_update()
   }
 }
 
-void ui_compositor_add(char* id, uint32_t index, uirect_t uirect, int page, char shadow, char blur)
+void ui_compositor_add(char* viewid, char* texid, uint32_t index, uirect_t uirect, int page, char shadow, char blur)
 {
-  printf("ui_compositor_add %s index %i page %i %f %f %f %f\n", id, index, page, uirect.x, uirect.y, uirect.w, uirect.h);
+  printf("ui_compositor_add %s index %i page %i %f %f %f %f\n", viewid, index, page, uirect.x, uirect.y, uirect.w, uirect.h);
 
-  gltex_t  tex_dim = gl_get_texture(page, uirect.w, uirect.h);
-  uitexc_t tex_cor = (uitexc_t){0.0, 0.0, uirect.w / tex_dim.w, uirect.h / tex_dim.h};
+  crect_t*    rect;
+  tm_coords_t coords = tm_get(tm, texid);
 
-  crect_t* rect = crect_new(id, index, page, uirect, tex_cor);
+  if (coords.w > 0)
+  {
+    // printf("ui_compositor text2ure size mismatch, adding as new %s %i %i %i %i\n", id, coords.w, tex->w, coords.h, tex->h);
+    coords = tm_get(tm, texid);
+
+    uitexc_t tex_cor = (uitexc_t){coords.ltx, coords.lty, coords.rbx, coords.rby};
+    rect             = crect_new(viewid, index, page, uirect, tex_cor);
+  }
+  else
+  {
+    gltex_t  tex_dim = gl_get_texture(page, uirect.w, uirect.h);
+    uitexc_t tex_cor = (uitexc_t){0.0, 0.0, uirect.w / tex_dim.w, uirect.h / tex_dim.h};
+
+    rect = crect_new(viewid, index, page, uirect, tex_cor);
+  }
 
   rect->shadow = shadow;
   rect->blur   = blur;
 
   VADD(rectv, rect);
-  MPUT(rectm, id, rect);
+  MPUT(rectm, viewid, rect);
 
   ui_compositor_update();
 }

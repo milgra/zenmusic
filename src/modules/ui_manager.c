@@ -42,7 +42,6 @@ void ui_manager_layout(view_t* view)
 
   while ((v = VNXT(view->views)))
   {
-    printf("layout %s %f\n", v->id, view->frame.local.w);
     if (v->layout.width > 0)
     {
       vframe_t frame = v->frame.local;

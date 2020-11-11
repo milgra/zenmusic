@@ -85,6 +85,7 @@ void ui_generator_add(view_t* view)
       view->frame.global.h};
 
   ui_compositor_add(view->id,
+                    view->texture.id,
                     view->index,
                     uirect,
                     view->texture.page,
