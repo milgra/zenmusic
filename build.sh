@@ -34,11 +34,11 @@ clang \
     src/modules/view/eh_list.c \
     src/modules/view/eh_text.c \
     src/modules/view/eh_touch.c \
+    src/modules/view/eh_video.c \
     src/modules/view/tg_text.c \
     src/modules/view/tg_color.c \
     src/modules/view/tg_bitmap.c \
     src/modules/view/tg_texmap.c \
-    src/modules/view/tg_video.c \
     src/modules/ui_manager.c \
     src/modules/ui_generator.c \
     src/modules/ui_compositor.c \
@@ -72,4 +72,5 @@ clang \
     src/zenmusic.c \
     src/songitem.c \
     src/common.c \
+    src/eh_visu.c \
     -o bin/zenmusic

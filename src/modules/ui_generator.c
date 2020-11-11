@@ -13,14 +13,15 @@
 
 #include "view.c"
 
-int  ui_generator_init(int, int);
-void ui_generator_reset();
-void ui_generator_cleanup();
-void ui_generator_render();
-void ui_generator_add(view_t* view);
-void ui_generator_remove(view_t* view);
-void ui_generator_set_index(view_t* view);
-void ui_generator_resize(int width, int height);
+int      ui_generator_init(int, int);
+void     ui_generator_reset();
+void     ui_generator_cleanup();
+void     ui_generator_render();
+void     ui_generator_add(view_t* view);
+void     ui_generator_remove(view_t* view);
+void     ui_generator_set_index(view_t* view);
+void     ui_generator_resize(int width, int height);
+uint32_t ui_generate_create_texture();
 
 #endif
 
@@ -39,6 +40,7 @@ mtch_t*   uich;
 pthread_t uibgth;
 mtvec_t*  trash;
 int       ui_generator_workloop(void* mypointer);
+uint32_t  tex_index = 2;
 
 int ui_generator_init(int width, int height)
 {
@@ -64,44 +66,36 @@ void ui_generator_reset()
 void ui_generator_add(view_t* view)
 {
   VADD(uiv, view);
-  if (view->tex_channel == 0)
+
+  if (view->texture.state == TS_EXTERN && view->texture.index == 0)
   {
-    ui_compositor_add(view->id,
-                      view->index,
-                      view->tex_channel,
-                      view->frame_global.x,
-                      view->frame_global.y,
-                      view->frame_global.w,
-                      view->frame_global.h,
-                      0.0,
-                      0.0,
-                      1.0,
-                      1.0,
-                      view->shadow,
-                      view->blur);
+    printf("ui gen add %s\n", view->id);
+    view_set_texture_index(view, tex_index++);
   }
   else
   {
-    ui_compositor_add(view->id,
-                      view->index,
-                      view->tex_channel,
-                      view->frame_global.x,
-                      view->frame_global.y,
-                      view->frame_global.w,
-                      view->frame_global.h,
-                      0.0,
-                      0.0,
-                      1280.0 / 4096.0,
-                      720.0 / 4096.0,
-                      view->shadow,
-                      view->blur);
+    // set default texture channel with texture map
+    view_set_texture_index(view, 1);
   }
+
+  uirect_t uirect = {
+      view->frame.global.x,
+      view->frame.global.y,
+      view->frame.global.w,
+      view->frame.global.h};
+
+  ui_compositor_add(view->id,
+                    view->index,
+                    uirect,
+                    view->texture.index,
+                    view->texture.shadow,
+                    view->texture.blur);
+
   view->connected = 1;
 }
 
 void ui_generator_cleanup()
 {
-  // remove views without parents
   view_t* v;
 
   while ((v = VNXT(uiv)))
@@ -129,26 +123,25 @@ void ui_generator_render()
 
   while ((view = VNXT(uiv)))
   {
-    if (view->tex_state == TS_BLANK) /* send unrendered views to renderer thread */
+    if (view->texture.state == TS_BLANK)
     {
-      if (mtch_send(uich, view))
-      {
-        view->tex_state = TS_PENDING;
-      }
+      if (mtch_send(uich, view)) view->texture.state = TS_PENDING;
     }
-    if (view->frame_changed) /* update dimension if needed */
+    if (view->frame.changed)
     {
-      ui_compositor_set_frame(view->id,
-                              view->frame_global.x,
-                              view->frame_global.y,
-                              view->frame_global.w,
-                              view->frame_global.h);
-      view->frame_changed = 0;
+      uirect_t uirect = {
+          view->frame.global.x,
+          view->frame.global.y,
+          view->frame.global.w,
+          view->frame.global.h};
+
+      ui_compositor_set_frame(view->id, uirect);
+      view->frame.changed = 0;
     }
-    if (view->tex_changed) /* update bitmap if needed */
+    if (view->texture.changed)
     {
-      ui_compositor_set_texture(view->id, view->tex);
-      view->tex_changed = 0;
+      ui_compositor_set_texture(view->id, view->texture.bitmap);
+      view->texture.changed = 0;
     }
   }
 

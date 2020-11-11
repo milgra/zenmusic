@@ -21,22 +21,22 @@ view_t* songitem_new()
   char idbuffer[100] = {0};
   snprintf(idbuffer, 100, "list_item%i", songitem_index);
 
-  view_t* rowview = view_new(idbuffer, (vframe_t){0, 0, 1500, 35}, 0);
+  view_t* rowview = view_new(idbuffer, (vframe_t){0, 0, 1500, 35});
 
   tg_color_add(rowview, 0x00000022);
 
   snprintf(idbuffer, 100, "index_item%i", songitem_index);
-  view_t* indexview = view_new(idbuffer, (vframe_t){0, 0, 80, 35}, 0);
+  view_t* indexview = view_new(idbuffer, (vframe_t){0, 0, 80, 35});
 
   view_add(rowview, indexview);
 
   snprintf(idbuffer, 100, "name_item%i", songitem_index);
-  view_t* nameview = view_new(idbuffer, (vframe_t){80, 0, 1000, 35}, 0);
+  view_t* nameview = view_new(idbuffer, (vframe_t){80, 0, 1000, 35});
 
   view_add(rowview, nameview);
 
   snprintf(idbuffer, 100, "type_item%i", songitem_index);
-  view_t* typeview = view_new(idbuffer, (vframe_t){1080, 0, 1000, 35}, 0);
+  view_t* typeview = view_new(idbuffer, (vframe_t){1080, 0, 1000, 35});
 
   view_add(rowview, typeview);
 
@@ -50,10 +50,12 @@ void songitem_update(view_t* rowview, int index, char* filename, void (*event)(e
   uint32_t color1 = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
   uint32_t color2 = (index % 2 == 0) ? 0xE5E5E5FF : 0xEFEFEFFF;
 
-  eh_touch_add(rowview, (void*)index, event);
+  size_t sind = index;
+  eh_touch_add(rowview, (void*)sind, event);
 
   char indbuffer[6];
   snprintf(indbuffer, 6, "%i.", index);
+
   tg_text_add(rowview->views->data[0], color1, 0x000000FF, indbuffer);
 
   tg_text_add(rowview->views->data[1], color1, 0x000000FF, filename);

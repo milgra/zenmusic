@@ -107,6 +107,8 @@ int decoder_decode_frame(Decoder* d, AVFrame* frame, AVSubtitle* sub)
             }
           }
           break;
+        default:
+          break;
         }
         if (ret == AVERROR_EOF)
         {

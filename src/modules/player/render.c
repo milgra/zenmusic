@@ -2,12 +2,13 @@
 #ifndef render_h
 #define render_h
 
-void video_refresh(void* opaque, double* remaining_time);
+void video_refresh(void* opaque, double* remaining_time, int index);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "gl_connector.c"
 #include "libavutil/bprint.h"
 #include "libavutil/time.h"
 #include "libswresample/swresample.h"
@@ -148,7 +149,7 @@ void check_external_clock_speed(VideoState* is)
   }
 }
 
-static void video_audio_display(VideoState* s)
+static void video_audio_display(VideoState* s, int index)
 {
   int     i, i_start, x, y1, y2, y, ys, delay, n, nb_display_channels;
   int     ch, channels, h, h2;
@@ -333,7 +334,7 @@ uint8_t* scaledpixels[1];
 
 static unsigned sws_flags = SWS_BICUBIC;
 
-static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, struct SwsContext** img_convert_ctx)
+static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, struct SwsContext** img_convert_ctx, int index)
 {
   int ret = 0;
 
@@ -363,9 +364,7 @@ static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, stru
               scaledpixels,
               pitch);
 
-    glActiveTexture(GL_TEXTURE1);
-
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, frame->width, frame->height, GL_BGRA, GL_UNSIGNED_BYTE, scaledpixels[0]);
+    gl_draw_to_texture(index, frame->width, frame->height, scaledpixels[0]);
   }
   return ret;
 }
@@ -403,7 +402,7 @@ static void calculate_display_rect(SDL_Rect*  rect,
   rect->h = FFMAX((int)height, 1);
 }
 
-static void video_image_display(VideoState* is)
+static void video_image_display(VideoState* is, int index)
 {
   Frame*   vp;
   Frame*   sp = NULL;
@@ -468,7 +467,7 @@ static void video_image_display(VideoState* is)
 
   if (!vp->uploaded)
   {
-    if (upload_texture(&is->vid_texture, vp->frame, rect, &is->img_convert_ctx) < 0)
+    if (upload_texture(&is->vid_texture, vp->frame, rect, &is->img_convert_ctx, index) < 0)
       return;
     vp->uploaded = 1;
     vp->flip_v   = vp->frame->linesize[0] < 0;
@@ -528,21 +527,21 @@ static int video_open(VideoState* is)
 }
 
 /* display the current picture, if any */
-static void video_display(VideoState* is)
+static void video_display(VideoState* is, int index)
 {
   if (!is->width) video_open(is);
 
   //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
   //SDL_RenderClear(renderer);
   /* if (is->audio_st && is->show_mode != SHOW_MODE_VIDEO) */
-  video_audio_display(is);
+  video_audio_display(is, index);
   /* else if (is->video_st) */
   //video_image_display(is);
   //SDL_RenderPresent(renderer);
 }
 
 /* called to display each frame */
-void video_refresh(void* opaque, double* remaining_time)
+void video_refresh(void* opaque, double* remaining_time, int index)
 {
   VideoState* is = opaque;
   double      time;
@@ -557,7 +556,7 @@ void video_refresh(void* opaque, double* remaining_time)
     time = av_gettime_relative() / 1000000.0;
     if (is->force_refresh || is->last_vis_time + rdftspeed < time)
     {
-      video_display(is);
+      video_display(is, index);
       is->last_vis_time = time;
     }
     *remaining_time = FFMIN(*remaining_time, is->last_vis_time + rdftspeed - time);
@@ -671,7 +670,7 @@ void video_refresh(void* opaque, double* remaining_time)
   display:
     /* display picture */
     if (!display_disable && is->force_refresh && is->show_mode == SHOW_MODE_VIDEO && is->pictq.rindex_shown)
-      video_display(is);
+      video_display(is, index);
   }
   is->force_refresh = 0;
   if (show_status)

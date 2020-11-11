@@ -14,7 +14,7 @@ void eh_drag_evt(view_t* view, ev_t ev)
 {
   if (ev.type == EV_MMOVE && ev.drag)
   {
-    vframe_t frame = view->frame;
+    vframe_t frame = view->frame.local;
     frame.x        = ev.x;
     frame.y        = ev.y;
     view_set_frame(view, frame);

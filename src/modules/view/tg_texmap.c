@@ -17,6 +17,8 @@ void tg_texmap_add(view_t* view);
 void tg_texmap_add(view_t* view)
 {
   // force upload to compositor without bitmap
+  view->texture.index = 1; // we will show the whole tilemap
+  view->texture.state = TS_EXTERN;
 }
 
 #endif

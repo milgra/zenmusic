@@ -33,7 +33,7 @@ void ui_manager_init(int width, int height)
 {
   ui_generator_init(width, height);
 
-  root = view_new("root", (vframe_t){0, 0, width, height}, 0);
+  root = view_new("root", (vframe_t){0, 0, width, height});
 }
 
 void ui_manager_layout(view_t* view)
@@ -42,60 +42,61 @@ void ui_manager_layout(view_t* view)
 
   while ((v = VNXT(view->views)))
   {
+    printf("layout %s %f\n", v->id, view->frame.local.w);
     if (v->layout.width > 0)
     {
-      vframe_t frame = v->frame;
+      vframe_t frame = v->frame.local;
       frame.w        = v->layout.width;
       view_set_frame(v, frame);
     }
     if (v->layout.height > 0)
     {
-      vframe_t frame = v->frame;
+      vframe_t frame = v->frame.local;
       frame.h        = v->layout.height;
       view_set_frame(v, frame);
     }
     if (v->layout.w_per > 0.0)
     {
-      vframe_t frame = v->frame;
+      vframe_t frame = v->frame.local;
       frame.x        = 0.0;
-      frame.w        = roundf((view->frame.w - v->layout.margin_left - v->layout.margin_right) * v->layout.w_per);
+      frame.w        = roundf((view->frame.local.w - v->layout.margin_left - v->layout.margin_right) * v->layout.w_per);
       view_set_frame(v, frame);
     }
     if (v->layout.h_per > 0.0)
     {
-      vframe_t frame = v->frame;
+      vframe_t frame = v->frame.local;
       frame.y        = 0.0;
-      frame.h        = roundf((view->frame.h - v->layout.margin_top - v->layout.margin_bottom) * v->layout.h_per);
+      frame.h        = roundf((view->frame.local.h - v->layout.margin_top - v->layout.margin_bottom) * v->layout.h_per);
       view_set_frame(v, frame);
     }
     if (v->layout.margin == INT_MAX)
     {
-      vframe_t frame = v->frame;
-      frame.x        = (view->frame.w / 2.0) - (v->frame.w / 2.0);
+      vframe_t frame = v->frame.local;
+      frame.x        = (view->frame.local.w / 2.0) - (v->frame.local.w / 2.0);
       view_set_frame(v, frame);
     }
     if (v->layout.margin_top > 0)
     {
-      vframe_t frame = v->frame;
+      vframe_t frame = v->frame.local;
       frame.y        = v->layout.margin_top;
       view_set_frame(v, frame);
     }
     if (v->layout.margin_left > 0)
     {
-      vframe_t frame = v->frame;
+      vframe_t frame = v->frame.local;
       frame.x        = v->layout.margin_left;
       view_set_frame(v, frame);
     }
     if (v->layout.margin_right > 0)
     {
-      vframe_t frame = v->frame;
-      frame.x        = view->frame.w - v->frame.w - v->layout.margin_right;
+      vframe_t frame = v->frame.local;
+      frame.x        = view->frame.local.w - v->frame.local.w - v->layout.margin_right;
       view_set_frame(v, frame);
     }
     if (v->layout.margin_bottom > 0)
     {
-      vframe_t frame = v->frame;
-      frame.y        = view->frame.h - v->frame.h - v->layout.margin_bottom;
+      vframe_t frame = v->frame.local;
+      frame.y        = view->frame.local.h - v->frame.local.h - v->layout.margin_bottom;
       view_set_frame(v, frame);
     }
   }

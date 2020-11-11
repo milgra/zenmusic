@@ -20,10 +20,10 @@ void eh_touch_evt(view_t* view, ev_t ev)
   eh_touch_t* eh = view->evt_han_data;
   if (ev.type == EV_MDOWN)
   {
-    if (ev.x < view->frame_global.x + view->frame_global.w &&
-        ev.x > view->frame_global.x &&
-        ev.y < view->frame_global.y + view->frame_global.h &&
-        ev.y > view->frame_global.y)
+    if (ev.x < view->frame.global.x + view->frame.global.w &&
+        ev.x > view->frame.global.x &&
+        ev.y < view->frame.global.y + view->frame.global.h &&
+        ev.y > view->frame.global.y)
     {
       (*eh->event)(ev, eh->data);
     }

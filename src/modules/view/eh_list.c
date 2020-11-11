@@ -58,7 +58,7 @@ void eh_list_evt(view_t* view, ev_t ev)
 
         // add items if needed
 
-        if (head->frame.y > 0.0 - PRELOAD_DISTANCE)
+        if (head->frame.local.y > 0.0 - PRELOAD_DISTANCE)
         {
           view_t* cacheitem = mtvec_head(eh->cache);
           view_t* rowitem   = (*eh->row_generator)(view, cacheitem, eh->head_index - 1);
@@ -71,7 +71,7 @@ void eh_list_evt(view_t* view, ev_t ev)
             mtvec_addatindex(eh->items, rowitem, 0);
 
             if (rowitem->parent == NULL) view_insert(view, rowitem, 0);
-            view_set_frame(rowitem, (vframe_t){0, head->frame.y - rowitem->frame.h, rowitem->frame.w, rowitem->frame.h});
+            view_set_frame(rowitem, (vframe_t){0, head->frame.local.y - rowitem->frame.local.h, rowitem->frame.local.w, rowitem->frame.local.h});
 
             eh->head_index -= 1;
           }
@@ -81,7 +81,7 @@ void eh_list_evt(view_t* view, ev_t ev)
         else
           eh->filled = 1;
 
-        if (tail->frame.y + tail->frame.h < view->frame.h + PRELOAD_DISTANCE)
+        if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h + PRELOAD_DISTANCE)
         {
           view_t* cacheitem = mtvec_head(eh->cache);
           view_t* rowitem   = (*eh->row_generator)(view, cacheitem, eh->tail_index + 1);
@@ -94,7 +94,7 @@ void eh_list_evt(view_t* view, ev_t ev)
             VADD(eh->items, rowitem);
 
             if (rowitem->parent == NULL) view_add(view, rowitem);
-            view_set_frame(rowitem, (vframe_t){0, tail->frame.y + tail->frame.h, rowitem->frame.w, rowitem->frame.h});
+            view_set_frame(rowitem, (vframe_t){0, tail->frame.local.y + tail->frame.local.h, rowitem->frame.local.w, rowitem->frame.local.h});
 
             eh->tail_index += 1;
           }
@@ -106,7 +106,7 @@ void eh_list_evt(view_t* view, ev_t ev)
 
         // remove items if needed
 
-        if (head->frame.y + head->frame.h < 0.0 - PRELOAD_DISTANCE && eh->items->length > 1)
+        if (head->frame.local.y + head->frame.local.h < 0.0 - PRELOAD_DISTANCE && eh->items->length > 1)
         {
           VADD(eh->cache, head);
 
@@ -116,7 +116,7 @@ void eh_list_evt(view_t* view, ev_t ev)
           eh->head_index += 1;
         }
 
-        if (tail->frame.y > view->frame.h + PRELOAD_DISTANCE && eh->items->length > 1)
+        if (tail->frame.local.y > view->frame.local.h + PRELOAD_DISTANCE && eh->items->length > 1)
         {
           VADD(eh->cache, tail);
 
@@ -133,7 +133,7 @@ void eh_list_evt(view_t* view, ev_t ev)
     view_t* sview;
     while ((sview = VNXT(view->views)))
     {
-      vframe_t frame = sview->frame;
+      vframe_t frame = sview->frame.local;
       frame.y += ev.dy;
       view_set_frame(sview, frame);
       eh->filled = 0;

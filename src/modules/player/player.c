@@ -11,6 +11,9 @@ void  player_play(char* path);
 void  player_stop();
 void  player_draw();
 bm_t* player_get_album(const char* path);
+void  player_draw_video(int index, int w, int h);
+void  player_draw_waves(int index, int channel, bm_t* bm);
+void  player_draw_rdft(int index, int channel, bm_t* bm);
 
 #endif
 
@@ -19,20 +22,13 @@ bm_t* player_get_album(const char* path);
 #include "SDL_image.h"
 #include "libavformat/avformat.h"
 #include "libavutil/imgutils.h"
+#include "render.c"
 #include "stream.c"
 
 static AVInputFormat* file_iformat;
 
 VideoState* is             = NULL;
 double      remaining_time = 0.0;
-
-void player_draw_video(int text_unit_both, int tex_unit_left, int tex_unit_right, int width, int height)
-{
-}
-
-void player_draw_spectrum(int text_unit_both, int tex_unit_left, int tex_unit_right, int width, int height)
-{
-}
 
 void player_play(char* path)
 {
@@ -41,8 +37,6 @@ void player_play(char* path)
     printf("player play %s\n", path);
 
     is = stream_open(path, file_iformat);
-
-    printf("videostate %xu\n", is);
   }
 }
 
@@ -56,13 +50,28 @@ void player_stop()
   }
 }
 
-void player_draw()
+void player_draw_video(int index, int w, int h)
 {
   if (is != NULL)
   {
     if (is->show_mode != SHOW_MODE_NONE && (!is->paused || is->force_refresh))
-      video_refresh(is, &remaining_time);
+      video_refresh(is, &remaining_time, index);
   }
+}
+
+void player_draw_waves(int index, int channel, bm_t* bm)
+{
+  if (is != NULL)
+  {
+    if (is->show_mode != SHOW_MODE_NONE && (!is->paused || is->force_refresh))
+    {
+      //video_draw_waves(is, &remaining_time, channel, bm);
+    }
+  }
+}
+
+void player_draw_rdft(int index, int channel, bm_t* bm)
+{
 }
 
 bm_t* player_get_album(const char* path)
@@ -120,7 +129,7 @@ bm_t* player_get_album(const char* path)
       bm_from3(result, image->pixels);
       //memcpy(result->data, image->pixels, image->w * image->h * 4);
 
-      av_free_packet(&pkt);
+      av_packet_unref(&pkt);
       break;
     }
 
@@ -129,6 +138,7 @@ bm_t* player_get_album(const char* path)
 
 fail:
   av_free(pFormatCtx);
+  return NULL;
   // this line crashes for some reason...
   //avformat_free_context(pFormatCtx);
 }

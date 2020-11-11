@@ -51,20 +51,21 @@ void tg_text_gen(view_t* view)
           .backcolor = gen->bc,
       };
 
-  bm_t* bmp = font_render_text((int)view->frame.w, (int)view->frame.h, str, common_font, ts, NULL, NULL);
+  bm_t* bmp = font_render_text((int)view->frame.local.w, (int)view->frame.local.h, str, common_font, ts, NULL, NULL);
   view_set_texture(view, bmp);
 }
 
 void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text)
 {
   tg_text_t* gen = mtmem_alloc(sizeof(tg_text_t), "tg_text_t", NULL, NULL);
-  gen->fc        = fc;
-  gen->bc        = bc;
-  gen->text      = mtcstr_fromcstring(text);
 
-  view->tex_state    = TS_BLANK;
-  view->tex_gen_data = gen;
-  view->tex_gen      = tg_text_gen;
+  gen->fc   = fc;
+  gen->bc   = bc;
+  gen->text = mtcstr_fromcstring(text);
+
+  view->texture.state = TS_BLANK;
+  view->tex_gen_data  = gen;
+  view->tex_gen       = tg_text_gen;
 }
 
 #endif

@@ -12,6 +12,7 @@
 #define gl_connector_h
 
 #include "gl_floatbuffer.c"
+#include "gl_utils.c"
 #include "mtbitmap.c"
 #include "mtmath4.c"
 #include <GL/glew.h>
@@ -40,18 +41,19 @@ typedef struct _region_t
   int h;
 } region_t;
 
-void gl_init();
-void gl_update_vertexes(fb_t* fb);
-void gl_update_textures(bm_t* bmp);
-void gl_clear_framebuffer(int index, float r, float g, float b, float a);
-void gl_draw_vertexes_in_framebuffer(int index, int start, int end, region_t source_region, region_t target_region, glshader_t shader);
-void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, region_t source_region, region_t target_region, region_t window, glshader_t shader);
+void    gl_init();
+void    gl_update_vertexes(fb_t* fb);
+void    gl_update_textures(int index, bm_t* bmp);
+void    gl_clear_framebuffer(int index, float r, float g, float b, float a);
+void    gl_draw_vertexes_in_framebuffer(int index, int start, int end, region_t source_region, region_t target_region, glshader_t shader);
+void    gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, region_t source_region, region_t target_region, region_t window, glshader_t shader);
+gltex_t gl_get_texture(uint32_t i, uint32_t w, uint32_t h);
+void    gl_draw_to_texture(int channel, int w, int h, void* data);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "gl_utils.c"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -214,18 +216,28 @@ void gl_init(width, height)
   GLint def_fb;
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &def_fb);
 
-  textures[0].fb = def_fb;              // context's buffer for drawing
-  textures[1]    = gl_create_texture(); // texture map
-  textures[2]    = gl_create_texture(); // video texture
-  textures[3]    = gl_create_texture(); // offscreen buffer
-  textures[4]    = gl_create_texture(); // offscreen buffer
-  textures[5]    = gl_create_texture(); // offscreen buffer
-  textures[6]    = gl_create_texture(); // offscreen buffer
+  textures[0].fb = def_fb; // context's buffer for drawing
 
   // create vertex buffers
 
   vertexes[0] = create_vertex_buffer();
   vertexes[1] = create_vertex_buffer();
+}
+
+gltex_t gl_get_texture(uint32_t i, uint32_t w, uint32_t h)
+{
+  if (textures[i].w == 0)
+  {
+    int x = 256;
+    int y = 256;
+    while (x < w)
+      x *= 2;
+    while (y < h)
+      y *= 2;
+    textures[i] = gl_create_texture(x, y);
+    printf("get texture %i : index %i name %i\n", i, textures[i].index, textures[i].tx);
+  }
+  return textures[i];
 }
 
 void gl_update_vertexes(fb_t* fb)
@@ -235,11 +247,11 @@ void gl_update_vertexes(fb_t* fb)
   vertexes[0].flo_buf = fb;
 }
 
-void gl_update_textures(bm_t* bmp)
+void gl_update_textures(int index, bm_t* bmp)
 {
-  glActiveTexture(GL_TEXTURE0);
+  glActiveTexture(GL_TEXTURE0 + textures[index].index);
 
-  if (bmp->w != textures[1].w || bmp->h != textures[1].h)
+  if (bmp->w != textures[index].w || bmp->h != textures[index].h)
   {
     // resize texture and framebuffer
   }
@@ -276,8 +288,8 @@ void gl_draw_vertexes_in_framebuffer(int        index,
     glUniformMatrix4fv(shaders[shader].uni_loc[0], 1, 0, projection.array);
     glViewport(0, 0, reg_tgt.w, reg_tgt.h);
 
-    glUniform1i(shaders[shader].uni_loc[1], 0);
-    glUniform1i(shaders[shader].uni_loc[2], 1);
+    glUniform1i(shaders[shader].uni_loc[1], textures[1].index);
+    glUniform1i(shaders[shader].uni_loc[2], textures[2].index);
   }
   else if (shader == SH_COLOR)
   {
@@ -289,7 +301,7 @@ void gl_draw_vertexes_in_framebuffer(int        index,
     glUniformMatrix4fv(shaders[shader].uni_loc[0], 1, 0, projection.array);
     glViewport(0, 0, reg_tgt.w, reg_tgt.h);
 
-    glUniform1i(shaders[shader].uni_loc[1], 0);
+    glUniform1i(shaders[shader].uni_loc[1], textures[1].index);
   }
 
   glBindVertexArray(vertexes[0].vao);
@@ -379,6 +391,14 @@ void gl_draw_framebuffer_in_framebuffer(int        src_ind,
 
   glDisable(GL_SCISSOR_TEST);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void gl_draw_to_texture(int channel, int w, int h, void* data)
+{
+  gltex_t texture = textures[channel];
+
+  glActiveTexture(GL_TEXTURE0 + texture.index);
+  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_BGRA, GL_UNSIGNED_BYTE, data);
 }
 
 #endif

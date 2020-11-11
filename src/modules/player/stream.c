@@ -6,7 +6,6 @@
 
 VideoState* stream_open(const char* filename, AVInputFormat* iformat);
 void        stream_close(VideoState* is);
-void        video_refresh(void* opaque, double* remaining_time);
 
 #endif
 
@@ -1002,6 +1001,8 @@ int stream_component_open(VideoState* is, int stream_index)
   case AVMEDIA_TYPE_VIDEO:
     is->last_video_stream = stream_index;
     forced_codec_name     = video_codec_name;
+    break;
+  default:
     break;
   }
   if (forced_codec_name)

@@ -34,7 +34,7 @@ void    gl_errors(const char* place);
 
 #include <stdio.h>
 
-int tex_index = 0;
+int gl_tex_index = 0;
 
 void gl_errors(const char* place)
 {
@@ -161,13 +161,13 @@ glsha_t gl_shader_create(const char*  vertex_source,
   return sh;
 }
 
-gltex_t gl_create_texture()
+gltex_t gl_create_texture(uint32_t w, uint32_t h)
 {
   gltex_t tex = {0};
 
-  tex.index = tex_index++;
-  tex.w     = 4096;
-  tex.h     = 4096;
+  tex.index = gl_tex_index++;
+  tex.w     = w;
+  tex.h     = h;
 
   glGenTextures(1, &tex.tx);
 
@@ -178,7 +178,7 @@ gltex_t gl_create_texture()
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4096, 4096, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
   glGenFramebuffers(1, &tex.fb);
   glBindFramebuffer(GL_FRAMEBUFFER, tex.fb);

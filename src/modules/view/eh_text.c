@@ -34,7 +34,7 @@ void eh_text_evt(view_t* view, ev_t ev)
     char idbuffer[100] = {0};
     snprintf(idbuffer, 100, "glyphview %s", ev.text);
 
-    view_t* glyphview = view_new(idbuffer, (vframe_t){0, 0, 20, 20}, 0);
+    view_t* glyphview = view_new(idbuffer, (vframe_t){0, 0, 20, 20});
     tg_text_add(glyphview, 0xFEFEFEFF, 0x000000FF, ev.text);
     view_add(view, glyphview);
 
@@ -45,7 +45,7 @@ void eh_text_evt(view_t* view, ev_t ev)
 
     while ((gview = VNXT(data->glyphs)))
     {
-      vframe_t frame = gview->frame;
+      vframe_t frame = gview->frame.local;
       frame.x        = pos;
       pos += frame.w;
       view_set_frame(gview, frame);

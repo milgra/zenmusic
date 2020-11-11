@@ -5,14 +5,6 @@
 #include "mtvector.c"
 #include "wm_event.c"
 
-typedef enum _texst_t // texture loading state
-{
-  TS_EXTERN,  /* texture is handled outside ui compositor */
-  TS_BLANK,   /* texture is empty */
-  TS_PENDING, /* texture is under generation */
-  TS_READY,   /* texture is generated */
-} texst_t;
-
 typedef enum _laypos_t // layout position
 {
   LP_STATIC = 0,
@@ -51,31 +43,47 @@ struct _vframe_t
   float h;
 };
 
+typedef enum _texst_t // texture loading state
+{
+  TS_BLANK,   /* texture is empty */
+  TS_PENDING, /* texture is under generation */
+  TS_READY,   /* texture is generated */
+  TS_EXTERN,  /* texture is handled outside ui compositor */
+} texst_t;
+
+typedef struct _texture_t
+{
+  texst_t  state;
+  uint32_t index;
+  bm_t*    bitmap;
+  char     changed;
+
+  char blur;
+  char shadow;
+} texture_t;
+
+typedef struct _frame_t
+{
+  vframe_t local;
+  vframe_t global;
+  char     changed;
+} frame_t;
+
 typedef struct _view_t view_t;
 struct _view_t
 {
+  char hidden;    /* exclude from rendering */
+  char overflow;  /* enable content outside frame */
   char connected; /* view is added to connector */
 
-  char*     id;     /* identifier for handling view */
-  mtvec_t*  views;  /* subviews */
-  view_t*   parent; /* parent view */
-  uint32_t  index;  /* depth */
+  char*    id;     /* identifier for handling view */
+  mtvec_t* views;  /* subviews */
+  view_t*  parent; /* parent view */
+  uint32_t index;  /* depth */
+
+  frame_t   frame;
   vlayout_t layout;
-
-  vframe_t frame;         /* parent local position and dimensions */
-  vframe_t frame_global;  /* global position and dimensions */
-  char     frame_changed; /* frame changed */
-
-  int tex_channel;
-
-  bm_t*   tex;         /* texture of view */
-  texst_t tex_state;   /* texture state */
-  char    tex_changed; /* texture changed */
-
-  char overflow; /* enable content outside frame */
-  char hidden;   /* exclude from rendering */
-  char shadow;   /* cast shadow? */
-  char blur;     /* blur background? */
+  texture_t texture;
 
   void (*evt_han)(view_t*, ev_t); /* event handler for view */
   void (*tex_gen)(view_t*);       /* texture generator for view */
@@ -83,7 +91,7 @@ struct _view_t
   void* tex_gen_data;             /* data for texture generator */
 };
 
-view_t* view_new(char* id, vframe_t frame, int texture_channel);
+view_t* view_new(char* id, vframe_t frame);
 void    view_add(view_t* view, view_t* subview);
 void    view_insert(view_t* view, view_t* subview, uint32_t index);
 void    view_remove(view_t* view, view_t* subview);
@@ -91,6 +99,7 @@ void    view_evt(view_t* view, ev_t ev);
 void    view_set_frame(view_t* view, vframe_t frame);
 void    view_set_layout(view_t* view, vlayout_t layout);
 void    view_set_texture(view_t* view, bm_t* tex);
+void    view_set_texture_index(view_t* view, uint32_t index);
 void    view_gen_texture(view_t* view);
 void    view_desc(void* pointer);
 void    view_calc_global(view_t* view);
@@ -112,21 +121,17 @@ void view_del(void* pointer)
 {
   view_t* view = (view_t*)pointer;
   REL(view->id);
-  REL(view->tex);
+  REL(view->texture.bitmap);
   REL(view->views);
 }
 
-view_t* view_new(char*    id, /* view id */
-                 vframe_t frame,
-                 int      texture_channel) /* view frame */
+view_t* view_new(char* id, vframe_t frame)
 {
   view_t* view       = mtmem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
   view->id           = mtcstr_fromcstring(id);
   view->views        = VNEW();
-  view->frame        = frame;
-  view->frame_global = frame;
-  view->tex_channel  = texture_channel;
-  view->tex_state    = texture_channel == 0 ? TS_BLANK : TS_READY;
+  view->frame.local  = frame;
+  view->frame.global = frame;
 
   return view;
 }
@@ -155,14 +160,6 @@ void view_remove(view_t* view, view_t* subview)
 {
   reindex = 1;
 
-  // TODO!!!
-  // remove all subviews recursively so ui_connector will know what to cleanup
-  /* view_t* v; */
-  /* while ((v = VNXT(subview->views))) */
-  /* { */
-  /*   view_remove(subview, v); */
-  /* } */
-
   VREM(view->views, subview);
   subview->parent = NULL;
 }
@@ -179,10 +176,10 @@ void view_evt(view_t* view, ev_t ev)
 void view_calc_global(view_t* view)
 {
   vframe_t frame_parent = {0};
-  if (view->parent != NULL) frame_parent = view->parent->frame_global;
-  view->frame_global.x = frame_parent.x + view->frame.x;
-  view->frame_global.y = frame_parent.y + view->frame.y;
-  view->frame_changed  = 1;
+  if (view->parent != NULL) frame_parent = view->parent->frame.global;
+  view->frame.global.x = frame_parent.x + view->frame.local.x;
+  view->frame.global.y = frame_parent.y + view->frame.local.y;
+  view->frame.changed  = 1;
 
   view_t* v;
   while ((v = VNXT(view->views)))
@@ -191,17 +188,22 @@ void view_calc_global(view_t* view)
 
 void view_set_frame(view_t* view, vframe_t frame)
 {
-  view->frame        = frame;
-  view->frame_global = frame;
+  view->frame.local  = frame;
+  view->frame.global = frame;
 
   view_calc_global(view);
 }
 
-void view_set_texture(view_t* view, bm_t* tex)
+void view_set_texture(view_t* view, bm_t* bitmap)
 {
-  RPL(view->tex, tex);
-  view->tex_state   = TS_READY;
-  view->tex_changed = 1;
+  RPL(view->texture.bitmap, bitmap);
+  view->texture.state   = TS_READY;
+  view->texture.changed = 1;
+}
+
+void view_set_texture_index(view_t* view, uint32_t index)
+{
+  view->texture.index = index;
 }
 
 void view_set_layout(view_t* view, vlayout_t layout)
@@ -217,7 +219,7 @@ void view_gen_texture(view_t* view)
 void view_desc(void* pointer)
 {
   view_t* view = (view_t*)pointer;
-  printf("id %s frame %f %f %f %f\n", view->id, view->frame.x, view->frame.y, view->frame.w, view->frame.h);
+  printf("id %s frame %f %f %f %f\n", view->id, view->frame.local.x, view->frame.local.y, view->frame.local.w, view->frame.local.h);
 }
 
 #endif
