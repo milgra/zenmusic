@@ -50,7 +50,7 @@ void songitem_event(ev_t ev, void* data)
     // printf("songitem event %i %i %s\n", ev.type, index, (char*)files->data[index]);
 
     bm_t* bitmap = player_get_album(files->data[index]);
-    tg_bitmap_add(coverview, NULL, bitmap);
+    tg_bitmap_add(coverview, NULL, bitmap, "album");
 
     player_play(files->data[index]);
   }
@@ -162,7 +162,7 @@ void init(int width, int height)
 
   char*   playpath = mtcstr_fromformat("%s/../res/play.png", respath, NULL);
   view_t* playbtn  = view_new("playbtnview", (vframe_t){0, 40, 80, 80});
-  tg_bitmap_add(playbtn, playpath, NULL);
+  tg_bitmap_add(playbtn, playpath, NULL, "play.png");
   view_set_layout(playbtn, (vlayout_t){
                                .margin = INT_MAX});
 
@@ -171,19 +171,19 @@ void init(int width, int height)
   view_add(coverview, playbtn);
 
   view_t* nextbtn = view_new("nextbtnview", (vframe_t){0, 60, 45, 45});
-  tg_bitmap_add(nextbtn, playpath, NULL);
+  tg_bitmap_add(nextbtn, playpath, NULL, "next.png");
   view_add(coverview, nextbtn);
 
   view_t* prevbtn = view_new("prevbtnview", (vframe_t){110, 60, 45, 45});
-  tg_bitmap_add(prevbtn, playpath, NULL);
+  tg_bitmap_add(prevbtn, playpath, NULL, "prev.png");
   view_add(coverview, prevbtn);
 
   view_t* repeatbtn = view_new("repeatbtnview", (vframe_t){0, 0, 45, 45});
-  tg_bitmap_add(repeatbtn, playpath, NULL);
+  tg_bitmap_add(repeatbtn, playpath, NULL, "repeat.png");
   view_add(coverview, repeatbtn);
 
   view_t* shufflebtn = view_new("shufflebtnview", (vframe_t){110, 0, 45, 45});
-  tg_bitmap_add(shufflebtn, playpath, NULL);
+  tg_bitmap_add(shufflebtn, playpath, NULL, "shuffle.png");
   view_add(coverview, shufflebtn);
 
   // seek bar
@@ -219,7 +219,7 @@ void init(int width, int height)
   mtdrawer_circle(circle, 75.5, 75.5, 45.0, 0xFF0000FF);
 
   view_t* circleview = view_new("circleview", (vframe_t){600, 600, 151, 151});
-  tg_bitmap_add(circleview, NULL, circle);
+  tg_bitmap_add(circleview, NULL, circle, "red circle");
 
   ui_manager_add(circleview);
 

@@ -11,11 +11,12 @@
 
 typedef struct _tg_bitmap_t
 {
+  char* id;
   char* path;
   bm_t* bitmap;
 } tg_bitmap_t;
 
-void tg_bitmap_add(view_t* view, char* filepath, bm_t* bitmap);
+void tg_bitmap_add(view_t* view, char* filepath, bm_t* bitmap, char* id);
 
 #endif
 
@@ -43,18 +44,19 @@ void tg_bitmap_gen(view_t* view)
 
     stbi_image_free(bytes);
 
-    view_set_texture(view, bmp);
+    view_set_texture(view, bmp, tg->id);
   }
 
   if (tg->bitmap)
   {
-    view_set_texture(view, tg->bitmap);
+    view_set_texture(view, tg->bitmap, tg->id);
   }
 }
 
-void tg_bitmap_add(view_t* view, char* filepath, bm_t* bitmap)
+void tg_bitmap_add(view_t* view, char* filepath, bm_t* bitmap, char* id)
 {
   tg_bitmap_t* tg = mtmem_calloc(sizeof(tg_bitmap_t), "tg_bitmap", NULL, NULL);
+  tg->id          = mtcstr_fromcstring(id);
   tg->path        = mtcstr_fromcstring(filepath);
   tg->bitmap      = bitmap;
 

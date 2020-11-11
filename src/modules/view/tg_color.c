@@ -11,7 +11,6 @@
 typedef struct _tg_color_t
 {
   uint32_t color;
-
 } tg_color_t;
 
 void tg_color_add(view_t* view, uint32_t color);
@@ -24,6 +23,9 @@ void tg_color_gen(view_t* view)
 {
   tg_color_t* gen = view->tex_gen_data;
 
+  char idbuffer[100] = {0};
+  snprintf(idbuffer, 20, "color %i", gen->color);
+
   bm_t* bmp = bm_new(view->frame.local.w, view->frame.local.h);
   bm_fill(bmp,
           0,
@@ -31,7 +33,7 @@ void tg_color_gen(view_t* view)
           view->frame.local.w,
           view->frame.local.h,
           gen->color);
-  view_set_texture(view, bmp);
+  view_set_texture(view, bmp, idbuffer);
 }
 
 void tg_color_add(view_t* view, uint32_t color)

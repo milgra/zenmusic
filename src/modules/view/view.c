@@ -34,15 +34,6 @@ struct _vlayout_t
   int      margin_bottom;
 };
 
-typedef struct _vframe_t vframe_t; // view frame
-struct _vframe_t
-{
-  float x;
-  float y;
-  float w;
-  float h;
-};
-
 typedef enum _texst_t // texture loading state
 {
   TS_BLANK,   /* texture is empty */
@@ -62,6 +53,14 @@ typedef struct _texture_t
   char blur;
   char shadow;
 } texture_t;
+
+typedef struct _vframe_t
+{
+  float x;
+  float y;
+  float w;
+  float h;
+} vframe_t;
 
 typedef struct _frame_t
 {
@@ -96,14 +95,17 @@ view_t* view_new(char* id, vframe_t frame);
 void    view_add(view_t* view, view_t* subview);
 void    view_insert(view_t* view, view_t* subview, uint32_t index);
 void    view_remove(view_t* view, view_t* subview);
-void    view_evt(view_t* view, ev_t ev);
-void    view_set_frame(view_t* view, vframe_t frame);
-void    view_set_layout(view_t* view, vlayout_t layout);
-void    view_set_texture(view_t* view, bm_t* tex);
-void    view_set_texture_page(view_t* view, uint32_t page);
-void    view_gen_texture(view_t* view);
-void    view_desc(void* pointer);
-void    view_calc_global(view_t* view);
+
+void view_evt(view_t* view, ev_t ev);
+void view_gen_texture(view_t* view);
+
+void view_set_frame(view_t* view, vframe_t frame);
+void view_set_layout(view_t* view, vlayout_t layout);
+void view_set_texture(view_t* view, bm_t* tex, char* id);
+void view_set_texture_page(view_t* view, uint32_t page);
+
+void view_desc(void* pointer);
+void view_calc_global(view_t* view);
 
 extern char reindex;
 
@@ -195,9 +197,10 @@ void view_set_frame(view_t* view, vframe_t frame)
   view_calc_global(view);
 }
 
-void view_set_texture(view_t* view, bm_t* bitmap)
+void view_set_texture(view_t* view, bm_t* bitmap, char* id)
 {
   RPL(view->texture.bitmap, bitmap);
+  view->texture.id      = mtcstr_fromcstring(id);
   view->texture.state   = TS_READY;
   view->texture.changed = 1;
 }

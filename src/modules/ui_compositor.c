@@ -35,7 +35,7 @@ void ui_compositor_add(char* id, uint32_t index, uirect_t uirect, int page, char
 void ui_compositor_rem(char* id);
 void ui_compositor_set_index(char* id, uint32_t index);
 void ui_compositor_set_frame(char* id, uirect_t rect);
-void ui_compositor_set_texture(char* id, bm_t* bmp);
+void ui_compositor_set_texture(char* viewid, char* texid, bm_t* bmp);
 void ui_compositor_resize(int width, int height);
 
 typedef struct _crect_t
@@ -243,25 +243,25 @@ void ui_compositor_set_frame(char* id, uirect_t uirect)
   ui_compositor_update();
 }
 
-void ui_compositor_set_texture(char* id, bm_t* tex)
+void ui_compositor_set_texture(char* viewid, char* texid, bm_t* tex)
 {
   crect_t*    rect;
   tm_coords_t coords;
 
-  if ((rect = MGET(rectm, id)))
+  if ((rect = MGET(rectm, viewid)))
   {
-    coords = tm_get(tm, id);
+    coords = tm_get(tm, texid);
 
     if (coords.w != tex->w || coords.h != tex->h)
     {
       // printf("ui_compositor text2ure size mismatch, adding as new %s %i %i %i %i\n", id, coords.w, tex->w, coords.h, tex->h);
-      tm_put(tm, id, tex);
-      coords = tm_get(tm, id);
+      tm_put(tm, texid, tex);
+      coords = tm_get(tm, texid);
     }
     else
     {
       // printf("ui_compositor updating texture in place %s\n", id);
-      tm_upd(tm, id, tex);
+      tm_upd(tm, texid, tex);
     }
 
     crect_set_texture(rect, (uitexc_t){.x = coords.ltx, .y = coords.lty, .z = coords.rbx, .w = coords.rby});

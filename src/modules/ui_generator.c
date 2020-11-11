@@ -140,7 +140,7 @@ void ui_generator_render()
     }
     if (view->texture.changed)
     {
-      ui_compositor_set_texture(view->id, view->texture.bitmap);
+      ui_compositor_set_texture(view->id, view->texture.id, view->texture.bitmap);
       view->texture.changed = 0;
     }
   }
