@@ -40,7 +40,7 @@ mtch_t*   uich;
 pthread_t uibgth;
 mtvec_t*  trash;
 int       ui_generator_workloop(void* mypointer);
-uint32_t  tex_index = 2;
+uint32_t  tex_page = 2;
 
 int ui_generator_init(int width, int height)
 {
@@ -67,15 +67,15 @@ void ui_generator_add(view_t* view)
 {
   VADD(uiv, view);
 
-  if (view->texture.state == TS_EXTERN && view->texture.index == 0)
+  if (view->texture.state == TS_EXTERN && view->texture.page == 0)
   {
     printf("ui gen add %s\n", view->id);
-    view_set_texture_index(view, tex_index++);
+    view_set_texture_page(view, tex_page++);
   }
   else
   {
     // set default texture channel with texture map
-    view_set_texture_index(view, 1);
+    view_set_texture_page(view, 1);
   }
 
   uirect_t uirect = {
@@ -87,7 +87,7 @@ void ui_generator_add(view_t* view)
   ui_compositor_add(view->id,
                     view->index,
                     uirect,
-                    view->texture.index,
+                    view->texture.page,
                     view->texture.shadow,
                     view->texture.blur);
 

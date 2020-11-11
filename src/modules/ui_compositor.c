@@ -31,7 +31,7 @@ typedef struct _uitexc_t
 void ui_compositor_init(int, int);
 void ui_compositor_render();
 void ui_compositor_reset();
-void ui_compositor_add(char* id, uint32_t index, uirect_t uirect, int texindex, char shadow, char blurred);
+void ui_compositor_add(char* id, uint32_t index, uirect_t uirect, int page, char shadow, char blurred);
 void ui_compositor_rem(char* id);
 void ui_compositor_set_index(char* id, uint32_t index);
 void ui_compositor_set_frame(char* id, uirect_t rect);
@@ -179,14 +179,14 @@ void ui_compositor_update()
   }
 }
 
-void ui_compositor_add(char* id, uint32_t index, uirect_t uirect, int texindex, char shadow, char blur)
+void ui_compositor_add(char* id, uint32_t index, uirect_t uirect, int page, char shadow, char blur)
 {
-  printf("ui_compositor_add %s index %i channel %i %f %f %f %f\n", id, index, texindex, uirect.x, uirect.y, uirect.w, uirect.h);
+  printf("ui_compositor_add %s index %i page %i %f %f %f %f\n", id, index, page, uirect.x, uirect.y, uirect.w, uirect.h);
 
-  gltex_t  tex_dim = gl_get_texture(texindex, uirect.w, uirect.h);
+  gltex_t  tex_dim = gl_get_texture(page, uirect.w, uirect.h);
   uitexc_t tex_cor = (uitexc_t){0.0, 0.0, uirect.w / tex_dim.w, uirect.h / tex_dim.h};
 
-  crect_t* rect = crect_new(id, index, texindex, uirect, tex_cor);
+  crect_t* rect = crect_new(id, index, page, uirect, tex_cor);
 
   rect->shadow = shadow;
   rect->blur   = blur;
@@ -279,7 +279,7 @@ void ui_compositor_resize(int width, int height)
 // Compositor Rect
 //
 
-crect_t* crect_new(char* id, uint32_t index, uint32_t texindex, uirect_t rect, uitexc_t texc)
+crect_t* crect_new(char* id, uint32_t index, uint32_t page, uirect_t rect, uitexc_t texc)
 {
   crect_t* r = mtmem_calloc(sizeof(crect_t), "crect_t", crect_del, NULL);
 
@@ -292,37 +292,37 @@ crect_t* crect_new(char* id, uint32_t index, uint32_t texindex, uirect_t rect, u
   r->data[1] = rect.y;
   r->data[2] = texc.x;
   r->data[3] = texc.y;
-  r->data[4] = (float)texindex;
+  r->data[4] = (float)page;
 
   r->data[5] = rect.x + rect.w;
   r->data[6] = rect.y + rect.h;
   r->data[7] = texc.z;
   r->data[8] = texc.w;
-  r->data[9] = (float)texindex;
+  r->data[9] = (float)page;
 
   r->data[10] = rect.x;
   r->data[11] = rect.y + rect.h;
   r->data[12] = texc.x;
   r->data[13] = texc.w;
-  r->data[14] = (float)texindex;
+  r->data[14] = (float)page;
 
   r->data[15] = rect.x + rect.w;
   r->data[16] = rect.y;
   r->data[17] = texc.z;
   r->data[18] = texc.y;
-  r->data[19] = (float)texindex;
+  r->data[19] = (float)page;
 
   r->data[20] = rect.x;
   r->data[21] = rect.y;
   r->data[22] = texc.x;
   r->data[23] = texc.y;
-  r->data[24] = (float)texindex;
+  r->data[24] = (float)page;
 
   r->data[25] = rect.x + rect.w;
   r->data[26] = rect.y + rect.h;
   r->data[27] = texc.z;
   r->data[28] = texc.w;
-  r->data[29] = (float)texindex;
+  r->data[29] = (float)page;
 
   return r;
 }

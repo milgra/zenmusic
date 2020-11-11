@@ -36,11 +36,11 @@ void eh_visu_evt(view_t* view, ev_t ev)
 
     if (audio_vis == VIS_WAVE)
     {
-      player_draw_waves(view->texture.index, 0, view->texture.bitmap);
+      player_draw_waves(view->texture.page, 0, view->texture.bitmap);
     }
     else if (audio_vis == VIS_RDFT)
     {
-      player_draw_rdft(view->texture.index, 0, view->texture.bitmap);
+      player_draw_rdft(view->texture.page, 0, view->texture.bitmap);
     }
   }
 }

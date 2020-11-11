@@ -53,10 +53,11 @@ typedef enum _texst_t // texture loading state
 
 typedef struct _texture_t
 {
-  texst_t  state;
-  uint32_t index;
-  bm_t*    bitmap;
-  char     changed;
+  char*    id;      /* texture id, multiple views can show the same texture */
+  texst_t  state;   /* render state of texture */
+  uint32_t page;    /* texture page */
+  bm_t*    bitmap;  /* texture bitmap */
+  char     changed; /* texture is changed */
 
   char blur;
   char shadow;
@@ -99,7 +100,7 @@ void    view_evt(view_t* view, ev_t ev);
 void    view_set_frame(view_t* view, vframe_t frame);
 void    view_set_layout(view_t* view, vlayout_t layout);
 void    view_set_texture(view_t* view, bm_t* tex);
-void    view_set_texture_index(view_t* view, uint32_t index);
+void    view_set_texture_page(view_t* view, uint32_t page);
 void    view_gen_texture(view_t* view);
 void    view_desc(void* pointer);
 void    view_calc_global(view_t* view);
@@ -201,9 +202,9 @@ void view_set_texture(view_t* view, bm_t* bitmap)
   view->texture.changed = 1;
 }
 
-void view_set_texture_index(view_t* view, uint32_t index)
+void view_set_texture_page(view_t* view, uint32_t page)
 {
-  view->texture.index = index;
+  view->texture.page = page;
 }
 
 void view_set_layout(view_t* view, vlayout_t layout)
