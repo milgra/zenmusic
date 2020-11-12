@@ -2,6 +2,8 @@
 #ifndef render_h
 #define render_h
 
+void video_show(void* opaque, int index);
+void visu_show(void* opaque, int index);
 void video_refresh(void* opaque, double* remaining_time, int index);
 
 #endif
@@ -526,18 +528,40 @@ static int video_open(VideoState* is)
   return 0;
 }
 
-/* display the current picture, if any */
-static void video_display(VideoState* is, int index)
+void video_show(void* opaque, int index)
 {
-  if (!is->width) video_open(is);
+  VideoState* is = opaque;
 
-  //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-  //SDL_RenderClear(renderer);
-  /* if (is->audio_st && is->show_mode != SHOW_MODE_VIDEO) */
-  //video_audio_display(is, index);
-  /* else if (is->video_st) */
-  video_image_display(is, index);
-  //SDL_RenderPresent(renderer);
+  if (!display_disable && is->show_mode == SHOW_MODE_VIDEO && is->pictq.rindex_shown)
+  {
+    if (!is->width) video_open(is);
+
+    //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    //SDL_RenderClear(renderer);
+    /* if (is->audio_st && is->show_mode != SHOW_MODE_VIDEO) */
+    //video_audio_display(is, index);
+    /* else if (is->video_st) */
+    video_image_display(is, index);
+    //SDL_RenderPresent(renderer);
+  }
+}
+
+void visu_show(void* opaque, int index)
+{
+  VideoState* is = opaque;
+
+  if (!display_disable && is->show_mode == SHOW_MODE_VIDEO && is->pictq.rindex_shown)
+  {
+    if (!is->width) video_open(is);
+
+    //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    //SDL_RenderClear(renderer);
+    /* if (is->audio_st && is->show_mode != SHOW_MODE_VIDEO) */
+    video_audio_display(is, index);
+    /* else if (is->video_st) */
+    //video_image_display(is, index);
+    //SDL_RenderPresent(renderer);
+  }
 }
 
 /* called to display each frame */
@@ -556,7 +580,7 @@ void video_refresh(void* opaque, double* remaining_time, int index)
     time = av_gettime_relative() / 1000000.0;
     if (is->force_refresh || is->last_vis_time + rdftspeed < time)
     {
-      video_display(is, index);
+      // video_display(is, index);
       is->last_vis_time = time;
     }
     *remaining_time = FFMIN(*remaining_time, is->last_vis_time + rdftspeed - time);
@@ -668,9 +692,10 @@ void video_refresh(void* opaque, double* remaining_time, int index)
         stream_toggle_pause(is);
     }
   display:
+    if (0) {};
     /* display picture */
-    if (!display_disable && is->force_refresh && is->show_mode == SHOW_MODE_VIDEO && is->pictq.rindex_shown)
-      video_display(is, index);
+    /* if (!display_disable && is->force_refresh && is->show_mode == SHOW_MODE_VIDEO && is->pictq.rindex_shown) */
+    /*   video_display(is, index); */
   }
   is->force_refresh = 0;
   if (show_status)

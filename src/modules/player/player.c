@@ -55,7 +55,10 @@ void player_draw_video(int index, int w, int h)
   if (is != NULL)
   {
     if (is->show_mode != SHOW_MODE_NONE && (!is->paused || is->force_refresh))
+    {
       video_refresh(is, &remaining_time, index);
+      video_show(is, index);
+    }
   }
 }
 

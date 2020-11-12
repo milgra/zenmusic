@@ -35,41 +35,41 @@ uint32_t ui_generate_create_texture();
 #include <SDL.h>
 #include <unistd.h>
 
-mtvec_t*  uiv;
-mtch_t*   uich;
-pthread_t uibgth;
-mtvec_t*  trash;
-int       ui_generator_workloop(void* mypointer);
-uint32_t  tex_page = 4;
+int ui_generator_workloop(void* mypointer);
+
+struct _ui_generator_t
+{
+  mtvec_t*    views;
+  mtch_t*     channel;
+  SDL_Thread* thread;
+  uint32_t    tex_page;
+} uig = {0};
 
 int ui_generator_init(int width, int height)
 {
   ui_compositor_init(width, height);
 
-  uiv   = VNEW();
-  uich  = mtch_new(50);
-  trash = VNEW();
+  uig.views    = VNEW();
+  uig.channel  = mtch_new(50);
+  uig.thread   = SDL_CreateThread(ui_generator_workloop, "generator", NULL);
+  uig.tex_page = 4;
 
-  SDL_Thread* thread = SDL_CreateThread(ui_generator_workloop,
-                                        "generator",
-                                        NULL);
-
-  return (thread != NULL);
+  return (uig.thread != NULL);
 }
 
 void ui_generator_reset()
 {
   ui_compositor_reset();
-  mtvec_reset(uiv);
+  mtvec_reset(uig.views);
 }
 
 void ui_generator_add(view_t* view)
 {
-  VADD(uiv, view);
+  VADD(uig.views, view);
 
   if (view->texture.state == TS_EXTERN && view->texture.page == 0)
   {
-    view_set_texture_page(view, tex_page++);
+    view_set_texture_page(view, uig.tex_page++);
   }
   else
   {
@@ -95,20 +95,6 @@ void ui_generator_add(view_t* view)
 
 void ui_generator_cleanup()
 {
-  view_t* v;
-
-  while ((v = VNXT(uiv)))
-  {
-    if (v->parent == NULL)
-    {
-      ui_compositor_rem(v->id);
-      v->connected = 0;
-      VADD(trash, v);
-    }
-  }
-
-  mtvec_reminvector(uiv, trash);
-  mtvec_reset(trash);
 }
 
 void ui_generator_set_index(view_t* view)
@@ -120,11 +106,11 @@ void ui_generator_render()
 {
   view_t* view;
 
-  while ((view = VNXT(uiv)))
+  while ((view = VNXT(uig.views)))
   {
     if (view->texture.state == TS_BLANK)
     {
-      if (mtch_send(uich, view)) view->texture.state = TS_PENDING;
+      if (mtch_send(uig.channel, view)) view->texture.state = TS_PENDING;
     }
     if (view->frame.changed)
     {
@@ -153,7 +139,7 @@ int ui_generator_workloop()
 
   while (1)
   {
-    while ((view = mtch_recv(uich)))
+    while ((view = mtch_recv(uig.channel)))
     {
       view_gen_texture(view);
     }
