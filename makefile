@@ -1,4 +1,7 @@
-src = $(wildcard src/*.c) \
+CC = clang
+OBJDIR = bin/obj
+
+SOURCES = $(wildcard src/*.c) \
 	$(wildcard src/mtlib/*.c) \
 	$(wildcard src/modules/*.c) \
 	$(wildcard src/modules/gl/*.c) \
@@ -9,41 +12,46 @@ src = $(wildcard src/*.c) \
 	$(wildcard src/modules/wm/*.c)
 
 CFLAGS = -I/usr/local/include \
-    -I/usr/local/include/GL \
-    -I/usr/local/include/SDL2 \
-    -Isrc \
-    -Isrc/ui \
-    -Isrc/mtlib \
-    -Isrc/views \
-    -Isrc/modules \
-    -Isrc/modules/gl \
-    -Isrc/modules/wm \
-    -Isrc/modules/text \
-    -Isrc/modules/view \
-    -Isrc/modules/image \
-    -Isrc/modules/player
+	-I/usr/local/include/GL \
+	-I/usr/local/include/SDL2 \
+	-Isrc \
+	-Isrc/ui \
+	-Isrc/mtlib \
+	-Isrc/views \
+	-Isrc/modules \
+	-Isrc/modules/gl \
+	-Isrc/modules/wm \
+	-Isrc/modules/text \
+	-Isrc/modules/view \
+	-Isrc/modules/image \
+	-Isrc/modules/player
 
 
 LDFLAGS = -L/usr/local/lib \
 	-lm \
 	-lGL \
-    -lGLEW \
-    -lSDL2 \
-    -lSDL2_image \
-    -lavutil \
-    -lavcodec \
-    -lavdevice \
-    -lavformat \
-    -lavfilter \
-    -lswresample \
-    -lswscale \
-    -Isrc/modules/player
+	-lGLEW \
+	-lSDL2 \
+	-lSDL2_image \
+	-lavutil \
+	-lavcodec \
+	-lavdevice \
+	-lavformat \
+	-lavfilter \
+	-lswresample \
+	-lswscale \
+	-Isrc/modules/player
 
-obj = $(src:.c=.o)
-CC = clang
+OBJECTS := $(addprefix $(OBJDIR)/,$(SOURCES:.c=.o))
 
-zenmusic: $(obj)
-	$(CC) -o bin/$@ $^ $(LDFLAGS)
+zenmusic: $(OBJECTS)
+	$(CC) $^ -o bin/$@ $(LDFLAGS)
+
+# As we keep the source tree we have to create the
+# needed directories for every object
+$(OBJECTS): $(OBJDIR)/%.o: %.c
+	mkdir -p $(@D)
+	$(CC) -c $< -o $@ $(CFLAGS)
 
 clean:
-	rm -f $(obj) myprog
+	rm -f $(OBJECTS) zenmusic
