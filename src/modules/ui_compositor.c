@@ -92,6 +92,7 @@ void ui_compositor_init(int width, int height)
 
   /* textures for framebuffer composition */
 
+  gl_get_texture(2, 4096, 4096);
   gl_get_texture(3, 4096, 4096);
   gl_get_texture(4, 4096, 4096);
   gl_get_texture(5, 4096, 4096);

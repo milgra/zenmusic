@@ -394,7 +394,7 @@ void gl_draw_vertexes_in_framebuffer(int          page,
     glViewport(0, 0, reg_tgt.w, reg_tgt.h);
 
     glUniform1i(gl.shaders[shader].uni_loc[1], gl.textures[1].index);
-    glUniform1i(gl.shaders[shader].uni_loc[2], gl.textures[2].index);
+    //glUniform1i(gl.shaders[shader].uni_loc[2], gl.textures[2].index);
   }
   else if (shader == SH_COLOR)
   {

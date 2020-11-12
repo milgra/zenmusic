@@ -32,8 +32,9 @@ void eh_video_add(view_t* view)
 {
   eh_video_t* eh = mtmem_calloc(sizeof(eh_video_t), "eh_video", NULL, NULL);
 
-  view->evt_han_data = eh;
-  view->evt_han      = eh_video_evt;
+  view->texture.state = TS_EXTERN;
+  view->evt_han_data  = eh;
+  view->evt_han       = eh_video_evt;
 }
 
 #endif

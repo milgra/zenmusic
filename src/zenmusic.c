@@ -2,6 +2,7 @@
 #include "eh_drag.c"
 #include "eh_list.c"
 #include "eh_text.c"
+#include "eh_video.c"
 #include "font.c"
 #include "mtcstring.c"
 #include "mtdrawer.c"
@@ -222,6 +223,11 @@ void init(int width, int height)
   tg_bitmap_add(circleview, NULL, circle, "red circle");
 
   ui_manager_add(circleview);
+
+  view_t* videoview = view_new("videoview", (vframe_t){800, 600, 300, 300});
+  eh_video_add(videoview);
+
+  ui_manager_add(videoview);
 
   /* view_t* texmapview = view_new("texmapview", (vframe_t){50, 500, 200, 200}, 0); */
   /* eh_drag_add(texmapview); */
