@@ -43,6 +43,7 @@ void     gl_draw_to_texture(int page, int w, int h, void* data);
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -280,6 +281,8 @@ void gl_init(width, height)
 
 glrect_t gl_get_texture(uint32_t page, uint32_t w, uint32_t h)
 {
+  assert(page > 0); /* 0 is reserved for context's default framebuffer */
+
   if (gl.textures[page].w == 0)
   {
     int x = 256;
