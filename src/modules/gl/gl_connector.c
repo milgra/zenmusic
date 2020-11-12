@@ -1,54 +1,43 @@
 /*
   OpenGL Connector Module for Zen Multimedia Desktop System
-  Renders incoming triangles and textures to screen
-  Composes framebuffers together
+  Renders textured triangles to framebuffers and combines framebuffers with different shaders
   Textures can be internal or external
-
-  gl_connector -> GPU
-  
  */
 
 #ifndef gl_connector_h
 #define gl_connector_h
 
 #include "gl_floatbuffer.c"
-#include "gl_utils.c"
+#include "gl_shader.c"
 #include "mtbitmap.c"
 #include "mtmath4.c"
 #include <GL/glew.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef enum _glshader_t // texture loading state
+typedef enum _gl_sha_typ_t
 {
   SH_TEXTURE,
   SH_COLOR,
   SH_BLUR
-} glshader_t;
+} gl_sha_typ_t;
 
-typedef struct _ver_buf_t
-{
-  GLuint vbo;
-  GLuint vao;
-  fb_t*  flo_buf;
-} ver_buf_t;
-
-typedef struct _region_t
+typedef struct _glrect_t
 {
   int x;
   int y;
   int w;
   int h;
-} region_t;
+} glrect_t;
 
-void    gl_init();
-void    gl_update_vertexes(fb_t* fb);
-void    gl_update_textures(int page, bm_t* bmp);
-void    gl_clear_framebuffer(int page, float r, float g, float b, float a);
-void    gl_draw_vertexes_in_framebuffer(int page, int start, int end, region_t source_region, region_t target_region, glshader_t shader);
-void    gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, region_t source_region, region_t target_region, region_t window, glshader_t shader);
-gltex_t gl_get_texture(uint32_t i, uint32_t w, uint32_t h);
-void    gl_draw_to_texture(int page, int w, int h, void* data);
+void     gl_init();
+glrect_t gl_get_texture(uint32_t i, uint32_t w, uint32_t h);
+void     gl_update_vertexes(fb_t* fb);
+void     gl_update_textures(int page, bm_t* bmp);
+void     gl_clear_framebuffer(int page, float r, float g, float b, float a);
+void     gl_draw_vertexes_in_framebuffer(int page, int start, int end, glrect_t source_region, glrect_t target_region, gl_sha_typ_t shader);
+void     gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glrect_t source_region, glrect_t target_region, glrect_t window, gl_sha_typ_t shader);
+void     gl_draw_to_texture(int page, int w, int h, void* data);
 
 #endif
 
@@ -56,6 +45,42 @@ void    gl_draw_to_texture(int page, int w, int h, void* data);
 
 #include <stdio.h>
 #include <stdlib.h>
+
+typedef struct _glbuf_t
+{
+  GLuint vbo;
+  GLuint vao;
+  fb_t*  flo_buf;
+} glbuf_t;
+
+typedef struct _gltex_t
+{
+  GLuint index;
+  GLuint tx;
+  GLuint fb;
+  GLuint w;
+  GLuint h;
+} gltex_t;
+
+struct gl_connector_t
+{
+  int tex_index;
+
+  glsha_t shaders[3];
+  gltex_t textures[10];
+  glbuf_t vertexes[10];
+} gl = {0};
+
+void gl_errors(const char* place)
+{
+  GLenum error = 0;
+  do
+  {
+    GLenum error = glGetError();
+    if (error > GL_NO_ERROR)
+      printf("GL Error at %s : %i\n", place, error);
+  } while (error > GL_NO_ERROR);
+}
 
 glsha_t create_texture_shader()
 {
@@ -179,9 +204,41 @@ glsha_t create_blur_shader()
                           ((const char*[]){"projection", "samplera"}));
 }
 
-ver_buf_t create_vertex_buffer()
+gltex_t gl_create_texture(uint32_t w, uint32_t h)
 {
-  ver_buf_t vb = {0};
+  gltex_t tex = {0};
+
+  tex.index = gl.tex_index++;
+  tex.w     = w;
+  tex.h     = h;
+
+  glGenTextures(1, &tex.tx);
+
+  glActiveTexture(GL_TEXTURE0 + tex.index);
+  glBindTexture(GL_TEXTURE_2D, tex.tx);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
+  glGenFramebuffers(1, &tex.fb);
+
+  glBindFramebuffer(GL_FRAMEBUFFER, tex.fb);
+  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex.tx, 0);
+
+  return tex;
+}
+
+void gl_delete_texture(gltex_t tex)
+{
+  glDeleteTextures(1, &tex.tx);
+  glDeleteFramebuffers(1, &tex.fb);
+}
+
+glbuf_t create_buffer()
+{
+  glbuf_t vb = {0};
 
   glGenBuffers(1, &vb.vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vb.vbo);
@@ -197,36 +254,33 @@ ver_buf_t create_vertex_buffer()
   return vb;
 }
 
-glsha_t   shaders[3]   = {0};
-gltex_t   textures[10] = {0};
-ver_buf_t vertexes[10] = {0};
+void gl_delete_vertex_buffer(glbuf_t buf)
+{
+  glDeleteBuffers(1, &buf.vbo);
+  glDeleteVertexArrays(1, &buf.vao);
+}
 
 void gl_init(width, height)
 {
   glewInit();
 
-  // create shaders
+  gl.shaders[SH_TEXTURE] = create_texture_shader();
+  gl.shaders[SH_COLOR]   = create_color_shader();
+  gl.shaders[SH_BLUR]    = create_blur_shader();
 
-  shaders[SH_TEXTURE] = create_texture_shader();
-  shaders[SH_COLOR]   = create_color_shader();
-  shaders[SH_BLUR]    = create_blur_shader();
+  /* texture 0 is preserved for context's default buffer */
+  GLint context_fb;
+  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &context_fb);
+  gl.textures[0].fb = context_fb;
 
-  // create textures
-
-  GLint def_fb;
-  glGetIntegerv(GL_FRAMEBUFFER_BINDING, &def_fb);
-
-  textures[0].fb = def_fb; // context's buffer for drawing
-
-  // create vertex buffers
-
-  vertexes[0] = create_vertex_buffer();
-  vertexes[1] = create_vertex_buffer();
+  /* buffer 0 is preserved for framebuffer drawing */
+  gl.vertexes[0] = create_buffer();
+  gl.vertexes[1] = create_buffer();
 }
 
-gltex_t gl_get_texture(uint32_t page, uint32_t w, uint32_t h)
+glrect_t gl_get_texture(uint32_t page, uint32_t w, uint32_t h)
 {
-  if (textures[page].w == 0)
+  if (gl.textures[page].w == 0)
   {
     int x = 256;
     int y = 256;
@@ -234,23 +288,26 @@ gltex_t gl_get_texture(uint32_t page, uint32_t w, uint32_t h)
       x *= 2;
     while (y < h)
       y *= 2;
-    textures[page] = gl_create_texture(x, y);
+    gl.textures[page] = gl_create_texture(x, y);
   }
-  return textures[page];
+
+  gltex_t tex = gl.textures[page];
+
+  return ((glrect_t){.w = tex.w, .h = tex.h});
 }
 
 void gl_update_vertexes(fb_t* fb)
 {
-  glBindBuffer(GL_ARRAY_BUFFER, vertexes[0].vbo);
+  glBindBuffer(GL_ARRAY_BUFFER, gl.vertexes[1].vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * fb->pos, fb->data, GL_DYNAMIC_DRAW);
-  vertexes[0].flo_buf = fb;
+  gl.vertexes[1].flo_buf = fb;
 }
 
 void gl_update_textures(int page, bm_t* bmp)
 {
-  glActiveTexture(GL_TEXTURE0 + textures[page].index);
+  glActiveTexture(GL_TEXTURE0 + gl.textures[page].index);
 
-  if (bmp->w != textures[page].w || bmp->h != textures[page].h)
+  if (bmp->w != gl.textures[page].w || bmp->h != gl.textures[page].h)
   {
     // resize texture and framebuffer
   }
@@ -261,50 +318,96 @@ void gl_update_textures(int page, bm_t* bmp)
 
 void gl_clear_framebuffer(int page, float r, float g, float b, float a)
 {
-  glBindFramebuffer(GL_FRAMEBUFFER, textures[page].fb);
+  glBindFramebuffer(GL_FRAMEBUFFER, gl.textures[page].fb);
   glClearColor(r, g, b, a);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void gl_draw_vertexes_in_framebuffer(int        page,
-                                     int        start,
-                                     int        end,
-                                     region_t   reg_src,
-                                     region_t   reg_tgt,
-                                     glshader_t shader)
+void gl_draw_rectangle(glrect_t src_reg, glrect_t tgt_reg)
+{
+  GLfloat data[] =
+      {
+          0.0,
+          0.0,
+          0.0,
+          (float)src_reg.h / 4096.0,
+          0.0,
+
+          tgt_reg.w,
+          tgt_reg.h,
+          (float)src_reg.w / 4096.0,
+          0.0,
+          0.0,
+
+          0.0,
+          tgt_reg.h,
+          0.0,
+          0.0,
+          0.0,
+
+          0.0,
+          0.0,
+          0.0,
+          (float)src_reg.h / 4096.0,
+          0.0,
+
+          tgt_reg.w,
+          0.0,
+          (float)src_reg.w / 4096.0,
+          (float)src_reg.h / 4096.0,
+          0.0,
+
+          tgt_reg.w,
+          tgt_reg.h,
+          (float)src_reg.w / 4096.0,
+          0.0,
+          0.0,
+      };
+
+  glBindBuffer(GL_ARRAY_BUFFER, gl.vertexes[0].vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 5, data, GL_DYNAMIC_DRAW);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void gl_draw_vertexes_in_framebuffer(int          page,
+                                     int          start,
+                                     int          end,
+                                     glrect_t     reg_src,
+                                     glrect_t     reg_tgt,
+                                     gl_sha_typ_t shader)
 {
   matrix4array_t projection;
   projection.matrix = m4_defaultortho(0.0, reg_src.w, reg_src.h, 0, 0.0, 1.0);
 
-  glUseProgram(shaders[shader].name);
+  glUseProgram(gl.shaders[shader].name);
 
   if (shader == SH_TEXTURE)
   {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glUniformMatrix4fv(shaders[shader].uni_loc[0], 1, 0, projection.array);
+    glUniformMatrix4fv(gl.shaders[shader].uni_loc[0], 1, 0, projection.array);
     glViewport(0, 0, reg_tgt.w, reg_tgt.h);
 
-    glUniform1i(shaders[shader].uni_loc[1], textures[1].index);
-    glUniform1i(shaders[shader].uni_loc[2], textures[2].index);
+    glUniform1i(gl.shaders[shader].uni_loc[1], gl.textures[1].index);
+    glUniform1i(gl.shaders[shader].uni_loc[2], gl.textures[2].index);
   }
   else if (shader == SH_COLOR)
   {
-    glUniformMatrix4fv(shaders[shader].uni_loc[0], 1, 0, projection.array);
+    glUniformMatrix4fv(gl.shaders[shader].uni_loc[0], 1, 0, projection.array);
     glViewport(0, 0, reg_tgt.w, reg_tgt.h);
   }
   else if (shader == SH_BLUR)
   {
-    glUniformMatrix4fv(shaders[shader].uni_loc[0], 1, 0, projection.array);
+    glUniformMatrix4fv(gl.shaders[shader].uni_loc[0], 1, 0, projection.array);
     glViewport(0, 0, reg_tgt.w, reg_tgt.h);
 
-    glUniform1i(shaders[shader].uni_loc[1], textures[1].index);
+    glUniform1i(gl.shaders[shader].uni_loc[1], gl.textures[1].index);
   }
 
-  glBindVertexArray(vertexes[0].vao);
-  glBindFramebuffer(GL_FRAMEBUFFER, textures[page].fb);
+  glBindVertexArray(gl.vertexes[1].vao);
+  glBindFramebuffer(GL_FRAMEBUFFER, gl.textures[page].fb);
 
   glDrawArrays(GL_TRIANGLES, start, end - start);
 
@@ -312,73 +415,32 @@ void gl_draw_vertexes_in_framebuffer(int        page,
   glBindVertexArray(0);
 }
 
-void gl_draw_framebuffer_in_framebuffer(int        src_page,
-                                        int        tgt_page,
-                                        region_t   src_reg,
-                                        region_t   tgt_reg,
-                                        region_t   window,
-                                        glshader_t shader)
+void gl_draw_framebuffer_in_framebuffer(int          src_page,
+                                        int          tgt_page,
+                                        glrect_t     src_reg,
+                                        glrect_t     tgt_reg,
+                                        glrect_t     window,
+                                        gl_sha_typ_t shader)
 {
-  glUseProgram(shaders[shader].name);
+  glUseProgram(gl.shaders[shader].name);
 
   if (shader == SH_TEXTURE)
   {
-    glUniform1i(shaders[shader].uni_loc[1], textures[src_page].index);
+    glUniform1i(gl.shaders[shader].uni_loc[1], gl.textures[src_page].index);
   }
   else if (shader == SH_BLUR)
   {
-    glUniform1i(shaders[shader].uni_loc[1], textures[src_page].index);
+    glUniform1i(gl.shaders[shader].uni_loc[1], gl.textures[src_page].index);
   }
-
-  GLfloat data[] = {
-      0.0,
-      0.0,
-      0.0,
-      (float)src_reg.h / 4096.0,
-      0.0,
-
-      tgt_reg.w,
-      tgt_reg.h,
-      (float)src_reg.w / 4096.0,
-      0.0,
-      0.0,
-
-      0.0,
-      tgt_reg.h,
-      0.0,
-      0.0,
-      0.0,
-
-      0.0,
-      0.0,
-      0.0,
-      (float)src_reg.h / 4096.0,
-      0.0,
-
-      tgt_reg.w,
-      0.0,
-      (float)src_reg.w / 4096.0,
-      (float)src_reg.h / 4096.0,
-      0.0,
-
-      tgt_reg.w,
-      tgt_reg.h,
-      (float)src_reg.w / 4096.0,
-      0.0,
-      0.0,
-  };
-
-  glBindBuffer(GL_ARRAY_BUFFER, vertexes[1].vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 5, data, GL_DYNAMIC_DRAW);
 
   matrix4array_t projection;
   projection.matrix = m4_defaultortho(0.0, tgt_reg.w, tgt_reg.h, 0.0, 0.0, 1.0);
-  glUniformMatrix4fv(shaders[shader].uni_loc[0], 1, 0, projection.array);
+  glUniformMatrix4fv(gl.shaders[shader].uni_loc[0], 1, 0, projection.array);
 
   glViewport(0, 0, tgt_reg.w, tgt_reg.h);
 
-  glBindFramebuffer(GL_FRAMEBUFFER, textures[tgt_page].fb);
-  glBindVertexArray(vertexes[1].vao);
+  glBindFramebuffer(GL_FRAMEBUFFER, gl.textures[tgt_page].fb);
+  glBindVertexArray(gl.vertexes[0].vao);
 
   if (window.w > 0)
   {
@@ -386,7 +448,7 @@ void gl_draw_framebuffer_in_framebuffer(int        src_page,
     glScissor(window.x, tgt_reg.h - window.y - window.h, window.w, window.h); // force upside down
   }
 
-  glDrawArrays(GL_TRIANGLES, 0, 6);
+  gl_draw_rectangle(src_reg, tgt_reg);
 
   glDisable(GL_SCISSOR_TEST);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -395,7 +457,7 @@ void gl_draw_framebuffer_in_framebuffer(int        src_page,
 /* draw to texture page, mainly from ffmpeg */
 void gl_draw_to_texture(int page, int w, int h, void* data)
 {
-  gltex_t texture = textures[page];
+  gltex_t texture = gl.textures[page];
 
   glActiveTexture(GL_TEXTURE0 + texture.index);
   glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_BGRA, GL_UNSIGNED_BYTE, data);

@@ -1,16 +1,7 @@
-#ifndef gl_utils_h
-#define gl_utils_h
+#ifndef gl_shader_h
+#define gl_shader_h
 
 #include <GL/glew.h>
-
-typedef struct _gltex_t
-{
-  GLuint tx;
-  GLuint fb;
-  GLuint index;
-  GLuint w;
-  GLuint h;
-} gltex_t;
 
 typedef struct _glsha_t
 {
@@ -25,27 +16,11 @@ glsha_t gl_shader_create(const char*  vertex_source,
                          int          uniform_locations_length,
                          const char** uniform_structure);
 
-gltex_t gl_create_texture();
-void    gl_errors(const char* place);
-
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
 #include <stdio.h>
-
-int gl_tex_index = 0;
-
-void gl_errors(const char* place)
-{
-  GLenum error = 0;
-  do
-  {
-    GLenum error = glGetError();
-    if (error > GL_NO_ERROR)
-      printf("GL Error at %s : %i\n", place, error);
-  } while (error > GL_NO_ERROR);
-}
 
 GLuint gl_shader_compile(GLenum type, const GLchar* source)
 {
@@ -159,39 +134,6 @@ glsha_t gl_shader_create(const char*  vertex_source,
   }
 
   return sh;
-}
-
-gltex_t gl_create_texture(uint32_t w, uint32_t h)
-{
-  gltex_t tex = {0};
-
-  tex.index = gl_tex_index++;
-  tex.w     = w;
-  tex.h     = h;
-
-  glGenTextures(1, &tex.tx);
-
-  glActiveTexture(GL_TEXTURE0 + tex.index);
-  glBindTexture(GL_TEXTURE_2D, tex.tx);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-
-  glGenFramebuffers(1, &tex.fb);
-  glBindFramebuffer(GL_FRAMEBUFFER, tex.fb);
-
-  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex.tx, 0);
-
-  return tex;
-}
-
-void gl_delete_texture(gltex_t tex)
-{
-  glDeleteTextures(1, &tex.tx);
-  glDeleteFramebuffers(1, &tex.fb);
 }
 
 #endif

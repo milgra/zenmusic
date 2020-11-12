@@ -1,7 +1,8 @@
 CC = clang
 OBJDIR = bin/obj
 
-SOURCES = $(wildcard src/*.c) \
+SOURCES = \
+	$(wildcard src/*.c) \
 	$(wildcard src/mtlib/*.c) \
 	$(wildcard src/modules/*.c) \
 	$(wildcard src/modules/gl/*.c) \
@@ -11,7 +12,8 @@ SOURCES = $(wildcard src/*.c) \
 	$(wildcard src/modules/view/*.c) \
 	$(wildcard src/modules/wm/*.c)
 
-CFLAGS = -I/usr/local/include \
+CFLAGS = \
+	-I/usr/local/include \
 	-I/usr/local/include/GL \
 	-I/usr/local/include/SDL2 \
 	-Isrc \
@@ -27,7 +29,8 @@ CFLAGS = -I/usr/local/include \
 	-Isrc/modules/player
 
 
-LDFLAGS = -L/usr/local/lib \
+LDFLAGS = \
+	-L/usr/local/lib \
 	-lm \
 	-lGL \
 	-lGLEW \
@@ -47,8 +50,6 @@ OBJECTS := $(addprefix $(OBJDIR)/,$(SOURCES:.c=.o))
 zenmusic: $(OBJECTS)
 	$(CC) $^ -o bin/$@ $(LDFLAGS)
 
-# As we keep the source tree we have to create the
-# needed directories for every object
 $(OBJECTS): $(OBJDIR)/%.o: %.c
 	mkdir -p $(@D)
 	$(CC) -c $< -o $@ $(CFLAGS)
