@@ -40,7 +40,7 @@ mtch_t*   uich;
 pthread_t uibgth;
 mtvec_t*  trash;
 int       ui_generator_workloop(void* mypointer);
-uint32_t  tex_page = 7;
+uint32_t  tex_page = 4;
 
 int ui_generator_init(int width, int height)
 {
@@ -73,7 +73,7 @@ void ui_generator_add(view_t* view)
   }
   else
   {
-    view_set_texture_page(view, 1);
+    view_set_texture_page(view, 0);
   }
 
   uirect_t uirect = {

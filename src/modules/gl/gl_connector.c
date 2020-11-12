@@ -15,11 +15,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define TEX_CTX 9
+
 typedef enum _gl_sha_typ_t
 {
   SH_TEXTURE,
   SH_COLOR,
-  SH_BLUR
+  SH_BLUR,
+  SH_DRAW,
 } gl_sha_typ_t;
 
 typedef struct _glrect_t
@@ -67,7 +70,7 @@ struct gl_connector_t
 {
   int tex_index;
 
-  glsha_t shaders[3];
+  glsha_t shaders[4];
   gltex_t textures[10];
   glbuf_t vertexes[10];
 } gl = {0};
@@ -90,8 +93,6 @@ glsha_t create_texture_shader()
       "attribute vec3 position;"
       "attribute vec3 texcoord;"
       "uniform mat4 projection;"
-      "uniform sampler2D samplera;"
-      "uniform sampler2D samplerb;"
       "varying vec3 vUv;"
       "void main ( )"
       "{"
@@ -101,27 +102,46 @@ glsha_t create_texture_shader()
 
   char* fsh =
       "#version 120\n"
-      "uniform sampler2D samplera;"
-      "uniform sampler2D samplerb;"
+      "uniform sampler2D sampler[10];"
       "varying vec3 vUv;"
       "void main( )"
       "{"
-      "	if (vUv.z == 1.0)"
-      "	{"
-      "		gl_FragColor = texture2D(samplerb, vUv.xy);"
-      "	}"
-      "	else"
-      "	{"
-      "		gl_FragColor = texture2D(samplera, vUv.xy);"
-      "	}"
+      " int unit = int(vUv.z);"
+      "	if (unit == 0) gl_FragColor = texture2D(sampler[0], vUv.xy);"
+      "	else if (unit == 1) gl_FragColor = texture2D(sampler[1], vUv.xy);"
+      "	else if (unit == 2) gl_FragColor = texture2D(sampler[2], vUv.xy);"
+      "	else if (unit == 3) gl_FragColor = texture2D(sampler[3], vUv.xy);"
+      "	else if (unit == 4) gl_FragColor = texture2D(sampler[4], vUv.xy);"
+      "	else if (unit == 5) gl_FragColor = texture2D(sampler[5], vUv.xy);"
+      "	else if (unit == 6) gl_FragColor = texture2D(sampler[6], vUv.xy);"
+      "	else if (unit == 7) gl_FragColor = texture2D(sampler[7], vUv.xy);"
+      "	else if (unit == 8) gl_FragColor = texture2D(sampler[8], vUv.xy);"
+      "	else if (unit == 9) gl_FragColor = texture2D(sampler[9], vUv.xy);"
       "}";
 
-  return gl_shader_create(vsh,
-                          fsh,
-                          2,
-                          ((const char*[]){"position", "texcoord"}),
-                          3,
-                          ((const char*[]){"projection", "samplera", "samplerb"}));
+  glsha_t sha = gl_shader_create(vsh,
+                                 fsh,
+                                 2,
+                                 ((const char*[]){"position", "texcoord"}),
+                                 11,
+                                 ((const char*[]){"projection", "sampler[0]", "sampler[1]", "sampler[2]",
+                                                  "sampler[3]", "sampler[4]", "sampler[5]", "sampler[6]",
+                                                  "sampler[7]", "sampler[8]", "sampler[9]"}));
+
+  glUseProgram(sha.name);
+
+  glUniform1i(sha.uni_loc[1], 0);
+  glUniform1i(sha.uni_loc[2], 1);
+  glUniform1i(sha.uni_loc[3], 2);
+  glUniform1i(sha.uni_loc[4], 3);
+  glUniform1i(sha.uni_loc[5], 4);
+  glUniform1i(sha.uni_loc[6], 5);
+  glUniform1i(sha.uni_loc[7], 6);
+  glUniform1i(sha.uni_loc[8], 7);
+  glUniform1i(sha.uni_loc[9], 8);
+  glUniform1i(sha.uni_loc[10], 9);
+
+  return sha;
 }
 
 glsha_t create_color_shader()
@@ -205,6 +225,39 @@ glsha_t create_blur_shader()
                           ((const char*[]){"projection", "samplera"}));
 }
 
+glsha_t create_draw_shader()
+{
+
+  char* vsh =
+      "#version 120\n"
+      "attribute vec3 position;"
+      "attribute vec3 texcoord;"
+      "uniform mat4 projection;"
+      "uniform sampler2D samplera;"
+      "varying vec3 vUv;"
+      "void main ( )"
+      "{"
+      "  gl_Position = projection * vec4(position,1.0);"
+      "  vUv = texcoord;"
+      "}";
+
+  char* fsh =
+      "#version 120\n"
+      "uniform sampler2D samplera;\n"
+      "varying vec3 vUv;"
+      "void main()"
+      "{"
+      " gl_FragColor = texture2D(samplera, vUv.xy);"
+      "}";
+
+  return gl_shader_create(vsh,
+                          fsh,
+                          2,
+                          ((const char*[]){"position", "texcoord"}),
+                          2,
+                          ((const char*[]){"projection", "samplera"}));
+}
+
 gltex_t gl_create_texture(uint32_t w, uint32_t h)
 {
   gltex_t tex = {0};
@@ -268,11 +321,12 @@ void gl_init(width, height)
   gl.shaders[SH_TEXTURE] = create_texture_shader();
   gl.shaders[SH_COLOR]   = create_color_shader();
   gl.shaders[SH_BLUR]    = create_blur_shader();
+  gl.shaders[SH_DRAW]    = create_draw_shader();
 
   /* texture 0 is preserved for context's default buffer */
   GLint context_fb;
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &context_fb);
-  gl.textures[0].fb = context_fb;
+  gl.textures[TEX_CTX].fb = context_fb;
 
   /* buffer 0 is preserved for framebuffer drawing */
   gl.vertexes[0] = create_buffer();
@@ -281,7 +335,7 @@ void gl_init(width, height)
 
 glrect_t gl_get_texture(uint32_t page, uint32_t w, uint32_t h)
 {
-  assert(page > 0); /* 0 is reserved for context's default framebuffer */
+  assert(page < TEX_CTX); /* 0 is reserved for context's default framebuffer */
 
   if (gl.textures[page].w == 0)
   {
@@ -291,7 +345,7 @@ glrect_t gl_get_texture(uint32_t page, uint32_t w, uint32_t h)
       x *= 2;
     while (y < h)
       y *= 2;
-    gl.textures[page] = gl_create_texture(x, y);
+    gl.textures[page] = gl_create_texture(4096, 4096);
   }
 
   gltex_t tex = gl.textures[page];
@@ -392,21 +446,11 @@ void gl_draw_vertexes_in_framebuffer(int          page,
 
     glUniformMatrix4fv(gl.shaders[shader].uni_loc[0], 1, 0, projection.array);
     glViewport(0, 0, reg_tgt.w, reg_tgt.h);
-
-    glUniform1i(gl.shaders[shader].uni_loc[1], gl.textures[1].index);
-    //glUniform1i(gl.shaders[shader].uni_loc[2], gl.textures[2].index);
   }
   else if (shader == SH_COLOR)
   {
     glUniformMatrix4fv(gl.shaders[shader].uni_loc[0], 1, 0, projection.array);
     glViewport(0, 0, reg_tgt.w, reg_tgt.h);
-  }
-  else if (shader == SH_BLUR)
-  {
-    glUniformMatrix4fv(gl.shaders[shader].uni_loc[0], 1, 0, projection.array);
-    glViewport(0, 0, reg_tgt.w, reg_tgt.h);
-
-    glUniform1i(gl.shaders[shader].uni_loc[1], gl.textures[1].index);
   }
 
   glBindVertexArray(gl.vertexes[1].vao);
@@ -427,7 +471,7 @@ void gl_draw_framebuffer_in_framebuffer(int          src_page,
 {
   glUseProgram(gl.shaders[shader].name);
 
-  if (shader == SH_TEXTURE)
+  if (shader == SH_DRAW)
   {
     glUniform1i(gl.shaders[shader].uni_loc[1], gl.textures[src_page].index);
   }

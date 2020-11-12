@@ -88,15 +88,13 @@ void ui_compositor_init(int width, int height)
 
   /* init texture for ui texture map */
 
-  gl_get_texture(1, 4096, 4096);
+  gl_get_texture(0, 4096, 4096);
 
   /* textures for framebuffer composition */
 
+  gl_get_texture(1, 4096, 4096);
   gl_get_texture(2, 4096, 4096);
   gl_get_texture(3, 4096, 4096);
-  gl_get_texture(4, 4096, 4096);
-  gl_get_texture(5, 4096, 4096);
-  gl_get_texture(6, 4096, 4096);
 }
 
 void ui_compositor_reset()
@@ -232,13 +230,17 @@ void ui_compositor_update()
 
 void ui_compositor_render()
 {
+
   gl_update_vertexes(uic.fb);
-  gl_update_textures(1, uic.tm->bm);
-  gl_clear_framebuffer(0, 0.01, 0.01, 0.01, 1.0);
-  gl_clear_framebuffer(3, 0.01, 0.01, 0.01, 1.0);
+  gl_update_textures(0, uic.tm->bm);
+
+  gl_clear_framebuffer(TEX_CTX, 0.01, 0.01, 0.01, 1.0);
 
   glrect_t reg_full = {0, 0, uic.width, uic.height};
   glrect_t reg_half = {0, 0, uic.width / 2, uic.height / 2};
+
+  gl_draw_vertexes_in_framebuffer(TEX_CTX, 0, uic.fb->pos / 5, reg_full, reg_full, SH_TEXTURE);
+  return;
 
   crect_t* rect;
   int      last  = 0;
@@ -262,7 +264,7 @@ void ui_compositor_render()
         // blur offscreen buffer for soft shadows
         gl_draw_framebuffer_in_framebuffer(4, 5, reg_half, reg_half, ((glrect_t){0}), SH_BLUR);
         // draw offscreen buffer on final buffer
-        gl_draw_framebuffer_in_framebuffer(5, 3, reg_half, reg_full, ((glrect_t){0}), SH_TEXTURE);
+        gl_draw_framebuffer_in_framebuffer(5, 3, reg_half, reg_full, ((glrect_t){0}), SH_DRAW);
       }
 
       if (rect->blur)
@@ -271,14 +273,14 @@ void ui_compositor_render()
         gl_clear_framebuffer(6, 0.0, 0.0, 0.0, 0.0);
         gl_clear_framebuffer(5, 0.0, 0.0, 0.0, 0.0);
         // shrink current framebuffer for blur
-        gl_draw_framebuffer_in_framebuffer(3, 6, reg_full, reg_half, ((glrect_t){0}), SH_TEXTURE);
+        gl_draw_framebuffer_in_framebuffer(3, 6, reg_full, reg_half, ((glrect_t){0}), SH_DRAW);
 
         // blur offscreen buffer for soft shadows
         gl_draw_framebuffer_in_framebuffer(6, 5, reg_half, reg_half, ((glrect_t){0}), SH_BLUR);
         gl_draw_framebuffer_in_framebuffer(5, 6, reg_half, reg_half, ((glrect_t){0}), SH_BLUR);
 
         // draw blurred buffer on final buffer inside the view
-        gl_draw_framebuffer_in_framebuffer(6, 3, reg_half, reg_full, rect->region, SH_TEXTURE);
+        gl_draw_framebuffer_in_framebuffer(6, 3, reg_half, reg_full, rect->region, SH_DRAW);
 
         // skip drawing actual rect when blur
         last++;
@@ -290,11 +292,11 @@ void ui_compositor_render()
   if (last < index)
   {
     // render remaining
-    gl_draw_vertexes_in_framebuffer(3, last * 6, index * 6, reg_full, reg_full, SH_TEXTURE);
+    gl_draw_vertexes_in_framebuffer(3, last * 6, index * 6, reg_full, reg_full, SH_DRAW);
   }
 
   // finally draw offscreen buffer to screen buffer
-  gl_draw_framebuffer_in_framebuffer(3, 0, reg_full, reg_full, ((glrect_t){0}), SH_TEXTURE);
+  gl_draw_framebuffer_in_framebuffer(3, 0, reg_full, reg_full, ((glrect_t){0}), SH_DRAW);
 }
 
 //
