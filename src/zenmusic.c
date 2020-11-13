@@ -8,6 +8,7 @@
 #include "mtcstring.c"
 #include "mtgraphics.c"
 #include "mtmath4.c"
+#include "mtparser.c"
 #include "player.c"
 #include "songitem.c"
 #include "tg_bitmap.c"
@@ -90,14 +91,23 @@ void init(int width, int height)
 
   srand((unsigned int)time(NULL));
 
-  char* respath = SDL_GetBasePath();
-  char* path    = mtcstr_fromformat("%s/../res/Ubuntu-Regular.ttf", respath, NULL);
+  char* respath  = SDL_GetBasePath();
+  char* fontpath = mtcstr_fromformat("%s/../res/Ubuntu-Regular.ttf", respath, NULL);
 
-  common_font = font_alloc(path);
+  common_font = font_alloc(fontpath);
+
+  char* htmlpath = mtcstr_fromformat("%s/../res/main.html", respath, NULL);
+  char* csspath  = mtcstr_fromformat("%s/../res/main.css", respath, NULL);
+
+  mtmap_t* view_structure = parse_html(htmlpath);
+  mtmap_t* view_styles    = parse_css(csspath);
 
   ui_manager_init(width, height);
   ui_manager_set_layout((vlayout_t){
       .display = LD_FLEX});
+
+  /* mtmap_describe(view_structure); */
+  /* mtmap_describe(view_styles); */
 
   // songlist view
   view_t* songlist = view_new("songlist", (vframe_t){0, 0, 500, 500});
