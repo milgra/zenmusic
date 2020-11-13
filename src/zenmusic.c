@@ -6,7 +6,7 @@
 #include "eh_visu.c"
 #include "font.c"
 #include "mtcstring.c"
-#include "mtdrawer.c"
+#include "mtgraphics.c"
 #include "mtmath4.c"
 #include "player.c"
 #include "songitem.c"
@@ -219,10 +219,10 @@ void init(int width, int height)
   ui_manager_add(visuals);
   ui_manager_add(header);
 
-  bm_t* circle = bm_new(151, 151);
-  mtdrawer_circle(circle, 75.5, 75.5, 45.0, 0xFF0000FF);
+  bm_t* circle = bm_new(500, 400);
+  mtgraphics_rounded_rect(circle, 30, 30, 300, 200, 10, 0xFAFAFAFF);
 
-  view_t* circleview = view_new("circleview", (vframe_t){600, 600, 151, 151});
+  view_t* circleview = view_new("circleview", (vframe_t){100, 600, 500, 400});
   tg_bitmap_add(circleview, NULL, circle, "red circle");
 
   ui_manager_add(circleview);

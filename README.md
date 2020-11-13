@@ -11,13 +11,12 @@ hook clang-format and gmake to file save hook
 
 ---
 
-rounded rect background, mask
+ui parser from html/css instead of the mess in zenmusic
 scrollbar
 text anim
 working time/seek
 list header
 
-ui parser from html/css instead of the mess in zenmusic
 felul legyen egy view title-nek, alatta seek bar, jobbra search bar, alul maradjon a borito es a visualizer
 volume bar pedig play button korul legyen egy gyuru - kell arc mtdrawer-be
 tg_rounded_rect - mtdrawer rounded rect. eh_resize
