@@ -21,22 +21,22 @@ struct _tm_coords_t
 typedef struct _tm_t tm_t;
 struct _tm_t
 {
-  bm_t*    bm;
   mtmap_t* coords;
   int      cx; // cursor x
   int      cy; // cursor y
   int      ch; // cursor height
   char     is_full;
   char     did_change;
+  int      width;
+  int      height;
 };
 
-tm_t*       tm_new();
+tm_t*       tm_new(int w, int h);
 void        tm_del(void* p);
 void        tm_reset(tm_t* tm);
 char        tm_has(tm_t* tm, char* id);
 tm_coords_t tm_get(tm_t* tm, char* id);
 char        tm_put(tm_t* tm, char* id, bm_t* bm);
-void        tm_upd(tm_t* tm, char* id, bm_t* bm);
 
 #endif
 
@@ -47,10 +47,9 @@ void        tm_upd(tm_t* tm, char* id, bm_t* bm);
 tm_t* tm_new(int w, int h)
 {
   tm_t* tm   = mtmem_calloc(sizeof(tm_t), "tm_t", tm_del, NULL);
-  tm->bm     = bm_new(w, h);
   tm->coords = mtmap_alloc();
-
-  bm_fill(tm->bm, 0, 0, w, h, 0x000000FF);
+  tm->width  = w;
+  tm->height = h;
 
   return tm;
 }
@@ -58,14 +57,12 @@ tm_t* tm_new(int w, int h)
 void tm_del(void* p)
 {
   tm_t* tm = (tm_t*)p;
-  REL(tm->bm);
   REL(tm->coords);
 }
 
 void tm_reset(tm_t* tm)
 {
   mtmap_reset(tm->coords);
-  bm_reset(tm->bm);
   tm->cx         = 0;
   tm->cy         = 0;
   tm->ch         = 0;
@@ -90,11 +87,11 @@ tm_coords_t tm_get(tm_t* tm, char* id)
 char tm_put(tm_t* tm, char* id, bm_t* bm)
 {
 
-  if (bm->w > tm->bm->w || bm->h > tm->bm->h) return -1; // too big bitmap
+  if (bm->w > tm->width || bm->h > tm->height) return -1; // too big bitmap
 
   int nch = tm->ch; // new cursor height
 
-  if (tm->cx + bm->w > tm->bm->w)
+  if (tm->cx + bm->w > tm->width)
   {
     nch = bm->h;
   }
@@ -105,14 +102,14 @@ char tm_put(tm_t* tm, char* id, bm_t* bm)
 
   int ncy = tm->cy; // new cursor y
 
-  if (tm->cx + bm->w > tm->bm->w)
+  if (tm->cx + bm->w > tm->width)
   {
     ncy = tm->cy + tm->ch;
   }
 
   int ncx = tm->cx; // new cursor x
 
-  if (tm->cx + bm->w > tm->bm->w)
+  if (tm->cx + bm->w > tm->width)
   {
     ncx = 0;
   }
@@ -120,16 +117,14 @@ char tm_put(tm_t* tm, char* id, bm_t* bm)
   int rbx = ncx + bm->w;
   int rby = ncy + bm->h;
 
-  char is_full = nch > tm->bm->h;
+  char is_full = nch > tm->height;
 
   if (is_full) return -2; // tilemap is full
 
-  bm_insert(tm->bm, bm, ncx, ncy);
-
-  tm_coords_t* coords = HEAP(((tm_coords_t){.ltx = (float)ncx / (float)tm->bm->w,
-                                            .lty = (float)ncy / (float)tm->bm->h,
-                                            .rbx = (float)rbx / (float)tm->bm->w,
-                                            .rby = (float)rby / (float)tm->bm->h,
+  tm_coords_t* coords = HEAP(((tm_coords_t){.ltx = (float)ncx / (float)tm->width,
+                                            .lty = (float)ncy / (float)tm->height,
+                                            .rbx = (float)rbx / (float)tm->width,
+                                            .rby = (float)rby / (float)tm->height,
                                             .x   = ncx,
                                             .y   = ncy,
                                             .w   = bm->w,
@@ -143,19 +138,6 @@ char tm_put(tm_t* tm, char* id, bm_t* bm)
   tm->ch = nch;
 
   return 0; // success
-}
-
-void tm_upd(tm_t* tm, char* id, bm_t* bm)
-{
-  tm_coords_t* coords = mtmap_get(tm->coords, id);
-
-  if (coords)
-  {
-    if (bm->w == coords->w && bm->h == coords->h)
-    {
-      bm_insert(tm->bm, bm, coords->x, coords->y);
-    }
-  }
 }
 
 #endif

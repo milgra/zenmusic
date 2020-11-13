@@ -214,14 +214,11 @@ void ui_compositor_set_texture(char* viewid, char* texid, bm_t* tex)
 
     if (coords.w != tex->w || coords.h != tex->h)
     {
-      // printf("ui_compositor text2ure size mismatch, adding as new %s %i %i %i %i\n", id, coords.w, tex->w, coords.h, tex->h);
       tm_put(uic.tm, texid, tex);
       coords = tm_get(uic.tm, texid);
     }
-    else
-    {
-      tm_upd(uic.tm, texid, tex);
-    }
+
+    gl_upload_to_texture(0, coords.x, coords.y, tex->w, tex->h, tex->data);
 
     crect_set_texture(rect, (uitexc_t){.x = coords.ltx, .y = coords.lty, .z = coords.rbx, .w = coords.rby});
     ui_compositor_update();
@@ -245,8 +242,7 @@ void ui_compositor_update()
 void ui_compositor_render()
 {
 
-  gl_update_vertexes(uic.fb);
-  gl_update_textures(0, uic.tm->bm);
+  gl_upload_vertexes(uic.fb);
 
   gl_clear_framebuffer(TEX_CTX, 0.01, 0.01, 0.01, 1.0);
 

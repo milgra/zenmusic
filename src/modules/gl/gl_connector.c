@@ -35,12 +35,11 @@ typedef struct _glrect_t
 
 void     gl_init();
 glrect_t gl_get_texture(uint32_t i, uint32_t w, uint32_t h);
-void     gl_update_vertexes(fb_t* fb);
-void     gl_update_textures(int page, bm_t* bmp);
+void     gl_upload_vertexes(fb_t* fb);
+void     gl_upload_to_texture(int page, int x, int y, int w, int h, void* data);
 void     gl_clear_framebuffer(int page, float r, float g, float b, float a);
 void     gl_draw_vertexes_in_framebuffer(int page, int start, int end, glrect_t source_region, glrect_t target_region, gl_sha_typ_t shader);
 void     gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glrect_t source_region, glrect_t target_region, glrect_t window, gl_sha_typ_t shader);
-void     gl_draw_to_texture(int page, int w, int h, void* data);
 
 #endif
 
@@ -323,7 +322,7 @@ void gl_init(width, height)
   gl.shaders[SH_BLUR]    = create_blur_shader();
   gl.shaders[SH_DRAW]    = create_draw_shader();
 
-  /* texture 0 is preserved for context's default buffer */
+  /* last is preserved for context's default buffer */
   GLint context_fb;
   glGetIntegerv(GL_FRAMEBUFFER_BINDING, &context_fb);
   gl.textures[TEX_CTX].fb = context_fb;
@@ -353,24 +352,18 @@ glrect_t gl_get_texture(uint32_t page, uint32_t w, uint32_t h)
   return ((glrect_t){.w = tex.w, .h = tex.h});
 }
 
-void gl_update_vertexes(fb_t* fb)
+void gl_upload_vertexes(fb_t* fb)
 {
   glBindBuffer(GL_ARRAY_BUFFER, gl.vertexes[1].vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * fb->pos, fb->data, GL_DYNAMIC_DRAW);
   gl.vertexes[1].flo_buf = fb;
 }
 
-void gl_update_textures(int page, bm_t* bmp)
+void gl_upload_to_texture(int page, int x, int y, int w, int h, void* data)
 {
-  glActiveTexture(GL_TEXTURE0 + gl.textures[page].index);
-
-  if (bmp->w != gl.textures[page].w || bmp->h != gl.textures[page].h)
-  {
-    // resize texture and framebuffer
-  }
-
-  // when size is the same use subimage for speed
-  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, bmp->w, bmp->h, GL_RGBA, GL_UNSIGNED_BYTE, bmp->data);
+  gltex_t texture = gl.textures[page];
+  glActiveTexture(GL_TEXTURE0 + texture.index);
+  glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, data);
 }
 
 void gl_clear_framebuffer(int page, float r, float g, float b, float a)
@@ -499,15 +492,6 @@ void gl_draw_framebuffer_in_framebuffer(int          src_page,
 
   glDisable(GL_SCISSOR_TEST);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-
-/* draw to texture page, mainly from ffmpeg */
-void gl_draw_to_texture(int page, int w, int h, void* data)
-{
-  gltex_t texture = gl.textures[page];
-
-  glActiveTexture(GL_TEXTURE0 + texture.index);
-  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, w, h, GL_BGRA, GL_UNSIGNED_BYTE, data);
 }
 
 #endif

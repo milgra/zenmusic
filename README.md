@@ -1,70 +1,54 @@
+Zen Multimedia Desktop System
+
+zen media - offline file/media viewer and manager / preview area, file info area
+zen music - offline music player and manager / video/album area, two spectrum/freq analyzer for stereo channels
+zen video - offline photo/video viewer and library manager / video/image area, location area, info area
+
 development :
 
-install sdl2 and ffmpeg and opengl
-setup clang-format
-hook clang-format and build.sh and run.sh to emacs's file save hook
-
-zen files - offline file/media viewer and manager / preview area, file info area
-zen music - offline music player and library manager / video/album area, two spectrum/freq analyzer for stereo channels
-zen photo and video - offline photo/video viewer and library manager / video/image area, location area, info area
-
-offline music player & manager
+pkg install sdl2 ffmpeg opengl gmake clang-format
+hook clang-format and gmake to file save hook
 
 ---
 
-texmap should use texture instead of bitmap
-ui parser from html/css instead of the mess in zenmusic
+rounded rect background, mask
+scrollbar
+text anim
 working time/seek
+list header
+
+ui parser from html/css instead of the mess in zenmusic
 felul legyen egy view title-nek, alatta seek bar, jobbra search bar, alul maradjon a borito es a visualizer
 volume bar pedig play button korul legyen egy gyuru - kell arc mtdrawer-be
 tg_rounded_rect - mtdrawer rounded rect. eh_resize
 search bar click hozza elo genre/artist listat
-
 resize textures on window change if needed
-
 unit teszter gl_compositorhoz
 flex - vertical, horizontal auto-layout
-lehessen teljes szelessegu a vizualization bar
-check leaks
-
-cortex-et berakni mini game-nek
-
-album/song info/genres/artist tabok a jobb oldali panel aljan
 ha az egeret a lista item jobb oldalara viszed popupban mutassa id3/song infokat es album artot
-play gomb hideolodjon ha szol a zene es mutassa a cover artot
-scrollbar
-text anim
-basic layout
-css styling
+css based styling, layout, color
 database, reordering
 reuse view bitmaps, only recreate on resize!!!
 resizable header/songlist border
-
-stencil, layer groups, space-autstart-stop files
-css based styling, layout, color
-
-zen ui renderer - modern ui/text renderer, can animate glyphs individually
+check leaks
 bar analyzer
-spectrum analyzer/bar in the background
-grid-based warping of video/album cover based on frequence ( bass in the center )
-
-about page with module playing in the background, 3d dot animation?
-
-zold/piros listitem background play/pausre, animalt!!!
 unshift bmp - spectrum analyzer shift left
+grid-based warping of video/album cover based on frequence ( bass in the center )
+ujdonsagok video jojjon fel az events windowban, about
+zold/piros listitem background play/pausre, animalt!!!
 analog mutatos output meterek is visualizacioban
-
 shuffle ikon egy dobokocka legyen, hover-re animaljon 3-6-2
 repeat ikon egy gyurus nyil legyen
-listitemek side panel ala, glossy effekt a panelen
-
+glossy effekt
 scroll-ra lehessen novelni/csokkenteni visuals meretet
 statisztikak - top 10 leghallgatottabb, milyen genre-t hallgatsz foleg elmult 1 honap, stb
-
+cortex as visualizer - level gen based on freq, LEFT/DOWN!!!
 glFragaCoord ?
+
+zen media :
+space start media
 
 optimize :
 only update vertexes when frame change
 only update shadow/blur when frame change
-
-cortex as visualizer - level gen based on freq, LEFT/DOWN!!!
+only update visu bitmaps when needed
