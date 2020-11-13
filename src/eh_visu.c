@@ -12,9 +12,7 @@ typedef enum _audio_vis_t
   VIS_RDFT
 } audio_vis_t;
 
-audio_vis_t audio_vis = VIS_WAVE;
-
-void eh_visu_add(view_t* view);
+void eh_visu_add(view_t* view, int channel);
 
 #endif
 
@@ -24,8 +22,8 @@ void eh_visu_add(view_t* view);
 
 typedef struct _eh_visu_t
 {
-  uint32_t tex_ind;
-  int      vis_type;
+  int vis_type;
+  int channel;
 } eh_visu_t;
 
 void eh_visu_evt(view_t* view, ev_t ev)
@@ -34,20 +32,38 @@ void eh_visu_evt(view_t* view, ev_t ev)
   {
     eh_visu_t* eh = view->evt_han_data;
 
-    if (audio_vis == VIS_WAVE)
+    if (eh->vis_type == VIS_WAVE)
     {
-      player_draw_waves(view->texture.page, 0, view->texture.bitmap);
+      player_draw_waves(view->texture.page, eh->channel, view->texture.bitmap);
     }
-    else if (audio_vis == VIS_RDFT)
+    else if (eh->vis_type == VIS_RDFT)
     {
-      player_draw_rdft(view->texture.page, 0, view->texture.bitmap);
+      player_draw_rdft(view->texture.page, eh->channel, view->texture.bitmap);
     }
+    // TODO only update when really changed
+    view->texture.changed = 1;
   }
 }
 
-void eh_visu_add(view_t* view)
+void eh_visu_add(view_t* view, int channel)
 {
   eh_visu_t* eh = mtmem_calloc(sizeof(eh_visu_t), "eh_visu", NULL, NULL);
+
+  bm_t* bmp = bm_new(view->frame.local.w, view->frame.local.h);
+  bm_fill(bmp,
+          0,
+          0,
+          view->frame.local.w,
+          view->frame.local.h,
+          0x000000FF);
+
+  char idbuffer[100] = {0};
+  snprintf(idbuffer, 20, "visu %i", channel);
+
+  view_set_texture(view, bmp, idbuffer);
+
+  eh->channel  = channel;
+  eh->vis_type = VIS_WAVE;
 
   view->evt_han_data = eh;
   view->evt_han      = eh_visu_evt;

@@ -126,7 +126,7 @@ int ui_compositor_map_texture()
 
 void ui_compositor_add(char* viewid, char* texid, uint32_t index, uirect_t uirect, int page, char shadow, char blur)
 {
-  printf("ui_compositor_add %s index %i page %i %f %f %f %f\n", viewid, index, page, uirect.x, uirect.y, uirect.w, uirect.h);
+  printf("ui_compositor_add viewid %s texid %s index %i page %i %f %f %f %f\n", viewid, texid, index, page, uirect.x, uirect.y, uirect.w, uirect.h);
 
   crect_t*    rect;
   tm_coords_t coords = tm_get(uic.tm, texid);
@@ -220,7 +220,6 @@ void ui_compositor_set_texture(char* viewid, char* texid, bm_t* tex)
     }
     else
     {
-      // printf("ui_compositor updating texture in place %s\n", id);
       tm_upd(uic.tm, texid, tex);
     }
 

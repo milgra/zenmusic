@@ -2,8 +2,10 @@
 #ifndef render_h
 #define render_h
 
+#include "mtbitmap.c"
+
 void video_show(void* opaque, int index);
-void visu_show(void* opaque, int index);
+void render_draw_waves(void* opaque, int index, bm_t* bitmap);
 void video_refresh(void* opaque, double* remaining_time, int index);
 
 #endif
@@ -39,8 +41,6 @@ void video_refresh(void* opaque, double* remaining_time, int index);
 #define EXTERNAL_CLOCK_MAX_FRAMES 10
 
 double rdftspeed = 0.02;
-
-bm_t* wavemap;
 
 int display_disable;
 
@@ -151,7 +151,7 @@ void check_external_clock_speed(VideoState* is)
   }
 }
 
-static void video_audio_display(VideoState* s, int index)
+static void video_audio_display(VideoState* s, int index, bm_t* bitmap)
 {
   int     i, i_start, x, y1, y2, y, ys, delay, n, nb_display_channels;
   int     ch, channels, h, h2;
@@ -215,7 +215,7 @@ static void video_audio_display(VideoState* s, int index)
 
   if (s->show_mode == SHOW_MODE_WAVES)
   {
-    bm_fill(wavemap, 0, 0, wavemap->w, wavemap->h, 0x000000FF);
+    bm_fill(bitmap, 0, 0, bitmap->w, bitmap->h, 0x000000FF);
 
     /* total height for one channel */
     h = s->height / nb_display_channels;
@@ -240,7 +240,7 @@ static void video_audio_display(VideoState* s, int index)
           ys = y1;
           y2 = ys + y;
         }
-        bm_fill(wavemap, s->xleft + x, y2, s->xleft + x + 1, y2 + 2, 0x00FF00FF);
+        bm_fill(bitmap, s->xleft + x, y2, s->xleft + x + 1, y2 + 2, 0x00FF00FF);
 
         i += channels;
         if (i >= SAMPLE_ARRAY_SIZE)
@@ -248,13 +248,10 @@ static void video_audio_display(VideoState* s, int index)
       }
     }
 
-    //SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
-
     for (ch = 1; ch < nb_display_channels; ch++)
     {
       y = s->ytop + ch * h;
-      bm_fill(wavemap, s->xleft, y, s->xleft + s->width, y + 1, 0xFFFFFF55);
-      //fill_rectangle(s->xleft, y, s->width, 1);
+      bm_fill(bitmap, s->xleft, y, s->xleft + s->width, y + 1, 0xFFFFFF55);
     }
   }
   else
@@ -303,7 +300,7 @@ static void video_audio_display(VideoState* s, int index)
 
       pitch = 1280;
       pitch >>= 2;
-      pixels = (uint32_t*)wavemap->data;
+      pixels = (uint32_t*)bitmap->data;
       pixels += pitch * s->height;
       for (y = 0; y < s->height; y++)
       {
@@ -316,7 +313,7 @@ static void video_audio_display(VideoState* s, int index)
         pixels -= pitch;
         uint32_t color = ((a << 16) + (b << 8) + ((a + b) >> 1)) << 8 | 0xFF;
 
-        bm_fill(wavemap, s->xpos, y, s->xpos + 1, y + 1, color);
+        bm_fill(bitmap, s->xpos, y, s->xpos + 1, y + 1, color);
         /*}*/
         /* SDL_UnlockTexture(s->vis_texture); */
       }
@@ -327,9 +324,6 @@ static void video_audio_display(VideoState* s, int index)
     if (s->xpos >= s->width)
       s->xpos = s->xleft;
   }
-
-  glActiveTexture(GL_TEXTURE1);
-  glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, wavemap->w, wavemap->h, GL_RGBA, GL_UNSIGNED_BYTE, wavemap->data);
 }
 
 uint8_t* scaledpixels[1];
@@ -516,8 +510,6 @@ static int video_open(VideoState* is)
   /*   SDL_SetWindowFullscreen(window, SDL_WINDOW_FULLSCREEN_DESKTOP); */
   /* SDL_ShowWindow(window); */
 
-  wavemap = bm_new(1280, 720);
-
   is->width  = 1280;
   is->height = 720;
 
@@ -534,7 +526,16 @@ void video_show(void* opaque, int index)
 
   if (!display_disable && is->show_mode == SHOW_MODE_VIDEO && is->pictq.rindex_shown)
   {
-    if (!is->width) video_open(is);
+
+    if (is->width != 1280)
+    {
+      printf("resetting is width and height for video");
+
+      is->width  = 1280;
+      is->height = 720;
+
+      scaledpixels[0] = malloc(1280 * 720 * 4);
+    }
 
     //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     //SDL_RenderClear(renderer);
@@ -546,18 +547,24 @@ void video_show(void* opaque, int index)
   }
 }
 
-void visu_show(void* opaque, int index)
+void render_draw_waves(void* opaque, int index, bm_t* bitmap)
 {
   VideoState* is = opaque;
 
-  if (!display_disable && is->show_mode == SHOW_MODE_VIDEO && is->pictq.rindex_shown)
+  if (!display_disable && is->pictq.rindex_shown)
   {
-    if (!is->width) video_open(is);
+    if (is->width != bitmap->w)
+    {
+      printf("resetting is width and height for wave");
+
+      is->width  = bitmap->w;
+      is->height = bitmap->h;
+    }
 
     //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     //SDL_RenderClear(renderer);
     /* if (is->audio_st && is->show_mode != SHOW_MODE_VIDEO) */
-    video_audio_display(is, index);
+    video_audio_display(is, index, bitmap);
     /* else if (is->video_st) */
     //video_image_display(is, index);
     //SDL_RenderPresent(renderer);

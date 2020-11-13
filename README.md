@@ -14,6 +14,7 @@ offline music player & manager
 
 independent channels, scale down
 texmap should use texture instead of bitmap
+ui parser from html/css instead of the mess in zenmusic
 
 working time/seek
 felul legyen egy view title-nek, alatta seek bar, jobbra search bar, alul maradjon a borito es a visualizer

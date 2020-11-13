@@ -3,6 +3,7 @@
 #include "eh_list.c"
 #include "eh_text.c"
 #include "eh_video.c"
+#include "eh_visu.c"
 #include "font.c"
 #include "mtcstring.c"
 #include "mtdrawer.c"
@@ -137,6 +138,7 @@ void init(int width, int height)
                                            .margin_left = 10.0});
 
   view_t* videoview_left = view_new("videoviewleft", (vframe_t){0, 0, 300, 150});
+  eh_visu_add(videoview_left, 0);
   view_add(videoview_left_base, videoview_left);
 
   view_t* videoview_right_base = view_new("videoviewrightbase", (vframe_t){0, 0, 300, 150});
@@ -146,6 +148,7 @@ void init(int width, int height)
                                             .margin_right = 10.0});
 
   view_t* videoview_right = view_new("videoviewright", (vframe_t){0, 0, 300, 150});
+  eh_visu_add(videoview_left, 0);
   view_add(videoview_right_base, videoview_right);
 
   coverview = view_new("coverview", (vframe_t){0, 0, 150, 150});
@@ -224,10 +227,14 @@ void init(int width, int height)
 
   ui_manager_add(circleview);
 
-  view_t* videoview = view_new("videoview", (vframe_t){800, 600, 300, 300});
+  view_t* videoviewbase = view_new("videoviewbase", (vframe_t){800, 600, 300, 300});
+  tg_color_add(videoviewbase, 0x000000FF);
+
+  view_t* videoview = view_new("videoview", (vframe_t){0, 0, 300, 300});
   eh_video_add(videoview);
 
-  ui_manager_add(videoview);
+  view_add(videoviewbase, videoview);
+  ui_manager_add(videoviewbase);
 
   /* view_t* texmapview = view_new("texmapview", (vframe_t){50, 500, 200, 200}, 0); */
   /* eh_drag_add(texmapview); */

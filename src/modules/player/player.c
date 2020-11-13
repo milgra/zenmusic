@@ -68,7 +68,7 @@ void player_draw_waves(int index, int channel, bm_t* bm)
   {
     if (is->show_mode != SHOW_MODE_NONE && (!is->paused || is->force_refresh))
     {
-      //video_draw_waves(is, &remaining_time, channel, bm);
+      render_draw_waves(is, channel, bm);
     }
   }
 }
