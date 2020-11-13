@@ -261,20 +261,20 @@ void ui_compositor_render()
     if (rect->shadow || rect->blur)
     {
       // render rects so far with simple texture renderer to offscreen buffer
-      gl_draw_vertexes_in_framebuffer(3, last * 6, index * 6, reg_full, reg_full, SH_TEXTURE);
+      gl_draw_vertexes_in_framebuffer(1, last * 6, index * 6, reg_full, reg_full, SH_TEXTURE);
 
       last = index;
 
       if (rect->shadow)
       {
         // render current view with black color to an offscreen buffer
-        gl_clear_framebuffer(4, 0.0, 0.0, 0.0, 0.0);
-        gl_clear_framebuffer(5, 0.0, 0.0, 0.0, 0.0);
-        gl_draw_vertexes_in_framebuffer(4, index * 6, (index + 1) * 6, reg_full, reg_half, SH_COLOR);
+        gl_clear_framebuffer(2, 0.0, 0.0, 0.0, 0.0);
+        gl_clear_framebuffer(3, 0.0, 0.0, 0.0, 0.0);
+        gl_draw_vertexes_in_framebuffer(2, index * 6, (index + 1) * 6, reg_full, reg_half, SH_COLOR);
         // blur offscreen buffer for soft shadows
-        gl_draw_framebuffer_in_framebuffer(4, 5, reg_half, reg_half, ((glrect_t){0}), SH_BLUR);
+        gl_draw_framebuffer_in_framebuffer(2, 3, reg_half, reg_half, ((glrect_t){0}), SH_BLUR);
         // draw offscreen buffer on final buffer
-        gl_draw_framebuffer_in_framebuffer(5, 3, reg_half, reg_full, ((glrect_t){0}), SH_DRAW);
+        gl_draw_framebuffer_in_framebuffer(3, 1, reg_half, reg_full, ((glrect_t){0}), SH_DRAW);
       }
 
       if (rect->blur)
@@ -302,11 +302,11 @@ void ui_compositor_render()
   if (last < index)
   {
     // render remaining
-    gl_draw_vertexes_in_framebuffer(3, last * 6, index * 6, reg_full, reg_full, SH_DRAW);
+    gl_draw_vertexes_in_framebuffer(1, last * 6, index * 6, reg_full, reg_full, SH_DRAW);
   }
 
   // finally draw offscreen buffer to screen buffer
-  gl_draw_framebuffer_in_framebuffer(3, 0, reg_full, reg_full, ((glrect_t){0}), SH_DRAW);
+  gl_draw_framebuffer_in_framebuffer(1, TEX_CTX, reg_full, reg_full, ((glrect_t){0}), SH_DRAW);
 }
 
 //

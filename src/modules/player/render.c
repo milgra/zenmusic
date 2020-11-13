@@ -341,7 +341,7 @@ static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, stru
                                           frame->format,
                                           w,
                                           h,
-                                          AV_PIX_FMT_BGRA,
+                                          AV_PIX_FMT_RGBA,
                                           sws_flags,
                                           NULL,
                                           NULL,
