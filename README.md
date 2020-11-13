@@ -12,10 +12,8 @@ offline music player & manager
 
 ---
 
-independent channels, scale down
 texmap should use texture instead of bitmap
 ui parser from html/css instead of the mess in zenmusic
-
 working time/seek
 felul legyen egy view title-nek, alatta seek bar, jobbra search bar, alul maradjon a borito es a visualizer
 volume bar pedig play button korul legyen egy gyuru - kell arc mtdrawer-be
@@ -68,3 +66,5 @@ glFragaCoord ?
 optimize :
 only update vertexes when frame change
 only update shadow/blur when frame change
+
+cortex as visualizer - level gen based on freq, LEFT/DOWN!!!

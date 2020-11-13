@@ -4,7 +4,7 @@
 
 #include "mtbitmap.c"
 
-void video_show(void* opaque, int index);
+void video_show(void* opaque, int index, int w, int h);
 void render_draw_waves(void* opaque, int index, bm_t* bitmap);
 void video_refresh(void* opaque, double* remaining_time, int index);
 
@@ -158,18 +158,21 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap)
   int64_t time_diff;
   int     rdft_bits, nb_freq;
 
-  for (rdft_bits = 1; (1 << rdft_bits) < 2 * s->height; rdft_bits++)
+  int width  = bitmap->w;
+  int height = bitmap->h;
+
+  for (rdft_bits = 1; (1 << rdft_bits) < 2 * height; rdft_bits++)
     ;
   nb_freq = 1 << (rdft_bits - 1);
 
-  s->show_mode = SHOW_MODE_WAVES;
+  s->show_mode = SHOW_MODE_RDFT;
 
   /* compute display index : center on currently output samples */
   channels            = s->audio_tgt.channels;
   nb_display_channels = channels;
   if (!s->paused)
   {
-    int data_used = s->show_mode == SHOW_MODE_WAVES ? s->width : (2 * nb_freq);
+    int data_used = s->show_mode == SHOW_MODE_WAVES ? width : (2 * nb_freq);
     n             = 2 * channels;
     delay         = s->audio_write_buf_size;
     delay /= n;
@@ -218,15 +221,17 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap)
     bm_fill(bitmap, 0, 0, bitmap->w, bitmap->h, 0x000000FF);
 
     /* total height for one channel */
-    h = s->height / nb_display_channels;
+    h = height;
     /* graph height / 2 */
     h2 = (h * 9) / 20;
-    for (ch = 0; ch < nb_display_channels; ch++)
+
+    ch = index;
+
     {
       i  = i_start + ch;
-      y1 = s->ytop + ch * h + (h / 2); /* position of center line */
+      y1 = s->ytop + (h / 2); /* position of center line */
 
-      for (x = 0; x < s->width; x++)
+      for (x = 0; x < width; x++)
       {
         y = (s->sample_array[i] * h2) >> 15;
         if (y < 0)
@@ -247,16 +252,10 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap)
           i -= SAMPLE_ARRAY_SIZE;
       }
     }
-
-    for (ch = 1; ch < nb_display_channels; ch++)
-    {
-      y = s->ytop + ch * h;
-      bm_fill(bitmap, s->xleft, y, s->xleft + s->width, y + 1, 0xFFFFFF55);
-    }
   }
   else
   {
-    /* if (realloc_texture(&s->vis_texture, SDL_PIXELFORMAT_ARGB8888, s->width, s->height, SDL_BLENDMODE_NONE, 1) < 0) */
+    /* if (realloc_texture(&s->vis_texture, SDL_PIXELFORMAT_ARGB8888, width, height, SDL_BLENDMODE_NONE, 1) < 0) */
     /*   return; */
 
     nb_display_channels = FFMIN(nb_display_channels, 2);
@@ -276,10 +275,12 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap)
     else
     {
       FFTSample* data[2];
-      SDL_Rect   rect = {.x = s->xpos, .y = 0, .w = 1, .h = s->height};
+      SDL_Rect   rect = {.x = s->xpos, .y = 0, .w = 1, .h = height};
       uint32_t*  pixels;
       int        pitch;
-      for (ch = 0; ch < nb_display_channels; ch++)
+
+      ch = index;
+      //for (ch = 0; ch < nb_display_channels; ch++)
       {
         data[ch] = s->rdft_data + 2 * nb_freq * ch;
         i        = i_start + ch;
@@ -298,11 +299,11 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap)
       /* if (!SDL_LockTexture(s->vis_texture, &rect, (void**)&pixels, &pitch)) */
       /* { */
 
-      pitch = 1280;
+      pitch = width;
       pitch >>= 2;
       pixels = (uint32_t*)bitmap->data;
-      pixels += pitch * s->height;
-      for (y = 0; y < s->height; y++)
+      pixels += pitch * height;
+      for (y = 0; y < height; y++)
       {
         double w = 1 / sqrt(nb_freq);
         int    a = sqrt(w * sqrt(data[0][2 * y + 0] * data[0][2 * y + 0] + data[0][2 * y + 1] * data[0][2 * y + 1]));
@@ -319,9 +320,9 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap)
       }
       /* SDL_RenderCopy(renderer, s->vis_texture, NULL, NULL); */
     }
-    if (!s->paused)
+    if (!s->paused && index == 1)
       s->xpos++;
-    if (s->xpos >= s->width)
+    if (s->xpos >= width)
       s->xpos = s->xleft;
   }
 }
@@ -330,7 +331,7 @@ uint8_t* scaledpixels[1];
 
 static unsigned sws_flags = SWS_BICUBIC;
 
-static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, struct SwsContext** img_convert_ctx, int index)
+static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, struct SwsContext** img_convert_ctx, int index, int w, int h)
 {
   int ret = 0;
 
@@ -338,8 +339,8 @@ static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, stru
                                           frame->width,
                                           frame->height,
                                           frame->format,
-                                          frame->width,
-                                          frame->height,
+                                          w,
+                                          h,
                                           AV_PIX_FMT_BGRA,
                                           sws_flags,
                                           NULL,
@@ -351,7 +352,7 @@ static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, stru
     uint8_t* pixels[4];
     int      pitch[4];
 
-    pitch[0] = 1280 * 4;
+    pitch[0] = w * 4;
     sws_scale(*img_convert_ctx,
               (const uint8_t* const*)frame->data,
               frame->linesize,
@@ -360,7 +361,7 @@ static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, stru
               scaledpixels,
               pitch);
 
-    gl_draw_to_texture(index, frame->width, frame->height, scaledpixels[0]);
+    gl_draw_to_texture(index, w, h, scaledpixels[0]);
   }
   return ret;
 }
@@ -398,7 +399,7 @@ static void calculate_display_rect(SDL_Rect*  rect,
   rect->h = FFMAX((int)height, 1);
 }
 
-static void video_image_display(VideoState* is, int index)
+static void video_image_display(VideoState* is, int index, int w, int h)
 {
   Frame*   vp;
   Frame*   sp = NULL;
@@ -463,7 +464,7 @@ static void video_image_display(VideoState* is, int index)
 
   if (!vp->uploaded)
   {
-    if (upload_texture(&is->vid_texture, vp->frame, rect, &is->img_convert_ctx, index) < 0)
+    if (upload_texture(&is->vid_texture, vp->frame, rect, &is->img_convert_ctx, index, w, h) < 0)
       return;
     vp->uploaded = 1;
     vp->flip_v   = vp->frame->linesize[0] < 0;
@@ -520,21 +521,21 @@ static int video_open(VideoState* is)
   return 0;
 }
 
-void video_show(void* opaque, int index)
+void video_show(void* opaque, int index, int w, int h)
 {
   VideoState* is = opaque;
 
-  if (!display_disable && is->show_mode == SHOW_MODE_VIDEO && is->pictq.rindex_shown)
+  if (!display_disable && is->pictq.rindex_shown)
   {
 
-    if (is->width != 1280)
+    if (is->width != w)
     {
       printf("resetting is width and height for video");
 
-      is->width  = 1280;
-      is->height = 720;
+      is->width  = w;
+      is->height = h;
 
-      scaledpixels[0] = malloc(1280 * 720 * 4);
+      scaledpixels[0] = malloc(w * h * 4);
     }
 
     //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -542,7 +543,7 @@ void video_show(void* opaque, int index)
     /* if (is->audio_st && is->show_mode != SHOW_MODE_VIDEO) */
     //video_audio_display(is, index);
     /* else if (is->video_st) */
-    video_image_display(is, index);
+    video_image_display(is, index, w, h);
     //SDL_RenderPresent(renderer);
   }
 }
@@ -553,13 +554,6 @@ void render_draw_waves(void* opaque, int index, bm_t* bitmap)
 
   if (!display_disable && is->pictq.rindex_shown)
   {
-    if (is->width != bitmap->w)
-    {
-      printf("resetting is width and height for wave");
-
-      is->width  = bitmap->w;
-      is->height = bitmap->h;
-    }
 
     //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     //SDL_RenderClear(renderer);

@@ -148,7 +148,7 @@ void init(int width, int height)
                                             .margin_right = 10.0});
 
   view_t* videoview_right = view_new("videoviewright", (vframe_t){0, 0, 300, 150});
-  eh_visu_add(videoview_left, 0);
+  eh_visu_add(videoview_right, 1);
   view_add(videoview_right_base, videoview_right);
 
   coverview = view_new("coverview", (vframe_t){0, 0, 150, 150});
