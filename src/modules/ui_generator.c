@@ -40,19 +40,17 @@ int ui_generator_workloop(void* mypointer);
 struct _ui_generator_t
 {
   mtvec_t*    views;
-  mtch_t*     channel;
   SDL_Thread* thread;
-  uint32_t    tex_page;
+  mtch_t*     channel;
 } uig = {0};
 
 int ui_generator_init(int width, int height)
 {
   ui_compositor_init(width, height);
 
-  uig.views    = VNEW();
-  uig.channel  = mtch_new(50);
-  uig.thread   = SDL_CreateThread(ui_generator_workloop, "generator", NULL);
-  uig.tex_page = 4;
+  uig.views   = VNEW();
+  uig.channel = mtch_new(50);
+  uig.thread  = SDL_CreateThread(ui_generator_workloop, "generator", NULL);
 
   return (uig.thread != NULL);
 }
@@ -69,11 +67,13 @@ void ui_generator_add(view_t* view)
 
   if (view->texture.state == TS_EXTERN && view->texture.page == 0)
   {
-    view_set_texture_page(view, uig.tex_page++);
+    // request new texture page for view
+    view_set_texture_page(view, ui_compositor_new_texture());
   }
   else
   {
-    view_set_texture_page(view, 0);
+    // use a texture map texture page
+    view_set_texture_page(view, ui_compositor_map_texture());
   }
 
   uirect_t uirect = {

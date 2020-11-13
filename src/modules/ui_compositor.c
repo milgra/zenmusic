@@ -28,6 +28,8 @@ void ui_compositor_add(char* viewid, char* texid, uint32_t index, uirect_t uirec
 void ui_compositor_rem(char* id);
 void ui_compositor_set_index(char* id, uint32_t index);
 void ui_compositor_set_frame(char* id, uirect_t rect);
+int  ui_compositor_map_texture();
+int  ui_compositor_new_texture();
 void ui_compositor_set_texture(char* viewid, char* texid, bm_t* bmp);
 void ui_compositor_update();
 
@@ -75,6 +77,7 @@ struct uic_t
   mtmap_t* rects_m; // rectangle map
   int      width;
   int      height;
+  int      tex_page;
 } uic = {0};
 
 void ui_compositor_init(int width, int height)
@@ -88,13 +91,13 @@ void ui_compositor_init(int width, int height)
 
   /* init texture for ui texture map */
 
-  gl_get_texture(0, 4096, 4096);
+  gl_get_texture(uic.tex_page++, 4096, 4096);
 
   /* textures for framebuffer composition */
 
-  gl_get_texture(1, 4096, 4096);
-  gl_get_texture(2, 4096, 4096);
-  gl_get_texture(3, 4096, 4096);
+  gl_get_texture(uic.tex_page++, 4096, 4096);
+  gl_get_texture(uic.tex_page++, 4096, 4096);
+  gl_get_texture(uic.tex_page++, 4096, 4096);
 }
 
 void ui_compositor_reset()
@@ -109,6 +112,16 @@ void ui_compositor_resize(int width, int height)
 {
   uic.width  = width;
   uic.height = height;
+}
+
+int ui_compositor_new_texture()
+{
+  return uic.tex_page++;
+}
+
+int ui_compositor_map_texture()
+{
+  return 0;
 }
 
 void ui_compositor_add(char* viewid, char* texid, uint32_t index, uirect_t uirect, int page, char shadow, char blur)
@@ -128,6 +141,8 @@ void ui_compositor_add(char* viewid, char* texid, uint32_t index, uirect_t uirec
   }
   else
   {
+    // add view with texture coords for frame, if it has a bitmap it will be updated after load
+
     glrect_t tex_dim = gl_get_texture(page, uirect.w, uirect.h);
     uitexc_t tex_cor = (uitexc_t){0.0, 0.0, uirect.w / (float)tex_dim.w, uirect.h / (float)tex_dim.h};
 
