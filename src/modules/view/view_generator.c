@@ -10,15 +10,15 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtparser.c"
+#include "html.c"
 
 mtvec_t* view_gen_load(char* htmlpath, char* csspath)
 {
-  char* html = parse_read(htmlpath);
-  char* css  = parse_read(csspath);
+  char* html = html_read(htmlpath);
+  char* css  = html_read(csspath);
 
-  tag_t*  view_structure = parse_html(html);
-  prop_t* view_styles    = parse_css(css);
+  tag_t*  view_structure = html_parse_html(html);
+  prop_t* view_styles    = html_parse_css(css);
 
   // create style map
   mtmap_t* styles = MNEW();
@@ -60,6 +60,30 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath)
         printf("parent %i %i\n", t.parent, views->length);
         view_add(parent, view);
       }
+
+      char cssid[100] = {0};
+      snprintf(cssid, 100, "#%s", id);
+
+      mtmap_t* style = MGET(styles, cssid);
+      if (style)
+      {
+        printf("style for %s : %i\n", cssid, style->count);
+        // apply style to view
+      }
+
+      if (t.class.len > 0)
+      {
+        char csscls[100] = {0};
+        snprintf(csscls, 100, ".%s", id);
+
+        style = MGET(styles, csscls);
+        if (style)
+        {
+          printf("style for %s : %i\n", cssid, style->count);
+          // apply style to view
+        }
+      }
+
       REL(id);
     }
     else

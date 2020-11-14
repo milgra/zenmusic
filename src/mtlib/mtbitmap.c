@@ -25,7 +25,7 @@ void  bm_del(void* bm);
 void  bm_reset(bm_t* bm);
 void  bm_insert(bm_t* the_base, bm_t* bm, int the_x, int the_y);
 void  bm_insert_blend(bm_t* the_base, bm_t* bm, int the_x, int the_y);
-void  bm_describe(void* p);
+void  bm_describe(void* p, int level);
 
 #endif
 
@@ -214,7 +214,7 @@ void bm_insert_blend(bm_t* base, bm_t* src, int sx, int sy)
   }
 }
 
-void bm_describe(void* p)
+void bm_describe(void* p, int level)
 {
   bm_t* bm = p;
   printf("width %i height %i size %u", bm->w, bm->h, bm->size);

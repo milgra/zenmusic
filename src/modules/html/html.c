@@ -1,5 +1,5 @@
-#ifndef mtparser_h
-#define mtparser_h
+#ifndef html_h
+#define html_h
 
 #include "mtcstring.c"
 #include "mtmap.c"
@@ -33,15 +33,15 @@ typedef struct _prop_t
   range_t value;
 } prop_t;
 
-char*   parse_read(char* path);
-tag_t*  parse_html(char* path);
-prop_t* parse_css(char* path);
+char*   html_read(char* path);
+tag_t*  html_parse_html(char* path);
+prop_t* html_parse_css(char* path);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-char* parse_read(char* path)
+char* html_read(char* path)
 {
   FILE* f = fopen(path, "rb");
   fseek(f, 0, SEEK_END);
@@ -159,7 +159,7 @@ void analyze_tags(char* html, tag_t* tags, uint32_t count)
   }
 }
 
-tag_t* parse_html(char* html)
+tag_t* html_parse_html(char* html)
 {
   uint32_t cnt  = count_tags(html);
   tag_t*   tags = mtmem_calloc(sizeof(tag_t) * (cnt + 1), "tag_t*", NULL, NULL);
@@ -236,7 +236,7 @@ void analyze_classes(char* css, prop_t* props)
   }
 }
 
-prop_t* parse_css(char* css)
+prop_t* html_parse_css(char* css)
 {
   mtmap_t* map   = mtmap_alloc();
   uint32_t cnt   = count_props(css);

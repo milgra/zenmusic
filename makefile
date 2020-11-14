@@ -10,6 +10,7 @@ SOURCES = \
 	$(wildcard src/modules/player/*.c) \
 	$(wildcard src/modules/text/*.c) \
 	$(wildcard src/modules/view/*.c) \
+	$(wildcard src/modules/html/*.c) \
 	$(wildcard src/modules/wm/*.c)
 
 CFLAGS = \
@@ -24,6 +25,7 @@ CFLAGS = \
 	-Isrc/modules/gl \
 	-Isrc/modules/wm \
 	-Isrc/modules/text \
+	-Isrc/modules/html \
 	-Isrc/modules/view \
 	-Isrc/modules/image \
 	-Isrc/modules/player

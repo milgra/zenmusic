@@ -105,8 +105,7 @@ void init(int width, int height)
   mtvec_t* views = view_gen_load(htmlpath, csspath);
 
   ui_manager_init(width, height);
-  ui_manager_set_layout((vlayout_t){
-      .display = LD_FLEX});
+  ui_manager_set_layout((vlayout_t){.display = LD_FLEX});
 
   /* mtmap_describe(view_structure); */
   /* mtmap_describe(view_styles); */
