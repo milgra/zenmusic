@@ -8,7 +8,6 @@
 #include "mtcstring.c"
 #include "mtgraphics.c"
 #include "mtmath4.c"
-#include "mtparser.c"
 #include "player.c"
 #include "songitem.c"
 #include "tg_bitmap.c"
@@ -17,6 +16,7 @@
 #include "tg_text.c"
 #include "ui_manager.c"
 #include "view.c"
+#include "view_generator.c"
 #include "wm_connector.c"
 #include "wm_event.c"
 #include <SDL.h>
@@ -102,67 +102,7 @@ void init(int width, int height)
   char* htmlpath = mtcstr_fromformat("%s/../res/main.html", respath, NULL);
   char* csspath  = mtcstr_fromformat("%s/../res/main.css", respath, NULL);
 
-  char* html = parse_read(htmlpath);
-  char* css  = parse_read(csspath);
-
-  tag_t*  view_structure = parse_html(html);
-  prop_t* view_styles    = parse_css(css);
-
-  // create style map
-  mtmap_t* styles = MNEW();
-  prop_t*  props  = view_styles;
-  while ((*props).class.len > 0)
-  {
-    prop_t t   = *props;
-    char*  cls = mtmem_calloc(sizeof(char) * t.class.len + 1, "char*", NULL, mtcstr_describe);
-    char*  key = mtmem_calloc(sizeof(char) * t.key.len + 1, "char*", NULL, mtcstr_describe);
-    char*  val = mtmem_calloc(sizeof(char) * t.value.len + 1, "char*", NULL, mtcstr_describe);
-
-    memcpy(cls, css + t.class.pos, t.class.len);
-    memcpy(key, css + t.key.pos, t.key.len);
-    memcpy(val, css + t.value.pos, t.value.len);
-
-    mtmap_t* style = MGET(styles, cls);
-    if (style == NULL)
-    {
-      style = MNEW();
-      MPUT(styles, cls, style);
-    }
-
-    MPUT(style, key, val);
-
-    props += 1;
-  }
-
-  printf("STYLES:\n");
-  mtmem_describe(styles, 0);
-
-  // create view structure
-  mtvec_t* views = VNEW();
-  tag_t*   tags  = view_structure;
-  while ((*tags).len > 0)
-  {
-    tag_t t = *tags;
-    // we are dealing with named tags only
-    if (t.id.len > 0)
-    {
-      char* id = mtmem_calloc(sizeof(char) * t.id.len + 1, "char*", NULL, NULL);
-      memcpy(id, html + t.id.pos + 1, t.id.len);
-
-      view_t* view = view_new(id, (vframe_t){0});
-      VADD(views, view);
-
-      if (t.level > 0)
-      {
-        // add view to parent
-      }
-      printf("view %s created\n", id);
-    }
-    tags += 1;
-  }
-
-  printf("VIEWS:\n");
-  mtmem_describe(views, 0);
+  mtvec_t* views = view_gen_load(htmlpath, csspath);
 
   ui_manager_init(width, height);
   ui_manager_set_layout((vlayout_t){
