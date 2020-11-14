@@ -78,9 +78,12 @@ view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index)
     nftw("/usr/home/milgra/Projects/zenmusic/res/med", display_info, 20, flags);
     printf("file count %i\n", files->length);
   }
-  if (index < 0) return NULL; // no items over 0
-  if (index > 2) return NULL;
-  if (rowview == NULL) rowview = songitem_new();
+  if (index < 0)
+    return NULL; // no items over 0
+  if (index > 2)
+    return NULL;
+  if (rowview == NULL)
+    rowview = songitem_new();
   songitem_update(rowview, index, files->data[index], songitem_event);
   return rowview;
 }
@@ -99,8 +102,8 @@ void init(int width, int height)
   char* htmlpath = mtcstr_fromformat("%s/../res/main.html", respath, NULL);
   char* csspath  = mtcstr_fromformat("%s/../res/main.css", respath, NULL);
 
-  mtmap_t* view_structure = parse_html(htmlpath);
-  mtmap_t* view_styles    = parse_css(csspath);
+  tag_t*  view_structure = parse_html(htmlpath);
+  prop_t* view_styles    = parse_css(csspath);
 
   ui_manager_init(width, height);
   ui_manager_set_layout((vlayout_t){

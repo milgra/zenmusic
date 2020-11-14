@@ -13,6 +13,7 @@ char*    mtcstr_fromfile(char* path);
 uint32_t mtcstr_color_from_cstring(char* string);
 char*    mtcstr_generate_readablec(uint32_t length);
 char*    mtcstr_generate_alphanumeric(uint32_t length);
+void     mtcstr_describe(void* p);
 
 #endif
 
@@ -156,6 +157,11 @@ char* mtcstr_generate_alphanumeric(uint32_t length)
     result[index] = mtcstr_alphanumeric[rand() % strlen(mtcstr_alphanumeric)];
   }
   return result;
+}
+
+void mtcstr_describe(void* p)
+{
+  printf("%s\n", (char*)p);
 }
 
 #endif
