@@ -102,8 +102,67 @@ void init(int width, int height)
   char* htmlpath = mtcstr_fromformat("%s/../res/main.html", respath, NULL);
   char* csspath  = mtcstr_fromformat("%s/../res/main.css", respath, NULL);
 
-  tag_t*  view_structure = parse_html(htmlpath);
-  prop_t* view_styles    = parse_css(csspath);
+  char* html = parse_read(htmlpath);
+  char* css  = parse_read(csspath);
+
+  tag_t*  view_structure = parse_html(html);
+  prop_t* view_styles    = parse_css(css);
+
+  // create style map
+  mtmap_t* styles = MNEW();
+  prop_t*  props  = view_styles;
+  while ((*props).class.len > 0)
+  {
+    prop_t t   = *props;
+    char*  cls = mtmem_calloc(sizeof(char) * t.class.len + 1, "char*", NULL, mtcstr_describe);
+    char*  key = mtmem_calloc(sizeof(char) * t.key.len + 1, "char*", NULL, mtcstr_describe);
+    char*  val = mtmem_calloc(sizeof(char) * t.value.len + 1, "char*", NULL, mtcstr_describe);
+
+    memcpy(cls, css + t.class.pos, t.class.len);
+    memcpy(key, css + t.key.pos, t.key.len);
+    memcpy(val, css + t.value.pos, t.value.len);
+
+    mtmap_t* style = MGET(styles, cls);
+    if (style == NULL)
+    {
+      style = MNEW();
+      MPUT(styles, cls, style);
+    }
+
+    MPUT(style, key, val);
+
+    props += 1;
+  }
+
+  printf("STYLES:\n");
+  mtmem_describe(styles, 0);
+
+  // create view structure
+  mtvec_t* views = VNEW();
+  tag_t*   tags  = view_structure;
+  while ((*tags).len > 0)
+  {
+    tag_t t = *tags;
+    // we are dealing with named tags only
+    if (t.id.len > 0)
+    {
+      char* id = mtmem_calloc(sizeof(char) * t.id.len + 1, "char*", NULL, NULL);
+      memcpy(id, html + t.id.pos + 1, t.id.len);
+
+      view_t* view = view_new(id, (vframe_t){0});
+      VADD(views, view);
+
+      if (t.level > 0)
+      {
+        // add view to parent
+      }
+      printf("view %s created\n", id);
+    }
+    tags += 1;
+  }
+
+  printf("VIEWS:\n");
+  mtmem_describe(views, 0);
 
   ui_manager_init(width, height);
   ui_manager_set_layout((vlayout_t){
@@ -117,10 +176,7 @@ void init(int width, int height)
   tg_color_add(songlist, 0x444444FF);
   eh_list_add(songlist, songlist_item_generator);
 
-  view_set_layout(songlist, (vlayout_t){
-                                .margin_right = 300.0,
-                                .w_per        = 1.0,
-                                .h_per        = 1.0});
+  view_set_layout(songlist, (vlayout_t){.margin_right = 300.0, .w_per = 1.0, .h_per = 1.0});
 
   ui_manager_add(songlist);
 
@@ -134,9 +190,7 @@ void init(int width, int height)
   // visualization views
 
   view_t* visuals = view_new("visuals", (vframe_t){0, 0, 790, 600});
-  view_set_layout(visuals, (vlayout_t){
-                               .margin_top = 260.0,
-                               .margin     = INT_MAX});
+  view_set_layout(visuals, (vlayout_t){.margin_top = 260.0, .margin = INT_MAX});
 
   //visuals->blur   = 1;
   visuals->texture.shadow = 1;
@@ -146,9 +200,7 @@ void init(int width, int height)
 
   view_t* videoview_left_base = view_new("videoviewleftbase", (vframe_t){10, 0, 300, 150});
   tg_color_add(videoview_left_base, 0x000000FF);
-  view_set_layout(videoview_left_base, (vlayout_t){
-                                           .margin_top  = 10.0,
-                                           .margin_left = 10.0});
+  view_set_layout(videoview_left_base, (vlayout_t){.margin_top = 10.0, .margin_left = 10.0});
 
   view_t* videoview_left = view_new("videoviewleft", (vframe_t){0, 0, 300, 150});
   eh_visu_add(videoview_left, 0);
@@ -156,9 +208,7 @@ void init(int width, int height)
 
   view_t* videoview_right_base = view_new("videoviewrightbase", (vframe_t){0, 0, 300, 150});
   tg_color_add(videoview_right_base, 0x000000FF);
-  view_set_layout(videoview_right_base, (vlayout_t){
-                                            .margin_top   = 10.0,
-                                            .margin_right = 10.0});
+  view_set_layout(videoview_right_base, (vlayout_t){.margin_top = 10.0, .margin_right = 10.0});
 
   view_t* videoview_right = view_new("videoviewright", (vframe_t){0, 0, 300, 150});
   eh_visu_add(videoview_right, 1);
@@ -166,9 +216,7 @@ void init(int width, int height)
 
   coverview = view_new("coverview", (vframe_t){0, 0, 150, 150});
   tg_color_add(coverview, 0x000000FF);
-  view_set_layout(coverview, (vlayout_t){
-                                 .margin_top  = 10.0,
-                                 .margin_left = 320.0});
+  view_set_layout(coverview, (vlayout_t){.margin_top = 10.0, .margin_left = 320.0});
 
   view_add(visualscolor, videoview_left_base);
   view_add(visualscolor, videoview_right_base);
@@ -180,8 +228,7 @@ void init(int width, int height)
   char*   playpath = mtcstr_fromformat("%s/../res/play.png", respath, NULL);
   view_t* playbtn  = view_new("playbtnview", (vframe_t){0, 40, 80, 80});
   tg_bitmap_add(playbtn, playpath, NULL, "play.png");
-  view_set_layout(playbtn, (vlayout_t){
-                               .margin = INT_MAX});
+  view_set_layout(playbtn, (vlayout_t){.margin = INT_MAX});
 
   eh_touch_add(playbtn, NULL, playbtn_event);
 

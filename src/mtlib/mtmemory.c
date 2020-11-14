@@ -19,20 +19,20 @@ struct mtmem_head
 {
   char type[10];
   void (*destructor)(void*);
-  void (*descriptor)(void*);
+  void (*descriptor)(void*, int);
   size_t retaincount;
 };
 
-void*  mtmem_alloc(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*));
-void*  mtmem_calloc(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*));
+void*  mtmem_alloc(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*, int));
+void*  mtmem_calloc(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*, int));
 void*  mtmem_realloc(void* pointer, size_t size);
 void*  mtmem_retain(void* pointer);
 char   mtmem_release(void* pointer);
 char   mtmem_releaseeach(void* first, ...);
 size_t mtmem_retaincount(void* pointer);
 void   mtmem_replace(void** address, void* data);
-void*  mtmem_stack_to_heap(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*), uint8_t* data);
-void   mtmem_describe(void* pointer);
+void*  mtmem_stack_to_heap(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*, int), uint8_t* data);
+void   mtmem_describe(void* pointer, int level);
 void   mtmem_exit(char* text, char* type);
 
 #endif
@@ -41,10 +41,10 @@ void   mtmem_exit(char* text, char* type);
 
 #include <string.h>
 
-void* mtmem_alloc(size_t size,               /* size of data to store */
-                  char*  type,               /* short descriptoon of data to show for describing memory map*/
-                  void (*destructor)(void*), /* optional destructor */
-                  void (*descriptor)(void*)) /* optional descriptor for describing memory map*/
+void* mtmem_alloc(size_t size,                    /* size of data to store */
+                  char*  type,                    /* short descriptoon of data to show for describing memory map*/
+                  void (*destructor)(void*),      /* optional destructor */
+                  void (*descriptor)(void*, int)) /* optional descriptor for describing memory map*/
 {
   if (size == 0) mtmem_exit("Ttrying to allocate 0 bytes for", type);
   uint8_t* bytes = malloc(sizeof(struct mtmem_head) + size);
@@ -60,10 +60,10 @@ void* mtmem_alloc(size_t size,               /* size of data to store */
   return bytes + sizeof(struct mtmem_head);
 }
 
-void* mtmem_calloc(size_t size,               /* size of data to store */
-                   char*  type,               /* short descriptoon of data to show for describing memory map*/
-                   void (*destructor)(void*), /* optional destructor */
-                   void (*descriptor)(void*)) /* optional descriptor for describing memory map*/
+void* mtmem_calloc(size_t size,                    /* size of data to store */
+                   char*  type,                    /* short descriptoon of data to show for describing memory map*/
+                   void (*destructor)(void*),      /* optional destructor */
+                   void (*descriptor)(void*, int)) /* optional descriptor for describing memory map*/
 {
   if (size == 0) mtmem_exit("Ttrying to allocate 0 bytes for", type);
   uint8_t* bytes = calloc(1, sizeof(struct mtmem_head) + size);
@@ -82,7 +82,7 @@ void* mtmem_calloc(size_t size,               /* size of data to store */
 void* mtmem_stack_to_heap(size_t size,
                           char*  type,
                           void (*destructor)(void*),
-                          void (*descriptor)(void*),
+                          void (*descriptor)(void*, int),
                           uint8_t* data)
 {
   uint8_t* bytes = mtmem_alloc(size, type, destructor, descriptor);
@@ -171,7 +171,7 @@ void mtmem_replace(void** address, void* data)
   *address = data;
 }
 
-void mtmem_describe(void* pointer)
+void mtmem_describe(void* pointer, int level)
 {
   assert(pointer != NULL);
 
@@ -179,8 +179,14 @@ void mtmem_describe(void* pointer)
   bytes -= sizeof(struct mtmem_head);
   struct mtmem_head* head = (struct mtmem_head*)bytes;
 
-  printf("%s:\n", head->type);
-  if (head->descriptor != NULL) head->descriptor(pointer);
+  if (head->descriptor != NULL)
+  {
+    head->descriptor(pointer, ++level);
+  }
+  else
+  {
+    printf("(%s)", head->type);
+  }
 }
 
 void mtmem_exit(char* text, char* type)

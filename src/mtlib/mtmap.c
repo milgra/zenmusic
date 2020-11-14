@@ -43,7 +43,7 @@ void     mtmap_del(mtmap_t* map, const char* key);
 mtvec_t* mtmap_keys(mtmap_t* map);
 mtvec_t* mtmap_values(mtmap_t* map);
 void     mtmap_printkeys(mtmap_t* map);
-void     mtmap_describe(void* p);
+void     mtmap_describe(void* p, int level);
 
 #ifdef DEBUG
 void mtmap_test(void);
@@ -404,16 +404,18 @@ void mtmap_printkeys(mtmap_t* map)
     printf(" %s", (char*)keys->data[index]);
 }
 
-void mtmap_describe(void* p)
+void mtmap_describe(void* p, int level)
 {
   mtmap_t* map  = p;
   mtvec_t* keys = mtmap_keys(map);
+  printf("{");
   for (int index = 0; index < keys->length; index++)
   {
     char* key = (char*)keys->data[index];
-    printf("%s:", key);
-    mtmem_describe(mtmap_get(map, key));
+    printf("\n%*s(K)%s\n%*s(V)", level, " ", key, level, " ");
+    mtmem_describe(mtmap_get(map, key), level + 1);
   }
+  printf("\n%*s}", level, " ");
 }
 
 // tests map

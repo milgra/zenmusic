@@ -33,6 +33,7 @@ typedef struct _prop_t
   range_t value;
 } prop_t;
 
+char*   parse_read(char* path);
 tag_t*  parse_html(char* path);
 prop_t* parse_css(char* path);
 
@@ -113,7 +114,7 @@ range_t extract_string(char* str, uint32_t pos, uint32_t len)
     }
   }
   if (!in)
-    return ((range_t){.pos = start, .len = end - start});
+    return ((range_t){.pos = start, .len = end - start - 1});
   else
     return ((range_t){0});
 }
@@ -158,9 +159,8 @@ void analyze_tags(char* html, tag_t* tags, uint32_t count)
   }
 }
 
-tag_t* parse_html(char* path)
+tag_t* parse_html(char* html)
 {
-  char*    html = parse_read(path);
   uint32_t cnt  = count_tags(html);
   tag_t*   tags = mtmem_calloc(sizeof(tag_t) * (cnt + 1), "tag_t*", NULL, NULL);
 
@@ -236,10 +236,9 @@ void analyze_classes(char* css, prop_t* props)
   }
 }
 
-prop_t* parse_css(char* path)
+prop_t* parse_css(char* css)
 {
   mtmap_t* map   = mtmap_alloc();
-  char*    css   = parse_read(path);
   uint32_t cnt   = count_props(css);
   prop_t*  props = mtmem_calloc(sizeof(prop_t) * (cnt + 1), "prop_t*", NULL, NULL);
 

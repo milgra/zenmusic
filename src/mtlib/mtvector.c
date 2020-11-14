@@ -44,7 +44,7 @@ void     mtvec_reverse(mtvec_t* vector);
 void*    mtvec_head(mtvec_t* vector);
 void*    mtvec_tail(mtvec_t* vector);
 uint32_t mtvec_indexofdata(mtvec_t* vector, void* data);
-void     mtvec_describe(void* p);
+void     mtvec_describe(void* p, int level);
 
 #endif
 #if __INCLUDE_LEVEL__ == 0
@@ -258,11 +258,14 @@ uint32_t mtvec_indexofdata(mtvec_t* vector, void* data)
   return UINT32_MAX;
 }
 
-void mtvec_describe(void* pointer)
+void mtvec_describe(void* pointer, int level)
 {
   mtvec_t* vector = pointer;
   for (uint32_t index = 0; index < vector->length; index++)
-    mtmem_describe(vector->data[index]);
+  {
+    mtmem_describe(vector->data[index], level + 1);
+    printf("\n");
+  }
 }
 
 #endif

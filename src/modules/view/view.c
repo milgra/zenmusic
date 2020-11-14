@@ -104,7 +104,7 @@ void view_set_layout(view_t* view, vlayout_t layout);
 void view_set_texture(view_t* view, bm_t* tex, char* id);
 void view_set_texture_page(view_t* view, uint32_t page);
 
-void view_desc(void* pointer);
+void view_desc(void* pointer, int level);
 void view_calc_global(view_t* view);
 
 extern char reindex;
@@ -220,10 +220,10 @@ void view_gen_texture(view_t* view)
   if (view->tex_gen) (*view->tex_gen)(view);
 }
 
-void view_desc(void* pointer)
+void view_desc(void* pointer, int level)
 {
   view_t* view = (view_t*)pointer;
-  printf("id %s frame %f %f %f %f\n", view->id, view->frame.local.x, view->frame.local.y, view->frame.local.w, view->frame.local.h);
+  printf("id %s frame %f %f %f %f", view->id, view->frame.local.x, view->frame.local.y, view->frame.local.w, view->frame.local.h);
 }
 
 #endif

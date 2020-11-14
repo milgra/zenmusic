@@ -42,7 +42,7 @@ mtvec_t* mtstr_split(mtstr_t* string, char character);
 mtmap_t* mtstr_tokenize(mtstr_t* descriptor);
 uint32_t mtstr_find(mtstr_t* string, mtstr_t* substring, uint32_t from);
 char*    mtstr_bytes(mtstr_t* string);
-void     mtstr_describe(void* p);
+void     mtstr_describe(void* p, int level);
 
 #endif
 #if __INCLUDE_LEVEL__ == 0
@@ -485,7 +485,7 @@ char* mtstr_bytes(mtstr_t* string)
   return bytes;
 }
 
-void mtstr_describe(void* p)
+void mtstr_describe(void* p, int level)
 {
   mtstr_t* str = p;
   printf("length %u", str->length);

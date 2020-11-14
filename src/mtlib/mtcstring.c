@@ -13,7 +13,7 @@ char*    mtcstr_fromfile(char* path);
 uint32_t mtcstr_color_from_cstring(char* string);
 char*    mtcstr_generate_readablec(uint32_t length);
 char*    mtcstr_generate_alphanumeric(uint32_t length);
-void     mtcstr_describe(void* p);
+void     mtcstr_describe(void* p, int level);
 
 #endif
 
@@ -159,9 +159,9 @@ char* mtcstr_generate_alphanumeric(uint32_t length)
   return result;
 }
 
-void mtcstr_describe(void* p)
+void mtcstr_describe(void* p, int level)
 {
-  printf("%s\n", (char*)p);
+  printf("%s", (char*)p);
 }
 
 #endif
