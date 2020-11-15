@@ -1,5 +1,11 @@
-#songlist {
+#base {
     background-color: #AAAAAAFF;
+    width: 100%;
+    height: 100%;
+}
+
+#songlist {
+    background-color: #555555FF;
     width: 100%;
     height: 100%;
 }

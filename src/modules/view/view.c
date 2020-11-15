@@ -197,6 +197,9 @@ void view_set_frame(view_t* view, vframe_t frame)
   view->frame.global = frame;
 
   view_calc_global(view);
+
+  // force rerender
+  view->texture.state = TS_BLANK;
 }
 
 void view_set_texture(view_t* view, bm_t* bitmap, char* id)

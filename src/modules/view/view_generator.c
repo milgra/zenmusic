@@ -35,7 +35,7 @@ void view_gen_apply_style(view_t* view, mtmap_t* style)
         int   len          = end - val;
         end[len - 1]       = '\0';
         int per            = atoi(val);
-        view->layout.w_per = per;
+        view->layout.w_per = (float)per / 100.0;
       }
       else if (strstr(val, "px") != NULL)
       {
@@ -54,7 +54,7 @@ void view_gen_apply_style(view_t* view, mtmap_t* style)
         int   len          = end - val;
         end[len - 1]       = '\0';
         int per            = atoi(val);
-        view->layout.h_per = per;
+        view->layout.h_per = (float)per / 100.0;
       }
       else if (strstr(val, "px") != NULL)
       {
@@ -115,7 +115,7 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath)
       if (t.level > 0) // add view to paernt
       {
         view_t* parent = views->data[t.parent];
-        printf("parent %i %i\n", t.parent, views->length);
+        //printf("parent %i %i\n", t.parent, views->length);
         view_add(parent, view);
       }
 

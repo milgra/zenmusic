@@ -16,17 +16,27 @@ void tg_color_add(view_t* view, uint32_t color);
 
 void tg_color_gen(view_t* view)
 {
-  char idbuffer[100] = {0};
-  snprintf(idbuffer, 20, "color %i", view->layout.background_color);
+  if (view->frame.local.w > 0 && view->frame.local.h > 0)
+  {
+    if (view->texture.bitmap == NULL ||
+        view->texture.bitmap->w != (int)view->frame.local.w ||
+        view->texture.bitmap->h != (int)view->frame.local.h)
+    {
+      char idbuffer[100] = {0};
+      snprintf(idbuffer, 20, "color %i", view->layout.background_color);
 
-  bm_t* bmp = bm_new(view->frame.local.w, view->frame.local.h);
-  bm_fill(bmp,
-          0,
-          0,
-          view->frame.local.w,
-          view->frame.local.h,
-          view->layout.background_color);
-  view_set_texture(view, bmp, idbuffer);
+      printf("tex color gen %f %f\n", view->frame.local.w, view->frame.local.h);
+
+      bm_t* bmp = bm_new(view->frame.local.w, view->frame.local.h);
+      bm_fill(bmp,
+              0,
+              0,
+              view->frame.local.w,
+              view->frame.local.h,
+              view->layout.background_color);
+      view_set_texture(view, bmp, idbuffer);
+    }
+  }
 }
 
 void tg_color_add(view_t* view, uint32_t color)

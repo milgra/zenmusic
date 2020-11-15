@@ -15,7 +15,6 @@ void ui_manager_event(ev_t event);
 void ui_manager_add(view_t* view);
 void ui_manager_remove(view_t* view);
 void ui_manager_render();
-void ui_manager_set_layout(vlayout_t layout);
 
 #endif
 
@@ -126,11 +125,6 @@ void ui_manager_add(view_t* view)
 void ui_manager_remove(view_t* view)
 {
   view_remove(root, view);
-}
-
-void ui_manager_set_layout(vlayout_t layout)
-{
-  view_set_layout(root, layout);
 }
 
 void ui_manager_reindex(view_t* view, uint32_t* index)

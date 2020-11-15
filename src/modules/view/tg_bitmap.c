@@ -30,26 +30,29 @@ void tg_bitmap_gen(view_t* view)
 {
   tg_bitmap_t* tg = view->tex_gen_data;
 
-  if (tg->path)
+  if (view->texture.bitmap == NULL)
   {
-    char* path = tg->path;
+    if (tg->path)
+    {
+      char* path = tg->path;
 
-    int components, w, h;
+      int components, w, h;
 
-    unsigned char* bytes = stbi_load(path, &w, &h, &components, 4);
+      unsigned char* bytes = stbi_load(path, &w, &h, &components, 4);
 
-    bm_t* bmp = bm_new(w, h);
+      bm_t* bmp = bm_new(w, h);
 
-    memcpy(bmp->data, bytes, bmp->size);
+      memcpy(bmp->data, bytes, bmp->size);
 
-    stbi_image_free(bytes);
+      stbi_image_free(bytes);
 
-    view_set_texture(view, bmp, tg->id);
-  }
+      view_set_texture(view, bmp, tg->id);
+    }
 
-  if (tg->bitmap)
-  {
-    view_set_texture(view, tg->bitmap, tg->id);
+    if (tg->bitmap)
+    {
+      view_set_texture(view, tg->bitmap, tg->id);
+    }
   }
 }
 
