@@ -12,6 +12,64 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath);
 
 #include "html.c"
 
+void view_gen_apply_style(view_t* view, mtmap_t* style)
+{
+  mtvec_t* keys = mtmap_keys(style);
+  for (int index = 0; index < keys->length; index++)
+  {
+    char* key = keys->data[index];
+    char* val = MGET(style, key);
+    printf("key %s val %s\n", key, val);
+
+    if (strcmp(key, "background-color") == 0)
+    {
+      int color                     = (int)strtol(val + 1, NULL, 16);
+      view->layout.background_color = color;
+      tg_color_add(view, color);
+    }
+    else if (strcmp(key, "width") == 0)
+    {
+      if (strstr(val, "%") != NULL)
+      {
+        char* end          = strstr(val, "%");
+        int   len          = end - val;
+        end[len - 1]       = '\0';
+        int per            = atoi(val);
+        view->layout.w_per = per;
+      }
+      else if (strstr(val, "px") != NULL)
+      {
+        char* end          = strstr(val, "px");
+        int   len          = end - val;
+        end[len - 1]       = '\0';
+        int pix            = atoi(val);
+        view->layout.width = pix;
+      }
+    }
+    else if (strcmp(key, "height") == 0)
+    {
+      if (strstr(val, "%") != NULL)
+      {
+        char* end          = strstr(val, "%");
+        int   len          = end - val;
+        end[len - 1]       = '\0';
+        int per            = atoi(val);
+        view->layout.h_per = per;
+      }
+      else if (strstr(val, "px") != NULL)
+      {
+        char* end           = strstr(val, "px");
+        int   len           = end - val;
+        end[len - 1]        = '\0';
+        int pix             = atoi(val);
+        view->layout.height = pix;
+      }
+    }
+  }
+  printf("layout for %s: ", view->id);
+  view_desc_layout(view->layout);
+}
+
 mtvec_t* view_gen_load(char* htmlpath, char* csspath)
 {
   char* html = html_read(htmlpath);
@@ -67,7 +125,8 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath)
       mtmap_t* style = MGET(styles, cssid);
       if (style)
       {
-        printf("style for %s : %i\n", cssid, style->count);
+
+        view_gen_apply_style(view, style);
         // apply style to view
       }
 
@@ -80,6 +139,7 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath)
         if (style)
         {
           printf("style for %s : %i\n", cssid, style->count);
+          mtmem_describe(style, 0);
           // apply style to view
         }
       }

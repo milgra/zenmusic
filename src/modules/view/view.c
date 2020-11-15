@@ -32,6 +32,7 @@ struct _vlayout_t
   int      margin_left;
   int      margin_right;
   int      margin_bottom;
+  uint32_t background_color;
 };
 
 typedef enum _texst_t // texture loading state
@@ -105,6 +106,7 @@ void view_set_texture(view_t* view, bm_t* tex, char* id);
 void view_set_texture_page(view_t* view, uint32_t page);
 
 void view_desc(void* pointer, int level);
+void view_desc_layout(vlayout_t l);
 void view_calc_global(view_t* view);
 
 extern char reindex;
@@ -224,6 +226,13 @@ void view_desc(void* pointer, int level)
 {
   view_t* view = (view_t*)pointer;
   printf("id %s frame %f %f %f %f", view->id, view->frame.local.x, view->frame.local.y, view->frame.local.w, view->frame.local.h);
+}
+
+void view_desc_layout(vlayout_t l)
+{
+  printf("pos %i dis %i w_per %f h_per %f w %i h %i margin %i m_top %i m_left %i m_right %i m_bot %i backg_col %x ",
+         l.position, l.display, l.w_per, l.h_per, l.width, l.height, l.margin,
+         l.margin_top, l.margin_left, l.margin_right, l.margin_bottom, l.background_color);
 }
 
 #endif

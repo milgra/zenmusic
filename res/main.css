@@ -1,8 +1,9 @@
-.songlist {
-    background-color: #000000;
-    font-face: "Arial";
+#songlist {
+    background-color: #AAAAAAFF;
+    width: 100%;
+    height: 100%;
 }
 
 #header {
-    color: #000000;
+    background-color: #00FF00;
 }

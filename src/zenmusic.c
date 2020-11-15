@@ -120,8 +120,8 @@ void init(int width, int height)
   ui_manager_add(songlist);
 
   view_t* header = view_new("header", (vframe_t){0, 0, 700, 150});
-  tg_color_add(header, 0xFFFFFFEE);
   view_set_layout(header, (vlayout_t){.w_per = 1.0});
+  tg_color_add(header, 0xFFFFFFEE);
 
   //header->blur = 1;
   header->texture.shadow = 1;

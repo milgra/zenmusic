@@ -18,6 +18,7 @@ working time/seek
 list header
 
 felul legyen egy view title-nek, alatta seek bar, jobbra search bar, alul maradjon a borito es a visualizer
+tilemap is auto-resize legyen duplazassal
 volume bar pedig play button korul legyen egy gyuru - kell arc mtdrawer-be
 tg_rounded_rect - mtdrawer rounded rect. eh_resize
 search bar click hozza elo genre/artist listat
@@ -43,6 +44,7 @@ scroll-ra lehessen novelni/csokkenteni visuals meretet
 statisztikak - top 10 leghallgatottabb, milyen genre-t hallgatsz foleg elmult 1 honap, stb
 cortex as visualizer - level gen based on freq, LEFT/DOWN!!!
 glFragaCoord ?
+volume fade in/out, cover arton is
 
 zen media :
 space start media
