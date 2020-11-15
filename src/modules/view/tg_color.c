@@ -25,7 +25,7 @@ void tg_color_gen(view_t* view)
       char idbuffer[100] = {0};
       snprintf(idbuffer, 20, "color %i", view->layout.background_color);
 
-      printf("tex color gen %f %f\n", view->frame.local.w, view->frame.local.h);
+      printf("tex color gen %s %x %f %f\n", view->id, view->layout.background_color, view->frame.local.w, view->frame.local.h);
 
       bm_t* bmp = bm_new(view->frame.local.w, view->frame.local.h);
       bm_fill(bmp,

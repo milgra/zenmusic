@@ -88,7 +88,8 @@ void ui_generator_add(view_t* view)
                     uirect,
                     view->texture.page,
                     view->texture.shadow,
-                    view->texture.blur);
+                    view->texture.blur,
+                    view->texture.full);
 
   view->connected = 1;
 }

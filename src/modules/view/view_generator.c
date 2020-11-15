@@ -11,6 +11,7 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "html.c"
+#include "tg_color.c"
 
 void view_gen_apply_style(view_t* view, mtmap_t* style)
 {
@@ -19,7 +20,7 @@ void view_gen_apply_style(view_t* view, mtmap_t* style)
   {
     char* key = keys->data[index];
     char* val = MGET(style, key);
-    printf("key %s val %s\n", key, val);
+    //printf("\nkey %s val %s", key, val);
 
     if (strcmp(key, "background-color") == 0)
     {
@@ -66,7 +67,7 @@ void view_gen_apply_style(view_t* view, mtmap_t* style)
       }
     }
   }
-  printf("layout for %s: ", view->id);
+  printf("\nlayout for %s: ", view->id);
   view_desc_layout(view->layout);
 }
 
@@ -138,8 +139,8 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath)
         style = MGET(styles, csscls);
         if (style)
         {
-          printf("style for %s : %i\n", cssid, style->count);
-          mtmem_describe(style, 0);
+          //printf("style for %s : %i\n", cssid, style->count);
+          //mtmem_describe(style, 0);
           // apply style to view
         }
       }

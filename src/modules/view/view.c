@@ -51,6 +51,7 @@ typedef struct _texture_t
   bm_t*    bitmap;  /* texture bitmap */
   char     changed; /* texture is changed */
 
+  char full;
   char blur;
   char shadow;
 } texture_t;
@@ -228,7 +229,11 @@ void view_gen_texture(view_t* view)
 void view_desc(void* pointer, int level)
 {
   view_t* view = (view_t*)pointer;
-  printf("id %s frame %f %f %f %f", view->id, view->frame.local.x, view->frame.local.y, view->frame.local.w, view->frame.local.h);
+  printf("%*.sid %s frame %.1f %.1f %.1f %.1f\n", level, " ", view->id, view->frame.local.x, view->frame.local.y, view->frame.local.w, view->frame.local.h);
+  for (int i = 0; i < view->views->length; i++)
+  {
+    view_desc(view->views->data[i], level + 1);
+  }
 }
 
 void view_desc_layout(vlayout_t l)

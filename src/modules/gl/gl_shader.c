@@ -116,7 +116,6 @@ glsha_t gl_shader_create(const char*  vertex_source,
       const GLchar* name     = uniform_structure[index];
       GLint         location = glGetUniformLocation(sh.name, name);
       sh.uni_loc[index]      = location;
-      printf("uniform location for %s : %i\n", name, location);
     }
   }
   else

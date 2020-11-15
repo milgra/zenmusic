@@ -90,7 +90,7 @@ view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index)
 
 void init(int width, int height)
 {
-  printf("zenmusic init %i %i\n", width, height);
+  printf("\nzenmusic init %i %i", width, height);
 
   srand((unsigned int)time(NULL));
 
@@ -107,6 +107,10 @@ void init(int width, int height)
 
   ui_manager_init(width, height);
   ui_manager_add(base);
+
+  view_t* texmapview       = view_new("texmapview", (vframe_t){50, 50, 200, 200});
+  texmapview->texture.full = 1;
+  ui_manager_add(texmapview);
 
   /* mtmap_describe(view_structure); */
   /* mtmap_describe(view_styles); */

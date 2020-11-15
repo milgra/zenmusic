@@ -170,7 +170,7 @@ tag_t* html_parse_html(char* html)
   for (int i = 0; i < cnt; i++)
   {
     tag_t t = tags[i];
-    printf("ind %i tag %.*s lvl %i par %i\n", i, t.len, html + t.pos, t.level, t.parent);
+    //printf("ind %i tag %.*s lvl %i par %i\n", i, t.len, html + t.pos, t.level, t.parent);
   }
 
   return tags;
@@ -247,7 +247,7 @@ prop_t* html_parse_css(char* css)
   for (int i = 0; i < cnt; i++)
   {
     prop_t p = props[i];
-    printf("extracted prop %.*s %.*s %.*s\n", p.class.len, css + p.class.pos, p.key.len, css + p.key.pos, p.value.len, css + p.value.pos);
+    //printf("extracted prop %.*s %.*s %.*s\n", p.class.len, css + p.class.pos, p.key.len, css + p.key.pos, p.value.len, css + p.value.pos);
   }
 
   return props;
