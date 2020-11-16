@@ -194,8 +194,8 @@ void view_calc_global(view_t* view)
 {
   vframe_t frame_parent = {0};
   if (view->parent != NULL) frame_parent = view->parent->frame.global;
-  view->frame.global.x = roundf(frame_parent.x) + view->frame.local.x;
-  view->frame.global.y = roundf(frame_parent.y) + view->frame.local.y;
+  view->frame.global.x = roundf(frame_parent.x) + roundf(view->frame.local.x);
+  view->frame.global.y = roundf(frame_parent.y) + roundf(view->frame.local.y);
   view->frame.changed  = 1;
 
   view_t* v;

@@ -224,7 +224,14 @@ void ui_compositor_set_texture(char* viewid, char* texid, bm_t* tex)
     if (coords.w != tex->w || coords.h != tex->h)
     {
       printf("texture size mismath, uploading again\n");
-      tm_put(uic.tm, texid, tex);
+      int success = tm_put(uic.tm, texid, tex);
+
+      // TODO reset main texture, maybe all views?
+      if (success < 0)
+      {
+        printf("TEXTURE FULL, NEEDS RESET\n");
+      }
+
       coords = tm_get(uic.tm, texid);
     }
 

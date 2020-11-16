@@ -150,7 +150,7 @@ void analyze_tags(char* html, tag_t* tags, uint32_t count)
     }
 
     tags[i].id    = extract_value(tags[i], "id=\"", html);
-    tags[i].class = extract_value(tags[i], "id=\"", html);
+    tags[i].class = extract_value(tags[i], "class=\"", html);
 
     if (html[tags[i].pos + 1] == '/')
       l -= 2; // </div>

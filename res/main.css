@@ -39,4 +39,18 @@
     background-color: #AA00AAFF;
     margin: auto;
     bottom: 0px;
+    display: flex;
+    flex-direction: row;
+}
+
+.channel {
+    width: 100%;
+    height: 150px;
+    background-color: #223322FF;
+}
+
+#video {
+    width: 150px;
+    height: 150px;
+    background-color: #556655FF;
 }

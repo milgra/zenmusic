@@ -151,6 +151,32 @@ int ui_generator_workloop()
 void ui_generator_resize(int width, int height)
 {
   ui_compositor_resize(width, height);
+
+  // reset ui compositor and re-add views
+
+  ui_compositor_reset();
+  view_t* view;
+  while ((view = VNXT(uig.views)))
+  {
+    uirect_t uirect = {
+        view->frame.global.x,
+        view->frame.global.y,
+        view->frame.global.w,
+        view->frame.global.h};
+
+    ui_compositor_add(view->id,
+                      view->texture.id,
+                      view->index,
+                      uirect,
+                      view->texture.page,
+                      view->texture.shadow,
+                      view->texture.blur,
+                      view->texture.full);
+    if (view->texture.state == TS_READY)
+    {
+      ui_compositor_set_texture(view->id, view->texture.id, view->texture.bitmap);
+    }
+  }
 }
 
 #endif

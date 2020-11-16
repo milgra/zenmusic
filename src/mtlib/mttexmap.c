@@ -36,7 +36,7 @@ void        tm_del(void* p);
 void        tm_reset(tm_t* tm);
 char        tm_has(tm_t* tm, char* id);
 tm_coords_t tm_get(tm_t* tm, char* id);
-char        tm_put(tm_t* tm, char* id, bm_t* bm);
+int         tm_put(tm_t* tm, char* id, bm_t* bm);
 
 #endif
 
@@ -84,7 +84,7 @@ tm_coords_t tm_get(tm_t* tm, char* id)
   return (tm_coords_t){0};
 }
 
-char tm_put(tm_t* tm, char* id, bm_t* bm)
+int tm_put(tm_t* tm, char* id, bm_t* bm)
 {
 
   if (bm->w > tm->width || bm->h > tm->height) return -1; // too big bitmap

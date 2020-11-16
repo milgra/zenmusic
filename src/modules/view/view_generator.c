@@ -159,22 +159,21 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath)
       mtmap_t* style = MGET(styles, cssid);
       if (style)
       {
-
         view_gen_apply_style(view, style);
-        // apply style to view
       }
 
       if (t.class.len > 0)
       {
+        char* class = mtmem_calloc(sizeof(char) * t.class.len + 1, "char*", NULL, NULL);
+        memcpy(class, html + t.class.pos + 1, t.class.len);
+
         char csscls[100] = {0};
-        snprintf(csscls, 100, ".%s", id);
+        snprintf(csscls, 100, ".%s", class);
 
         style = MGET(styles, csscls);
         if (style)
         {
-          //printf("style for %s : %i\n", cssid, style->count);
-          //mtmem_describe(style, 0);
-          // apply style to view
+          view_gen_apply_style(view, style);
         }
       }
 

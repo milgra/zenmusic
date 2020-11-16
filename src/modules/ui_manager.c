@@ -38,6 +38,7 @@ void ui_manager_init(int width, int height)
 
 void ui_manager_layout(view_t* view)
 {
+  printf("LAYOUT MAIN %s\n", view->id);
   view_t* v;
 
   float act_x = 0;
@@ -67,9 +68,11 @@ void ui_manager_layout(view_t* view)
     }
   }
 
+  printf("rel_w %f rem_w %i\n", rel_w, rem_w);
+
   while ((v = VNXT(view->views)))
   {
-    printf("LAYOUT %s\n", v->id);
+    printf("LAYOUT SUB %s\n", v->id);
 
     vframe_t frame = v->frame.local;
 
@@ -103,7 +106,7 @@ void ui_manager_layout(view_t* view)
         act_x += width;
         rem_w -= 1;
         rel_w -= width;
-        printf("W_PER width %f act_x %f rem_w %i\n", rel_w, act_x, rem_w);
+        printf("W_PER width %f act_x %f rem_w %i\n", width, act_x, rem_w);
       }
       frame.w = width * v->layout.w_per;
     }
@@ -147,7 +150,7 @@ void ui_manager_layout(view_t* view)
     {
       frame.y = view->frame.local.h - frame.h;
     }
-
+    printf("FINAL %f\n", frame.w);
     view_set_frame(v, frame);
   }
 

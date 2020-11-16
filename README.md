@@ -45,6 +45,7 @@ statisztikak - top 10 leghallgatottabb, milyen genre-t hallgatsz foleg elmult 1 
 cortex as visualizer - level gen based on freq, LEFT/DOWN!!!
 glFragaCoord ?
 volume fade in/out, cover arton is
+donate button /donate popup after 100 startups
 
 zen media :
 space start media
