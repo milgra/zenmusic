@@ -1,21 +1,42 @@
 #base {
-    background-color: #AAAAAAFF;
     width: 100%;
     height: 100%;
 }
 
 #main {
+    background-color: #AAAAAAFF;
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 #header {
+    flex-basis: 150px;
     background-color: #22AAAAFF;
     width: 100%;
     height: 150px;
 }
 
+#songlistheader {
+    background-color: #EEEEEEFF;
+    width: 100%;
+    height: 30px;
+}
+
 #songlist {
+    background-color: #222222FF;
     width: 100%;
     height: 100%;
+    overflow: scroll;
+}
+
+#visuals {
+    position: absolute;
+    margin: auto;
+    width: 700px;
+    height: 150px;
+    background-color: #AA00AAFF;
+    margin: auto;
+    bottom: 0px;
 }

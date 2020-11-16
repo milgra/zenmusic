@@ -90,7 +90,7 @@ view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index)
 
 void init(int width, int height)
 {
-  printf("\nzenmusic init %i %i", width, height);
+  printf("zenmusic init %i %i\n", width, height);
 
   srand((unsigned int)time(NULL));
 

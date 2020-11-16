@@ -18,21 +18,32 @@ typedef enum _laydis_t // layout display
   LD_FLEX,
 } laydis_t;
 
+typedef enum _exdir_t // layout display
+{
+  FD_ROW = 0,
+  FD_COL,
+} flexdir_t;
+
 typedef struct _vlayout_t vlayout_t; // view layout
 struct _vlayout_t
 {
-  laypos_t position;
-  laydis_t display;
-  float    w_per;
-  float    h_per;
-  int      width;
-  int      height;
-  int      margin;
-  int      margin_top;
-  int      margin_left;
-  int      margin_right;
-  int      margin_bottom;
-  uint32_t background_color;
+  laypos_t  position;
+  laydis_t  display;
+  flexdir_t flexdir;
+  float     w_per;
+  float     h_per;
+  int       width;
+  int       height;
+  int       margin;
+  int       margin_top;
+  int       margin_left;
+  int       margin_right;
+  int       margin_bottom;
+  int       top;
+  int       left;
+  int       right;
+  int       bottom;
+  uint32_t  background_color;
 };
 
 typedef enum _texst_t // texture loading state
@@ -238,9 +249,40 @@ void view_desc(void* pointer, int level)
 
 void view_desc_layout(vlayout_t l)
 {
-  printf("pos %i dis %i w_per %f h_per %f w %i h %i margin %i m_top %i m_left %i m_right %i m_bot %i backg_col %x ",
-         l.position, l.display, l.w_per, l.h_per, l.width, l.height, l.margin,
-         l.margin_top, l.margin_left, l.margin_right, l.margin_bottom, l.background_color);
+  printf("position %i\n"
+         "display %i\n"
+         "flexdir %i\n"
+         "w_per %f\n"
+         "h_per %f\n"
+         "width %i\n"
+         "height %i\n"
+         "margin %i\n"
+         "margin_top %i\n"
+         "margin_left %i\n"
+         "margin_right %i\n"
+         "margin_bottom %i\n"
+         "top %i\n"
+         "left %i\n"
+         "right %i\n"
+         "bottom %i\n"
+         "background_cololor %x\n",
+         l.position,
+         l.display,
+         l.flexdir,
+         l.w_per,
+         l.h_per,
+         l.width,
+         l.height,
+         l.margin,
+         l.margin_top,
+         l.margin_left,
+         l.margin_right,
+         l.margin_bottom,
+         l.top,
+         l.left,
+         l.right,
+         l.bottom,
+         l.background_color);
 }
 
 #endif
