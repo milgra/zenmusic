@@ -28,9 +28,25 @@ typedef struct _eh_visu_t
 
 void eh_visu_evt(view_t* view, ev_t ev)
 {
-  if (ev.type == EV_TIME)
+  if (ev.type == EV_TIME && view->texture.bitmap != NULL)
   {
     eh_visu_t* eh = view->evt_han_data;
+
+    if (view->texture.bitmap == NULL)
+    {
+      bm_t* bmp = bm_new(view->frame.local.w, view->frame.local.h);
+      bm_fill(bmp,
+              0,
+              0,
+              view->frame.local.w,
+              view->frame.local.h,
+              0x000000FF);
+
+      char idbuffer[100] = {0};
+      snprintf(idbuffer, 20, "visu %i", eh->channel);
+
+      view_set_texture(view, bmp, idbuffer);
+    }
 
     if (eh->vis_type == VIS_WAVE)
     {
@@ -48,19 +64,6 @@ void eh_visu_evt(view_t* view, ev_t ev)
 void eh_visu_add(view_t* view, int channel)
 {
   eh_visu_t* eh = mtmem_calloc(sizeof(eh_visu_t), "eh_visu", NULL, NULL);
-
-  bm_t* bmp = bm_new(view->frame.local.w, view->frame.local.h);
-  bm_fill(bmp,
-          0,
-          0,
-          view->frame.local.w,
-          view->frame.local.h,
-          0x000000FF);
-
-  char idbuffer[100] = {0};
-  snprintf(idbuffer, 20, "visu %i", channel);
-
-  view_set_texture(view, bmp, idbuffer);
 
   eh->channel  = channel;
   eh->vis_type = VIS_WAVE;

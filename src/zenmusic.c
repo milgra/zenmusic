@@ -17,6 +17,7 @@
 #include "ui_manager.c"
 #include "view.c"
 #include "view_generator.c"
+#include "view_util.c"
 #include "wm_connector.c"
 #include "wm_event.c"
 #include <SDL.h>
@@ -53,7 +54,7 @@ void songitem_event(ev_t ev, void* data)
     // printf("songitem event %i %i %s\n", ev.type, index, (char*)files->data[index]);
 
     bm_t* bitmap = player_get_album(files->data[index]);
-    tg_bitmap_add(coverview, NULL, bitmap, "album");
+    //tg_bitmap_add(coverview, NULL, bitmap, "album");
 
     player_play(files->data[index]);
   }
@@ -95,15 +96,14 @@ void init(int width, int height)
   srand((unsigned int)time(NULL));
 
   char* respath  = SDL_GetBasePath();
-  char* fontpath = mtcstr_fromformat("%s/../res/Ubuntu-Regular.ttf", respath, NULL);
-
-  common_font = font_alloc(fontpath);
-
-  char* htmlpath = mtcstr_fromformat("%s/../res/main.html", respath, NULL);
   char* csspath  = mtcstr_fromformat("%s/../res/main.css", respath, NULL);
+  char* htmlpath = mtcstr_fromformat("%s/../res/main.html", respath, NULL);
+  char* fontpath = mtcstr_fromformat("%s/../res/Ubuntu-Regular.ttf", respath, NULL);
 
   mtvec_t* views = view_gen_load(htmlpath, csspath);
   view_t*  base  = mtvec_head(views);
+
+  common_font = font_alloc(fontpath);
 
   ui_manager_init(width, height);
   ui_manager_add(base);
@@ -112,62 +112,28 @@ void init(int width, int height)
   texmapview->texture.full = 1;
   ui_manager_add(texmapview);
 
+  view_t* songlist = view_get_subview(base, "songlist");
+  eh_list_add(songlist, songlist_item_generator);
+
+  view_t* video = view_get_subview(base, "video");
+  eh_video_add(video);
+
+  view_t* left = view_get_subview(base, "left");
+  eh_visu_add(left, 0);
+
+  view_t* right = view_get_subview(base, "right");
+  eh_visu_add(left, 1);
+
+  view_t* header = view_get_subview(base, "header");
+  //header->texture.blur = 1;
+  //header->texture.shadow = 1;
+
   /* mtmap_describe(view_structure); */
   /* mtmap_describe(view_styles); */
-
-  /* // songlist view */
-  /* view_t* songlist = view_new("songlist", (vframe_t){0, 0, 500, 500}); */
-  /* tg_color_add(songlist, 0x444444FF); */
-  /* eh_list_add(songlist, songlist_item_generator); */
-
-  /* view_set_layout(songlist, (vlayout_t){.margin_right = 300.0, .w_per = 1.0, .h_per = 1.0}); */
-
-  /* ui_manager_add(songlist); */
-
-  /* view_t* header = view_new("header", (vframe_t){0, 0, 700, 150}); */
-  /* view_set_layout(header, (vlayout_t){.w_per = 1.0}); */
-  /* tg_color_add(header, 0xFFFFFFEE); */
-
-  /* //header->blur = 1; */
-  /* header->texture.shadow = 1; */
-
-  /* // visualization views */
-
-  /* view_t* visuals = view_new("visuals", (vframe_t){0, 0, 790, 600}); */
-  /* view_set_layout(visuals, (vlayout_t){.margin_top = 260.0, .margin = INT_MAX}); */
-
-  /* //visuals->blur   = 1; */
-  /* visuals->texture.shadow = 1; */
-
-  /* view_t* visualscolor = view_new("visualscolor", (vframe_t){0, 0, 790, 170}); */
-  /* tg_color_add(visualscolor, 0xFFFFFFFF); */
-
-  /* view_t* videoview_left_base = view_new("videoviewleftbase", (vframe_t){10, 0, 300, 150}); */
-  /* tg_color_add(videoview_left_base, 0x000000FF); */
-  /* view_set_layout(videoview_left_base, (vlayout_t){.margin_top = 10.0, .margin_left = 10.0}); */
-
-  /* view_t* videoview_left = view_new("videoviewleft", (vframe_t){0, 0, 300, 150}); */
-  /* eh_visu_add(videoview_left, 0); */
-  /* view_add(videoview_left_base, videoview_left); */
-
-  /* view_t* videoview_right_base = view_new("videoviewrightbase", (vframe_t){0, 0, 300, 150}); */
-  /* tg_color_add(videoview_right_base, 0x000000FF); */
-  /* view_set_layout(videoview_right_base, (vlayout_t){.margin_top = 10.0, .margin_right = 10.0}); */
-
-  /* view_t* videoview_right = view_new("videoviewright", (vframe_t){0, 0, 300, 150}); */
-  /* eh_visu_add(videoview_right, 1); */
-  /* view_add(videoview_right_base, videoview_right); */
 
   /* coverview = view_new("coverview", (vframe_t){0, 0, 150, 150}); */
   /* tg_color_add(coverview, 0x000000FF); */
   /* view_set_layout(coverview, (vlayout_t){.margin_top = 10.0, .margin_left = 320.0}); */
-
-  /* view_add(visualscolor, videoview_left_base); */
-  /* view_add(visualscolor, videoview_right_base); */
-  /* view_add(visualscolor, coverview); */
-  /* view_add(visuals, visualscolor); */
-
-  /* // buttons */
 
   /* char*   playpath = mtcstr_fromformat("%s/../res/play.png", respath, NULL); */
   /* view_t* playbtn  = view_new("playbtnview", (vframe_t){0, 40, 80, 80}); */

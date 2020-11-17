@@ -11,7 +11,9 @@ hook clang-format and gmake to file save hook
 
 ---
 
-ui parser from html/css instead of the mess in zenmusic
+rounded rect background
+image background
+list item reusage
 scrollbar
 text anim
 working time/seek

@@ -99,9 +99,9 @@ void view_gen_apply_style(view_t* view, mtmap_t* style)
       }
     }
   }
-  printf("layout for %s: ", view->id);
-  view_desc_layout(view->layout);
-  printf("\n");
+  //printf("layout for %s: ", view->id);
+  //view_desc_layout(view->layout);
+  //printf("\n");
 }
 
 mtvec_t* view_gen_load(char* htmlpath, char* csspath)

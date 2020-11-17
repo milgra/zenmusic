@@ -16,6 +16,8 @@
     background-color: #22AAAAFF;
     width: 100%;
     height: 150px;
+    display: flex;
+    flex-direction: row;
 }
 
 #songlistheader {
@@ -50,6 +52,23 @@
 }
 
 #video {
+    width: 150px;
+    height: 150px;
+}
+
+#playbtn {
+    width: 150px;
+    height: 150px;
+    padding: 15px;
+    background-image: url("play.png");
+    background-color: #556655FF;
+}
+#display {
+    width: 100%;
+    height: 150px;
+    background-color: #556655FF;
+}
+#search {
     width: 150px;
     height: 150px;
     background-color: #556655FF;

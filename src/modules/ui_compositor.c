@@ -126,14 +126,14 @@ int ui_compositor_map_texture()
 
 void ui_compositor_add(char* viewid, char* texid, uint32_t index, uirect_t uirect, int page, char shadow, char blur, char full)
 {
-  printf("ui_compositor_add viewid %s texid %s index %i page %i %f %f %f %f\n", viewid, texid, index, page, uirect.x, uirect.y, uirect.w, uirect.h);
+  // printf("ui_compositor_add viewid %s texid %s index %i page %i %f %f %f %f\n", viewid, texid, index, page, uirect.x, uirect.y, uirect.w, uirect.h);
 
   crect_t*    rect;
   tm_coords_t coords = tm_get(uic.tm, texid);
 
   if (coords.w > 0)
   {
-    printf("existing texcoords, creating new crect\n");
+    //printf("existing texcoords, creating new crect\n");
     coords = tm_get(uic.tm, texid);
 
     uitexc_t tex_cor = (uitexc_t){coords.ltx, coords.lty, coords.rbx, coords.rby};
@@ -147,7 +147,7 @@ void ui_compositor_add(char* viewid, char* texid, uint32_t index, uirect_t uirec
   }
   else
   {
-    printf("no texcoords, creating new crect with full frame\n");
+    //printf("no texcoords, creating new crect with full frame\n");
     // add view with texture coords for frame, if it has a bitmap it will be updated after load
 
     glrect_t tex_dim = gl_get_texture(page, uirect.w, uirect.h);
@@ -179,7 +179,7 @@ void ui_compositor_rem(char* id)
 
 void ui_compositor_set_index(char* id, uint32_t index)
 {
-  printf("ui_compositor_set_index %s %i\n", id, index);
+  //printf("ui_compositor_set_index %s %i\n", id, index);
 
   crect_t* rect;
 
@@ -199,7 +199,7 @@ void ui_compositor_set_index(char* id, uint32_t index)
 
 void ui_compositor_set_frame(char* id, uirect_t uirect)
 {
-  printf("ui_compositor_set_frame %s %f %f %f %f\n", id, uirect.x, uirect.y, uirect.w, uirect.h);
+  //printf("ui_compositor_set_frame %s %f %f %f %f\n", id, uirect.x, uirect.y, uirect.w, uirect.h);
 
   crect_t* rect;
 
@@ -212,7 +212,7 @@ void ui_compositor_set_frame(char* id, uirect_t uirect)
 
 void ui_compositor_set_texture(char* viewid, char* texid, bm_t* tex)
 {
-  printf("ui_compositor_set_texture %s %s\n", viewid, texid);
+  //printf("ui_compositor_set_texture %s %s\n", viewid, texid);
 
   crect_t*    rect;
   tm_coords_t coords;
@@ -223,7 +223,7 @@ void ui_compositor_set_texture(char* viewid, char* texid, bm_t* tex)
 
     if (coords.w != tex->w || coords.h != tex->h)
     {
-      printf("texture size mismath, uploading again\n");
+      //printf("texture size mismath, uploading again\n");
       int success = tm_put(uic.tm, texid, tex);
 
       // TODO reset main texture, maybe all views?
