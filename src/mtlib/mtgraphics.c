@@ -17,7 +17,6 @@ void mtgraphics_tile(bm_t* bitmap);
 
 void mtgraphics_circle(bm_t* bitmap, float cx, float cy, float r, float edge, uint32_t c)
 {
-  printf("CIRCLE %i %f %f %f\n", bitmap->w, cx, cy, r);
   float m = r;
   for (int x = 0; x < bitmap->w; x++)
   {

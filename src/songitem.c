@@ -11,7 +11,6 @@ void    songitem_update(view_t* rowview, int index, char* filename, void (*event
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "tg_color.c"
 #include "tg_text.c"
 
 uint32_t songitem_index = 0;
@@ -23,7 +22,8 @@ view_t* songitem_new()
 
   view_t* rowview = view_new(idbuffer, (vframe_t){0, 0, 1500, 35});
 
-  tg_color_add(rowview, 0x00000022);
+  rowview->layout.background_color = 0x00000022;
+  tg_css_add(rowview);
 
   snprintf(idbuffer, 100, "index_item%i", songitem_index);
   view_t* indexview = view_new(idbuffer, (vframe_t){0, 0, 80, 35});

@@ -4,17 +4,19 @@
 #include "mtvector.c"
 #include "view.c"
 
-mtvec_t* view_gen_load(char* htmlpath, char* csspath);
+mtvec_t* view_gen_load(char* htmlpath, char* csspath, char* respath);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "common.c"
 #include "html.c"
 #include "tg_color.c"
+#include "tg_css.c"
 #include <limits.h>
 
-void view_gen_apply_style(view_t* view, mtmap_t* style)
+void view_gen_apply_style(view_t* view, mtmap_t* style, char* respath)
 {
   mtvec_t* keys = mtmap_keys(style);
   for (int index = 0; index < keys->length; index++)
@@ -27,7 +29,19 @@ void view_gen_apply_style(view_t* view, mtmap_t* style)
     {
       int color                     = (int)strtol(val + 1, NULL, 16);
       view->layout.background_color = color;
-      tg_color_add(view, color);
+      tg_css_add(view);
+    }
+    else if (strcmp(key, "background-image") == 0)
+    {
+      if (strstr(val, "url") != NULL)
+      {
+        char* url = mtmem_calloc(sizeof(char) * strlen(val), "char*", NULL, NULL);
+        memcpy(url, val + 5, strlen(val) - 7);
+        char* imagepath               = mtcstr_fromformat("%s/../res/%s", respath, url, NULL);
+        view->layout.background_image = imagepath;
+        REL(url);
+        tg_css_add(view);
+      }
     }
     else if (strcmp(key, "width") == 0)
     {
@@ -98,13 +112,25 @@ void view_gen_apply_style(view_t* view, mtmap_t* style)
         view->layout.bottom = pix;
       }
     }
+    else if (strcmp(key, "border-radius") == 0)
+    {
+      if (strstr(val, "px") != NULL)
+      {
+        char* end    = strstr(val, "px");
+        int   len    = end - val;
+        end[len - 1] = '\0';
+        // if value is 0 we have to make layouter know that it is an explicit 0 so all values are increased by 1
+        int pix                    = atoi(val) + 1;
+        view->layout.border_radius = pix;
+      }
+    }
   }
-  //printf("layout for %s: ", view->id);
-  //view_desc_layout(view->layout);
-  //printf("\n");
+  printf("layout for %s: ", view->id);
+  view_desc_layout(view->layout);
+  printf("\n");
 }
 
-mtvec_t* view_gen_load(char* htmlpath, char* csspath)
+mtvec_t* view_gen_load(char* htmlpath, char* csspath, char* respath)
 {
   char* html = html_read(htmlpath);
   char* css  = html_read(csspath);
@@ -159,7 +185,7 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath)
       mtmap_t* style = MGET(styles, cssid);
       if (style)
       {
-        view_gen_apply_style(view, style);
+        view_gen_apply_style(view, style, respath);
       }
 
       if (t.class.len > 0)
@@ -173,7 +199,7 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath)
         style = MGET(styles, csscls);
         if (style)
         {
-          view_gen_apply_style(view, style);
+          view_gen_apply_style(view, style, respath);
         }
       }
 

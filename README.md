@@ -11,26 +11,19 @@ hook clang-format and gmake to file save hook
 
 ---
 
-rounded rect background
-image background
 list item reusage
 scrollbar
 text anim
 working time/seek
 list header
 
-felul legyen egy view title-nek, alatta seek bar, jobbra search bar, alul maradjon a borito es a visualizer
 tilemap is auto-resize legyen duplazassal
 volume bar pedig play button korul legyen egy gyuru - kell arc mtdrawer-be
-tg_rounded_rect - mtdrawer rounded rect. eh_resize
 search bar click hozza elo genre/artist listat
 resize textures on window change if needed
 unit teszter gl_compositorhoz
-flex - vertical, horizontal auto-layout
 ha az egeret a lista item jobb oldalara viszed popupban mutassa id3/song infokat es album artot
-css based styling, layout, color
 database, reordering
-reuse view bitmaps, only recreate on resize!!!
 resizable header/songlist border
 check leaks
 bar analyzer

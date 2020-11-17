@@ -100,10 +100,11 @@ void init(int width, int height)
   char* htmlpath = mtcstr_fromformat("%s/../res/main.html", respath, NULL);
   char* fontpath = mtcstr_fromformat("%s/../res/Ubuntu-Regular.ttf", respath, NULL);
 
-  mtvec_t* views = view_gen_load(htmlpath, csspath);
+  mtvec_t* views = view_gen_load(htmlpath, csspath, respath);
   view_t*  base  = mtvec_head(views);
 
-  common_font = font_alloc(fontpath);
+  common_respath = respath;
+  common_font    = font_alloc(fontpath);
 
   ui_manager_init(width, height);
   ui_manager_add(base);

@@ -43,7 +43,9 @@ struct _vlayout_t
   int       left;
   int       right;
   int       bottom;
+  int       border_radius;
   uint32_t  background_color;
+  char*     background_image;
 };
 
 typedef enum _texst_t // texture loading state
@@ -137,6 +139,9 @@ char reindex = 1;
 void view_del(void* pointer)
 {
   view_t* view = (view_t*)pointer;
+
+  if (view->layout.background_image != NULL) REL(view->layout.background_image);
+
   REL(view->id);
   REL(view->texture.bitmap);
   REL(view->views);
@@ -265,7 +270,9 @@ void view_desc_layout(vlayout_t l)
          "left %i\n"
          "right %i\n"
          "bottom %i\n"
-         "background_cololor %x\n",
+         "border_radius %i\n"
+         "background_color %x\n"
+         "background_image %s\n",
          l.position,
          l.display,
          l.flexdir,
@@ -282,7 +289,9 @@ void view_desc_layout(vlayout_t l)
          l.left,
          l.right,
          l.bottom,
-         l.background_color);
+         l.border_radius,
+         l.background_color,
+         l.background_image == NULL ? "" : l.background_image);
 }
 
 #endif
