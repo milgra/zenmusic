@@ -11,11 +11,16 @@ hook clang-format and gmake to file save hook
 
 ---
 
+play/pause button kore seek ring
+mute/unmute button kore volume ring
+
+list overflow
 list item reusage
 scrollbar
 text anim
 working time/seek
 list header
+database
 
 tilemap is auto-resize legyen duplazassal
 volume bar pedig play button korul legyen egy gyuru - kell arc mtdrawer-be

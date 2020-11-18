@@ -146,14 +146,13 @@ void wm_init(void (*init)(int, int),
             }
             else if (event.type == SDL_MOUSEWHEEL)
             {
-
               scroll.active = 1;
 
               uint32_t delta   = ev.time - scroll.time_last;
               scroll.time_last = ev.time;
 
-              scroll.sx += (float)event.wheel.x * 4.0;
-              scroll.sy += (float)event.wheel.y * 4.0;
+              scroll.sx += (float)event.wheel.x * 5.0;
+              scroll.sy += (float)event.wheel.y * 5.0;
 
               scroll.time_to_stop = delta < SCROLL_RELEASED_DELAY ? UINT32_MAX : ev.time + SCROLL_TOUCHED_TIMEOUT;
               scroll.slowdown     = delta < SCROLL_RELEASED_DELAY ? SCROLL_RELEASED_SLOWDOWN : SCROLL_TOUCHED_SLOWDOWN;

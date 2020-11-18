@@ -48,6 +48,12 @@ void view_layout(view_t* view)
   {
     vframe_t frame = v->frame.local;
 
+    if (v->layout.margin > 0)
+    {
+      frame.x = 0;
+      frame.y = 0;
+    }
+
     if (v->layout.width > 0)
     {
       frame.w = v->layout.width;
@@ -114,9 +120,21 @@ void view_layout(view_t* view)
     {
       frame.h -= v->layout.margin_bottom;
     }
+    if (v->layout.top > 0)
+    {
+      frame.y = v->layout.top - 1;
+    }
+    if (v->layout.left > 0)
+    {
+      frame.x = v->layout.left - 1;
+    }
+    if (v->layout.right > 0)
+    {
+      frame.x = view->frame.local.w - frame.w - v->layout.right + 1;
+    }
     if (v->layout.bottom > 0)
     {
-      frame.y = view->frame.local.h - frame.h;
+      frame.y = view->frame.local.h - frame.h - v->layout.bottom + 1;
     }
     view_set_frame(v, frame);
   }

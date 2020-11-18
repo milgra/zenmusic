@@ -10,9 +10,6 @@
 #include "mtmath4.c"
 #include "player.c"
 #include "songitem.c"
-#include "tg_bitmap.c"
-#include "tg_color.c"
-#include "tg_texmap.c"
 #include "tg_text.c"
 #include "ui_manager.c"
 #include "view.c"
@@ -109,7 +106,7 @@ void init(int width, int height)
   ui_manager_init(width, height);
   ui_manager_add(base);
 
-  view_t* texmapview       = view_new("texmapview", (vframe_t){50, 50, 200, 200});
+  view_t* texmapview       = view_new("texmapview", (vframe_t){500, 500, 200, 200});
   texmapview->texture.full = 1;
   ui_manager_add(texmapview);
 
@@ -119,15 +116,19 @@ void init(int width, int height)
   view_t* video = view_get_subview(base, "video");
   eh_video_add(video);
 
-  view_t* left = view_get_subview(base, "left");
+  view_t* left = view_get_subview(base, "visuleft");
   eh_visu_add(left, 0);
 
-  view_t* right = view_get_subview(base, "right");
+  view_t* right = view_get_subview(base, "visuright");
   eh_visu_add(left, 1);
 
-  view_t* header = view_get_subview(base, "header");
+  view_t* songlistheader = view_get_subview(base, "songlistheader");
   //header->texture.blur = 1;
   //header->texture.shadow = 1;
+
+  view_t* headeritem = songitem_new();
+  songitem_update(headeritem, -1, "file name", NULL);
+  view_add(songlistheader, headeritem);
 
   /* mtmap_describe(view_structure); */
   /* mtmap_describe(view_styles); */
@@ -135,14 +136,6 @@ void init(int width, int height)
   /* coverview = view_new("coverview", (vframe_t){0, 0, 150, 150}); */
   /* tg_color_add(coverview, 0x000000FF); */
   /* view_set_layout(coverview, (vlayout_t){.margin_top = 10.0, .margin_left = 320.0}); */
-
-  /* char*   playpath = mtcstr_fromformat("%s/../res/play.png", respath, NULL); */
-  /* view_t* playbtn  = view_new("playbtnview", (vframe_t){0, 40, 80, 80}); */
-  /* tg_bitmap_add(playbtn, playpath, NULL, "play.png"); */
-  /* view_set_layout(playbtn, (vlayout_t){.margin = INT_MAX}); */
-
-  /* eh_touch_add(playbtn, NULL, playbtn_event); */
-
   /* view_add(coverview, playbtn); */
 
   /* view_t* nextbtn = view_new("nextbtnview", (vframe_t){0, 60, 45, 45}); */

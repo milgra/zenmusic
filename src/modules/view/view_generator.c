@@ -12,7 +12,6 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath, char* respath);
 
 #include "common.c"
 #include "html.c"
-#include "tg_color.c"
 #include "tg_css.c"
 #include <limits.h>
 
@@ -98,6 +97,55 @@ void view_gen_apply_style(view_t* view, mtmap_t* style, char* respath)
       if (strcmp(val, "auto") == 0)
       {
         view->layout.margin = INT_MAX;
+      }
+      else if (strstr(val, "px") != NULL)
+      {
+        char* end    = strstr(val, "px");
+        int   len    = end - val;
+        end[len - 1] = '\0';
+        // if value is 0 we have to make layouter know that it is an explicit 0 so all values are increased by 1
+        int pix                    = atoi(val) + 1;
+        view->layout.margin        = pix;
+        view->layout.margin_top    = pix;
+        view->layout.margin_left   = pix;
+        view->layout.margin_right  = pix;
+        view->layout.margin_bottom = pix;
+      }
+    }
+    else if (strcmp(key, "top") == 0)
+    {
+      if (strstr(val, "px") != NULL)
+      {
+        char* end    = strstr(val, "px");
+        int   len    = end - val;
+        end[len - 1] = '\0';
+        // if value is 0 we have to make layouter know that it is an explicit 0 so all values are increased by 1
+        int pix          = atoi(val) + 1;
+        view->layout.top = pix;
+      }
+    }
+    else if (strcmp(key, "left") == 0)
+    {
+      if (strstr(val, "px") != NULL)
+      {
+        char* end    = strstr(val, "px");
+        int   len    = end - val;
+        end[len - 1] = '\0';
+        // if value is 0 we have to make layouter know that it is an explicit 0 so all values are increased by 1
+        int pix           = atoi(val) + 1;
+        view->layout.left = pix;
+      }
+    }
+    else if (strcmp(key, "right") == 0)
+    {
+      if (strstr(val, "px") != NULL)
+      {
+        char* end    = strstr(val, "px");
+        int   len    = end - val;
+        end[len - 1] = '\0';
+        // if value is 0 we have to make layouter know that it is an explicit 0 so all values are increased by 1
+        int pix            = atoi(val) + 1;
+        view->layout.right = pix;
       }
     }
     else if (strcmp(key, "bottom") == 0)
