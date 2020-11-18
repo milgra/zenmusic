@@ -98,9 +98,13 @@ void view_layout(view_t* view)
       }
       frame.h = height * v->layout.h_per;
     }
-    if (v->layout.margin == INT_MAX)
+    if (v->layout.margin == INT_MAX || view->layout.cjustify == JC_CENTER)
     {
       frame.x = (view->frame.local.w / 2.0) - (v->frame.local.w / 2.0);
+    }
+    if (v->layout.itemalign == IA_CENTER)
+    {
+      frame.y = (view->frame.local.h / 2.0) - (v->frame.local.h / 2.0);
     }
     if (v->layout.margin_top > 0)
     {

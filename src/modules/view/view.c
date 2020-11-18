@@ -18,34 +18,48 @@ typedef enum _laydis_t // layout display
   LD_FLEX,
 } laydis_t;
 
-typedef enum _exdir_t // layout display
+typedef enum _exdir_t // flexdir
 {
   FD_ROW = 0,
   FD_COL,
 } flexdir_t;
 
+typedef enum _itemalign_t // flexdir
+{
+  IA_NONE = 0,
+  IA_CENTER,
+} itemalign_t;
+
+typedef enum _cjustify_t // justify content
+{
+  JC_NONE = 0,
+  JC_CENTER,
+} cjustify_t;
+
 typedef struct _vlayout_t vlayout_t; // view layout
 struct _vlayout_t
 {
-  laypos_t  position;
-  laydis_t  display;
-  flexdir_t flexdir;
-  float     w_per;
-  float     h_per;
-  int       width;
-  int       height;
-  int       margin;
-  int       margin_top;
-  int       margin_left;
-  int       margin_right;
-  int       margin_bottom;
-  int       top;
-  int       left;
-  int       right;
-  int       bottom;
-  int       border_radius;
-  uint32_t  background_color;
-  char*     background_image;
+  laypos_t    position;
+  laydis_t    display;
+  flexdir_t   flexdir;
+  itemalign_t itemalign;
+  cjustify_t  cjustify;
+  float       w_per;
+  float       h_per;
+  int         width;
+  int         height;
+  int         margin;
+  int         margin_top;
+  int         margin_left;
+  int         margin_right;
+  int         margin_bottom;
+  int         top;
+  int         left;
+  int         right;
+  int         bottom;
+  int         border_radius;
+  uint32_t    background_color;
+  char*       background_image;
 };
 
 typedef enum _texst_t // texture loading state
@@ -257,6 +271,8 @@ void view_desc_layout(vlayout_t l)
   printf("position %i\n"
          "display %i\n"
          "flexdir %i\n"
+         "itemalign %i\n"
+         "cjustify %i\n"
          "w_per %f\n"
          "h_per %f\n"
          "width %i\n"
@@ -276,6 +292,8 @@ void view_desc_layout(vlayout_t l)
          l.position,
          l.display,
          l.flexdir,
+         l.itemalign,
+         l.cjustify,
          l.w_per,
          l.h_per,
          l.width,
