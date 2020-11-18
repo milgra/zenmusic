@@ -7,13 +7,14 @@
 
 #include "mtbitmap.c"
 
-void  player_play(char* path);
-void  player_stop();
-void  player_draw();
-bm_t* player_get_album(const char* path);
-void  player_draw_video(int index, int w, int h);
-void  player_draw_waves(int index, int channel, bm_t* bm);
-void  player_draw_rdft(int index, int channel, bm_t* bm);
+void   player_play(char* path);
+void   player_stop();
+void   player_draw();
+double player_time();
+bm_t*  player_get_album(const char* path);
+void   player_draw_video(int index, int w, int h);
+void   player_draw_waves(int index, int channel, bm_t* bm);
+void   player_draw_rdft(int index, int channel, bm_t* bm);
 
 #endif
 
@@ -48,6 +49,16 @@ void player_stop()
     stream_close(is);
     is = NULL;
   }
+}
+
+double player_time()
+{
+  if (is != NULL)
+  {
+    return get_master_clock(is);
+  }
+  else
+    return 0.0;
 }
 
 void player_draw_video(int index, int w, int h)

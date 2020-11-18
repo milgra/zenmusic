@@ -102,7 +102,7 @@ void view_layout(view_t* view)
     {
       frame.x = (view->frame.local.w / 2.0) - (v->frame.local.w / 2.0);
     }
-    if (v->layout.itemalign == IA_CENTER)
+    if (view->layout.itemalign == IA_CENTER)
     {
       frame.y = (view->frame.local.h / 2.0) - (v->frame.local.h / 2.0);
     }

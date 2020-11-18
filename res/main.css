@@ -38,6 +38,7 @@
     height: 100%;
     background-color: #00FF000A;
     display: flex;
+    align-items: center;
 }
 
 .headcenter {
@@ -57,9 +58,6 @@
     height: 100px;
     margin: auto;
     padding: 15px;
-    background-image: url("play.png");
-    background-color: #556655FF;
-    align-items: center;
 }
 
 #volbtn {
@@ -67,9 +65,6 @@
     height: 100px;
     margin: auto;
     padding: 15px;
-    background-image: url("play.png");
-    background-color: #556655FF;
-    align-items: center;
 }
 
 #display {

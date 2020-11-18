@@ -13,6 +13,9 @@ hook clang-format and gmake to file save hook
 
 play/pause button kore seek ring
 mute/unmute button kore volume ring
+search button maradhasson benyomva - search cuccok kint
+events button maradhasson benyomva - events
+knob folotti scroll tekerje a knobot
 
 list overflow
 list item reusage

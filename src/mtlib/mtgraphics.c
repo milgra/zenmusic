@@ -8,6 +8,7 @@
 #include <stdint.h>
 
 void mtgraphics_circle(bm_t* bitmap, float cx, float cy, float r, float edge, uint32_t c);
+void mtgraphics_arc(bm_t* bitmap, float cx, float cy, float r, float edge, uint32_t c, float as, float ae);
 void mtgraphics_rounded_rect(bm_t* bitmap, int x, int y, int w, int h, int r, uint32_t c);
 void mtgraphics_tile(bm_t* bitmap);
 
@@ -22,8 +23,8 @@ void mtgraphics_circle(bm_t* bitmap, float cx, float cy, float r, float edge, ui
   {
     for (int y = 0; y < bitmap->h; y++)
     {
-      int     dx = cx - (float)x;
-      int     dy = cy - (float)y;
+      float   dx = cx - (float)x;
+      float   dy = cy - (float)y;
       float   d  = sqrt(dx * dx + dy * dy);
       uint8_t a  = 255;
       if (d < m + edge)
@@ -34,6 +35,36 @@ void mtgraphics_circle(bm_t* bitmap, float cx, float cy, float r, float edge, ui
           a           = (uint8_t)(delta / edge * 255.0);
         }
         bm_fill(bitmap, x, y, x + 1, y + 1, (c & 0xFFFFFF00) | a);
+      }
+    }
+  }
+}
+
+void mtgraphics_arc(bm_t* bitmap, float cx, float cy, float r, float edge, uint32_t c, float as, float ae)
+{
+  printf("arc %f %f\n", as, ae);
+  float m = r;
+  for (int x = 0; x < bitmap->w; x++)
+  {
+    for (int y = 0; y < bitmap->h; y++)
+    {
+      float   dx = (float)x - cx;
+      float   dy = (float)y - cy;
+      float   d  = sqrt(dx * dx + dy * dy);
+      uint8_t a  = 255;
+      if (d < m + edge)
+      {
+        float r = atan2(dy, dx);
+        if (r < 0) r += 6.28;
+        if (r > as && r < ae)
+        {
+          if (d > m)
+          {
+            float delta = m + edge - d;
+            a           = (uint8_t)(delta / edge * 255.0);
+          }
+          bm_fill(bitmap, x, y, x + 1, y + 1, (c & 0xFFFFFF00) | a);
+        }
       }
     }
   }
@@ -57,9 +88,9 @@ void mtgraphics_rounded_rect(bm_t* bitmap, int x, int y, int w, int h, int r, ui
 {
   // draw corners
   mtgraphics_circle(bitmap, x + r, y + r, r, 1.0, c);
-  mtgraphics_circle(bitmap, x + w - r, y + r, r, 1.0, c);
-  mtgraphics_circle(bitmap, x + r, y + h - r, r, 1.0, c);
-  mtgraphics_circle(bitmap, x + w - r, y + h - r, r, 1.0, c);
+  mtgraphics_circle(bitmap, x + w - r - 1.0, y + r, r, 1.0, c);
+  mtgraphics_circle(bitmap, x + r, y + h - r - 1.0, r, 1.0, c);
+  mtgraphics_circle(bitmap, x + w - r - 1.0, y + h - r - 1.0, r, 1.0, c);
   bm_fill(bitmap, x + r, y, x + w - r + 1, y + h + 1, c);
   bm_fill(bitmap, x, y + r, x + w + 1, y + h - r + 1, c);
 }

@@ -32,32 +32,40 @@ int tg_text_index = 0;
 
 void tg_text_gen(view_t* view)
 {
-  tg_text_t* gen = view->tex_gen_data;
+  if (view->frame.local.w > 0 && view->frame.local.h > 0)
+  {
+    tg_text_t* gen = view->tex_gen_data;
 
-  mtstr_t* str = mtstr_frombytes(gen->text);
+    mtstr_t* str = mtstr_frombytes(gen->text);
 
-  textstyle_t ts =
-      {
-          .align      = 0,
-          .editable   = 0,
-          .selectable = 0,
-          .multiline  = 0,
-          .autosize   = 0,
-          .uppercase  = 0,
+    textstyle_t ts =
+        {
+            .align      = 0,
+            .editable   = 0,
+            .selectable = 0,
+            .multiline  = 0,
+            .autosize   = 0,
+            .uppercase  = 0,
 
-          .textsize   = 20.0,
-          .marginsize = 5.0,
-          .cursorsize = 15.0,
+            .textsize   = 20.0,
+            .marginsize = 5.0,
+            .cursorsize = 15.0,
 
-          .textcolor = gen->fc,
-          .backcolor = gen->bc,
-      };
+            .textcolor = gen->fc,
+            .backcolor = gen->bc,
+        };
 
-  char idbuffer[100] = {0};
-  snprintf(idbuffer, 20, "text %i", tg_text_index++);
+    char idbuffer[100] = {0};
+    snprintf(idbuffer, 20, "text %i", tg_text_index++);
 
-  bm_t* bmp = font_render_text((int)view->frame.local.w, (int)view->frame.local.h, str, common_font, ts, NULL, NULL);
-  view_set_texture(view, bmp, idbuffer);
+    bm_t* bmp = font_render_text((int)view->frame.local.w, (int)view->frame.local.h, str, common_font, ts, NULL, NULL);
+    view_set_texture(view, bmp, idbuffer);
+  }
+  else
+  {
+    // request regeneration after we have real size
+    view->texture.state = TS_BLANK;
+  }
 }
 
 void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text)
