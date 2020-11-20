@@ -11,7 +11,7 @@
 
 #header {
     flex-basis: 150px;
-    background-color: #ABABABFF;
+    background-color: #DEDEDEFF;
     width: 100%;
     height: 150px;
     display: flex;
@@ -43,21 +43,59 @@
 .headedge {
     width: 150px;
     height: 100%;
+    display: none;
     background-color: #00FF000A;
-    display: flex;
+    display: none;
     align-items: center;
 }
 
 .headcenter {
     width: 500px;
     height: 100%;
+    display: none;
     background-color: #0000FF0A;
 }
 
 .stretch {
     width: 100%;
     height: 100%;
+    display: none;
     background-color: #FF00000A;
+}
+
+#prevbtn {
+    width: 50px;
+    height: 30px;
+    left: 20px;
+    top: 60px;    
+    border-radius: 8px;
+    background-color: #ACACACFF;
+}
+
+#nextbtn {
+    width: 50px;
+    height: 30px;
+    left: 72px;
+    top: 60px;    
+    border-radius: 8px;
+    background-color: #ACACACFF;
+}
+
+#randbtn {
+    width: 50px;
+    height: 30px;
+    right: 72px;
+    top: 60px;    
+    border-radius: 8px;
+    background-color: #ACACACFF;
+}
+#loopbtn {
+    width: 50px;
+    height: 30px;
+    right: 20px;
+    top: 60px;    
+    border-radius: 8px;
+    background-color: #ACACACFF;
 }
 
 #playbtn {
@@ -88,19 +126,19 @@
 #time {
     width: 50%;
     height: 50px;
-    background-color: #FFDDDDFF;
+    background-color: #DFFFFFFF;
 }
 
 #artist {
-    width: 100%;
+    width: 90%;
     height: 30px;
-    background-color: #DDFFDDFF;
+    background-color: #DFFFFFFF;
 }
 
 #song {
-    width: 100%;
+    width: 90%;
     height: 30px;
-    background-color: #DDFFDDFF;
+    background-color: #DFFFFFFF;
 }
 
 #search {
@@ -126,7 +164,7 @@
     height: 150px;
     background-color: #000000FF;
     border-radius: 15px;
-    right: 20px;
+    right: 10px;
     bottom: 25px;
 }
 
@@ -135,7 +173,7 @@
     height: 150px;
     background-color: #000000FF;
     border-radius: 15px;
-    left: 20px;
+    left: 10px;
     bottom: 25px;
 }
 

@@ -51,7 +51,7 @@ void songitem_event(ev_t ev, void* data)
     // printf("songitem event %i %i %s\n", ev.type, index, (char*)files->data[index]);
 
     view_t* song = view_get_subview(baseview, "song");
-    tg_text_add(song, 0x00000011, 0x000000FF, (char*)files->data[index], 0);
+    tg_text_add(song, 0x00000000, 0x000000FF, (char*)files->data[index], 0);
 
     bm_t* bitmap = player_get_album(files->data[index]);
     //tg_bitmap_add(coverview, NULL, bitmap, "album");
@@ -127,10 +127,10 @@ void init(int width, int height)
   eh_visu_add(left, 1);
 
   timeview = view_get_subview(baseview, "time");
-  tg_text_add(timeview, 0x00000011, 0x000000FF, "0:00", 1);
+  tg_text_add(timeview, 0x00000000, 0x000000FF, "0:00", 1);
 
   view_t* song = view_get_subview(baseview, "song");
-  tg_text_add(song, 0x00000011, 0x000000FF, "-", 1);
+  tg_text_add(song, 0x00000000, 0x000000FF, "-", 1);
 
   view_t* songlistheader = view_get_subview(baseview, "songlistheader");
   //header->texture.blur = 1;
@@ -169,7 +169,7 @@ void update(ev_t ev)
   {
     char timebuff[20];
     snprintf(timebuff, 20, "%.2f", time);
-    tg_text_add(timeview, 0x00000011, 0x000000FF, timebuff, 1);
+    tg_text_add(timeview, 0x00000000, 0x000000FF, timebuff, 1);
   }
   ui_manager_event(ev);
 }
