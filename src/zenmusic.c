@@ -133,11 +133,10 @@ void init(int width, int height)
   tg_text_add(song, 0x00000000, 0x000000FF, "-", 1);
 
   view_t* songlistheader = view_get_subview(baseview, "songlistheader");
-  //header->texture.blur = 1;
-  //header->texture.shadow = 1;
 
   view_t* filterbar = view_get_subview(baseview, "filterbar");
   tg_text_add(filterbar, 0xFFFFFFFF, 0x000000FF, "Search/Filter", 1);
+  eh_text_add(filterbar, "placeholder");
 
   view_t* headeritem = songitem_new();
   songitem_update(headeritem, -1, "Artist", NULL);
@@ -146,20 +145,9 @@ void init(int width, int height)
   view_t* playbtn = view_get_subview(baseview, "playbtn");
   eh_knob_add(playbtn);
 
-  /* mtmap_describe(view_structure); */
-  /* mtmap_describe(view_styles); */
-
-  /* search bar */
-
-  /* view_t* searchbar = view_new("searchbar", (vframe_t){1, 180, 375, 30}); */
-  /* eh_text_add(searchbar, "placeholder"); */
-  /* view_add(visuals, searchbar); */
-
-  /* events bar */
-
-  /* view_t* eventbar = view_new("eventbar", (vframe_t){377, 180, 375, 30}); */
-  /* tg_text_add(eventbar, 0xFEFEFEFF, 0x000000FF, "Event log"); */
-  /* view_add(visuals, eventbar); */
+  view_t* header = view_get_subview(baseview, "header");
+  //header->texture.blur = 1;
+  //header->texture.shadow = 1;
 }
 
 void update(ev_t ev)

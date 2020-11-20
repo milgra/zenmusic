@@ -1,5 +1,7 @@
 Zen Multimedia Desktop System
 
+Main goals : operating transparency - all events are logged in event viewer
+
 zen media - offline file/media viewer and manager / preview area, file info area
 zen music - offline music player and manager / video/album area, two spectrum/freq analyzer for stereo channels
 zen video - offline photo/video viewer and library manager / video/image area, location area, info area
@@ -11,22 +13,18 @@ hook clang-format and gmake to file save hook
 
 ---
 
-visu main update funkcioban legyen rarajzolva bitmapekre
-play/pause button kore seek ring
-mute/unmute button kore volume ring
-search button maradhasson benyomva - search cuccok kint
-events button maradhasson benyomva - events
-knob folotti scroll tekerje a knobot
-search/filter bar - genre is metal, name contains x
+texture reuse fix
+working vol/seek ring, play/pause, mute/unmute
 
-list overflow
-list item reusage
+visu main update funkcioban legyen rarajzolva bitmapekre
+knob folotti scroll tekerje a knobot
+search/filter bar - genre is metal, name contains x, year between x and y
+
 scrollbar
 text anim
-working time/seek
-list header
 database
 
+uj event villanjon fel artist helyen, odakattintva event viewer, 
 tilemap is auto-resize legyen duplazassal
 volume bar pedig play button korul legyen egy gyuru - kell arc mtdrawer-be
 search bar click hozza elo genre/artist listat
