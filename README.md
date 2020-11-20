@@ -11,11 +11,13 @@ hook clang-format and gmake to file save hook
 
 ---
 
+visu main update funkcioban legyen rarajzolva bitmapekre
 play/pause button kore seek ring
 mute/unmute button kore volume ring
 search button maradhasson benyomva - search cuccok kint
 events button maradhasson benyomva - events
 knob folotti scroll tekerje a knobot
+search/filter bar - genre is metal, name contains x
 
 list overflow
 list item reusage

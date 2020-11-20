@@ -245,7 +245,7 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap)
           ys = y1;
           y2 = ys + y;
         }
-        bm_fill(bitmap, s->xleft + x, y2, s->xleft + x + 1, y2 + 2, 0x00FF00FF);
+        bm_fill(bitmap, s->xleft + x, y2, s->xleft + x + 1, y2 + 2, 0xFFFFFFFF);
 
         i += channels;
         if (i >= SAMPLE_ARRAY_SIZE)

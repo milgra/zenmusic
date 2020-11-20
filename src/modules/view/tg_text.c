@@ -11,12 +11,13 @@
 typedef struct _tg_text_t
 {
   char*    text;
+  char     align;
   uint32_t fc;
   uint32_t bc;
 
 } tg_text_t;
 
-void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text);
+void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text, char align);
 
 #endif
 
@@ -40,7 +41,7 @@ void tg_text_gen(view_t* view)
 
     textstyle_t ts =
         {
-            .align      = 0,
+            .align      = gen->align,
             .editable   = 0,
             .selectable = 0,
             .multiline  = 0,
@@ -68,13 +69,14 @@ void tg_text_gen(view_t* view)
   }
 }
 
-void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text)
+void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text, char align)
 {
   tg_text_t* gen = mtmem_alloc(sizeof(tg_text_t), "tg_text_t", NULL, NULL);
 
-  gen->fc   = fc;
-  gen->bc   = bc;
-  gen->text = mtcstr_fromcstring(text);
+  gen->fc    = fc;
+  gen->bc    = bc;
+  gen->text  = mtcstr_fromcstring(text);
+  gen->align = align;
 
   view->texture.state = TS_BLANK;
   view->tex_gen_data  = gen;

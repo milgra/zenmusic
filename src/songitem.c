@@ -11,6 +11,7 @@ void    songitem_update(view_t* rowview, int index, char* filename, void (*event
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "tg_css.c"
 #include "tg_text.c"
 
 uint32_t songitem_index = 0;
@@ -54,13 +55,16 @@ void songitem_update(view_t* rowview, int index, char* filename, void (*event)(e
   eh_touch_add(rowview, (void*)sind, event);
 
   char indbuffer[6];
-  snprintf(indbuffer, 6, "%i.", index);
+  if (index > -1)
+    snprintf(indbuffer, 6, "%i.", index);
+  else
+    snprintf(indbuffer, 6, "No.");
 
-  tg_text_add(rowview->views->data[0], color1, 0x000000FF, indbuffer);
+  tg_text_add(rowview->views->data[0], color1, 0x000000FF, indbuffer, 1);
 
-  tg_text_add(rowview->views->data[1], color1, 0x000000FF, filename);
+  tg_text_add(rowview->views->data[1], color1, 0x000000FF, filename, 0);
 
-  tg_text_add(rowview->views->data[2], color1, 0x000000FF, "mp3");
+  tg_text_add(rowview->views->data[2], color1, 0x000000FF, "mp3", 0);
 }
 
 #endif

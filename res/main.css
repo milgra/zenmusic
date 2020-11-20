@@ -4,11 +4,9 @@
 }
 
 #main {
-    background-color: #AAAAAAFF;
+    display: none;
     width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
 }
 
 #header {
@@ -20,13 +18,22 @@
     flex-direction: row;
 }
 
+#filterbar {
+    background-color: #FFFFFFFF;
+    top: 150px;
+    width: 100%;
+    height: 35px;
+}
+
 #songlistheader {
     background-color: #EEEEEEFF;
+    top: 185px;
     width: 100%;
     height: 35px;
 }
 
 #songlist {
+    top: 220px;
     background-color: #222222FF;
     width: 100%;
     height: 100%;
@@ -82,6 +89,12 @@
     width: 50%;
     height: 50px;
     background-color: #FFDDDDFF;
+}
+
+#artist {
+    width: 100%;
+    height: 30px;
+    background-color: #DDFFDDFF;
 }
 
 #song {

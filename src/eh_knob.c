@@ -26,7 +26,7 @@ void eh_knob_evt(view_t* view, ev_t ev)
       bm_t* bmp = bm_new(view->frame.local.w, view->frame.local.h);
 
       mtgraphics_circle(bmp, (view->frame.local.w - 1.0) / 2.0, (view->frame.local.h - 1.0) / 2.0, (view->frame.local.w / 2.0 - 2.0), 1.0, 0x999999FF);
-      mtgraphics_circle(bmp, (view->frame.local.w - 1.0) / 2.0, (view->frame.local.h - 1.0) / 2.0, 30.0, 3.0, 0x666666FF);
+      mtgraphics_circle(bmp, (view->frame.local.w - 1.0) / 2.0, (view->frame.local.h - 1.0) / 2.0, 30.0, 1.0, 0x666666FF);
 
       char idbuffer[100] = {0};
       snprintf(idbuffer, 20, "knob %i", rand());
@@ -49,8 +49,45 @@ void eh_knob_evt(view_t* view, ev_t ev)
       if (angle < 0) angle += 6.28;
 
       printf("angle %f\n", angle * 180 / 3.14);
-      mtgraphics_arc(view->texture.bitmap, (view->frame.local.w - 1.0) / 2.0, (view->frame.local.h - 1.0) / 2.0, (view->frame.local.w / 2.0 - 2.0), 1.0, 0xFF0000FF, 0, angle);
-      mtgraphics_circle(view->texture.bitmap, (view->frame.local.w - 1.0) / 2.0, (view->frame.local.h - 1.0) / 2.0, 30.0, 3.0, 0x666666FF);
+      mtgraphics_circle(view->texture.bitmap, (view->frame.local.w - 1.0) / 2.0, (view->frame.local.h - 1.0) / 2.0, (view->frame.local.w / 2.0 - 2.0), 1.0, 0x999999FF);
+
+      if (angle > 3.14 * 3 / 2)
+      {
+        mtgraphics_arc(view->texture.bitmap,
+                       (view->frame.local.w - 1.0) / 2.0,
+                       (view->frame.local.h - 1.0) / 2.0,
+                       (view->frame.local.w / 2.0 - 2.0),
+                       1.0,
+                       0x000000FF,
+                       3.14 * 3 / 2,
+                       angle);
+      }
+      else
+      {
+        mtgraphics_arc(view->texture.bitmap,
+                       (view->frame.local.w - 1.0) / 2.0,
+                       (view->frame.local.h - 1.0) / 2.0,
+                       (view->frame.local.w / 2.0 - 2.0),
+                       1.0,
+                       0x000000FF,
+                       3.14 * 3 / 2,
+                       6.28);
+        mtgraphics_arc(view->texture.bitmap,
+                       (view->frame.local.w - 1.0) / 2.0,
+                       (view->frame.local.h - 1.0) / 2.0,
+                       (view->frame.local.w / 2.0 - 2.0),
+                       1.0,
+                       0x000000FF,
+                       0,
+                       angle);
+      }
+
+      mtgraphics_circle(view->texture.bitmap,
+                        (view->frame.local.w - 1.0) / 2.0,
+                        (view->frame.local.h - 1.0) / 2.0,
+                        30.0,
+                        2.0,
+                        0x666666FF);
 
       view->texture.changed = 1;
 
