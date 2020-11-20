@@ -64,37 +64,46 @@ void ui_generator_add(view_t* view)
 {
   VADD(uig.views, view);
 
+  ui_compositor_add(view->id,
+                    view->frame.global,
+                    view->index);
+
   int has_tex = ui_compositor_has_texture(view->texture.id);
 
   if (has_tex)
   {
     // no need for texture rendering
     view->texture.state = TS_READY;
+    // update texture in compositor
+    ui_compositor_set_texture(view->id,
+                              view->texture.id,
+                              view->texture.bitmap,
+                              view->texture.page,
+                              view->texture.shadow,
+                              view->texture.blur,
+                              view->texture.full);
   }
   else if (view->texture.state == TS_EXTERN)
   {
     // request new texture page if needed
-    if (view->texture.page == 0) view_set_texture_page(view, ui_compositor_new_texture());
+    if (view->texture.page == 0)
+    {
+      view_set_texture_page(view, ui_compositor_new_texture());
+      // update texture in compositor
+      ui_compositor_set_texture(view->id,
+                                view->texture.id,
+                                view->texture.bitmap,
+                                view->texture.page,
+                                view->texture.shadow,
+                                view->texture.blur,
+                                view->texture.full);
+    }
   }
   else
   {
     // use a texture map texture page
     view_set_texture_page(view, ui_compositor_map_texture());
-    // send to renderer immediately
-    if (view->texture.state == TS_BLANK)
-    {
-      if (mtch_send(uig.channel, view)) view->texture.state = TS_PENDING;
-    }
   }
-
-  ui_compositor_add(view->id,
-                    view->texture.id,
-                    view->index,
-                    view->frame.global,
-                    view->texture.page,
-                    view->texture.shadow,
-                    view->texture.blur,
-                    view->texture.full);
 
   view->connected = 1;
 }
@@ -124,7 +133,14 @@ void ui_generator_render()
     if (view->texture.changed)
     {
       // update texture in compositor
-      ui_compositor_set_texture(view->id, view->texture.id, view->texture.bitmap);
+      ui_compositor_set_texture(view->id,
+                                view->texture.id,
+                                view->texture.bitmap,
+                                view->texture.page,
+                                view->texture.shadow,
+                                view->texture.blur,
+                                view->texture.full);
+
       view->texture.changed = 0;
     }
   }
@@ -157,16 +173,18 @@ void ui_generator_resize(int width, int height)
   while ((view = VNXT(uig.views)))
   {
     ui_compositor_add(view->id,
-                      view->texture.id,
-                      view->index,
                       view->frame.global,
-                      view->texture.page,
-                      view->texture.shadow,
-                      view->texture.blur,
-                      view->texture.full);
+                      view->index);
+
     if (view->texture.state == TS_READY)
     {
-      ui_compositor_set_texture(view->id, view->texture.id, view->texture.bitmap);
+      ui_compositor_set_texture(view->id,
+                                view->texture.id,
+                                view->texture.bitmap,
+                                view->texture.page,
+                                view->texture.shadow,
+                                view->texture.blur,
+                                view->texture.full);
     }
   }
 }

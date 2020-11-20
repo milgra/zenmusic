@@ -36,6 +36,7 @@ void     mtvec_addatindex(mtvec_t* vector, void* data, size_t index);
 void     mtvec_addinvector(mtvec_t* mtvec_a, mtvec_t* mtvec_b);
 void     mtvec_adduniquedata(mtvec_t* vector, void* data);
 void     mtvec_adduniquedataatindex(mtvec_t* vector, void* data, size_t index);
+void     mtvec_replaceatindex(mtvec_t* vector, void* data, size_t index);
 char     mtvec_rem(mtvec_t* vector, void* data);
 char     mtvec_rematindex(mtvec_t* vector, uint32_t index);
 void     mtvec_reminrange(mtvec_t* vector, uint32_t start, uint32_t end);
@@ -162,6 +163,15 @@ void mtvec_adduniquedata(mtvec_t* vector, void* data)
 void mtvec_adduniquedataatindex(mtvec_t* vector, void* data, size_t index)
 {
   if (mtvec_indexofdata(vector, data) == UINT32_MAX) mtvec_addatindex(vector, data, index);
+}
+
+/* replaces data at given index */
+
+void mtvec_replaceatindex(mtvec_t* vector, void* data, size_t index)
+{
+  mtmem_release(vector->data[index]);
+  mtmem_retain(data);
+  vector->data[index] = data;
 }
 
 /* removes single data, returns 1 if data is removed and released during removal */

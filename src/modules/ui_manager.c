@@ -64,12 +64,11 @@ void ui_manager_reindex(view_t* view, uint32_t* index)
 {
   if (!view->hidden)
   {
-    if (view->index != *index)
+    if (view->index != *index || *index == 0)
     {
       view->index = *index;
       if (view->connected == 0)
       {
-        //if (!(view->tg == NULL && view->tex == NULL)) //don't add empty views
         ui_generator_add(view);
       }
 
