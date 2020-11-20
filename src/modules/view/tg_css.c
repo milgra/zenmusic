@@ -43,7 +43,7 @@ void tg_css_gen(view_t* view)
         bm_t* texbmp = bm_new(view->frame.local.w, view->frame.local.h);
         bm_insert(texbmp, imagebmp, 0, 0);
         REL(imagebmp);
-        view_set_texture(view, texbmp, view->layout.background_image);
+        view_set_texture(view, texbmp, view->texture.id ? view->texture.id : view->id);
       }
       else
         printf("invalid image : %s\n", view->layout.background_image);
@@ -75,7 +75,7 @@ void tg_css_gen(view_t* view)
                                 view->layout.background_color);
       }
 
-      view_set_texture(view, bmp, idbuffer);
+      view_set_texture(view, bmp, view->texture.id);
     }
   }
   else
@@ -88,6 +88,7 @@ void tg_css_gen(view_t* view)
 void tg_css_add(view_t* view)
 {
   view->tex_gen = tg_css_gen;
+  if (!view->texture.id) view->texture.id = view->id;
 }
 
 #endif

@@ -32,7 +32,7 @@ void ui_manager_init(int width, int height)
 {
   ui_generator_init(width, height);
 
-  root = view_new("root", (vframe_t){0, 0, width, height});
+  root = view_new("root", (r2_t){0, 0, width, height});
 }
 
 void ui_manager_event(ev_t ev)
@@ -41,7 +41,7 @@ void ui_manager_event(ev_t ev)
 
   if (ev.type == EV_RESIZE)
   {
-    view_set_frame(root, (vframe_t){0.0, 0.0, (float)ev.w, (float)ev.h});
+    view_set_frame(root, (r2_t){0.0, 0.0, (float)ev.w, (float)ev.h});
     ui_generator_resize(ev.w, ev.h);
     view_layout(root);
 
@@ -88,7 +88,6 @@ void ui_manager_render()
 {
   if (reindex)
   {
-    ui_generator_cleanup();
     uint32_t index = 0;
     ui_manager_reindex(root, &index);
     reindex = 0;

@@ -2,6 +2,7 @@
 #define view_h
 
 #include "mtbitmap.c"
+#include "mtmath2.c"
 #include "mtvector.c"
 #include "wm_event.c"
 
@@ -83,19 +84,11 @@ typedef struct _texture_t
   char shadow;
 } texture_t;
 
-typedef struct _vframe_t
-{
-  float x;
-  float y;
-  float w;
-  float h;
-} vframe_t;
-
 typedef struct _frame_t
 {
-  vframe_t local;
-  vframe_t global;
-  char     changed;
+  r2_t local;
+  r2_t global;
+  char changed;
 } frame_t;
 
 typedef struct _view_t view_t;
@@ -120,7 +113,7 @@ struct _view_t
   void* tex_gen_data;             /* data for texture generator */
 };
 
-view_t* view_new(char* id, vframe_t frame);
+view_t* view_new(char* id, r2_t frame);
 void    view_add(view_t* view, view_t* subview);
 void    view_insert(view_t* view, view_t* subview, uint32_t index);
 void    view_remove(view_t* view, view_t* subview);
@@ -128,7 +121,7 @@ void    view_remove(view_t* view, view_t* subview);
 void view_evt(view_t* view, ev_t ev);
 void view_gen_texture(view_t* view);
 
-void view_set_frame(view_t* view, vframe_t frame);
+void view_set_frame(view_t* view, r2_t frame);
 void view_set_layout(view_t* view, vlayout_t layout);
 void view_set_texture(view_t* view, bm_t* tex, char* id);
 void view_set_texture_page(view_t* view, uint32_t page);
@@ -161,7 +154,7 @@ void view_del(void* pointer)
   REL(view->views);
 }
 
-view_t* view_new(char* id, vframe_t frame)
+view_t* view_new(char* id, r2_t frame)
 {
   view_t* view       = mtmem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
   view->id           = mtcstr_fromcstring(id);
@@ -211,7 +204,7 @@ void view_evt(view_t* view, ev_t ev)
 
 void view_calc_global(view_t* view)
 {
-  vframe_t frame_parent = {0};
+  r2_t frame_parent = {0};
   if (view->parent != NULL) frame_parent = view->parent->frame.global;
   view->frame.global.x = roundf(frame_parent.x) + roundf(view->frame.local.x);
   view->frame.global.y = roundf(frame_parent.y) + roundf(view->frame.local.y);
@@ -222,7 +215,7 @@ void view_calc_global(view_t* view)
     view_calc_global(v);
 }
 
-void view_set_frame(view_t* view, vframe_t frame)
+void view_set_frame(view_t* view, r2_t frame)
 {
   view->frame.local  = frame;
   view->frame.global = frame;

@@ -46,7 +46,7 @@ void view_layout(view_t* view)
 
   while ((v = VNXT(view->views)))
   {
-    vframe_t frame = v->frame.local;
+    r2_t frame = v->frame.local;
 
     if (v->layout.margin > 0)
     {

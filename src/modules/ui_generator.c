@@ -15,7 +15,6 @@
 
 int      ui_generator_init(int, int);
 void     ui_generator_reset();
-void     ui_generator_cleanup();
 void     ui_generator_render();
 void     ui_generator_add(view_t* view);
 void     ui_generator_remove(view_t* view);
@@ -65,37 +64,39 @@ void ui_generator_add(view_t* view)
 {
   VADD(uig.views, view);
 
-  if (view->texture.state == TS_EXTERN && view->texture.page == 0)
+  int has_tex = ui_compositor_has_texture(view->texture.id);
+
+  if (has_tex)
   {
-    // request new texture page for view
-    view_set_texture_page(view, ui_compositor_new_texture());
+    // no need for texture rendering
+    view->texture.state = TS_READY;
+  }
+  else if (view->texture.state == TS_EXTERN)
+  {
+    // request new texture page if needed
+    if (view->texture.page == 0) view_set_texture_page(view, ui_compositor_new_texture());
   }
   else
   {
     // use a texture map texture page
     view_set_texture_page(view, ui_compositor_map_texture());
+    // send to renderer immediately
+    if (view->texture.state == TS_BLANK)
+    {
+      if (mtch_send(uig.channel, view)) view->texture.state = TS_PENDING;
+    }
   }
-
-  uirect_t uirect = {
-      view->frame.global.x,
-      view->frame.global.y,
-      view->frame.global.w,
-      view->frame.global.h};
 
   ui_compositor_add(view->id,
                     view->texture.id,
                     view->index,
-                    uirect,
+                    view->frame.global,
                     view->texture.page,
                     view->texture.shadow,
                     view->texture.blur,
                     view->texture.full);
 
   view->connected = 1;
-}
-
-void ui_generator_cleanup()
-{
 }
 
 void ui_generator_set_index(view_t* view)
@@ -111,21 +112,18 @@ void ui_generator_render()
   {
     if (view->texture.state == TS_BLANK)
     {
+      // send to renderer if needed
       if (mtch_send(uig.channel, view)) view->texture.state = TS_PENDING;
     }
     if (view->frame.changed)
     {
-      uirect_t uirect = {
-          view->frame.global.x,
-          view->frame.global.y,
-          view->frame.global.w,
-          view->frame.global.h};
-
-      ui_compositor_set_frame(view->id, uirect);
+      // update frame in compositor
+      ui_compositor_set_frame(view->id, view->frame.global);
       view->frame.changed = 0;
     }
     if (view->texture.changed)
     {
+      // update texture in compositor
       ui_compositor_set_texture(view->id, view->texture.id, view->texture.bitmap);
       view->texture.changed = 0;
     }
@@ -158,16 +156,10 @@ void ui_generator_resize(int width, int height)
   view_t* view;
   while ((view = VNXT(uig.views)))
   {
-    uirect_t uirect = {
-        view->frame.global.x,
-        view->frame.global.y,
-        view->frame.global.w,
-        view->frame.global.h};
-
     ui_compositor_add(view->id,
                       view->texture.id,
                       view->index,
-                      uirect,
+                      view->frame.global,
                       view->texture.page,
                       view->texture.shadow,
                       view->texture.blur,

@@ -37,7 +37,8 @@ struct _m4_t
 };
 
 typedef union _matrix4array_t matrix4array_t;
-union _matrix4array_t {
+union _matrix4array_t
+{
   m4_t  matrix;
   float array[16];
 };

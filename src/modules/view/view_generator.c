@@ -234,7 +234,7 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath, char* respath)
     {
       char* id = mtmem_calloc(sizeof(char) * t.id.len + 1, "char*", NULL, NULL);
       memcpy(id, html + t.id.pos + 1, t.id.len);
-      view_t* view = view_new(id, (vframe_t){0});
+      view_t* view = view_new(id, (r2_t){0});
       VADD(views, view);
       if (t.level > 0) // add view to paernt
       {
@@ -272,7 +272,7 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath, char* respath)
     else
     {
       // idless view, probably </div>
-      view_t* view = view_new("", (vframe_t){0});
+      view_t* view = view_new("", (r2_t){0});
       VADD(views, view);
     }
     tags += 1;

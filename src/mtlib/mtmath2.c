@@ -7,6 +7,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef struct _r2_t r2_t;
+struct _r2_t
+{
+  float x;
+  float y;
+  float w;
+  float h;
+};
+
+typedef struct _r2i_t r2i_t;
+struct _r2i_t
+{
+  int x;
+  int y;
+  int w;
+  int h;
+};
+
 typedef struct _v2_t v2_t;
 struct _v2_t
 {

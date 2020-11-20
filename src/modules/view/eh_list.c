@@ -71,7 +71,7 @@ void eh_list_evt(view_t* view, ev_t ev)
             mtvec_addatindex(eh->items, rowitem, 0);
 
             if (rowitem->parent == NULL) view_insert(view, rowitem, 0);
-            view_set_frame(rowitem, (vframe_t){0, head->frame.local.y - rowitem->frame.local.h, rowitem->frame.local.w, rowitem->frame.local.h});
+            view_set_frame(rowitem, (r2_t){0, head->frame.local.y - rowitem->frame.local.h, rowitem->frame.local.w, rowitem->frame.local.h});
 
             eh->head_index -= 1;
           }
@@ -94,7 +94,7 @@ void eh_list_evt(view_t* view, ev_t ev)
             VADD(eh->items, rowitem);
 
             if (rowitem->parent == NULL) view_add(view, rowitem);
-            view_set_frame(rowitem, (vframe_t){0, tail->frame.local.y + tail->frame.local.h, rowitem->frame.local.w, rowitem->frame.local.h});
+            view_set_frame(rowitem, (r2_t){0, tail->frame.local.y + tail->frame.local.h, rowitem->frame.local.w, rowitem->frame.local.h});
 
             eh->tail_index += 1;
           }
@@ -133,7 +133,7 @@ void eh_list_evt(view_t* view, ev_t ev)
     view_t* sview;
     while ((sview = VNXT(view->views)))
     {
-      vframe_t frame = sview->frame.local;
+      r2_t frame = sview->frame.local;
       frame.y += ev.dy;
       view_set_frame(sview, frame);
       eh->filled = 0;

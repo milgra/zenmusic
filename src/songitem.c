@@ -21,23 +21,23 @@ view_t* songitem_new()
   char idbuffer[100] = {0};
   snprintf(idbuffer, 100, "list_item%i", songitem_index);
 
-  view_t* rowview = view_new(idbuffer, (vframe_t){0, 0, 1500, 35});
+  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 1500, 35});
 
   rowview->layout.background_color = 0x00000022;
   tg_css_add(rowview);
 
   snprintf(idbuffer, 100, "index_item%i", songitem_index);
-  view_t* indexview = view_new(idbuffer, (vframe_t){0, 0, 80, 35});
+  view_t* indexview = view_new(idbuffer, (r2_t){0, 0, 80, 35});
 
   view_add(rowview, indexview);
 
   snprintf(idbuffer, 100, "name_item%i", songitem_index);
-  view_t* nameview = view_new(idbuffer, (vframe_t){80, 0, 1000, 35});
+  view_t* nameview = view_new(idbuffer, (r2_t){80, 0, 1000, 35});
 
   view_add(rowview, nameview);
 
   snprintf(idbuffer, 100, "type_item%i", songitem_index);
-  view_t* typeview = view_new(idbuffer, (vframe_t){1080, 0, 1000, 35});
+  view_t* typeview = view_new(idbuffer, (r2_t){1080, 0, 1000, 35});
 
   view_add(rowview, typeview);
 

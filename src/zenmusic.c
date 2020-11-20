@@ -110,7 +110,7 @@ void init(int width, int height)
   ui_manager_init(width, height);
   ui_manager_add(baseview);
 
-  view_t* texmapview       = view_new("texmapview", (vframe_t){500, 500, 200, 200});
+  view_t* texmapview       = view_new("texmapview", (r2_t){500, 500, 200, 200});
   texmapview->texture.full = 1;
   ui_manager_add(texmapview);
 
@@ -121,10 +121,10 @@ void init(int width, int height)
   eh_video_add(video);
 
   view_t* left = view_get_subview(baseview, "visuleft");
-  eh_visu_add(left, 0);
+  //eh_visu_add(left, 0);
 
   view_t* right = view_get_subview(baseview, "visuright");
-  eh_visu_add(left, 1);
+  //eh_visu_add(left, 1);
 
   timeview = view_get_subview(baseview, "time");
   tg_text_add(timeview, 0x00000000, 0x000000FF, "0:00", 1);

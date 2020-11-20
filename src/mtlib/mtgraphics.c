@@ -42,7 +42,6 @@ void mtgraphics_circle(bm_t* bitmap, float cx, float cy, float r, float edge, ui
 
 void mtgraphics_arc(bm_t* bitmap, float cx, float cy, float r, float edge, uint32_t c, float as, float ae)
 {
-  printf("arc %f %f\n", as, ae);
   float m = r;
   for (int x = 0; x < bitmap->w; x++)
   {
