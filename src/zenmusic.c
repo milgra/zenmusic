@@ -28,6 +28,7 @@ view_t*  baseview;
 view_t*  timeview;
 view_t*  visuleft;
 view_t*  visuright;
+double   lasttime = 0.0;
 
 static int display_info(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
 {
@@ -122,7 +123,7 @@ void init(int width, int height)
   eh_video_add(video);
 
   timeview = view_get_subview(baseview, "time");
-  tg_text_add(timeview, 0x00000000, 0x000000FF, "0:00", 1);
+  tg_text_add(timeview, 0x00000000, 0x000000FF, "00:00", 0);
 
   view_t* song = view_get_subview(baseview, "song");
   tg_text_add(song, 0x00000000, 0x000000FF, "-", 1);
@@ -153,14 +154,20 @@ void init(int width, int height)
 
 void update(ev_t ev)
 {
-
   double time = player_time();
   if (time > 0.0)
   {
-    char timebuff[20];
-    snprintf(timebuff, 20, "%.2f", time);
-    tg_text_add(timeview, 0x00000000, 0x000000FF, timebuff, 1);
+    // update timer
+    if (floor(time) != lasttime)
+    {
+      lasttime = floor(time);
 
+      char timebuff[20];
+      snprintf(timebuff, 20, "%.2i:%.2i", (int)floor(lasttime / 60.0), (int)lasttime % 60);
+      tg_text_set(timeview, 0x00000000, 0x000000FF, timebuff, 0);
+    }
+
+    // update visualizer
     player_draw_waves(visuleft->texture.page, 0, visuleft->texture.bitmap);
     player_draw_waves(visuright->texture.page, 1, visuright->texture.bitmap);
     visuleft->texture.changed  = 1;

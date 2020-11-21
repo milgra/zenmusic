@@ -18,6 +18,7 @@ typedef struct _tg_text_t
 } tg_text_t;
 
 void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text, char align);
+void tg_text_set(view_t* view, uint32_t bc, uint32_t fc, char* text, char align);
 
 #endif
 
@@ -80,6 +81,21 @@ void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text, char align)
   view->texture.state = TS_BLANK;
   view->tex_gen_data  = gen;
   view->tex_gen       = tg_text_gen;
+}
+
+void tg_text_set(view_t* view, uint32_t bc, uint32_t fc, char* text, char align)
+{
+  tg_text_t* gen = view->tex_gen_data;
+
+  if (gen->fc != fc || gen->bc != bc || gen->text != text || gen->align != align)
+  {
+    REL(gen->text);
+    gen->fc             = fc;
+    gen->bc             = bc;
+    gen->text           = mtcstr_fromcstring(text);
+    gen->align          = align;
+    view->texture.state = TS_BLANK;
+  }
 }
 
 #endif
