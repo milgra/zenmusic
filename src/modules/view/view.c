@@ -68,16 +68,27 @@ typedef enum _texst_t // texture loading state
   TS_BLANK,   /* texture is empty */
   TS_PENDING, /* texture is under generation */
   TS_READY,   /* texture is generated */
-  TS_EXTERN,  /* texture is handled outside ui compositor */
 } texst_t;
+
+typedef enum _textype_t
+{
+  TT_MANAGED,
+  TT_EXTERNAL
+} textype_t;
 
 typedef struct _texture_t
 {
-  char*    id;      /* texture id, multiple views can show the same texture */
-  texst_t  state;   /* render state of texture */
-  uint32_t page;    /* texture page */
-  bm_t*    bitmap;  /* texture bitmap */
-  char     changed; /* texture is changed */
+  textype_t type; /* managed or external */
+  uint32_t  page; /* texture page */
+
+  // internal texture
+
+  char*   id;      /* texture id, multiple views can show the same texture */
+  texst_t state;   /* render state of texture */
+  bm_t*   bitmap;  /* texture bitmap */
+  char    changed; /* texture is changed */
+
+  // decoration
 
   char full;
   char blur;
@@ -125,6 +136,7 @@ void view_set_frame(view_t* view, r2_t frame);
 void view_set_layout(view_t* view, vlayout_t layout);
 void view_set_texture(view_t* view, bm_t* tex, char* id);
 void view_set_texture_page(view_t* view, uint32_t page);
+void view_set_texture_type(view_t* view, textype_t type);
 
 void view_desc(void* pointer, int level);
 void view_desc_layout(vlayout_t l);
@@ -223,7 +235,8 @@ void view_set_frame(view_t* view, r2_t frame)
   view_calc_global(view);
 
   // force rerender
-  view->texture.state = TS_BLANK;
+
+  if (view->texture.type == TT_MANAGED) view->texture.state = TS_BLANK;
 }
 
 void view_set_texture(view_t* view, bm_t* bitmap, char* id)
@@ -239,6 +252,11 @@ void view_set_texture_page(view_t* view, uint32_t page)
   view->texture.page = page;
 }
 
+void view_set_texture_type(view_t* view, textype_t type)
+{
+  view->texture.type = type;
+}
+
 void view_set_layout(view_t* view, vlayout_t layout)
 {
   view->layout = layout;
@@ -252,7 +270,14 @@ void view_gen_texture(view_t* view)
 void view_desc(void* pointer, int level)
 {
   view_t* view = (view_t*)pointer;
-  printf("%*.sid %s frame %.1f %.1f %.1f %.1f\n", level, " ", view->id, view->frame.local.x, view->frame.local.y, view->frame.local.w, view->frame.local.h);
+  printf("%*.sid %s frame %.1f %.1f %.1f %.1f tex %i\n", level, " ",
+         view->id,
+         view->frame.local.x,
+         view->frame.local.y,
+         view->frame.local.w,
+         view->frame.local.h,
+         view->texture.page);
+
   for (int i = 0; i < view->views->length; i++)
   {
     view_desc(view->views->data[i], level + 1);

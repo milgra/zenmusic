@@ -1,6 +1,9 @@
 /*
   UI Compositor Module for Zen Multimedia Desktop System
-  Places incoming bitmaps in texture maps, incoming rectangles and texture map positions in floatbuffers, renders rects on demand.
+  Stores incoming rects
+  Stores incoming textures
+  Links rects with textures
+  Uploads and renders rects on demand
 
   ui_compositor -> gl_connector -> GPU
 
@@ -50,6 +53,7 @@ typedef struct _crect_t
   char*    id;
   float    data[30];
   uint32_t index;
+  int      page;
   char     ready;
   char     blur;
   char     shadow;
@@ -103,6 +107,7 @@ void ui_compositor_reset()
   fb_reset(uic.fb);
   tm_reset(uic.tm);
   mtvec_reset(uic.rects_v);
+  mtvec_reset(uic.final_v);
   mtmap_reset(uic.rects_m);
 }
 
@@ -170,13 +175,23 @@ void ui_compositor_set_frame(char* id, r2_t uirect)
   if ((rect = MGET(uic.rects_m, id)))
   {
     crect_set_frame(rect, uirect);
+    // TODO this hould be independent from sequence of frame/texture calls
+    if (rect->page > 0)
+    {
+      glrect_t tex_dim = gl_get_texture(rect->page, rect->region.w, rect->region.h);
+      uitexc_t tex_cor = (uitexc_t){0.0, 0.0, rect->region.w / (float)tex_dim.w, rect->region.h / (float)tex_dim.h};
+
+      crect_set_texture(rect, tex_cor, rect->page);
+    }
+
     uic.upd_geo = 1;
   }
 }
 
 void ui_compositor_set_texture(char* viewid, char* texid, bm_t* tex, int page, char shadow, char blur, char full)
 {
-  //printf("ui_compositor_set_texture %s %s\n", viewid, texid);
+  // printf("ui_compositor_set_texture %s %s %i\n", viewid, texid, page);
+
   crect_t* rect;
 
   if ((rect = MGET(uic.rects_m, viewid)))
@@ -203,11 +218,8 @@ void ui_compositor_set_texture(char* viewid, char* texid, bm_t* tex, int page, c
     }
     else if (page > 0)
     {
-      // external textures use view size part of the texture
-      glrect_t tex_dim = gl_get_texture(page, rect->region.w, rect->region.h);
-      uitexc_t tex_cor = (uitexc_t){0.0, 0.0, rect->region.w / (float)tex_dim.w, rect->region.h / (float)tex_dim.h};
+      uitexc_t tex_cor = (uitexc_t){0};
       crect_set_texture(rect, tex_cor, page);
-      uic.upd_geo = 1;
     }
     else
     {
@@ -248,9 +260,11 @@ void ui_compositor_render()
       mtvec_replaceatindex(uic.final_v, rect, rect->index);
 
     while ((rect = VNXT(uic.final_v)))
+    {
       if (rect->ready) fb_add(uic.fb, rect->data, 30);
-    //printf("adding vertexs for %s index %i\n", rect->id, rect->index);
-    //crect_desc(rect);
+      // printf("adding vertexs for %s index %i\n", rect->id, rect->index);
+      // crect_desc(rect);
+    }
 
     uic.upd_geo = 0;
     gl_upload_vertexes(uic.fb);
@@ -386,6 +400,7 @@ void crect_set_frame(crect_t* r, r2_t rect)
 
 void crect_set_texture(crect_t* r, uitexc_t texc, uint32_t page)
 {
+  r->page  = page;
   r->ready = 1;
 
   r->data[2] = texc.x;

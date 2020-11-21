@@ -68,22 +68,31 @@ void ui_generator_add(view_t* view)
                     view->frame.global,
                     view->index);
 
-  int has_tex = ui_compositor_has_texture(view->texture.id);
+  view->connected = 1;
 
-  if (has_tex)
+  if (view->texture.type == TT_MANAGED)
   {
-    // no need for texture rendering
-    view->texture.state = TS_READY;
-    // update texture in compositor
-    ui_compositor_set_texture(view->id,
-                              view->texture.id,
-                              view->texture.bitmap,
-                              view->texture.page,
-                              view->texture.shadow,
-                              view->texture.blur,
-                              view->texture.full);
+    int has_tex = ui_compositor_has_texture(view->texture.id);
+    if (has_tex)
+    {
+      // no need for texture rendering
+      view->texture.state = TS_READY;
+      // update texture in compositor
+      ui_compositor_set_texture(view->id,
+                                view->texture.id,
+                                view->texture.bitmap,
+                                view->texture.page,
+                                view->texture.shadow,
+                                view->texture.blur,
+                                view->texture.full);
+    }
+    else
+    {
+      // use a texture map texture page
+      view_set_texture_page(view, ui_compositor_map_texture());
+    }
   }
-  else if (view->texture.state == TS_EXTERN)
+  else
   {
     // request new texture page if needed
     if (view->texture.page == 0)
@@ -99,13 +108,6 @@ void ui_generator_add(view_t* view)
                                 view->texture.full);
     }
   }
-  else
-  {
-    // use a texture map texture page
-    view_set_texture_page(view, ui_compositor_map_texture());
-  }
-
-  view->connected = 1;
 }
 
 void ui_generator_set_index(view_t* view)
@@ -119,7 +121,7 @@ void ui_generator_render()
 
   while ((view = VNXT(uig.views)))
   {
-    if (view->texture.state == TS_BLANK)
+    if (view->texture.type == TT_MANAGED && view->texture.state == TS_BLANK)
     {
       // send to renderer if needed
       if (mtch_send(uig.channel, view)) view->texture.state = TS_PENDING;
@@ -176,7 +178,7 @@ void ui_generator_resize(int width, int height)
                       view->frame.global,
                       view->index);
 
-    if (view->texture.state == TS_READY)
+    if (view->texture.type == TT_EXTERNAL || view->texture.state == TS_READY)
     {
       ui_compositor_set_texture(view->id,
                                 view->texture.id,
@@ -186,6 +188,8 @@ void ui_generator_resize(int width, int height)
                                 view->texture.blur,
                                 view->texture.full);
     }
+
+    ui_compositor_set_frame(view->id, view->frame.global);
   }
 }
 
