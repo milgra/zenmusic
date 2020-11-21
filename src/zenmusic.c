@@ -3,7 +3,6 @@
 #include "eh_list.c"
 #include "eh_text.c"
 #include "eh_video.c"
-#include "eh_visu.c"
 #include "font.c"
 #include "mtcstring.c"
 #include "player.c"
@@ -27,6 +26,8 @@ mtvec_t* files;
 view_t*  coverview;
 view_t*  baseview;
 view_t*  timeview;
+view_t*  visuleft;
+view_t*  visuright;
 
 static int display_info(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
 {
@@ -120,12 +121,6 @@ void init(int width, int height)
   view_t* video = view_get_subview(baseview, "video");
   eh_video_add(video);
 
-  view_t* left = view_get_subview(baseview, "visuleft");
-  //eh_visu_add(left, 0);
-
-  view_t* right = view_get_subview(baseview, "visuright");
-  //eh_visu_add(left, 1);
-
   timeview = view_get_subview(baseview, "time");
   tg_text_add(timeview, 0x00000000, 0x000000FF, "0:00", 1);
 
@@ -145,19 +140,31 @@ void init(int width, int height)
   view_t* playbtn = view_get_subview(baseview, "playbtn");
   eh_knob_add(playbtn);
 
+  view_t* volbtn = view_get_subview(baseview, "volbtn");
+  eh_knob_add(volbtn);
+
   view_t* header = view_get_subview(baseview, "header");
   //header->texture.blur = 1;
   //header->texture.shadow = 1;
+
+  visuleft  = view_get_subview(baseview, "visuleft");
+  visuright = view_get_subview(baseview, "visuright");
 }
 
 void update(ev_t ev)
 {
+
   double time = player_time();
   if (time > 0.0)
   {
     char timebuff[20];
     snprintf(timebuff, 20, "%.2f", time);
     tg_text_add(timeview, 0x00000000, 0x000000FF, timebuff, 1);
+
+    player_draw_waves(visuleft->texture.page, 0, visuleft->texture.bitmap);
+    player_draw_waves(visuright->texture.page, 1, visuright->texture.bitmap);
+    visuleft->texture.changed  = 1;
+    visuright->texture.changed = 1;
   }
   ui_manager_event(ev);
 }
