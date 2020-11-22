@@ -72,8 +72,9 @@ void eh_text_add(view_t* view, char* text)
   data->text      = mtcstr_fromcstring(text);
   data->glyphs    = mtvec_alloc();
 
-  view->evt_han      = eh_text_evt;
-  view->evt_han_data = data;
+  view->evt_han       = eh_text_evt;
+  view->evt_han_data  = data;
+  view->texture.state = TS_BLANK;
 }
 
 #endif

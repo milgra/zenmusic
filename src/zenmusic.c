@@ -7,6 +7,7 @@
 #include "mtcstring.c"
 #include "player.c"
 #include "songitem.c"
+#include "tg_knob.c"
 #include "tg_text.c"
 #include "ui_manager.c"
 #include "view.c"
@@ -136,9 +137,11 @@ void init(int width, int height)
 
   view_t* playbtn = view_get_subview(baseview, "playbtn");
   eh_knob_add(playbtn);
+  tg_knob_add(playbtn);
 
   view_t* volbtn = view_get_subview(baseview, "volbtn");
   eh_knob_add(volbtn);
+  tg_knob_add(volbtn);
 
   view_t* header = view_get_subview(baseview, "header");
   //header->texture.blur = 1;
