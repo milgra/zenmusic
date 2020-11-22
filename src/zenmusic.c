@@ -112,10 +112,6 @@ void init(int width, int height)
   ui_manager_init(width, height);
   ui_manager_add(baseview);
 
-  view_t* texmapview       = view_new("texmapview", (r2_t){500, 500, 200, 200});
-  texmapview->texture.full = 1;
-  ui_manager_add(texmapview);
-
   view_t* songlist = view_get_subview(baseview, "songlist");
   eh_list_add(songlist, songlist_item_generator);
 
@@ -150,6 +146,10 @@ void init(int width, int height)
 
   visuleft  = view_get_subview(baseview, "visuleft");
   visuright = view_get_subview(baseview, "visuright");
+
+  /* view_t* texmapview       = view_new("texmapview", (r2_t){500, 500, 200, 200}); */
+  /* texmapview->texture.full = 1; */
+  /* ui_manager_add(texmapview); */
 }
 
 void update(ev_t ev)

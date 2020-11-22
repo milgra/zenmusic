@@ -232,14 +232,18 @@ void view_calc_global(view_t* view)
 
 void view_set_frame(view_t* view, r2_t frame)
 {
+  // force rerender
+  // TODO this will cause problems when eh's render textures instead of tg's
+
+  if (view->frame.local.w != frame.w || view->frame.local.h != frame.h)
+  {
+    if (view->texture.type == TT_MANAGED) view->texture.state = TS_BLANK;
+  }
+
   view->frame.local  = frame;
   view->frame.global = frame;
 
   view_calc_global(view);
-
-  // force rerender
-
-  if (view->texture.type == TT_MANAGED) view->texture.state = TS_BLANK;
 }
 
 void view_set_texture_bmp(view_t* view, bm_t* bitmap)

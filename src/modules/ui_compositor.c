@@ -197,6 +197,8 @@ void ui_compositor_upd_frame(char* rectid, r2_t frame)
 
 void ui_compositor_upd_bitmap(char* texid, bm_t* bm)
 {
+  // printf("update bitmap %s %i %i\n", texid, bm->w, bm->h);
+
   tm_coords_t tc = tm_get(uic.tm, texid);
 
   if (bm->w != tc.w || bm->h != tc.h)
