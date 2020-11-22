@@ -13,17 +13,12 @@ hook clang-format and gmake to file save hook
 
 ---
 
-texture reuse fix
 working vol/seek ring, play/pause, mute/unmute
-
-visu main update funkcioban legyen rarajzolva bitmapekre
 knob folotti scroll tekerje a knobot
 search/filter bar - genre is metal, name contains x, year between x and y
-
 scrollbar
 text anim
 database
-
 uj event villanjon fel artist helyen, odakattintva event viewer, 
 tilemap is auto-resize legyen duplazassal
 volume bar pedig play button korul legyen egy gyuru - kell arc mtdrawer-be

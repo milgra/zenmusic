@@ -20,14 +20,16 @@ void ui_compositor_init(int, int);
 void ui_compositor_reset();
 void ui_compositor_resize(int width, int height);
 void ui_compositor_render();
-void ui_compositor_add(char* viewid, r2_t uirect, uint32_t index);
-void ui_compositor_rem(char* id);
-void ui_compositor_set_index(char* id, uint32_t index);
-void ui_compositor_set_frame(char* id, r2_t rect);
 int  ui_compositor_map_texture();
 int  ui_compositor_new_texture();
-void ui_compositor_set_texture(char* viewid, char* texid, bm_t* tex, int page, char shadow, char blur, char full);
-int  ui_compositor_has_texture(char* texid);
+void ui_compositor_add(char*    rectid,
+                       char*    texid,
+                       uint32_t index);
+void ui_compositor_rem(char* rectid);
+void ui_compositor_upd_texture(char* id, int page, int full, int ext, int blur, int shadow, int w, int h);
+void ui_compositor_upd_bitmap(char* texid, bm_t* tex);
+void ui_compositor_upd_frame(char* rectid, r2_t frame);
+void ui_compositor_upd_index(char* rectid, int index);
 
 #endif
 
@@ -40,40 +42,34 @@ int  ui_compositor_has_texture(char* texid);
 #include "mttexmap.c"
 #include "mtvector.c"
 
-typedef struct _uitexc_t
-{
-  float x;
-  float y;
-  float z;
-  float w;
-} uitexc_t;
-
 typedef struct _crect_t
 {
   char*    id;
+  char*    tex_id;
   float    data[30];
   uint32_t index;
-  int      page;
   char     ready;
+  int      page;
   char     blur;
   char     shadow;
   glrect_t region;
 } crect_t;
 
-crect_t* crect_new(char* id, r2_t rect, uint32_t index);
+crect_t* crect_new(char* id, char* tex_id, uint32_t index);
 void     crect_del(void* rect);
 void     crect_desc(crect_t* rect);
+void     crect_set_frame(crect_t* rect, r2_t uirect);
+void     crect_set_page(crect_t* rect, uint32_t page);
 void     crect_set_blur(crect_t* rect, char blur);
 void     crect_set_shadow(crect_t* rect, char shadow);
-void     crect_set_frame(crect_t* rect, r2_t uirect);
-void     crect_set_texture(crect_t* rect, uitexc_t texc, uint32_t page);
+void     crect_set_texture(crect_t* rect, float tlx, float tly, float brx, float bry);
 
 struct uic_t
 {
   fb_t*    fb;      // float buffer
   tm_t*    tm;      // texture map
   mtvec_t* rects_v; // rectangle vector
-  mtvec_t* final_v; // rectangle vector
+  mtvec_t* final_v; // rectangle vector for quick sort
   mtmap_t* rects_m; // rectangle map
   int      width;
   int      height;
@@ -106,6 +102,7 @@ void ui_compositor_reset()
 {
   fb_reset(uic.fb);
   tm_reset(uic.tm);
+
   mtvec_reset(uic.rects_v);
   mtvec_reset(uic.final_v);
   mtmap_reset(uic.rects_m);
@@ -127,124 +124,111 @@ int ui_compositor_map_texture()
   return 0;
 }
 
-void ui_compositor_add(char* viewid, r2_t uirect, uint32_t index)
+void ui_compositor_add(char* rectid, char* texid, uint32_t index)
 {
-  // printf("ui_compositor_add viewid %s rect %f %f %f %f index %i\n", viewid, uirect.x, uirect.y, uirect.w, uirect.h, index);
+  printf("ui_compositor_add rectid %s texid %s index %i\n", rectid, texid, index);
 
-  crect_t* rect = crect_new(viewid, uirect, index);
+  crect_t* rect = crect_new(rectid, texid, index);
 
   VADD(uic.rects_v, rect);
   VADD(uic.final_v, rect);
-  MPUT(uic.rects_m, viewid, rect);
+  MPUT(uic.rects_m, rectid, rect);
+
+  REL(rect);
 
   uic.upd_geo = 1;
 }
 
 void ui_compositor_rem(char* id)
 {
-  // printf("ui_compositor_rem %s\n", id);
-  crect_t* rect;
+  //printf("ui_compositor_rem %s\n", id);
+  crect_t* rect = mtmap_get(uic.rects_m, id);
 
-  rect = mtmap_get(uic.rects_m, id);
-  MDEL(uic.rects_m, id);
-  VREM(uic.rects_v, rect);
-  VREM(uic.final_v, rect);
+  if (rect)
+  {
+    VREM(uic.rects_v, rect);
+    VREM(uic.final_v, rect);
+    MDEL(uic.rects_m, id);
 
-  uic.upd_geo = 1;
+    uic.upd_geo = 1;
+  }
 }
 
-void ui_compositor_set_index(char* id, uint32_t index)
+void ui_compositor_upd_texture(char* id, int page, int full, int ext, int blur, int shadow, int w, int h)
 {
-  // printf("ui_compositor_set_index %s %i\n", id, index);
+  crect_t* rect = mtmap_get(uic.rects_m, id);
+
+  if (rect)
+  {
+    crect_set_blur(rect, blur);
+    crect_set_shadow(rect, shadow);
+
+    // TODO set this in individual function
+    if (full)
+    {
+      // view wants full texture to show, no tex update will come so we set tex coords here
+      crect_set_texture(rect, 0.0, 0.0, 1.0, 1.0);
+    }
+
+    if (ext)
+    {
+      // use view dimensions as texture dimensions in case of external texture
+      glrect_t tex_dim = gl_get_texture(rect->page, w, h);
+      crect_set_texture(rect, 0.0, 0.0, w / (float)tex_dim.w, h / (float)tex_dim.h);
+    }
+
+    crect_set_page(rect, page);
+
+    uic.upd_geo = 1;
+  }
+}
+
+void ui_compositor_upd_frame(char* rectid, r2_t frame)
+{
+  crect_t* rect = mtmap_get(uic.rects_m, rectid);
+
+  if (rect)
+  {
+    crect_set_frame(rect, frame);
+    uic.upd_geo = 1;
+  }
+}
+
+void ui_compositor_upd_bitmap(char* texid, bm_t* bm)
+{
+  tm_coords_t tc = tm_get(uic.tm, texid);
+
+  if (bm->w != tc.w || bm->h != tc.h)
+  {
+    // texture doesn't exist or size mismatch
+    int success = tm_put(uic.tm, texid, bm->w, bm->h);
+    // TODO reset main texture, maybe all views?
+    if (success < 0) printf("TEXTURE FULL, NEEDS RESET\n");
+    // update tex coords
+    tc = tm_get(uic.tm, texid);
+  }
+
+  // upload to GPU
+  gl_upload_to_texture(0, tc.x, tc.y, bm->w, bm->h, bm->data);
 
   crect_t* rect;
 
-  if ((rect = MGET(uic.rects_m, id)))
+  // go through all rects, update texture coord if texid is identical
+  while ((rect = VNXT(uic.rects_v)))
+  {
+    if (strcmp(rect->tex_id, texid) == 0) crect_set_texture(rect, tc.ltx, tc.lty, tc.rbx, tc.rby);
+  }
+}
+
+void ui_compositor_upd_index(char* rectid, int index)
+{
+  crect_t* rect = mtmap_get(uic.rects_m, rectid);
+
+  if (rect)
   {
     rect->index = index;
     uic.upd_geo = 1;
   }
-}
-
-void ui_compositor_set_frame(char* id, r2_t uirect)
-{
-  // printf("ui_compositor_set_frame %s %f %f %f %f\n", id, uirect.x, uirect.y, uirect.w, uirect.h);
-
-  crect_t* rect;
-
-  if ((rect = MGET(uic.rects_m, id)))
-  {
-    crect_set_frame(rect, uirect);
-    // TODO this hould be independent from sequence of frame/texture calls
-    if (rect->page > 0)
-    {
-      glrect_t tex_dim = gl_get_texture(rect->page, rect->region.w, rect->region.h);
-      uitexc_t tex_cor = (uitexc_t){0.0, 0.0, rect->region.w / (float)tex_dim.w, rect->region.h / (float)tex_dim.h};
-
-      crect_set_texture(rect, tex_cor, rect->page);
-    }
-
-    uic.upd_geo = 1;
-  }
-}
-
-void ui_compositor_set_texture(char* viewid, char* texid, bm_t* tex, int page, char shadow, char blur, char full)
-{
-  // printf("ui_compositor_set_texture %s %s %i\n", viewid, texid, page);
-
-  crect_t* rect;
-
-  if ((rect = MGET(uic.rects_m, viewid)))
-  {
-    tm_coords_t coords  = tm_get(uic.tm, texid);
-    uitexc_t    tex_cor = {0};
-
-    crect_set_blur(rect, blur);
-    crect_set_shadow(rect, shadow);
-
-    if (coords.w > 0)
-    {
-      // texture exists for view, refresh texture
-      tex_cor = (uitexc_t){coords.ltx, coords.lty, coords.rbx, coords.rby};
-      gl_upload_to_texture(0, coords.x, coords.y, tex->w, tex->h, tex->data);
-      crect_set_texture(rect, tex_cor, page);
-    }
-    else if (full)
-    {
-      // view wants full texture to show
-      tex_cor = (uitexc_t){0.0, 0.0, 1.0, 1.0};
-      crect_set_texture(rect, tex_cor, page);
-      uic.upd_geo = 1;
-    }
-    else if (page > 0)
-    {
-      uitexc_t tex_cor = (uitexc_t){0};
-      crect_set_texture(rect, tex_cor, page);
-    }
-    else
-    {
-      // texture doesn't exist
-      int success = tm_put(uic.tm, texid, tex);
-      // TODO reset main texture, maybe all views?
-      if (success < 0) printf("TEXTURE FULL, NEEDS RESET\n");
-
-      coords = tm_get(uic.tm, texid);
-      gl_upload_to_texture(0, coords.x, coords.y, tex->w, tex->h, tex->data);
-
-      uitexc_t tex_cor = (uitexc_t){coords.ltx, coords.lty, coords.rbx, coords.rby};
-      crect_set_texture(rect, tex_cor, page);
-      uic.upd_geo = 1;
-    }
-  }
-}
-
-int ui_compositor_has_texture(char* texid)
-{
-  tm_coords_t coord = tm_get(uic.tm, texid);
-  if (coord.w > 0 && coord.h > 0)
-    return 1;
-  else
-    return 0;
 }
 
 void ui_compositor_render()
@@ -257,7 +241,9 @@ void ui_compositor_render()
 
     // set sequence
     while ((rect = VNXT(uic.rects_v)))
-      mtvec_replaceatindex(uic.final_v, rect, rect->index);
+    {
+      if (rect->index < uic.final_v->length) mtvec_replaceatindex(uic.final_v, rect, rect->index);
+    }
 
     while ((rect = VNXT(uic.final_v)))
     {
@@ -339,17 +325,13 @@ void ui_compositor_render()
 // Compositor Rect
 //
 
-crect_t* crect_new(char* id, r2_t rect, uint32_t index)
+crect_t* crect_new(char* id, char* texid, uint32_t index)
 {
   crect_t* r = mtmem_calloc(sizeof(crect_t), "crect_t", crect_del, NULL);
 
-  r->id    = mtcstr_fromcstring(id);
-  r->index = index;
-  r->ready = 0;
-
-  r->region = ((glrect_t){rect.x, rect.y, rect.w, rect.h});
-
-  crect_set_frame(r, rect);
+  r->id     = mtcstr_fromcstring(id);
+  r->tex_id = mtcstr_fromcstring(texid);
+  r->index  = index;
 
   return r;
 }
@@ -398,33 +380,37 @@ void crect_set_frame(crect_t* r, r2_t rect)
   r->data[26] = rect.y + rect.h;
 }
 
-void crect_set_texture(crect_t* r, uitexc_t texc, uint32_t page)
+void crect_set_texture(crect_t* r, float tlx, float tly, float brx, float bry)
 {
-  r->page  = page;
   r->ready = 1;
 
-  r->data[2] = texc.x;
-  r->data[3] = texc.y;
-  r->data[4] = (float)page;
+  r->data[2] = tlx;
+  r->data[3] = tly;
 
-  r->data[7] = texc.z;
-  r->data[8] = texc.w;
-  r->data[9] = (float)page;
+  r->data[7] = brx;
+  r->data[8] = bry;
 
-  r->data[12] = texc.x;
-  r->data[13] = texc.w;
+  r->data[12] = tlx;
+  r->data[13] = bry;
+
+  r->data[17] = brx;
+  r->data[18] = tly;
+
+  r->data[22] = tlx;
+  r->data[23] = tly;
+
+  r->data[27] = brx;
+  r->data[28] = bry;
+}
+
+void crect_set_page(crect_t* r, uint32_t page)
+{
+  r->page     = page;
+  r->data[4]  = (float)page;
+  r->data[9]  = (float)page;
   r->data[14] = (float)page;
-
-  r->data[17] = texc.z;
-  r->data[18] = texc.y;
   r->data[19] = (float)page;
-
-  r->data[22] = texc.x;
-  r->data[23] = texc.y;
   r->data[24] = (float)page;
-
-  r->data[27] = texc.z;
-  r->data[28] = texc.w;
   r->data[29] = (float)page;
 }
 

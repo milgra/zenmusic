@@ -58,7 +58,7 @@ void tg_text_gen(view_t* view)
         };
 
     bm_t* bmp = font_render_text((int)view->frame.local.w, (int)view->frame.local.h, str, common_font, ts, NULL, NULL);
-    view_set_texture(view, bmp, view->texture.id ? view->texture.id : view->id);
+    view_set_texture_bmp(view, bmp);
   }
   else
   {
@@ -70,8 +70,6 @@ void tg_text_gen(view_t* view)
 void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text, char align)
 {
   tg_text_t* gen = mtmem_alloc(sizeof(tg_text_t), "tg_text_t", NULL, NULL);
-
-  if (!view->texture.id) view->texture.id = view->id;
 
   gen->fc    = fc;
   gen->bc    = bc;

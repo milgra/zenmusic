@@ -28,7 +28,7 @@ void eh_knob_evt(view_t* view, ev_t ev)
       mtgraphics_circle(bmp, (view->frame.local.w - 1.0) / 2.0, (view->frame.local.h - 1.0) / 2.0, (view->frame.local.w / 2.0 - 2.0), 1.0, 0x999999FF);
       mtgraphics_circle(bmp, (view->frame.local.w - 1.0) / 2.0, (view->frame.local.h - 1.0) / 2.0, 30.0, 1.0, 0x666666FF);
 
-      view_set_texture(view, bmp, view->id);
+      view_set_texture_bmp(view, bmp);
     }
   }
   else if (ev.type == EV_MDOWN)

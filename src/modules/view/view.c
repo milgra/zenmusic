@@ -134,7 +134,8 @@ void view_gen_texture(view_t* view);
 
 void view_set_frame(view_t* view, r2_t frame);
 void view_set_layout(view_t* view, vlayout_t layout);
-void view_set_texture(view_t* view, bm_t* tex, char* id);
+void view_set_texture_bmp(view_t* view, bm_t* tex);
+void view_set_texture_id(view_t* view, char* id);
 void view_set_texture_page(view_t* view, uint32_t page);
 void view_set_texture_type(view_t* view, textype_t type);
 
@@ -173,6 +174,8 @@ view_t* view_new(char* id, r2_t frame)
   view->views        = VNEW();
   view->frame.local  = frame;
   view->frame.global = frame;
+  view->texture.page = -1;
+  view->texture.id   = mtcstr_fromcstring(id);
 
   return view;
 }
@@ -239,12 +242,17 @@ void view_set_frame(view_t* view, r2_t frame)
   if (view->texture.type == TT_MANAGED) view->texture.state = TS_BLANK;
 }
 
-void view_set_texture(view_t* view, bm_t* bitmap, char* id)
+void view_set_texture_bmp(view_t* view, bm_t* bitmap)
 {
   RPL(view->texture.bitmap, bitmap);
-  view->texture.id      = mtcstr_fromcstring(id);
   view->texture.state   = TS_READY;
   view->texture.changed = 1;
+}
+
+void view_set_texture_id(view_t* view, char* id)
+{
+  REL(view->texture.id);
+  view->texture.id = mtcstr_fromcstring(id);
 }
 
 void view_set_texture_page(view_t* view, uint32_t page)

@@ -36,7 +36,7 @@ void        tm_del(void* p);
 void        tm_reset(tm_t* tm);
 char        tm_has(tm_t* tm, char* id);
 tm_coords_t tm_get(tm_t* tm, char* id);
-int         tm_put(tm_t* tm, char* id, bm_t* bm);
+int         tm_put(tm_t* tm, char* id, int w, int h);
 
 #endif
 
@@ -84,38 +84,38 @@ tm_coords_t tm_get(tm_t* tm, char* id)
   return (tm_coords_t){0};
 }
 
-int tm_put(tm_t* tm, char* id, bm_t* bm)
+int tm_put(tm_t* tm, char* id, int w, int h)
 {
 
-  if (bm->w > tm->width || bm->h > tm->height) return -1; // too big bitmap
+  if (w > tm->width || h > tm->height) return -1; // too big bitmap
 
   int nch = tm->ch; // new cursor height
 
-  if (tm->cx + bm->w > tm->width)
+  if (tm->cx + w > tm->width)
   {
-    nch = bm->h;
+    nch = h;
   }
-  else if (bm->h > tm->ch)
+  else if (h > tm->ch)
   {
-    nch = bm->h;
+    nch = h;
   }
 
   int ncy = tm->cy; // new cursor y
 
-  if (tm->cx + bm->w > tm->width)
+  if (tm->cx + w > tm->width)
   {
     ncy = tm->cy + tm->ch;
   }
 
   int ncx = tm->cx; // new cursor x
 
-  if (tm->cx + bm->w > tm->width)
+  if (tm->cx + w > tm->width)
   {
     ncx = 0;
   }
 
-  int rbx = ncx + bm->w;
-  int rby = ncy + bm->h;
+  int rbx = ncx + w;
+  int rby = ncy + h;
 
   char is_full = nch > tm->height;
 
@@ -127,8 +127,8 @@ int tm_put(tm_t* tm, char* id, bm_t* bm)
                                             .rby = (float)rby / (float)tm->height,
                                             .x   = ncx,
                                             .y   = ncy,
-                                            .w   = bm->w,
-                                            .h   = bm->h}),
+                                            .w   = w,
+                                            .h   = h}),
                              "float*");
 
   mtmap_put(tm->coords, id, coords);

@@ -68,11 +68,9 @@ void ui_manager_reindex(view_t* view, uint32_t* index)
     {
       view->index = *index;
       if (view->connected == 0)
-      {
         ui_generator_add(view);
-      }
-
-      ui_generator_set_index(view);
+      else
+        ui_generator_set_index(view);
     }
     *index += 1;
   }

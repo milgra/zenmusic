@@ -64,55 +64,38 @@ void ui_generator_add(view_t* view)
 {
   VADD(uig.views, view);
 
-  ui_compositor_add(view->id,
-                    view->frame.global,
-                    view->index);
-
   view->connected = 1;
 
-  if (view->texture.type == TT_MANAGED)
+  // assign pages if view is new
+  if (view->texture.page == -1)
   {
-    int has_tex = ui_compositor_has_texture(view->texture.id);
-    if (has_tex)
-    {
-      // no need for texture rendering
-      view->texture.state = TS_READY;
-      // update texture in compositor
-      ui_compositor_set_texture(view->id,
-                                view->texture.id,
-                                view->texture.bitmap,
-                                view->texture.page,
-                                view->texture.shadow,
-                                view->texture.blur,
-                                view->texture.full);
-    }
-    else
-    {
-      // use a texture map texture page
-      view_set_texture_page(view, ui_compositor_map_texture());
-    }
+    // use a texture map texture page
+    if (view->texture.type == TT_MANAGED) view_set_texture_page(view, ui_compositor_map_texture());
+    if (view->texture.type == TT_EXTERNAL) view_set_texture_page(view, ui_compositor_new_texture());
   }
-  else
-  {
-    // request new texture page if needed
-    if (view->texture.page == 0)
-    {
-      view_set_texture_page(view, ui_compositor_new_texture());
-      // update texture in compositor
-      ui_compositor_set_texture(view->id,
-                                view->texture.id,
-                                view->texture.bitmap,
-                                view->texture.page,
-                                view->texture.shadow,
-                                view->texture.blur,
-                                view->texture.full);
-    }
-  }
+
+  ui_compositor_add(view->id,
+                    view->texture.id,
+                    view->index);
+  ui_compositor_upd_texture(view->id,
+                            view->texture.page,
+                            view->texture.full,
+                            view->texture.page > 0,
+                            view->texture.blur,
+                            view->texture.shadow,
+                            view->frame.global.w,
+                            view->frame.global.h);
+  ui_compositor_upd_frame(view->id,
+                          view->frame.global);
+
+  if (view->texture.state == TS_READY)
+    ui_compositor_upd_bitmap(view->texture.id,
+                             view->texture.bitmap);
 }
 
 void ui_generator_set_index(view_t* view)
 {
-  ui_compositor_set_index(view->id, view->index);
+  ui_compositor_upd_index(view->id, view->index);
 }
 
 void ui_generator_render()
@@ -123,25 +106,19 @@ void ui_generator_render()
   {
     if (view->texture.type == TT_MANAGED && view->texture.state == TS_BLANK)
     {
-      // send to renderer if needed
       if (mtch_send(uig.channel, view)) view->texture.state = TS_PENDING;
     }
     if (view->frame.changed)
     {
-      // update frame in compositor
-      ui_compositor_set_frame(view->id, view->frame.global);
+      ui_compositor_upd_frame(view->id,
+                              view->frame.global);
+
       view->frame.changed = 0;
     }
     if (view->texture.changed)
     {
-      // update texture in compositor
-      ui_compositor_set_texture(view->id,
-                                view->texture.id,
-                                view->texture.bitmap,
-                                view->texture.page,
-                                view->texture.shadow,
-                                view->texture.blur,
-                                view->texture.full);
+      ui_compositor_upd_bitmap(view->texture.id,
+                               view->texture.bitmap);
 
       view->texture.changed = 0;
     }
@@ -167,29 +144,26 @@ int ui_generator_workloop()
 void ui_generator_resize(int width, int height)
 {
   ui_compositor_resize(width, height);
-
-  // reset ui compositor and re-add views
-
   ui_compositor_reset();
+
   view_t* view;
   while ((view = VNXT(uig.views)))
   {
     ui_compositor_add(view->id,
-                      view->frame.global,
+                      view->texture.id,
                       view->index);
-
-    if (view->texture.type == TT_EXTERNAL || view->texture.state == TS_READY)
-    {
-      ui_compositor_set_texture(view->id,
-                                view->texture.id,
-                                view->texture.bitmap,
-                                view->texture.page,
-                                view->texture.shadow,
-                                view->texture.blur,
-                                view->texture.full);
-    }
-
-    ui_compositor_set_frame(view->id, view->frame.global);
+    ui_compositor_upd_texture(view->id,
+                              view->texture.page,
+                              view->texture.full,
+                              view->texture.page > 0,
+                              view->texture.blur,
+                              view->texture.shadow,
+                              view->frame.global.w,
+                              view->frame.global.h);
+    ui_compositor_upd_frame(view->id, view->frame.global);
+    if (view->texture.state == TS_READY)
+      ui_compositor_upd_bitmap(view->texture.id,
+                               view->texture.bitmap);
   }
 }
 
