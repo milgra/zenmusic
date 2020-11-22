@@ -11,6 +11,7 @@ void   player_play(char* path);
 void   player_stop();
 void   player_draw();
 double player_time();
+double player_duration();
 bm_t*  player_get_album(const char* path);
 void   player_draw_video(int index, int w, int h);
 void   player_draw_waves(int index, int channel, bm_t* bm);
@@ -56,6 +57,16 @@ double player_time()
   if (is != NULL)
   {
     return get_master_clock(is);
+  }
+  else
+    return 0.0;
+}
+
+double player_duration()
+{
+  if (is != NULL)
+  {
+    return is->duration;
   }
   else
     return 0.0;

@@ -44,6 +44,7 @@ typedef struct VideoState
   int              read_pause_return;
   AVFormatContext* ic;
   int              realtime;
+  int              duration;
 
   Clock audclk;
   Clock vidclk;

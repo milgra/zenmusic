@@ -1190,7 +1190,6 @@ int read_thread(void* arg)
   }
   is->ic = ic;
 
-  printf("START METADATA");
   AVDictionaryEntry* tag = NULL;
   while ((tag = av_dict_get(ic->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
     printf("%s=%s\n", tag->key, tag->value);
@@ -1219,6 +1218,7 @@ int read_thread(void* arg)
       goto fail;
     }
   }
+
   if (ic->pb)
     ic->pb->eof_reached = 0; // FIXME hack, ffplay maybe should not use avio_feof() to test for the end
 
@@ -1226,6 +1226,8 @@ int read_thread(void* arg)
     seek_by_bytes = !!(ic->iformat->flags & AVFMT_TS_DISCONT) && strcmp("ogg", ic->iformat->name);
 
   is->max_frame_duration = (ic->iformat->flags & AVFMT_TS_DISCONT) ? 10.0 : 3600.0;
+
+  is->duration = (float)ic->duration / (float)AV_TIME_BASE;
 
   //if (!window_title && (t = av_dict_get(ic->metadata, "title", NULL, 0)))
   //  window_title = av_asprintf("%s - %s", t->value, input_filename);

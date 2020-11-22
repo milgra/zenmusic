@@ -30,6 +30,8 @@ view_t*  timeview;
 view_t*  visuleft;
 view_t*  visuright;
 double   lasttime = 0.0;
+view_t*  playbtn;
+view_t*  volbtn;
 
 static int display_info(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
 {
@@ -135,11 +137,11 @@ void init(int width, int height)
   songitem_update(headeritem, -1, "Artist", NULL);
   view_add(songlistheader, headeritem);
 
-  view_t* playbtn = view_get_subview(baseview, "playbtn");
+  playbtn = view_get_subview(baseview, "playbtn");
   eh_knob_add(playbtn);
   tg_knob_add(playbtn);
 
-  view_t* volbtn = view_get_subview(baseview, "volbtn");
+  volbtn = view_get_subview(baseview, "volbtn");
   eh_knob_add(volbtn);
   tg_knob_add(volbtn);
 
@@ -168,6 +170,9 @@ void update(ev_t ev)
       char timebuff[20];
       snprintf(timebuff, 20, "%.2i:%.2i", (int)floor(lasttime / 60.0), (int)lasttime % 60);
       tg_text_set(timeview, 0x00000000, 0x000000FF, timebuff, 0);
+
+      double posratio = time / player_duration();
+      tg_knob_set_angle(playbtn, posratio * 3.14 - 3.14 / 2.0);
     }
 
     // update visualizer
