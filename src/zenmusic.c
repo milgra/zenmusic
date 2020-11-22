@@ -173,6 +173,9 @@ void update(ev_t ev)
 
       double posratio = time / player_duration();
       tg_knob_set_angle(playbtn, posratio * 3.14 - 3.14 / 2.0);
+
+      double volume = player_volume();
+      tg_knob_set_angle(volbtn, volume * 3.14 - 3.14 / 2.0);
     }
 
     // update visualizer

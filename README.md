@@ -13,11 +13,10 @@ hook clang-format and gmake to file save hook
 
 ---
 
-working vol/seek ring, play/pause, mute/unmute
-knob folotti scroll tekerje a knobot
+set pos/set vol/start/pause/mute/unmute next, prev, shuffle, repeat
+text anim
 search/filter bar - genre is metal, name contains x, year between x and y
 scrollbar
-text anim
 database
 
 uj event villanjon fel artist helyen, odakattintva event viewer, 

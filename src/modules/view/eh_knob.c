@@ -23,13 +23,12 @@ typedef struct _eh_knob_t
 
 void eh_knob_evt(view_t* view, ev_t ev)
 {
-  if (ev.type == EV_MDOWN)
+  if (ev.type == EV_MDOWN || (ev.type == EV_MMOVE && ev.drag))
   {
     if (ev.x < view->frame.global.x + view->frame.global.w &&
         ev.x > view->frame.global.x &&
         ev.y < view->frame.global.y + view->frame.global.h &&
-        ev.y > view->frame.global.y &&
-        view->texture.bitmap)
+        ev.y > view->frame.global.y)
     {
       eh_knob_t* eh = view->evt_han_data;
 
@@ -39,6 +38,21 @@ void eh_knob_evt(view_t* view, ev_t ev)
 
       if (angle < 0) angle += 6.28;
 
+      tg_knob_set_angle(view, angle);
+    }
+  }
+  else if (ev.type == EV_SCROLL)
+  {
+    if (ev.x < view->frame.global.x + view->frame.global.w &&
+        ev.x > view->frame.global.x &&
+        ev.y < view->frame.global.y + view->frame.global.h &&
+        ev.y > view->frame.global.y)
+    {
+      tg_knob_t* tg = view->tex_gen_data;
+
+      float angle = tg->angle + ev.dy / 50.0;
+      if (angle < 0) angle += 6.28;
+      if (angle > 6.28) angle -= 6.28;
       tg_knob_set_angle(view, angle);
     }
   }

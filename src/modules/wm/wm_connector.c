@@ -119,12 +119,10 @@ void wm_init(void (*init)(int, int),
 
           while (SDL_PollEvent(&event) != 0)
           {
-
             if (event.type == SDL_MOUSEBUTTONDOWN ||
                 event.type == SDL_MOUSEBUTTONUP ||
                 event.type == SDL_MOUSEMOTION)
             {
-
               SDL_GetMouseState(&ev.x, &ev.y);
 
               if (event.type == SDL_MOUSEBUTTONDOWN)
