@@ -22,23 +22,22 @@ view_t* songitem_new()
   snprintf(idbuffer, 100, "list_item%i", songitem_index);
 
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 1500, 35});
-
-  rowview->layout.background_color = 0x00000022;
-  tg_css_add(rowview);
+  rowview->hidden = 1;
 
   snprintf(idbuffer, 100, "index_item%i", songitem_index);
   view_t* indexview = view_new(idbuffer, (r2_t){0, 0, 80, 35});
-
-  view_add(rowview, indexview);
+  tg_text_add(indexview, 0xFFFFFFFF, 0x000000FF, "0", 1);
 
   snprintf(idbuffer, 100, "name_item%i", songitem_index);
   view_t* nameview = view_new(idbuffer, (r2_t){80, 0, 1000, 35});
-
-  view_add(rowview, nameview);
+  tg_text_add(nameview, 0xFFFFFFFF, 0x000000FF, "0", 0);
 
   snprintf(idbuffer, 100, "type_item%i", songitem_index);
   view_t* typeview = view_new(idbuffer, (r2_t){1080, 0, 1000, 35});
+  tg_text_add(typeview, 0xFFFFFFFF, 0x000000FF, "0", 1);
 
+  view_add(rowview, indexview);
+  view_add(rowview, nameview);
   view_add(rowview, typeview);
 
   songitem_index++;
@@ -60,11 +59,11 @@ void songitem_update(view_t* rowview, int index, char* filename, void (*event)(e
   else
     snprintf(indbuffer, 6, "No.");
 
-  tg_text_add(rowview->views->data[0], color1, 0x000000FF, indbuffer, 1);
+  tg_text_set(rowview->views->data[0], color1, 0x000000FF, indbuffer, 1);
 
-  tg_text_add(rowview->views->data[1], color1, 0x000000FF, filename, 0);
+  tg_text_set(rowview->views->data[1], color1, 0x000000FF, filename, 0);
 
-  tg_text_add(rowview->views->data[2], color1, 0x000000FF, "mp3", 0);
+  tg_text_set(rowview->views->data[2], color1, 0x000000FF, "mp3", 0);
 }
 
 #endif

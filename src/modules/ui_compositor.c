@@ -126,7 +126,7 @@ int ui_compositor_map_texture()
 
 void ui_compositor_add(char* rectid, char* texid, uint32_t index)
 {
-  printf("ui_compositor_add rectid %s texid %s index %i\n", rectid, texid, index);
+  // printf("ui_compositor_add rectid %s texid %s index %i\n", rectid, texid, index);
 
   crect_t* rect = crect_new(rectid, texid, index);
 
@@ -141,7 +141,7 @@ void ui_compositor_add(char* rectid, char* texid, uint32_t index)
 
 void ui_compositor_rem(char* id)
 {
-  //printf("ui_compositor_rem %s\n", id);
+  // printf("ui_compositor_rem %s\n", id);
   crect_t* rect = mtmap_get(uic.rects_m, id);
 
   if (rect)
@@ -156,6 +156,7 @@ void ui_compositor_rem(char* id)
 
 void ui_compositor_upd_texture(char* id, int page, int full, int ext, int blur, int shadow, int w, int h)
 {
+  // printf("ui_compositor_upd_texture %s %i\n", id, page);
   crect_t* rect = mtmap_get(uic.rects_m, id);
 
   if (rect)
@@ -170,10 +171,10 @@ void ui_compositor_upd_texture(char* id, int page, int full, int ext, int blur, 
       crect_set_texture(rect, 0.0, 0.0, 1.0, 1.0);
     }
 
-    if (ext)
+    if (ext && w > 0 && h > 0)
     {
       // use view dimensions as texture dimensions in case of external texture
-      glrect_t tex_dim = gl_get_texture(rect->page, w, h);
+      glrect_t tex_dim = gl_get_texture(page, w, h);
       crect_set_texture(rect, 0.0, 0.0, w / (float)tex_dim.w, h / (float)tex_dim.h);
     }
 
@@ -204,20 +205,25 @@ void ui_compositor_upd_bitmap(char* texid, bm_t* bm)
     int success = tm_put(uic.tm, texid, bm->w, bm->h);
     // TODO reset main texture, maybe all views?
     if (success < 0) printf("TEXTURE FULL, NEEDS RESET\n");
+
     // update tex coords
     tc = tm_get(uic.tm, texid);
+
+    crect_t* rect;
+
+    // go through all rects, update texture coord if texid is identical
+    while ((rect = VNXT(uic.rects_v)))
+    {
+      if (strcmp(rect->tex_id, texid) == 0)
+      {
+        crect_set_texture(rect, tc.ltx, tc.lty, tc.rbx, tc.rby);
+        uic.upd_geo = 1;
+      }
+    }
   }
 
   // upload to GPU
   gl_upload_to_texture(0, tc.x, tc.y, bm->w, bm->h, bm->data);
-
-  crect_t* rect;
-
-  // go through all rects, update texture coord if texid is identical
-  while ((rect = VNXT(uic.rects_v)))
-  {
-    if (strcmp(rect->tex_id, texid) == 0) crect_set_texture(rect, tc.ltx, tc.lty, tc.rbx, tc.rby);
-  }
 }
 
 void ui_compositor_upd_index(char* rectid, int index)
@@ -248,8 +254,8 @@ void ui_compositor_render()
     while ((rect = VNXT(uic.final_v)))
     {
       if (rect->ready) fb_add(uic.fb, rect->data, 30);
-      // printf("adding vertexs for %s index %i\n", rect->id, rect->index);
-      // crect_desc(rect);
+      //printf("adding vertexs for %s index %i\n", rect->id, rect->index);
+      //crect_desc(rect);
     }
 
     uic.upd_geo = 0;

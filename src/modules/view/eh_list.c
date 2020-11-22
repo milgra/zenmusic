@@ -153,8 +153,6 @@ void eh_list_del(void* p)
 
 void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t* rowview, int index))
 {
-  printf("eh_list new\n");
-
   eh_list_t* eh     = mtmem_calloc(sizeof(eh_list_t), "eh_list", eh_list_del, NULL);
   eh->items         = VNEW();
   eh->cache         = VNEW();

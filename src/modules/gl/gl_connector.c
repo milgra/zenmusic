@@ -337,6 +337,7 @@ void gl_init(width, height)
 glrect_t gl_get_texture(uint32_t page, uint32_t w, uint32_t h)
 {
   assert(page < TEX_CTX); /* 0 is reserved for context's default framebuffer */
+  assert(w > 0 && h > 0); /* shouldn't create 0x0 texture */
 
   if (gl.textures[page].w == 0)
   {
