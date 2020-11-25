@@ -73,6 +73,47 @@ void playbtn_event(ev_t ev, void* data)
   }
 }
 
+void seek_ratio_changed(view_t* view, float angle)
+{
+  float ratio = 0.0;
+  if (angle > 0 && angle < 3.14 * 3 / 2)
+  {
+    ratio = angle / 6.28 + 0.25;
+  }
+  else if (angle > 3.14 * 3 / 2)
+  {
+    ratio = (angle - (3.14 * 3 / 2)) / 6.28;
+  }
+
+  player_set_position(ratio);
+}
+
+void play_button_pushed(view_t* view)
+{
+
+  player_toggle_pause();
+}
+
+void vol_ratio_changed(view_t* view, float angle)
+{
+  float ratio = 0.0;
+  if (angle > 0 && angle < 3.14 * 3 / 2)
+  {
+    ratio = angle / 6.28 + 0.25;
+  }
+  else if (angle > 3.14 * 3 / 2)
+  {
+    ratio = (angle - (3.14 * 3 / 2)) / 6.28;
+  }
+
+  player_set_volume(ratio);
+}
+
+void mute_button_pushed(view_t* view)
+{
+  player_toggle_mute();
+}
+
 view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index)
 {
   if (files == NULL)
@@ -138,12 +179,12 @@ void init(int width, int height)
   view_add(songlistheader, headeritem);
 
   playbtn = view_get_subview(baseview, "playbtn");
-  eh_knob_add(playbtn);
   tg_knob_add(playbtn);
+  eh_knob_add(playbtn, seek_ratio_changed, play_button_pushed);
 
   volbtn = view_get_subview(baseview, "volbtn");
-  eh_knob_add(volbtn);
   tg_knob_add(volbtn);
+  eh_knob_add(volbtn, vol_ratio_changed, mute_button_pushed);
 
   view_t* header = view_get_subview(baseview, "header");
   //header->texture.blur = 1;
@@ -172,10 +213,10 @@ void update(ev_t ev)
       tg_text_set(timeview, 0x00000000, 0x000000FF, timebuff, 0);
 
       double posratio = time / player_duration();
-      tg_knob_set_angle(playbtn, posratio * 3.14 - 3.14 / 2.0);
+      tg_knob_set_angle(playbtn, posratio * 6.28 - 3.14 / 2.0);
 
       double volume = player_volume();
-      tg_knob_set_angle(volbtn, volume * 3.14 - 3.14 / 2.0);
+      tg_knob_set_angle(volbtn, volume * 6.28 - 3.14 / 2.0);
     }
 
     // update visualizer

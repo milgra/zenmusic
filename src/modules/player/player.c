@@ -8,8 +8,12 @@
 #include "mtbitmap.c"
 
 void   player_play(char* path);
+void   player_toggle_pause();
+void   player_toggle_mute();
 void   player_stop();
 void   player_draw();
+void   player_set_volume(float ratio);
+void   player_set_position(float ratio);
 double player_time();
 double player_duration();
 double player_volume();
@@ -26,6 +30,7 @@ void   player_draw_rdft(int index, int channel, bm_t* bm);
 #include "libavformat/avformat.h"
 #include "libavutil/imgutils.h"
 #include "render.c"
+#include "strcomm.c"
 #include "stream.c"
 
 static AVInputFormat* file_iformat;
@@ -40,6 +45,23 @@ void player_play(char* path)
     printf("player play %s\n", path);
 
     is = stream_open(path, file_iformat);
+  }
+}
+
+void player_toggle_pause()
+{
+  if (is)
+  {
+    stream_toggle_pause(is);
+    is->step = 0;
+  }
+}
+
+void player_toggle_mute()
+{
+  if (is)
+  {
+    is->muted = !is->muted;
   }
 }
 
@@ -73,10 +95,32 @@ double player_duration()
     return 0.0;
 }
 
+void player_set_volume(float ratio)
+{
+  /* double volume_level = is->audio_volume ? (20 * log(is->audio_volume / (double)SDL_MIX_MAXVOLUME) / log(10)) : -1000.0; */
+  /* int    new_volume   = lrint(SDL_MIX_MAXVOLUME * pow(10.0, (volume_level + sign * step) / 20.0)); */
+  /* is->audio_volume    = av_clip(is->audio_volume == new_volume ? (is->audio_volume + sign) : new_volume, 0, SDL_MIX_MAXVOLUME); */
+}
+
+void player_set_position(float ratio)
+{
+  if (is)
+  {
+    printf("ratio %f\n", ratio);
+    printf("duration %f\n", player_duration());
+    int newpos = (int)player_duration() * ratio;
+    int diff   = (int)player_time() - newpos;
+    printf("newpos %i\n", newpos);
+    stream_seek(is, (int64_t)(newpos * AV_TIME_BASE), (int64_t)(diff * AV_TIME_BASE), 0);
+  }
+}
+
 double player_volume()
 {
   if (is != NULL)
   {
+    float vol = (20 * log(is->audio_volume / (double)SDL_MIX_MAXVOLUME) / log(10));
+    printf("vol %f\n", vol);
     return (float)is->audio_volume / (float)SDL_MIX_MAXVOLUME;
   }
   else

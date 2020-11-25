@@ -6,6 +6,7 @@
 
 VideoState* stream_open(const char* filename, AVInputFormat* iformat);
 void        stream_close(VideoState* is);
+void        stream_seek(VideoState* is, int64_t pos, int64_t rel, int seek_by_bytes);
 
 #endif
 

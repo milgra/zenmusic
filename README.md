@@ -47,6 +47,8 @@ donate button /donate popup after 100 startups
 
 zen media :
 space start media
+info/hex tab
+binary files shows up immediately as hex in media viewer
 
 optimize :
 only update vertexes when frame change
