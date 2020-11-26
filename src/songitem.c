@@ -1,10 +1,11 @@
 #ifndef songitem_h
 #define songitem_h
 
+#include "mtmap.c"
 #include "view.c"
 
 view_t* songitem_new();
-void    songitem_update(view_t* rowview, int index, char* filename, void (*event)(view_t* view, void* data));
+void    songitem_update(view_t* rowview, int index, mtmap_t* file, void (*event)(view_t* view, void* data));
 
 #endif
 
@@ -29,11 +30,11 @@ view_t* songitem_new()
   tg_text_add(indexview, 0xFFFFFFFF, 0x000000FF, "0", 1);
 
   snprintf(idbuffer, 100, "name_item%i", songitem_index);
-  view_t* nameview = view_new(idbuffer, (r2_t){80, 0, 1000, 35});
+  view_t* nameview = view_new(idbuffer, (r2_t){80, 0, 500, 35});
   tg_text_add(nameview, 0xFFFFFFFF, 0x000000FF, "0", 0);
 
   snprintf(idbuffer, 100, "type_item%i", songitem_index);
-  view_t* typeview = view_new(idbuffer, (r2_t){1080, 0, 1000, 35});
+  view_t* typeview = view_new(idbuffer, (r2_t){580, 0, 1000, 35});
   tg_text_add(typeview, 0xFFFFFFFF, 0x000000FF, "0", 1);
 
   view_add(rowview, indexview);
@@ -45,7 +46,7 @@ view_t* songitem_new()
   return rowview;
 }
 
-void songitem_update(view_t* rowview, int index, char* filename, void (*event)(view_t* view, void* data))
+void songitem_update(view_t* rowview, int index, mtmap_t* file, void (*event)(view_t* view, void* data))
 {
   uint32_t color1 = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
   uint32_t color2 = (index % 2 == 0) ? 0xE5E5E5FF : 0xEFEFEFFF;
@@ -59,11 +60,11 @@ void songitem_update(view_t* rowview, int index, char* filename, void (*event)(v
   else
     snprintf(indbuffer, 6, "No.");
 
-  tg_text_set(rowview->views->data[0], color1, 0x000000FF, indbuffer, 1);
+  tg_text_set(rowview->views->data[0], color1, 0x000000FF, MGET(file, "id"), 1);
 
-  tg_text_set(rowview->views->data[1], color1, 0x000000FF, filename, 0);
+  tg_text_set(rowview->views->data[1], color1, 0x000000FF, MGET(file, "artist"), 0);
 
-  tg_text_set(rowview->views->data[2], color1, 0x000000FF, "mp3", 0);
+  tg_text_set(rowview->views->data[2], color1, 0x000000FF, MGET(file, "title"), 0);
 }
 
 #endif

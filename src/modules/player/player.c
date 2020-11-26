@@ -6,20 +6,26 @@
 #define player_h
 
 #include "mtbitmap.c"
+#include "mtmap.c"
 
-void   player_play(char* path);
-void   player_toggle_pause();
-void   player_toggle_mute();
-void   player_draw();
-void   player_set_volume(float ratio);
-void   player_set_position(float ratio);
+void player_play(char* path);
+
+void player_toggle_pause();
+void player_toggle_mute();
+
+void player_set_volume(float ratio);
+void player_set_position(float ratio);
+
 double player_time();
-double player_duration();
 double player_volume();
-bm_t*  player_get_album(const char* path);
-void   player_draw_video(int index, int w, int h);
-void   player_draw_waves(int index, int channel, bm_t* bm);
-void   player_draw_rdft(int index, int channel, bm_t* bm);
+double player_duration();
+
+void player_draw_video(int index, int w, int h);
+void player_draw_waves(int index, int channel, bm_t* bm);
+void player_draw_rdft(int index, int channel, bm_t* bm);
+
+bm_t* player_get_album(const char* path);
+void  player_get_metadata(const char* path, mtmap_t* map);
 
 #endif
 
@@ -28,9 +34,11 @@ void   player_draw_rdft(int index, int channel, bm_t* bm);
 #include "SDL_image.h"
 #include "libavformat/avformat.h"
 #include "libavutil/imgutils.h"
+#include "mtcstring.c"
 #include "render.c"
 #include "strcomm.c"
 #include "stream.c"
+#include <assert.h>
 
 static AVInputFormat* file_iformat;
 
@@ -141,31 +149,48 @@ void player_draw_rdft(int index, int channel, bm_t* bm)
 {
 }
 
-bm_t* player_get_album(const char* path)
+void player_get_metadata(const char* path, mtmap_t* map)
 {
+  assert(path != NULL);
+
   int i, ret = 0;
 
-  if (!path)
+  AVFormatContext* pFormatCtx  = avformat_alloc_context();
+  AVDictionary*    format_opts = NULL;
+  AVInputFormat*   fileformat  = NULL;
+
+  av_dict_set(&format_opts, "scan_all_pmts", "1", AV_DICT_DONT_OVERWRITE);
+
+  /* // open the specified path */
+  if (avformat_open_input(&pFormatCtx, path, fileformat, &format_opts) != 0)
   {
-    printf("Path is NULL\n");
-    return NULL;
+    printf("avformat_open_input() failed");
   }
+
+  av_dict_set(&format_opts, "scan_all_pmts", NULL, AV_DICT_MATCH_CASE);
+
+  AVDictionaryEntry* tag = NULL;
+
+  while ((tag = av_dict_get(pFormatCtx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
+  {
+    char* value = mtcstr_fromcstring(tag->value);
+    MPUT(map, tag->key, value);
+    REL(value);
+  }
+}
+
+bm_t* player_get_album(const char* path)
+{
+  assert(path != NULL);
+
+  int i, ret = 0;
 
   AVFormatContext* pFormatCtx = avformat_alloc_context();
 
-  printf("Opening %s\n", path);
-
-  // open the specified path
+  /* // open the specified path */
   if (avformat_open_input(&pFormatCtx, path, NULL, NULL) != 0)
   {
     printf("avformat_open_input() failed");
-    goto fail;
-  }
-
-  // read the format headers
-  if (pFormatCtx->iformat->read_header(pFormatCtx) < 0)
-  {
-    printf("could not read the format header\n");
     goto fail;
   }
 
@@ -200,6 +225,8 @@ bm_t* player_get_album(const char* path)
       break;
     }
 
+  //avformat_free_context(pFormatCtx);
+
   printf("returning\n");
   return result;
 
@@ -209,5 +236,63 @@ fail:
   // this line crashes for some reason...
   //avformat_free_context(pFormatCtx);
 }
+
+// get duration
+
+/* void openVideoFile(char *filename) { */
+/*     AVFormatContext* pFormatCtx; */
+/*     AVCodecContext* pCodecCtx; */
+/*     int videoStream = -1; */
+/*     int i = 0; */
+
+/* 	// open video file */
+/*     int ret = avformat_open_input(&pFormatCtx, filename, NULL, NULL); */
+/*     if (ret != 0) { */
+/*         printf("Unable to open video file: %s\n", filename); */
+/*         return; */
+/*     } */
+
+/*     // Retrieve stream information */
+/*     ret = avformat_find_stream_info(pFormatCtx, NULL); */
+/*     assert(ret >= 0); */
+
+/*     printf("\n"); */
+/*     printf("Duration: %lus\n", pFormatCtx->duration/1000000); */
+/* } */
+
+// get width and height
+
+/* void openVideoFile(char *filename) { */
+/* 	AVFormatContext* pFormatCtx; */
+/* 	AVCodecContext* pCodecCtx; */
+/* 	int videoStream = -1; */
+/*     int i = 0; */
+
+/* 	// open video file */
+/*     int ret = avformat_open_input(&pFormatCtx, filename, NULL, NULL); */
+/*     if (ret != 0) { */
+/*         printf("Unable to open video file: %s\n", filename); */
+/*         return; */
+/*     } */
+
+/*     // Retrieve stream information */
+/*     ret = avformat_find_stream_info(pFormatCtx, NULL); */
+/*     assert(ret >= 0); */
+
+/*     for(i = 0; i < pFormatCtx->nb_streams; i++) { */
+/*         if (pFormatCtx->streams[i]->codec->codec_type==AVMEDIA_TYPE_VIDEO && videoStream < 0) { */
+/*             videoStream = i;             */
+/*         } */
+/*     } // end for i */
+/*     assert(videoStream != -1); */
+
+/*     // Get a pointer to the codec context for the video stream */
+/*     pCodecCtx=pFormatCtx->streams[videoStream]->codec; */
+/*     assert(pCodecCtx != NULL); */
+
+/*     printf("\n"); */
+/*     printf("Width: %d\n", pCodecCtx->width); */
+/*     printf("Height: %d\n", pCodecCtx->height); */
+/* } */
 
 #endif

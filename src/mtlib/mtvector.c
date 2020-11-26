@@ -45,7 +45,9 @@ void     mtvec_reverse(mtvec_t* vector);
 void*    mtvec_head(mtvec_t* vector);
 void*    mtvec_tail(mtvec_t* vector);
 uint32_t mtvec_indexofdata(mtvec_t* vector, void* data);
-void     mtvec_describe(void* p, int level);
+void     mtvec_sort(mtvec_t* vector, int (*comp)(void* left, void* right));
+
+void mtvec_describe(void* p, int level);
 
 #endif
 #if __INCLUDE_LEVEL__ == 0
@@ -266,6 +268,61 @@ uint32_t mtvec_indexofdata(mtvec_t* vector, void* data)
     actual += 1;
   }
   return UINT32_MAX;
+}
+
+typedef struct _mtvn_t mtvn_t;
+struct _mtvn_t
+{
+  void*   c; // content
+  mtvn_t* l; // left
+  mtvn_t* r; // right
+};
+
+// TODO use node pool
+
+void mtvec_sort_ins(mtvn_t* node, void* data, int (*comp)(void* left, void* right))
+{
+  if (node->c == NULL)
+  {
+    node->c = data;
+  }
+  else
+  {
+    if (comp(data, node->c) < 0)
+    {
+      if (node->l == NULL) node->l = mtmem_calloc(sizeof(mtvn_t), "mtvn_t", NULL, NULL);
+      mtvec_sort_ins(node->l, data, comp);
+    }
+    else
+    {
+      if (node->r == NULL) node->r = mtmem_calloc(sizeof(mtvn_t), "mtvn_t", NULL, NULL);
+      mtvec_sort_ins(node->r, data, comp);
+    }
+  }
+}
+
+void mtvec_sort_ord(mtvn_t* node, mtvec_t* vector, int* index)
+{
+  if (node->l) mtvec_sort_ord(node->l, vector, index);
+  vector->data[*index] = node->c;
+  *index += 1;
+
+  // cleanup node
+  mtvn_t* right = node->r;
+  REL(node);
+
+  if (right) mtvec_sort_ord(right, vector, index);
+}
+
+void mtvec_sort(mtvec_t* vector, int (*comp)(void* left, void* right))
+{
+  mtvn_t* node = mtmem_calloc(sizeof(mtvn_t), "mtvn_t", NULL, NULL);
+  for (int index = 0; index < vector->length; index++)
+  {
+    mtvec_sort_ins(node, vector->data[index], comp);
+  }
+  int index = 0;
+  mtvec_sort_ord(node, vector, &index);
 }
 
 void mtvec_describe(void* pointer, int level)

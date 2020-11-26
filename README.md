@@ -13,20 +13,17 @@ hook clang-format and gmake to file save hook
 
 ---
 
-set pos/set vol/start/pause/mute/unmute next, prev, shuffle, repeat
+database, sorting
 text anim
 search/filter bar - genre is metal, name contains x, year between x and y
 scrollbar
-database
 
 uj event villanjon fel artist helyen, odakattintva event viewer, 
 tilemap is auto-resize legyen duplazassal
-volume bar pedig play button korul legyen egy gyuru - kell arc mtdrawer-be
 search bar click hozza elo genre/artist listat
 resize textures on window change if needed
 unit teszter gl_compositorhoz
 ha az egeret a lista item jobb oldalara viszed popupban mutassa id3/song infokat es album artot
-database, reordering
 resizable header/songlist border
 check leaks
 bar analyzer
@@ -44,6 +41,7 @@ cortex as visualizer - level gen based on freq, LEFT/DOWN!!!
 glFragaCoord ?
 volume fade in/out, cover arton is
 donate button /donate popup after 100 startups
+refresh library button
 
 zen media :
 space start media

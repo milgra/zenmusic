@@ -24,45 +24,35 @@
 #include <stdlib.h>
 #include <time.h>
 
+view_t* coverview;
+view_t* baseview;
+view_t* timeview;
+view_t* visuleft;
+view_t* visuright;
+double  lasttime = 0.0;
+view_t* playbtn;
+view_t* volbtn;
+size_t  lastindex = 0;
+int     loop_all  = 0;
+
 mtvec_t* files;
-view_t*  coverview;
-view_t*  baseview;
-view_t*  timeview;
-view_t*  visuleft;
-view_t*  visuright;
-double   lasttime = 0.0;
-view_t*  playbtn;
-view_t*  volbtn;
-size_t   lastindex = 0;
-int      loop_all  = 0;
-
-static int display_info(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
-{
-  /* printf("%-3s %2d %7jd   %-40s %d %s\n", */
-  /*        (tflag == FTW_D) ? "d" : (tflag == FTW_DNR) ? "dnr" : (tflag == FTW_DP) ? "dp" : (tflag == FTW_F) ? "f" : (tflag == FTW_NS) ? "ns" : (tflag == FTW_SL) ? "sl" : (tflag == FTW_SLN) ? "sln" : "???", */
-  /*        ftwbuf->level, */
-  /*        (intmax_t)sb->st_size, */
-  /*        fpath, */
-  /*        ftwbuf->base, */
-  /*        fpath + ftwbuf->base); */
-
-  mtvec_add(files, mtcstr_fromcstring((char*)fpath));
-
-  return 0; /* To tell nftw() to continue */
-}
+mtmap_t* db;
+mtvec_t* sorted;
 
 void songitem_event(view_t* view, void* data)
 {
   lastindex = (size_t)data;
   // printf("songitem event %i %i %s\n", ev.type, index, (char*)files->data[index]);
 
+  mtmap_t* songmap = sorted->data[lastindex];
+
   view_t* song = view_get_subview(baseview, "song");
-  tg_text_add(song, 0x00000000, 0x000000FF, (char*)files->data[lastindex], 0);
+  tg_text_add(song, 0x00000000, 0x000000FF, (char*)MGET(songmap, "title"), 0);
 
   //bm_t* bitmap = player_get_album(files->data[lastindex]);
   //tg_bitmap_add(coverview, NULL, bitmap, "album");
 
-  player_play(files->data[lastindex]);
+  player_play(MGET(songmap, "path"));
 }
 
 void seek_ratio_changed(view_t* view, float angle)
@@ -111,31 +101,37 @@ void prev_button_pushed(view_t* view, void* data)
   lastindex = lastindex - 1;
   if (lastindex < 0) lastindex = 0;
 
-  view_t* song = view_get_subview(baseview, "song");
-  tg_text_add(song, 0x00000000, 0x000000FF, (char*)files->data[lastindex], 0);
+  mtmap_t* songmap = sorted->data[lastindex];
 
-  player_play(files->data[lastindex]);
+  view_t* song = view_get_subview(baseview, "song");
+  tg_text_add(song, 0x00000000, 0x000000FF, (char*)MGET(songmap, "title"), 0);
+
+  player_play(MGET(songmap, "path"));
 }
 
 void next_button_pushed(view_t* view, void* data)
 {
   lastindex = lastindex + 1;
-  if (lastindex == files->length) lastindex = files->length - 1;
+  if (lastindex == sorted->length) lastindex = files->length - 1;
+
+  mtmap_t* songmap = sorted->data[lastindex];
 
   view_t* song = view_get_subview(baseview, "song");
-  tg_text_add(song, 0x00000000, 0x000000FF, (char*)files->data[lastindex], 0);
+  tg_text_add(song, 0x00000000, 0x000000FF, (char*)MGET(songmap, "title"), 0);
 
-  player_play(files->data[lastindex]);
+  player_play(MGET(songmap, "path"));
 }
 
 void rand_button_pushed(view_t* view, void* data)
 {
-  lastindex = rand() % files->length;
+  lastindex = rand() % sorted->length;
+
+  mtmap_t* songmap = sorted->data[lastindex];
 
   view_t* song = view_get_subview(baseview, "song");
-  tg_text_add(song, 0x00000000, 0x000000FF, (char*)files->data[lastindex], 0);
+  tg_text_add(song, 0x00000000, 0x000000FF, (char*)MGET(songmap, "title"), 0);
 
-  player_play(files->data[lastindex]);
+  player_play(MGET(songmap, "path"));
 }
 
 void loop_button_pushed(view_t* view, void* data)
@@ -144,25 +140,97 @@ void loop_button_pushed(view_t* view, void* data)
   loop_all = !loop_all;
 }
 
+static int display_info(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
+{
+  /* printf("%-3s %2d %7jd   %-40s %d %s\n", */
+  /*        (tflag == FTW_D) ? "d" : (tflag == FTW_DNR) ? "dnr" : (tflag == FTW_DP) ? "dp" : (tflag == FTW_F) ? "f" : (tflag == FTW_NS) ? "ns" : (tflag == FTW_SL) ? "sl" : (tflag == FTW_SLN) ? "sln" : "???", */
+  /*        ftwbuf->level, */
+  /*        (intmax_t)sb->st_size, */
+  /*        fpath, */
+  /*        ftwbuf->base, */
+  /*        fpath + ftwbuf->base); */
+
+  if (tflag != FTW_D)
+  {
+    char sizestr[20] = {0};
+    snprintf(sizestr, 20, "%li", sb->st_size);
+
+    mtmap_t* map  = MNEW();
+    char*    path = mtcstr_fromcstring((char*)fpath);
+    char*    size = mtcstr_fromcstring(sizestr);
+
+    MPUT(map, "path", path);
+    MPUT(map, "size", size);
+
+    mtvec_add(files, map);
+
+    REL(path);
+    REL(size);
+    REL(map);
+  }
+
+  return 0; /* To tell nftw() to continue */
+}
+
+int comp_artist(void* left, void* right)
+{
+  mtmap_t* l = left;
+  mtmap_t* r = right;
+
+  char* la = MGET(l, "title");
+  char* ra = MGET(r, "title");
+
+  return strcmp(la, ra);
+}
+
+void read_library()
+{
+  files     = VNEW();
+  int flags = 0;
+  int id    = 0;
+  //flags |= FTW_DEPTH;
+  flags |= FTW_PHYS;
+  //nftw("/usr/home/milgra/Projects/zenmusic/res/med", display_info, 20, flags);
+  nftw("/usr/home/milgra/Music", display_info, 20, flags);
+  printf("file count %i\n", files->length);
+  // build up database
+  for (int index = 0; index < 100; index++)
+  {
+    mtmap_t* map = files->data[index];
+
+    char idstr[10] = {0};
+    snprintf(idstr, 10, "%i", id++);
+    char* idcstr = mtcstr_fromcstring(idstr);
+
+    MPUT(map, "id", idcstr);
+
+    char* path = MGET(map, "path");
+
+    player_get_metadata(path, map);
+
+    if (MGET(map, "title") == NULL) MPUT(map, "title", path);
+    if (MGET(map, "artist") == NULL) MPUT(map, "artist", path);
+
+    MPUT(db, idstr, map);
+  }
+  // printf("FINAL:\n");
+  // mtmem_describe(db, 0);
+
+  sorted = mtmap_values(db);
+
+  mtvec_sort(sorted, comp_artist);
+}
+
 view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index)
 {
-  if (files == NULL)
-  {
-    files     = mtvec_alloc();
-    int flags = 0;
-    //flags |= FTW_DEPTH;
-    flags |= FTW_PHYS;
-    //nftw("/usr/home/milgra/Projects/zenmusic/res/med", display_info, 20, flags);
-    nftw("/usr/home/milgra/Music", display_info, 20, flags);
-    //printf("file count %i\n", files->length);
-  }
   if (index < 0)
     return NULL; // no items over 0
-  if (index > files->length)
+  if (index >= sorted->length)
     return NULL;
   if (rowview == NULL)
     rowview = songitem_new();
-  songitem_update(rowview, index, files->data[index], songitem_event);
+
+  songitem_update(rowview, index, sorted->data[index], songitem_event);
   return rowview;
 }
 
@@ -171,6 +239,15 @@ void init(int width, int height)
   printf("zenmusic init %i %i\n", width, height);
 
   srand((unsigned int)time(NULL));
+
+  db = MNEW();
+
+  // read library
+  read_library();
+
+  // read database
+
+  // compare lib and database
 
   char* respath  = SDL_GetBasePath();
   char* csspath  = mtcstr_fromformat("%s/../res/main.css", respath, NULL);
@@ -205,7 +282,7 @@ void init(int width, int height)
   eh_text_add(filterbar, "placeholder");
 
   view_t* headeritem = songitem_new();
-  songitem_update(headeritem, -1, "Artist", NULL);
+  //songitem_update(headeritem, -1, "Artist", NULL);
   view_add(songlistheader, headeritem);
 
   playbtn = view_get_subview(baseview, "playbtn");
