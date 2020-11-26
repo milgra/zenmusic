@@ -1,16 +1,16 @@
 #ifndef songitem_h
 #define songitem_h
 
-#include "eh_touch.c"
 #include "view.c"
 
 view_t* songitem_new();
-void    songitem_update(view_t* rowview, int index, char* filename, void (*event)(ev_t ev, void* data));
+void    songitem_update(view_t* rowview, int index, char* filename, void (*event)(view_t* view, void* data));
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "eh_button.c"
 #include "tg_css.c"
 #include "tg_text.c"
 
@@ -45,13 +45,13 @@ view_t* songitem_new()
   return rowview;
 }
 
-void songitem_update(view_t* rowview, int index, char* filename, void (*event)(ev_t ev, void* data))
+void songitem_update(view_t* rowview, int index, char* filename, void (*event)(view_t* view, void* data))
 {
   uint32_t color1 = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
   uint32_t color2 = (index % 2 == 0) ? 0xE5E5E5FF : 0xEFEFEFFF;
 
   size_t sind = index;
-  eh_touch_add(rowview, (void*)sind, event);
+  eh_button_add(rowview, (void*)sind, event);
 
   char indbuffer[6];
   if (index > -1)

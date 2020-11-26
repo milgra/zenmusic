@@ -1,4 +1,5 @@
 #include "common.c"
+#include "eh_button.c"
 #include "eh_knob.c"
 #include "eh_list.c"
 #include "eh_text.c"
@@ -32,6 +33,8 @@ view_t*  visuright;
 double   lasttime = 0.0;
 view_t*  playbtn;
 view_t*  volbtn;
+size_t   lastindex = 0;
+int      loop_all  = 0;
 
 static int display_info(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
 {
@@ -48,21 +51,18 @@ static int display_info(const char* fpath, const struct stat* sb, int tflag, str
   return 0; /* To tell nftw() to continue */
 }
 
-void songitem_event(ev_t ev, void* data)
+void songitem_event(view_t* view, void* data)
 {
-  if (ev.type == EV_MDOWN)
-  {
-    size_t index = (size_t)data;
-    // printf("songitem event %i %i %s\n", ev.type, index, (char*)files->data[index]);
+  lastindex = (size_t)data;
+  // printf("songitem event %i %i %s\n", ev.type, index, (char*)files->data[index]);
 
-    view_t* song = view_get_subview(baseview, "song");
-    tg_text_add(song, 0x00000000, 0x000000FF, (char*)files->data[index], 0);
+  view_t* song = view_get_subview(baseview, "song");
+  tg_text_add(song, 0x00000000, 0x000000FF, (char*)files->data[lastindex], 0);
 
-    bm_t* bitmap = player_get_album(files->data[index]);
-    //tg_bitmap_add(coverview, NULL, bitmap, "album");
+  //bm_t* bitmap = player_get_album(files->data[lastindex]);
+  //tg_bitmap_add(coverview, NULL, bitmap, "album");
 
-    player_play(files->data[index]);
-  }
+  player_play(files->data[lastindex]);
 }
 
 void seek_ratio_changed(view_t* view, float angle)
@@ -104,6 +104,44 @@ void vol_ratio_changed(view_t* view, float angle)
 void mute_button_pushed(view_t* view)
 {
   player_toggle_mute();
+}
+
+void prev_button_pushed(view_t* view, void* data)
+{
+  lastindex = lastindex - 1;
+  if (lastindex < 0) lastindex = 0;
+
+  view_t* song = view_get_subview(baseview, "song");
+  tg_text_add(song, 0x00000000, 0x000000FF, (char*)files->data[lastindex], 0);
+
+  player_play(files->data[lastindex]);
+}
+
+void next_button_pushed(view_t* view, void* data)
+{
+  lastindex = lastindex + 1;
+  if (lastindex == files->length) lastindex = files->length - 1;
+
+  view_t* song = view_get_subview(baseview, "song");
+  tg_text_add(song, 0x00000000, 0x000000FF, (char*)files->data[lastindex], 0);
+
+  player_play(files->data[lastindex]);
+}
+
+void rand_button_pushed(view_t* view, void* data)
+{
+  lastindex = rand() % files->length;
+
+  view_t* song = view_get_subview(baseview, "song");
+  tg_text_add(song, 0x00000000, 0x000000FF, (char*)files->data[lastindex], 0);
+
+  player_play(files->data[lastindex]);
+}
+
+void loop_button_pushed(view_t* view, void* data)
+{
+  printf("LOOP\n");
+  loop_all = !loop_all;
 }
 
 view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index)
@@ -178,6 +216,16 @@ void init(int width, int height)
   tg_knob_add(volbtn);
   eh_knob_add(volbtn, vol_ratio_changed, mute_button_pushed);
 
+  view_t* prevbtn = view_get_subview(baseview, "prevbtn");
+  view_t* nextbtn = view_get_subview(baseview, "nextbtn");
+  view_t* randbtn = view_get_subview(baseview, "randbtn");
+  view_t* loopbtn = view_get_subview(baseview, "loopbtn");
+
+  eh_button_add(prevbtn, NULL, prev_button_pushed);
+  eh_button_add(nextbtn, NULL, next_button_pushed);
+  eh_button_add(randbtn, NULL, rand_button_pushed);
+  eh_button_add(loopbtn, NULL, loop_button_pushed);
+
   view_t* header = view_get_subview(baseview, "header");
   //header->texture.blur = 1;
   //header->texture.shadow = 1;
@@ -210,7 +258,6 @@ void update(ev_t ev)
       // TODO remove hack
       // TODO use pi constant
       double volume = player_volume() - 0.0001; // hack for knob limit
-      printf("volume %f\n", volume);
       tg_knob_set_angle(volbtn, volume * 6.28 - 3.14 / 2.0);
     }
 

@@ -83,6 +83,14 @@ void tg_knob_gen(view_t* view)
                      0,
                      tg->angle);
     }
+
+    mtgraphics_circle(view->texture.bitmap,
+                      (view->frame.local.w - 1.0) / 2.0 + 39 * cos(tg->angle),
+                      (view->frame.local.h - 1.0) / 2.0 + 39 * sin(tg->angle),
+                      7.0,
+                      1.0,
+                      0xABABABFF);
+
     bm_insert_blend(view->texture.bitmap, tg->fore, 0, 0);
     view->texture.changed = 1;
   }
