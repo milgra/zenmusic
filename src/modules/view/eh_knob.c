@@ -44,12 +44,15 @@ void eh_knob_evt(view_t* view, ev_t ev)
 
       if (angle < 0) angle += 6.28;
 
-      tg_knob_set_angle(view, angle);
-
       if (r < 30.0)
+      {
         (*eh->button_pushed)(view);
+      }
       else if (r < view->frame.global.w / 2.0)
+      {
+        tg_knob_set_angle(view, angle);
         (*eh->ratio_changed)(view, angle);
+      }
     }
   }
   else if (ev.type == EV_SCROLL)

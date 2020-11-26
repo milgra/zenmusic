@@ -65,14 +65,6 @@ void songitem_event(ev_t ev, void* data)
   }
 }
 
-void playbtn_event(ev_t ev, void* data)
-{
-  if (ev.type == EV_MDOWN)
-  {
-    player_stop();
-  }
-}
-
 void seek_ratio_changed(view_t* view, float angle)
 {
   float ratio = 0.0;
@@ -215,7 +207,10 @@ void update(ev_t ev)
       double posratio = time / player_duration();
       tg_knob_set_angle(playbtn, posratio * 6.28 - 3.14 / 2.0);
 
-      double volume = player_volume();
+      // TODO remove hack
+      // TODO use pi constant
+      double volume = player_volume() - 0.0001; // hack for knob limit
+      printf("volume %f\n", volume);
       tg_knob_set_angle(volbtn, volume * 6.28 - 3.14 / 2.0);
     }
 

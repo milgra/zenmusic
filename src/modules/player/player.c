@@ -10,7 +10,6 @@
 void   player_play(char* path);
 void   player_toggle_pause();
 void   player_toggle_mute();
-void   player_stop();
 void   player_draw();
 void   player_set_volume(float ratio);
 void   player_set_position(float ratio);
@@ -40,12 +39,11 @@ double      remaining_time = 0.0;
 
 void player_play(char* path)
 {
-  if (is == NULL)
-  {
-    printf("player play %s\n", path);
+  if (is != NULL) stream_close(is);
 
-    is = stream_open(path, file_iformat);
-  }
+  printf("LOG : playing %s\n", path);
+
+  is = stream_open(path, file_iformat);
 }
 
 void player_toggle_pause()
@@ -62,16 +60,6 @@ void player_toggle_mute()
   if (is)
   {
     is->muted = !is->muted;
-  }
-}
-
-void player_stop()
-{
-  if (is != NULL)
-  {
-    printf("player stop\n");
-    stream_close(is);
-    is = NULL;
   }
 }
 
@@ -95,13 +83,6 @@ double player_duration()
     return 0.0;
 }
 
-void player_set_volume(float ratio)
-{
-  /* double volume_level = is->audio_volume ? (20 * log(is->audio_volume / (double)SDL_MIX_MAXVOLUME) / log(10)) : -1000.0; */
-  /* int    new_volume   = lrint(SDL_MIX_MAXVOLUME * pow(10.0, (volume_level + sign * step) / 20.0)); */
-  /* is->audio_volume    = av_clip(is->audio_volume == new_volume ? (is->audio_volume + sign) : new_volume, 0, SDL_MIX_MAXVOLUME); */
-}
-
 void player_set_position(float ratio)
 {
   if (is)
@@ -119,12 +100,18 @@ double player_volume()
 {
   if (is != NULL)
   {
-    float vol = (20 * log(is->audio_volume / (double)SDL_MIX_MAXVOLUME) / log(10));
-    printf("vol %f\n", vol);
     return (float)is->audio_volume / (float)SDL_MIX_MAXVOLUME;
   }
   else
     return 1.0;
+}
+
+void player_set_volume(float ratio)
+{
+  /* double volume_level = is->audio_volume ? (20 * log(is->audio_volume / (double)SDL_MIX_MAXVOLUME) / log(10)) : -1000.0; */
+  /* int    new_volume   = lrint(SDL_MIX_MAXVOLUME * pow(10.0, (volume_level + sign * step) / 20.0)); */
+  /* is->audio_volume    = av_clip(is->audio_volume == new_volume ? (is->audio_volume + sign) : new_volume, 0, SDL_MIX_MAXVOLUME); */
+  is->audio_volume = (int)((float)SDL_MIX_MAXVOLUME * ratio);
 }
 
 void player_draw_video(int index, int w, int h)
