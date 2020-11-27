@@ -306,20 +306,17 @@ void update(ev_t ev)
     char* path = MGET(entry, "path");
     MPUT(db, path, entry);
     REL(entry);
-    if (!song_refr_flag)
-    {
-      song_refr_flag = 1;
-      song_recv_time = ev.time;
-    }
+    song_refr_flag = 1;
+    song_recv_time = ev.time;
   }
   // reload
   if (song_refr_flag)
   {
     if (ev.time > song_recv_time + 3000)
     {
-      printf("%u %u\n", ev.time, song_recv_time);
       song_refr_flag = 0;
       sort();
+      db_write(db);
     }
   }
   // update ui

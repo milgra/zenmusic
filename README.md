@@ -18,6 +18,8 @@ text anim
 search/filter bar - genre is metal, name contains x, year between x and y
 scrollbar
 
+analyzer progresst mutassa valahol amig zenet hallgatsz
+fix freq analyzer on aacs
 config file - library path, visu state,
 unicode support files, metadata!!!
 uj event villanjon fel artist helyen, odakattintva event viewer, 
