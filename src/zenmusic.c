@@ -6,6 +6,7 @@
 #include "eh_text.c"
 #include "eh_video.c"
 #include "font.c"
+#include "lib.c"
 #include "mtcstring.c"
 #include "mtmap.c"
 #include "player.c"
@@ -20,8 +21,6 @@
 #include "wm_event.c"
 #include <SDL.h>
 #include <float.h>
-#include <ftw.h>
-#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -153,80 +152,6 @@ int comp_artist(void* left, void* right)
   return strcmp(la, ra);
 }
 
-static int display_info(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
-{
-  /* printf("%-3s %2d %7jd   %-40s %d %s\n", */
-  /*        (tflag == FTW_D) ? "d" : (tflag == FTW_DNR) ? "dnr" : (tflag == FTW_DP) ? "dp" : (tflag == FTW_F) ? "f" : (tflag == FTW_NS) ? "ns" : (tflag == FTW_SL) ? "sl" : (tflag == FTW_SLN) ? "sln" : "???", */
-  /*        ftwbuf->level, */
-  /*        (intmax_t)sb->st_size, */
-  /*        fpath, */
-  /*        ftwbuf->base, */
-  /*        fpath + ftwbuf->base); */
-
-  if (tflag != FTW_D)
-  {
-    char sizestr[20] = {0};
-    snprintf(sizestr, 20, "%li", sb->st_size);
-
-    mtmap_t* map  = MNEW();
-    char*    path = mtcstr_fromcstring((char*)fpath);
-    char*    size = mtcstr_fromcstring(sizestr);
-
-    MPUT(map, "path", path);
-    MPUT(map, "size", size);
-
-    mtvec_add(files, map);
-
-    REL(path);
-    REL(size);
-    REL(map);
-  }
-
-  return 0; /* To tell nftw() to continue */
-}
-
-void read_library()
-{
-  files     = VNEW();
-  int flags = 0;
-  int id    = 0;
-  //flags |= FTW_DEPTH;
-  flags |= FTW_PHYS;
-  //nftw("/usr/home/milgra/Projects/zenmusic/res/med", display_info, 20, flags);
-  nftw("/usr/home/milgra/Music", display_info, 20, flags);
-  printf("file count %i, reading tags\n", files->length);
-  // build up database
-  for (int index = 0; index < 100; index++)
-  {
-    mtmap_t* map = files->data[index];
-
-    char idstr[10] = {0};
-    snprintf(idstr, 10, "%i", id++);
-    char* idcstr = mtcstr_fromcstring(idstr);
-
-    MPUT(map, "id", idcstr);
-
-    char* path = MGET(map, "path");
-
-    player_get_metadata(path, map);
-
-    if (MGET(map, "title") == NULL) MPUT(map, "title", path);
-    if (MGET(map, "artist") == NULL) MPUT(map, "artist", path);
-
-    MPUT(db, idstr, map);
-  }
-  // printf("FINAL:\n");
-  // mtmem_describe(db, 0);
-
-  sorted = mtmap_values(db);
-
-  printf("sort\n");
-  mtvec_sort(sorted, comp_artist);
-
-  printf("write\n");
-  db_write(db);
-}
-
 view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index)
 {
   if (index < 0)
@@ -249,9 +174,12 @@ void init(int width, int height)
   db = MNEW();
 
   // read db
-  //printf("LOG : reading db");
   db_read(db);
 
+  // read library
+  lib_read();
+
+  // sort
   sorted = mtmap_values(db);
   mtvec_sort(sorted, comp_artist);
 

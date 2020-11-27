@@ -18,6 +18,7 @@ text anim
 search/filter bar - genre is metal, name contains x, year between x and y
 scrollbar
 
+config file - library path, visu state,
 unicode support files, metadata!!!
 uj event villanjon fel artist helyen, odakattintva event viewer, 
 tilemap is auto-resize legyen duplazassal
