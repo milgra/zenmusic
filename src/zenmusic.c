@@ -1,4 +1,5 @@
 #include "common.c"
+#include "db.c"
 #include "eh_button.c"
 #include "eh_knob.c"
 #include "eh_list.c"
@@ -6,6 +7,7 @@
 #include "eh_video.c"
 #include "font.c"
 #include "mtcstring.c"
+#include "mtmap.c"
 #include "player.c"
 #include "songitem.c"
 #include "tg_knob.c"
@@ -140,6 +142,17 @@ void loop_button_pushed(view_t* view, void* data)
   loop_all = !loop_all;
 }
 
+int comp_artist(void* left, void* right)
+{
+  mtmap_t* l = left;
+  mtmap_t* r = right;
+
+  char* la = MGET(l, "artist");
+  char* ra = MGET(r, "artist");
+
+  return strcmp(la, ra);
+}
+
 static int display_info(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
 {
   /* printf("%-3s %2d %7jd   %-40s %d %s\n", */
@@ -172,17 +185,6 @@ static int display_info(const char* fpath, const struct stat* sb, int tflag, str
   return 0; /* To tell nftw() to continue */
 }
 
-int comp_artist(void* left, void* right)
-{
-  mtmap_t* l = left;
-  mtmap_t* r = right;
-
-  char* la = MGET(l, "title");
-  char* ra = MGET(r, "title");
-
-  return strcmp(la, ra);
-}
-
 void read_library()
 {
   files     = VNEW();
@@ -192,7 +194,7 @@ void read_library()
   flags |= FTW_PHYS;
   //nftw("/usr/home/milgra/Projects/zenmusic/res/med", display_info, 20, flags);
   nftw("/usr/home/milgra/Music", display_info, 20, flags);
-  printf("file count %i\n", files->length);
+  printf("file count %i, reading tags\n", files->length);
   // build up database
   for (int index = 0; index < 100; index++)
   {
@@ -218,7 +220,11 @@ void read_library()
 
   sorted = mtmap_values(db);
 
+  printf("sort\n");
   mtvec_sort(sorted, comp_artist);
+
+  printf("write\n");
+  db_write(db);
 }
 
 view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index)
@@ -242,8 +248,15 @@ void init(int width, int height)
 
   db = MNEW();
 
+  // read db
+  //printf("LOG : reading db");
+  db_read(db);
+
+  sorted = mtmap_values(db);
+  mtvec_sort(sorted, comp_artist);
+
   // read library
-  read_library();
+  //read_library();
 
   // read database
 

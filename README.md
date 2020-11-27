@@ -13,11 +13,12 @@ hook clang-format and gmake to file save hook
 
 ---
 
-database, sorting
+touch ordering
 text anim
 search/filter bar - genre is metal, name contains x, year between x and y
 scrollbar
 
+unicode support files, metadata!!!
 uj event villanjon fel artist helyen, odakattintva event viewer, 
 tilemap is auto-resize legyen duplazassal
 search bar click hozza elo genre/artist listat
