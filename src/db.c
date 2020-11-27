@@ -36,8 +36,8 @@ void db_read(mtmap_t* db)
       {
         if (token[0] == '-')
         {
-          char* id = MGET(map, "id");
-          MPUT(db, id, map);
+          char* path = MGET(map, "path");
+          MPUT(db, path, map);
           REL(map);
           map = MNEW();
         }

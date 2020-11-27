@@ -60,7 +60,7 @@ void songitem_update(view_t* rowview, int index, mtmap_t* file, void (*event)(vi
   else
     snprintf(indbuffer, 6, "No.");
 
-  tg_text_set(rowview->views->data[0], color1, 0x000000FF, MGET(file, "id"), 1);
+  tg_text_set(rowview->views->data[0], color1, 0x000000FF, indbuffer, 1);
 
   tg_text_set(rowview->views->data[1], color1, 0x000000FF, MGET(file, "artist"), 0);
 

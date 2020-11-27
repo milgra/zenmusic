@@ -1,20 +1,25 @@
 #ifndef lib_h
 #define lib_h
 
+#include "mtchannel.c"
 #include "mtmap.c"
 
 void lib_read();
+void lib_remove_duplicates(mtmap_t* db);
+void lib_analyze(mtch_t* channel);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtchannel.c"
 #include "mtcstring.c"
+#include "player.c"
 #include <ftw.h>
 #include <limits.h>
 
 mtmap_t* lib_db;
+mtvec_t* rem_db;
+char     lock_db = 0;
 
 static int lib_file_data(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
 {
@@ -41,6 +46,8 @@ static int lib_file_data(const char* fpath, const struct stat* sb, int tflag, st
 
 void lib_read()
 {
+  if (lock_db) return;
+
   lib_db    = MNEW();
   int flags = 0;
   int id    = 0;
@@ -54,79 +61,82 @@ void lib_read()
 
 void lib_remove_duplicates(mtmap_t* db)
 {
-  // remove entries existing in db
-  mtvec_t* vals        = mtmap_values(db);
-  mtmap_t* path_to_map = MNEW();
-  for (int index = 0; index < vals->length; index++)
+  if (lock_db) return;
+
+  // go through db paths
+  mtvec_t* paths = mtmap_keys(db);
+  for (int index = 0; index < paths->length; index++)
   {
-    mtmap_t* map  = vals->data[index];
-    char*    path = MGET(map, "path");
-    MPUT(path_to_map, path, map);
+    char*    path = paths->data[index];
+    mtmap_t* map  = MGET(lib_db, path);
+    if (!map)
+    {
+      // db path is missing from file path, file was removed
+      MDEL(db, path);
+      printf("LOG file is missing for path %s, song entry was removed from db\n", path);
+    }
   }
-  REL(vals);
-  // go through lib
-  mtvec_t* keys = mtmap_keys(lib_db);
-  for (int index = 0; index < keys->length; index++)
+
+  // go through lib paths
+  paths = mtmap_keys(lib_db);
+  for (int index = 0; index < paths->length; index++)
   {
-    char*    key = keys->data[index];
-    mtmap_t* map = MGET(path_to_map, key);
+    char*    path = paths->data[index];
+    mtmap_t* map  = MGET(db, path);
     if (map)
     {
       // path exist in db, removing entry from lib
-      MDEL(lib_db, key);
+      MDEL(lib_db, path);
     }
   }
-  printf("LOG analyzing %i entries\n", lib_db->count);
+
+  REL(paths);
 }
 
-void analyze_thread(mtch_t* channel)
+int analyzer_thread(void* chptr)
 {
-  /* while (lib_db->count > 0) */
-  /* { */
-  /*   // remove last item */
-  /*   if (mtch_send(map)) */
-  /*   { */
-  /*     // if sent, remove from lib_db */
-  /*     RET(map) // retain because we will remove it from lib db and mtch doesn't retain */
-  /*     mtvec_rematindex(lib_db, ); */
-  /*   } */
-  /* } */
+  mtch_t* channel = chptr;
+  printf("analyzer thread start\n");
+  mtmap_t* curr = NULL;
+
+  while (lib_db->count > 0)
+  {
+    if (!curr)
+    {
+      // create actual song entry
+      curr       = MNEW();
+      char* path = mtvec_tail(rem_db);
+      char* size = MGET(lib_db, path);
+      MPUT(curr, "path", path);
+      MPUT(curr, "size", size);
+      if (MGET(curr, "title") == NULL) MPUT(curr, "title", path);
+      if (MGET(curr, "artist") == NULL) MPUT(curr, "artist", path);
+      player_get_metadata(path, curr);
+      // remove entry from remaining
+      mtvec_rematindex(rem_db, rem_db->length - 1);
+      // try to send it to main thread
+      if (mtch_send(channel, curr)) curr = NULL;
+    }
+    else
+    {
+      // wait for main thread to process new entries
+      SDL_Delay(5);
+      if (mtch_send(channel, curr)) curr = NULL;
+    }
+  }
+
+  lock_db = 0;
+  return 0;
 }
 
-// analyze in background thread
 void lib_analyze(mtch_t* channel)
 {
+  if (lock_db) return;
 
-  /* // build up database */
-  /* for (int index = 0; index < 100; index++) */
-  /* { */
-  /*   mtmap_t* map = files->data[index]; */
+  lock_db = 1;
+  rem_db  = mtmap_keys(lib_db);
 
-  /*   char idstr[10] = {0}; */
-  /*   snprintf(idstr, 10, "%i", id++); */
-  /*   char* idcstr = mtcstr_fromcstring(idstr); */
-
-  /*   MPUT(map, "id", idcstr); */
-
-  /*   char* path = MGET(map, "path"); */
-
-  /*   player_get_metadata(path, map); */
-
-  /*   if (MGET(map, "title") == NULL) MPUT(map, "title", path); */
-  /*   if (MGET(map, "artist") == NULL) MPUT(map, "artist", path); */
-
-  /*   MPUT(db, idstr, map); */
-  /* } */
-  /* // printf("FINAL:\n"); */
-  /* // mtmem_describe(db, 0); */
-
-  /* sorted = mtmap_values(db); */
-
-  /* printf("sort\n"); */
-  /* mtvec_sort(sorted, comp_artist); */
-
-  /* printf("write\n"); */
-  /* db_write(db); */
+  SDL_CreateThread(analyzer_thread, "analyzer", channel);
 }
 
 #endif

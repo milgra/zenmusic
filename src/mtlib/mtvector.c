@@ -196,7 +196,13 @@ char mtvec_rematindex(mtvec_t* vector, uint32_t index)
   if (index < vector->length)
   {
     mtmem_release(vector->data[index]);
-    memmove(vector->data + index, vector->data + index + 1, (vector->length - index - 1) * sizeof(void*));
+
+    if (index < vector->length - 1)
+    {
+      // have to shift elements after element to left
+      memmove(vector->data + index, vector->data + index + 1, (vector->length - index - 1) * sizeof(void*));
+    }
+
     vector->length -= 1;
     return 1;
   }

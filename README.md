@@ -43,7 +43,7 @@ cortex as visualizer - level gen based on freq, LEFT/DOWN!!!
 glFragaCoord ?
 volume fade in/out, cover arton is
 donate button /donate popup after 100 startups
-refresh library button
+resync library button
 
 zen media :
 space start media

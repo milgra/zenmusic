@@ -7,6 +7,7 @@
 #include "eh_video.c"
 #include "font.c"
 #include "lib.c"
+#include "mtchannel.c"
 #include "mtcstring.c"
 #include "mtmap.c"
 #include "player.c"
@@ -39,6 +40,7 @@ int     loop_all  = 0;
 mtvec_t* files;
 mtmap_t* db;
 mtvec_t* sorted;
+mtch_t*  libch;
 
 void songitem_event(view_t* view, void* data)
 {
@@ -165,30 +167,18 @@ view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index)
   return rowview;
 }
 
+void sort()
+{
+  if (sorted) REL(sorted);
+  sorted = mtmap_values(db);
+  mtvec_sort(sorted, comp_artist);
+}
+
 void init(int width, int height)
 {
   printf("zenmusic init %i %i\n", width, height);
 
   srand((unsigned int)time(NULL));
-
-  db = MNEW();
-
-  // read db
-  db_read(db);
-
-  // read library
-  lib_read();
-
-  // sort
-  sorted = mtmap_values(db);
-  mtvec_sort(sorted, comp_artist);
-
-  // read library
-  //read_library();
-
-  // read database
-
-  // compare lib and database
 
   char* respath  = SDL_GetBasePath();
   char* csspath  = mtcstr_fromformat("%s/../res/main.css", respath, NULL);
@@ -254,10 +244,28 @@ void init(int width, int height)
   /* view_t* texmapview       = view_new("texmapview", (r2_t){500, 500, 200, 200}); */
   /* texmapview->texture.full = 1; */
   /* ui_manager_add(texmapview); */
+
+  db    = MNEW();
+  libch = mtch_new(100);
+
+  // read db
+  db_read(db);
+
+  // read library
+  lib_read();
+
+  // remove existing
+  lib_remove_duplicates(db);
+
+  // start analyzing new entries
+  lib_analyze(libch);
+
+  sort();
 }
 
 void update(ev_t ev)
 {
+  // update time, knobs and visualizer
   double time = player_time();
   if (time > 0.0)
   {
@@ -285,6 +293,17 @@ void update(ev_t ev)
     visuleft->texture.changed  = 1;
     visuright->texture.changed = 1;
   }
+  // get analyzed song entries
+  mtmap_t* entry;
+  while ((entry = mtch_recv(libch)))
+  {
+    char* path = MGET(entry, "path");
+    MPUT(db, path, entry);
+    REL(entry);
+    printf("putting entry to db %s\n", MGET(entry, "title"));
+  }
+  // reload
+  // update ui
   ui_manager_event(ev);
 }
 
