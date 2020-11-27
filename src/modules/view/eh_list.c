@@ -18,6 +18,7 @@ typedef struct _eh_list_t
 } eh_list_t;
 
 void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t* rowview, int index));
+void eh_list_fill(view_t* view);
 
 #endif
 
@@ -160,6 +161,12 @@ void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t
 
   view->evt_han_data = eh;
   view->evt_han      = eh_list_evt;
+}
+
+void eh_list_fill(view_t* view)
+{
+  eh_list_t* eh = view->evt_han_data;
+  eh->filled    = 0;
 }
 
 #endif

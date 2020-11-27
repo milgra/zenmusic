@@ -26,6 +26,7 @@
 #include <stdlib.h>
 #include <time.h>
 
+view_t* songlist;
 view_t* coverview;
 view_t* baseview;
 view_t* timeview;
@@ -36,6 +37,9 @@ view_t* playbtn;
 view_t* volbtn;
 size_t  lastindex = 0;
 int     loop_all  = 0;
+
+char     song_refr_flag = 0;
+uint32_t song_recv_time = 0;
 
 mtvec_t* files;
 mtmap_t* db;
@@ -172,6 +176,8 @@ void sort()
   if (sorted) REL(sorted);
   sorted = mtmap_values(db);
   mtvec_sort(sorted, comp_artist);
+  eh_list_fill(songlist);
+  printf("COUNT %i\n", sorted->length);
 }
 
 void init(int width, int height)
@@ -194,7 +200,7 @@ void init(int width, int height)
   ui_manager_init(width, height);
   ui_manager_add(baseview);
 
-  view_t* songlist = view_get_subview(baseview, "songlist");
+  songlist = view_get_subview(baseview, "songlist");
   eh_list_add(songlist, songlist_item_generator);
 
   view_t* video = view_get_subview(baseview, "video");
@@ -300,9 +306,22 @@ void update(ev_t ev)
     char* path = MGET(entry, "path");
     MPUT(db, path, entry);
     REL(entry);
-    printf("putting entry to db %s\n", MGET(entry, "title"));
+    if (!song_refr_flag)
+    {
+      song_refr_flag = 1;
+      song_recv_time = ev.time;
+    }
   }
   // reload
+  if (song_refr_flag)
+  {
+    if (ev.time > song_recv_time + 3000)
+    {
+      printf("%u %u\n", ev.time, song_recv_time);
+      song_refr_flag = 0;
+      sort();
+    }
+  }
   // update ui
   ui_manager_event(ev);
 }

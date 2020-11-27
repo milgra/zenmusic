@@ -99,7 +99,7 @@ int analyzer_thread(void* chptr)
   printf("analyzer thread start\n");
   mtmap_t* curr = NULL;
 
-  while (lib_db->count > 0)
+  while (rem_db->length > 0)
   {
     if (!curr)
     {
@@ -125,6 +125,7 @@ int analyzer_thread(void* chptr)
     }
   }
 
+  printf("closing analyzer loop\n");
   lock_db = 0;
   return 0;
 }
