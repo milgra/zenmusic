@@ -31,11 +31,24 @@ void eh_list_fill(view_t* view);
 
 #define PRELOAD_DISTANCE 100.0
 
+void eh_list_move(view_t* view, float dy)
+{
+  eh_list_t* eh = view->evt_han_data;
+  view_t*    sview;
+  while ((sview = VNXT(view->views)))
+  {
+    r2_t frame = sview->frame.local;
+    frame.y += dy;
+    view_set_frame(sview, frame);
+  }
+}
+
 void eh_list_evt(view_t* view, ev_t ev)
 {
   eh_list_t* eh = view->evt_han_data;
   if (ev.type == EV_TIME)
   {
+    // fill up if needed
     while (eh->filled == 0)
     {
       if (eh->items->length == 0)
@@ -128,17 +141,24 @@ void eh_list_evt(view_t* view, ev_t ev)
         }
       }
     }
+    // scroll bounce if needed
+    if (eh->items->length > 0)
+    {
+      view_t* head = mtvec_head(eh->items);
+      view_t* tail = mtvec_tail(eh->items);
+
+      // add items if needed
+
+      if (head->frame.local.y > 0.0)
+        eh_list_move(view, -head->frame.local.y);
+      else if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h)
+        eh_list_move(view, view->frame.local.h - tail->frame.local.h - tail->frame.local.y);
+    }
   }
   else if (ev.type == EV_SCROLL)
   {
-    view_t* sview;
-    while ((sview = VNXT(view->views)))
-    {
-      r2_t frame = sview->frame.local;
-      frame.y += ev.dy;
-      view_set_frame(sview, frame);
-      eh->filled = 0;
-    }
+    eh_list_move(view, ev.dy);
+    eh->filled = 0;
   }
   else if (ev.type == EV_RESIZE)
   {
