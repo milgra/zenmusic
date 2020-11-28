@@ -150,9 +150,9 @@ void eh_list_evt(view_t* view, ev_t ev)
       // add items if needed
 
       if (head->frame.local.y > 0.0)
-        eh_list_move(view, -head->frame.local.y);
+        eh_list_move(view, -head->frame.local.y / 5.0);
       else if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h)
-        eh_list_move(view, view->frame.local.h - tail->frame.local.h - tail->frame.local.y);
+        eh_list_move(view, (view->frame.local.h - tail->frame.local.h - tail->frame.local.y) / 5.0);
     }
   }
   else if (ev.type == EV_SCROLL)
