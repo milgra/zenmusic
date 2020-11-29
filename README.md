@@ -13,10 +13,10 @@ hook clang-format and gmake to file save hook
 
 ---
 
-text anim
-scrollbar
 mem management
 search/filter bar - genre is metal, name contains x, year between x and y
+finalize scrollbar
+finalize text
 
 analyzer progresst mutassa valahol amig zenet hallgatsz
 fix freq analyzer on aacs

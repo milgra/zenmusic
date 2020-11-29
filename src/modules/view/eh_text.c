@@ -11,6 +11,7 @@ void eh_text_add(view_t* view, char* text);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "SDL.h"
+#include "eh_anim.c"
 #include "mtcstring.c"
 #include "mtvector.c"
 #include "tg_text.c"
@@ -34,8 +35,10 @@ void eh_text_evt(view_t* view, ev_t ev)
     char idbuffer[100] = {0};
     snprintf(idbuffer, 100, "glyphview %s", ev.text);
 
+    // TODO get glyph width first
     view_t* glyphview = view_new(idbuffer, (r2_t){0, 0, 20, 20});
     tg_text_add(glyphview, 0xFEFEFEFF, 0x000000FF, ev.text, 0);
+
     view_add(view, glyphview);
 
     VADD(data->glyphs, glyphview);
@@ -46,10 +49,18 @@ void eh_text_evt(view_t* view, ev_t ev)
     while ((gview = VNXT(data->glyphs)))
     {
       r2_t frame = gview->frame.local;
-      frame.x    = pos;
       pos += frame.w;
-      view_set_frame(gview, frame);
     }
+
+    r2_t sf = (r2_t){pos, 0, 1, 20};
+
+    view_set_frame(glyphview, sf);
+
+    r2_t ef = sf;
+    ef.x += 10.0;
+    ef.w = 20.0;
+
+    eh_anim_add(glyphview, sf, ef, 10, AT_LINEAR);
   }
   else if (ev.type == EV_KDOWN)
   {

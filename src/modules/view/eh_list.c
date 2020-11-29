@@ -14,6 +14,9 @@ typedef struct _eh_list_t
   int  tail_index;
   char filled;
 
+  view_t* vscr;
+  view_t* hcsr;
+
   view_t* (*row_generator)(view_t* listview, view_t* rowview, int index); /* event handler for view */
 } eh_list_t;
 
@@ -26,6 +29,7 @@ void eh_list_fill(view_t* view);
 
 #include "mtcstring.c"
 #include "mtstring.c"
+#include "tg_css.c"
 #include "tg_text.c"
 #include <math.h>
 
@@ -35,7 +39,7 @@ void eh_list_move(view_t* view, float dy)
 {
   eh_list_t* eh = view->evt_han_data;
   view_t*    sview;
-  while ((sview = VNXT(view->views)))
+  while ((sview = VNXT(eh->items)))
   {
     r2_t frame = sview->frame.local;
     frame.y += dy;
@@ -60,7 +64,7 @@ void eh_list_evt(view_t* view, ev_t ev)
         {
           VREM(eh->cache, rowitem);
           VADD(eh->items, rowitem);
-          view_add(view, rowitem);
+          view_insert(view, rowitem, 0);
         }
         else
           eh->filled = 1;
@@ -107,7 +111,7 @@ void eh_list_evt(view_t* view, ev_t ev)
             VREM(eh->cache, rowitem);
             VADD(eh->items, rowitem);
 
-            if (rowitem->parent == NULL) view_add(view, rowitem);
+            if (rowitem->parent == NULL) view_insert(view, rowitem, view->views->length - 3);
             view_set_frame(rowitem, (r2_t){0, tail->frame.local.y + tail->frame.local.h, rowitem->frame.local.w, rowitem->frame.local.h});
 
             eh->tail_index += 1;
@@ -172,6 +176,12 @@ void eh_list_del(void* p)
   REL(eh->items);
 }
 
+void eh_list_fill(view_t* view)
+{
+  eh_list_t* eh = view->evt_han_data;
+  eh->filled    = 0;
+}
+
 void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t* rowview, int index))
 {
   eh_list_t* eh     = mtmem_calloc(sizeof(eh_list_t), "eh_list", eh_list_del, NULL);
@@ -179,15 +189,21 @@ void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t
   eh->cache         = VNEW();
   eh->row_generator = row_generator;
 
+  view_t* vscr = view_new("vscr", (r2_t){0, 0, 20, 20});
+  view_t* hscr = view_new("hscr", (r2_t){0, 20, 20, 20});
+
+  tg_css_add(vscr);
+  tg_css_add(hscr);
+
+  vscr->layout.background_color = 0x000000FF;
+  hscr->layout.background_color = 0x000000FF;
+
+  view_add(view, vscr);
+  view_add(view, hscr);
+
   view->needs_scroll = 1;
   view->evt_han_data = eh;
   view->evt_han      = eh_list_evt;
-}
-
-void eh_list_fill(view_t* view)
-{
-  eh_list_t* eh = view->evt_han_data;
-  eh->filled    = 0;
 }
 
 #endif

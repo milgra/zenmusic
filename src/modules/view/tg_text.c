@@ -88,10 +88,12 @@ void tg_text_set(view_t* view, uint32_t bc, uint32_t fc, char* text, char align)
   if (gen->fc != fc || gen->bc != bc || gen->text != text || gen->align != align)
   {
     REL(gen->text);
-    gen->fc             = fc;
-    gen->bc             = bc;
-    gen->text           = mtcstr_fromcstring(text);
-    gen->align          = align;
+    gen->fc    = fc;
+    gen->bc    = bc;
+    gen->text  = mtcstr_fromcstring(text);
+    gen->align = align;
+    //REL(view->texture.id);
+    //view->texture.id    = mtcstr_fromcstring(text);
     view->texture.state = TS_BLANK;
   }
 }
