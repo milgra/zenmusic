@@ -40,7 +40,9 @@ void ui_manager_init(int width, int height)
 void ui_manager_event(ev_t ev)
 {
   if (ev.type == EV_TIME)
+  {
     view_evt(root, ev);
+  }
   else if (ev.type == EV_RESIZE)
   {
     view_set_frame(root, (r2_t){0.0, 0.0, (float)ev.w, (float)ev.h});
@@ -56,7 +58,6 @@ void ui_manager_event(ev_t ev)
   {
     if (ev.type == EV_MMOVE)
     {
-      printf("\n2");
       mtvec_reset(queue);
       view_coll_touched(root, ev, queue);
     }
@@ -64,7 +65,6 @@ void ui_manager_event(ev_t ev)
     for (int i = queue->length - 1; i > -1; i--)
     {
       view_t* v = queue->data[i];
-      printf("needs touch? %s\n", v->id);
       if (v->needs_touch)
       {
         if (v->evt_han) (*v->evt_han)(v, ev);
@@ -78,6 +78,30 @@ void ui_manager_event(ev_t ev)
     {
       view_t* v = queue->data[i];
       if (v->needs_scroll)
+      {
+        if (v->evt_han) (*v->evt_han)(v, ev);
+        break;
+      }
+    }
+  }
+  else if (ev.type == EV_KDOWN || ev.type == EV_KUP)
+  {
+    for (int i = queue->length - 1; i > -1; i--)
+    {
+      view_t* v = queue->data[i];
+      if (v->needs_key)
+      {
+        if (v->evt_han) (*v->evt_han)(v, ev);
+        break;
+      }
+    }
+  }
+  else if (ev.type == EV_TEXT)
+  {
+    for (int i = queue->length - 1; i > -1; i--)
+    {
+      view_t* v = queue->data[i];
+      if (v->needs_text)
       {
         if (v->evt_han) (*v->evt_han)(v, ev);
         break;

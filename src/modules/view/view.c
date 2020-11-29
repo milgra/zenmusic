@@ -109,6 +109,8 @@ struct _view_t
   char overflow;  /* enable content outside frame */
   char connected; /* view is added to connector */
 
+  char needs_key;    /* accepts key events */
+  char needs_text;   /* accepts text events */
   char needs_time;   /* accepts time events */
   char needs_touch;  /* accepts touch events */
   char needs_scroll; /* accepts scroll events */
@@ -221,7 +223,6 @@ void view_coll_touched(view_t* view, ev_t ev, mtvec_t* queue)
       ev.y < view->frame.global.y + view->frame.global.h &&
       ev.y > view->frame.global.y)
   {
-    printf("ADDING %s\n", view->id);
     VADD(queue, view);
     for (int i = 0; i < view->views->length; i++)
     {
