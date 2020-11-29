@@ -26,32 +26,64 @@ void ui_manager_render();
 #include "ui_generator.c"
 #include "view_layout.c"
 
-view_t* root;
+view_t*  root;
+mtvec_t* queue;
 
 void ui_manager_init(int width, int height)
 {
   ui_generator_init(width, height);
 
-  root = view_new("root", (r2_t){0, 0, width, height});
+  root  = view_new("root", (r2_t){0, 0, width, height});
+  queue = VNEW();
 }
 
 void ui_manager_event(ev_t ev)
 {
-  if (ev.type == EV_RESIZE)
+  if (ev.type == EV_TIME)
+    view_evt(root, ev);
+  else if (ev.type == EV_RESIZE)
   {
     view_set_frame(root, (r2_t){0.0, 0.0, (float)ev.w, (float)ev.h});
     ui_generator_resize(ev.w, ev.h);
     view_layout(root);
     //printf("\nAFTER RESIZE");
     //view_desc(root, 0);
-  }
-
-  if (ev.type == EV_TIME || ev.type == EV_RESIZE)
-  {
     view_evt(root, ev);
   }
-  else
-    view_ptr_evt(root, ev);
+  else if (ev.type == EV_MMOVE ||
+           ev.type == EV_MDOWN ||
+           ev.type == EV_MUP)
+  {
+    if (ev.type == EV_MMOVE)
+    {
+      printf("\n2");
+      mtvec_reset(queue);
+      view_coll_touched(root, ev, queue);
+    }
+
+    for (int i = queue->length - 1; i > -1; i--)
+    {
+      view_t* v = queue->data[i];
+      printf("needs touch? %s\n", v->id);
+      if (v->needs_touch)
+      {
+        if (v->evt_han) (*v->evt_han)(v, ev);
+        break;
+      }
+    }
+  }
+  else if (ev.type == EV_SCROLL)
+  {
+    for (int i = queue->length - 1; i > -1; i--)
+    {
+      view_t* v = queue->data[i];
+      if (v->needs_scroll)
+      {
+        if (v->evt_han) (*v->evt_han)(v, ev);
+        break;
+      }
+    }
+  }
 }
 
 void ui_manager_add(view_t* view)

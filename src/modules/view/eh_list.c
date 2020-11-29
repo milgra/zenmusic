@@ -179,6 +179,7 @@ void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t
   eh->cache         = VNEW();
   eh->row_generator = row_generator;
 
+  view->needs_scroll = 1;
   view->evt_han_data = eh;
   view->evt_han      = eh_list_evt;
 }

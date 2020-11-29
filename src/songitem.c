@@ -22,24 +22,23 @@ view_t* songitem_new()
   char idbuffer[100] = {0};
   snprintf(idbuffer, 100, "list_item%i", songitem_index);
 
-  view_t* rowview    = view_new(idbuffer, (r2_t){0, 0, 1500, 35});
-  rowview->hidden    = 1;
-  rowview->block_evt = 0;
+  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 1500, 35});
+  rowview->hidden = 1;
 
   snprintf(idbuffer, 100, "index_item%i", songitem_index);
   view_t* indexview = view_new(idbuffer, (r2_t){0, 0, 80, 35});
   tg_text_add(indexview, 0xFFFFFFFF, 0x000000FF, "0", 1);
-  indexview->block_evt = 0;
+  indexview->needs_touch = 0;
 
   snprintf(idbuffer, 100, "name_item%i", songitem_index);
   view_t* nameview = view_new(idbuffer, (r2_t){80, 0, 500, 35});
   tg_text_add(nameview, 0xFFFFFFFF, 0x000000FF, "0", 0);
-  nameview->block_evt = 0;
+  nameview->needs_touch = 0;
 
   snprintf(idbuffer, 100, "type_item%i", songitem_index);
   view_t* typeview = view_new(idbuffer, (r2_t){580, 0, 1000, 35});
   tg_text_add(typeview, 0xFFFFFFFF, 0x000000FF, "0", 1);
-  typeview->block_evt = 0;
+  typeview->needs_touch = 0;
 
   view_add(rowview, indexview);
   view_add(rowview, nameview);

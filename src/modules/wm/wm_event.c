@@ -7,15 +7,15 @@
 enum evtype
 {
   EV_EMPTY,
+  EV_TIME,
+  EV_RESIZE,
+  EV_MMOVE,
   EV_MDOWN,
   EV_MUP,
-  EV_MMOVE,
+  EV_SCROLL,
   EV_KDOWN,
   EV_KUP,
-  EV_SCROLL,
   EV_TEXT,
-  EV_RESIZE,
-  EV_TIME
 };
 
 typedef struct _ev_t

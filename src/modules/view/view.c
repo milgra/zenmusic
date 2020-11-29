@@ -108,7 +108,10 @@ struct _view_t
   char hidden;    /* exclude from rendering */
   char overflow;  /* enable content outside frame */
   char connected; /* view is added to connector */
-  char block_evt; /* accepts pointer events */
+
+  char needs_time;   /* accepts time events */
+  char needs_touch;  /* accepts touch events */
+  char needs_scroll; /* accepts scroll events */
 
   char*    id;     /* identifier for handling view */
   mtvec_t* views;  /* subviews */
@@ -130,8 +133,8 @@ void    view_add(view_t* view, view_t* subview);
 void    view_insert(view_t* view, view_t* subview, uint32_t index);
 void    view_remove(view_t* view, view_t* subview);
 
-void view_evt(view_t* view, ev_t ev);     /* general event, sending to all views */
-int  view_ptr_evt(view_t* view, ev_t ev); /* pointer event, checking intersection */
+void view_evt(view_t* view, ev_t ev); /* general event, sending to all views */
+void view_coll_touched(view_t* view, ev_t ev, mtvec_t* queue);
 void view_gen_texture(view_t* view);
 
 void view_set_frame(view_t* view, r2_t frame);
@@ -176,9 +179,9 @@ view_t* view_new(char* id, r2_t frame)
   view->views        = VNEW();
   view->frame.local  = frame;
   view->frame.global = frame;
-  view->block_evt    = 1;
   view->texture.page = -1;
   view->texture.id   = mtcstr_fromcstring(id);
+  view->needs_touch  = 1;
 
   return view;
 }
@@ -211,33 +214,21 @@ void view_remove(view_t* view, view_t* subview)
   subview->parent = NULL;
 }
 
-int view_ptr_evt(view_t* view, ev_t ev)
+void view_coll_touched(view_t* view, ev_t ev, mtvec_t* queue)
 {
   if (ev.x < view->frame.global.x + view->frame.global.w &&
       ev.x > view->frame.global.x &&
       ev.y < view->frame.global.y + view->frame.global.h &&
       ev.y > view->frame.global.y)
   {
-    // first try to process the event with subviews
-    view_t* v;
-    char    succ = 0;
-    while ((v = VNXT(view->views)))
-      if (view_ptr_evt(v, ev))
-      {
-        // event is blocked
-        //return 1;
-      }
-    /* // if no subview blocked the event, handle it */
-    if (view->evt_han)
+    printf("ADDING %s\n", view->id);
+    VADD(queue, view);
+    for (int i = 0; i < view->views->length; i++)
     {
-      printf("view ptr event %s\n", view->id);
-      (*view->evt_han)(view, ev);
+      view_t* v = view->views->data[i];
+      view_coll_touched(v, ev, queue);
     }
-    /* // block bubbling if we are blocking */
-    /* if (view->block_evt) return 1; */
   }
-  // no intersection or no blocking
-  return 0;
 }
 
 void view_evt(view_t* view, ev_t ev)

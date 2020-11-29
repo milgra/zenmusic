@@ -240,6 +240,9 @@ void init(int width, int height)
   eh_button_add(randbtn, NULL, rand_button_pushed);
   eh_button_add(loopbtn, NULL, loop_button_pushed);
 
+  view_t* main      = view_get_subview(baseview, "main");
+  main->needs_touch = 0;
+
   view_t* header = view_get_subview(baseview, "header");
   //header->texture.blur = 1;
   //header->texture.shadow = 1;

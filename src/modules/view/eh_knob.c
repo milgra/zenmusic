@@ -54,7 +54,7 @@ void eh_knob_evt(view_t* view, ev_t ev)
     eh_knob_t* eh = view->evt_han_data;
     tg_knob_t* tg = view->tex_gen_data;
 
-    float angle = tg->angle + ev.dy / 50.0;
+    float angle = tg->angle - ev.dy / 50.0;
     if (angle < 0) angle += 6.28;
     if (angle > 6.28) angle -= 6.28;
     tg_knob_set_angle(view, angle);
@@ -71,6 +71,7 @@ void eh_knob_add(view_t* view,
   eh->ratio_changed = ratio_changed;
   eh->button_pushed = button_pushed;
 
+  view->needs_scroll = 1;
   view->evt_han_data = eh;
   view->evt_han      = eh_knob_evt;
 }
