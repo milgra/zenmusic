@@ -37,17 +37,21 @@ void ui_manager_init(int width, int height)
 
 void ui_manager_event(ev_t ev)
 {
-  view_evt(root, ev);
-
   if (ev.type == EV_RESIZE)
   {
     view_set_frame(root, (r2_t){0.0, 0.0, (float)ev.w, (float)ev.h});
     ui_generator_resize(ev.w, ev.h);
     view_layout(root);
-
     //printf("\nAFTER RESIZE");
     //view_desc(root, 0);
   }
+
+  if (ev.type == EV_TIME || ev.type == EV_RESIZE)
+  {
+    view_evt(root, ev);
+  }
+  else
+    view_ptr_evt(root, ev);
 }
 
 void ui_manager_add(view_t* view)

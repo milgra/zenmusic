@@ -17,16 +17,10 @@ void eh_button_add(view_t* view, void* data, void (*event)(view_t* view, void* d
 
 void eh_button_evt(view_t* view, ev_t ev)
 {
-  eh_button_t* eh = view->evt_han_data;
   if (ev.type == EV_MDOWN)
   {
-    if (ev.x < view->frame.global.x + view->frame.global.w &&
-        ev.x > view->frame.global.x &&
-        ev.y < view->frame.global.y + view->frame.global.h &&
-        ev.y > view->frame.global.y)
-    {
-      (*eh->event)(view, eh->data);
-    }
+    eh_button_t* eh = view->evt_han_data;
+    (*eh->event)(view, eh->data);
   }
 }
 
