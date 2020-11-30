@@ -14,8 +14,10 @@ typedef struct _eh_list_t
   int  tail_index;
   char filled;
 
+  int count;
+
   view_t* vscr;
-  view_t* hcsr;
+  view_t* hscr;
 
   view_t* (*row_generator)(view_t* listview, view_t* rowview, int index); /* event handler for view */
 } eh_list_t;
@@ -45,6 +47,8 @@ void eh_list_move(view_t* view, float dy)
     frame.y += dy;
     view_set_frame(sview, frame);
   }
+  view_set_frame(eh->vscr, (r2_t){view->frame.local.w - 20.0, 0.0, 20.0, 20.0});
+  view_set_frame(eh->hscr, (r2_t){0, view->frame.local.h - 20.0, 20.0, 20.0});
 }
 
 void eh_list_evt(view_t* view, ev_t ev)
@@ -200,6 +204,9 @@ void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t
 
   view_add(view, vscr);
   view_add(view, hscr);
+
+  eh->vscr = vscr;
+  eh->hscr = hscr;
 
   view->needs_scroll = 1;
   view->evt_han_data = eh;

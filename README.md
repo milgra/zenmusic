@@ -3,7 +3,7 @@ Zen Multimedia Desktop System
 Main goals : operating transparency - all events are logged in event viewer
 
 zen media - offline file/media viewer and manager / preview area, file info area
-zen music - offline music player and manager / video/album area, two spectrum/freq analyzer for stereo channels
+zen music - offline music player manager and visualizer / video/album area, two spectrum/freq analyzer for stereo channels
 zen video - offline photo/video viewer and library manager / video/image area, location area, info area
 
 development :
@@ -17,6 +17,7 @@ mem management
 search/filter bar - genre is metal, name contains x, year between x and y
 finalize scrollbar
 finalize text
+spectrum, bar analyzer, left/right eff button
 
 analyzer progresst mutassa valahol amig zenet hallgatsz
 fix freq analyzer on aacs
@@ -29,8 +30,6 @@ resize textures on window change if needed
 unit teszter gl_compositorhoz
 ha az egeret a lista item jobb oldalara viszed popupban mutassa id3/song infokat es album artot
 resizable header/songlist border
-check leaks
-bar analyzer
 unshift bmp - spectrum analyzer shift left
 grid-based warping of video/album cover based on frequence ( bass in the center )
 ujdonsagok video jojjon fel az events windowban, about

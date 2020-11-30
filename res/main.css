@@ -9,6 +9,25 @@
     height: 100%;
 }
 
+#songs {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+}
+
+#songlisttop {
+    height: 220px;
+    width: 100%;
+}
+
+#songlist {
+    height: 100%;
+    background-color: #222222FF;
+    width: 100%;
+    overflow: scroll;
+}
+
 #header {
     flex-basis: 150px;
     background-color: #DEDEDEFF;
@@ -30,14 +49,6 @@
     top: 185px;
     width: 100%;
     height: 35px;
-}
-
-#songlist {
-    top: 220px;
-    background-color: #222222FF;
-    width: 100%;
-    height: 100%;
-    overflow: scroll;
 }
 
 .headedge {
