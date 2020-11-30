@@ -18,17 +18,23 @@ typedef struct _eh_list_t
 
   view_t* vscr;
   view_t* hscr;
+  view_t* vscrc;
+  view_t* hscrc;
 
-  view_t* (*row_generator)(view_t* listview, view_t* rowview, int index); /* event handler for view */
+  uint32_t vtimeout;
+  uint32_t htimeout;
+
+  view_t* (*row_generator)(view_t* listview, view_t* rowview, int index, int* count); /* event handler for view */
 } eh_list_t;
 
-void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t* rowview, int index));
+void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t* rowview, int index, int* count));
 void eh_list_fill(view_t* view);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "eh_anim.c"
 #include "mtcstring.c"
 #include "mtstring.c"
 #include "tg_css.c"
@@ -47,8 +53,15 @@ void eh_list_move(view_t* view, float dy)
     frame.y += dy;
     view_set_frame(sview, frame);
   }
-  view_set_frame(eh->vscr, (r2_t){view->frame.local.w - 20.0, 0.0, 20.0, 20.0});
-  view_set_frame(eh->hscr, (r2_t){0, view->frame.local.h - 20.0, 20.0, 20.0});
+
+  float hratio = (float)(eh->tail_index - eh->head_index) / (float)eh->count;
+  float pratio = (float)(eh->tail_index) / (float)(eh->count - (eh->tail_index - eh->head_index));
+  if (hratio < 0.1) hratio = 0.1;
+  float h = view->frame.local.h * hratio;
+  float p = (view->frame.local.h - h) * pratio;
+
+  view_set_frame(eh->vscr, (r2_t){view->frame.local.w - 10.0, p, 10.0, h});
+  /* view_set_frame(eh->hscr, (r2_t){0, view->frame.local.h - 10.0, 50.0, 10.0}); */
 }
 
 void eh_list_evt(view_t* view, ev_t ev)
@@ -62,7 +75,7 @@ void eh_list_evt(view_t* view, ev_t ev)
       if (eh->items->length == 0)
       {
         view_t* cacheitem = mtvec_head(eh->cache);
-        view_t* rowitem   = (*eh->row_generator)(view, cacheitem, 0);
+        view_t* rowitem   = (*eh->row_generator)(view, cacheitem, 0, &eh->count);
 
         if (rowitem)
         {
@@ -83,7 +96,7 @@ void eh_list_evt(view_t* view, ev_t ev)
         if (head->frame.local.y > 0.0 - PRELOAD_DISTANCE)
         {
           view_t* cacheitem = mtvec_head(eh->cache);
-          view_t* rowitem   = (*eh->row_generator)(view, cacheitem, eh->head_index - 1);
+          view_t* rowitem   = (*eh->row_generator)(view, cacheitem, eh->head_index - 1, &eh->count);
 
           if (rowitem)
           {
@@ -106,7 +119,7 @@ void eh_list_evt(view_t* view, ev_t ev)
         if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h + PRELOAD_DISTANCE)
         {
           view_t* cacheitem = mtvec_head(eh->cache);
-          view_t* rowitem   = (*eh->row_generator)(view, cacheitem, eh->tail_index + 1);
+          view_t* rowitem   = (*eh->row_generator)(view, cacheitem, eh->tail_index + 1, &eh->count);
 
           if (rowitem)
           {
@@ -162,11 +175,41 @@ void eh_list_evt(view_t* view, ev_t ev)
       else if (head->frame.local.y < -0.0001 && tail->frame.local.y + tail->frame.local.h < view->frame.local.h)
         eh_list_move(view, (view->frame.local.h - tail->frame.local.h - tail->frame.local.y) / 5.0);
     }
+    // close scrollbar
+    if (eh->vtimeout > 0 && eh->vtimeout < ev.time)
+    {
+      eh->vtimeout = 0;
+
+      r2_t sf = eh->vscr->frame.local;
+      sf.x    = 0;
+      sf.y    = 0;
+      r2_t ef = sf;
+      ef.y    = ef.h / 2.0;
+      ef.h    = 0.0;
+
+      eh_anim_set(eh->vscrc, sf, ef, 10, AT_LINEAR);
+    }
   }
   else if (ev.type == EV_SCROLL)
   {
     eh_list_move(view, ev.dy);
     eh->filled = 0;
+
+    if (eh->vtimeout == 0)
+    {
+      eh->vtimeout = ev.time + 1000;
+
+      r2_t ef = eh->vscr->frame.local;
+      ef.x    = 0;
+      ef.y    = 0;
+      r2_t sf = ef;
+      sf.y    = sf.h / 2.0;
+      sf.h    = 0.0;
+
+      eh_anim_set(eh->vscrc, sf, ef, 10, AT_LINEAR);
+    }
+    else
+      eh->vtimeout = ev.time + 1000;
   }
   else if (ev.type == EV_RESIZE)
   {
@@ -186,27 +229,45 @@ void eh_list_fill(view_t* view)
   eh->filled    = 0;
 }
 
-void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t* rowview, int index))
+void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t* rowview, int index, int* count))
 {
   eh_list_t* eh     = mtmem_calloc(sizeof(eh_list_t), "eh_list", eh_list_del, NULL);
   eh->items         = VNEW();
   eh->cache         = VNEW();
   eh->row_generator = row_generator;
 
-  view_t* vscr = view_new("vscr", (r2_t){0, 0, 20, 20});
-  view_t* hscr = view_new("hscr", (r2_t){0, 20, 20, 20});
+  view_t* vscr = view_new("vscr", (r2_t){0, 0, 10, 50});
+  view_t* hscr = view_new("hscr", (r2_t){0, 10, 50, 10});
 
-  tg_css_add(vscr);
-  tg_css_add(hscr);
+  view_t* vscrc = view_new("vscrc", (r2_t){0, 0, 10, 0});
+  view_t* hscrc = view_new("hscrc", (r2_t){0, 10, 0, 10});
 
-  vscr->layout.background_color = 0x000000FF;
-  hscr->layout.background_color = 0x000000FF;
+  //tg_css_add(vscr);
+  //tg_css_add(hscr);
+  tg_css_add(vscrc);
+  tg_css_add(hscrc);
+
+  eh_anim_add(vscrc);
+  eh_anim_add(hscrc);
+
+  //vscr->layout.background_color  = 0x000000FF;
+  //hscr->layout.background_color  = 0x000000FF;
+  vscr->hidden = 1;
+  hscr->hidden = 1;
+
+  vscrc->layout.background_color = 0x000000AA;
+  hscrc->layout.background_color = 0x000000AA;
+
+  view_add(vscr, vscrc);
+  view_add(hscr, hscrc);
 
   view_add(view, vscr);
   view_add(view, hscr);
 
-  eh->vscr = vscr;
-  eh->hscr = hscr;
+  eh->vscr  = vscr;
+  eh->hscr  = hscr;
+  eh->vscrc = vscrc;
+  eh->hscrc = hscrc;
 
   view->needs_scroll = 1;
   view->evt_han_data = eh;

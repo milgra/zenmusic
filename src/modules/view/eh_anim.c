@@ -22,7 +22,8 @@ typedef struct _eh_anim_t
   int        steps;
 } eh_anim_t;
 
-void eh_anim_add(view_t* view, r2_t sf, r2_t ef, int steps, animtype_t type);
+void eh_anim_set(view_t* view, r2_t sf, r2_t ef, int steps, animtype_t type);
+void eh_anim_add(view_t* view);
 
 #endif
 
@@ -68,15 +69,20 @@ void eh_anim_evt(view_t* view, ev_t ev)
   }
 }
 
-void eh_anim_add(view_t* view, r2_t sf, r2_t ef, int steps, animtype_t type)
+void eh_anim_set(view_t* view, r2_t sf, r2_t ef, int steps, animtype_t type)
 {
-  eh_anim_t* eh = mtmem_calloc(sizeof(eh_anim_t), "eh_anim", NULL, NULL);
+  eh_anim_t* eh = view->evt_han_data;
   eh->sf        = sf;
   eh->cf        = sf;
   eh->ef        = ef;
   eh->step      = 0;
   eh->type      = type;
   eh->steps     = steps;
+}
+
+void eh_anim_add(view_t* view)
+{
+  eh_anim_t* eh = mtmem_calloc(sizeof(eh_anim_t), "eh_anim", NULL, NULL);
 
   view->evt_han      = eh_anim_evt;
   view->evt_han_data = eh;

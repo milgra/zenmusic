@@ -60,7 +60,8 @@ void eh_text_evt(view_t* view, ev_t ev)
     ef.x += 10.0;
     ef.w = 20.0;
 
-    eh_anim_add(glyphview, sf, ef, 10, AT_LINEAR);
+    eh_anim_add(glyphview);
+    eh_anim_set(glyphview, sf, ef, 10, AT_LINEAR);
   }
   else if (ev.type == EV_KDOWN)
   {

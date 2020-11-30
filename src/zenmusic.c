@@ -158,7 +158,7 @@ int comp_artist(void* left, void* right)
   return strcmp(la, ra);
 }
 
-view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index)
+view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index, int* count)
 {
   if (index < 0)
     return NULL; // no items over 0
@@ -166,6 +166,8 @@ view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index)
     return NULL;
   if (rowview == NULL)
     rowview = songitem_new();
+
+  *count = sorted->length;
 
   songitem_update(rowview, index, sorted->data[index], songitem_event);
   return rowview;

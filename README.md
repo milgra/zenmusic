@@ -13,9 +13,8 @@ hook clang-format and gmake to file save hook
 
 ---
 
-mem management
 search/filter bar - genre is metal, name contains x, year between x and y
-finalize scrollbar
+mem management
 finalize text
 spectrum, bar analyzer, left/right eff button
 
