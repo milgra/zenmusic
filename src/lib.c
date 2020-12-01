@@ -64,7 +64,8 @@ void lib_remove_duplicates(mtmap_t* db)
   if (lock_db) return;
 
   // go through db paths
-  mtvec_t* paths = mtmap_keys(db);
+  mtvec_t* paths = VNEW();
+  mtmap_keys(db, paths);
   for (int index = 0; index < paths->length; index++)
   {
     char*    path = paths->data[index];
@@ -78,7 +79,8 @@ void lib_remove_duplicates(mtmap_t* db)
   }
 
   // go through lib paths
-  paths = mtmap_keys(lib_db);
+  mtvec_reset(paths);
+  mtmap_keys(lib_db, paths);
   for (int index = 0; index < paths->length; index++)
   {
     char*    path = paths->data[index];
@@ -135,7 +137,9 @@ void lib_analyze(mtch_t* channel)
   if (lock_db) return;
 
   lock_db = 1;
-  rem_db  = mtmap_keys(lib_db);
+
+  rem_db = VNEW();
+  mtmap_keys(lib_db, rem_db);
 
   SDL_CreateThread(analyzer_thread, "analyzer", channel);
 }

@@ -44,6 +44,7 @@ glFragaCoord ?
 volume fade in/out, cover arton is
 donate button /donate popup after 100 startups
 resync library button
+replace stb image with ffmpeg
 
 zen media :
 space start media

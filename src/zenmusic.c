@@ -44,7 +44,9 @@ uint32_t song_recv_time = 0;
 
 mtvec_t* files;
 mtmap_t* db;
-mtvec_t* sorted;
+mtvec_t* vec_srt;
+mtvec_t* vec_hlp1; // helper vector for speeding up ops by avoiding memory allocation
+mtvec_t* vec_hlp2;
 mtch_t*  libch;
 
 void songitem_event(view_t* view, void* data)
@@ -52,7 +54,7 @@ void songitem_event(view_t* view, void* data)
   lastindex = (size_t)data;
   // printf("songitem event %i %i %s\n", ev.type, index, (char*)files->data[index]);
 
-  mtmap_t* songmap = sorted->data[lastindex];
+  mtmap_t* songmap = vec_srt->data[lastindex];
 
   view_t* song = view_get_subview(baseview, "song");
   tg_text_add(song, 0x00000000, 0x000000FF, (char*)MGET(songmap, "title"), 0);
@@ -109,7 +111,7 @@ void prev_button_pushed(view_t* view, void* data)
   lastindex = lastindex - 1;
   if (lastindex < 0) lastindex = 0;
 
-  mtmap_t* songmap = sorted->data[lastindex];
+  mtmap_t* songmap = vec_srt->data[lastindex];
 
   view_t* song = view_get_subview(baseview, "song");
   tg_text_add(song, 0x00000000, 0x000000FF, (char*)MGET(songmap, "title"), 0);
@@ -120,9 +122,9 @@ void prev_button_pushed(view_t* view, void* data)
 void next_button_pushed(view_t* view, void* data)
 {
   lastindex = lastindex + 1;
-  if (lastindex == sorted->length) lastindex = files->length - 1;
+  if (lastindex == vec_srt->length) lastindex = files->length - 1;
 
-  mtmap_t* songmap = sorted->data[lastindex];
+  mtmap_t* songmap = vec_srt->data[lastindex];
 
   view_t* song = view_get_subview(baseview, "song");
   tg_text_add(song, 0x00000000, 0x000000FF, (char*)MGET(songmap, "title"), 0);
@@ -132,9 +134,9 @@ void next_button_pushed(view_t* view, void* data)
 
 void rand_button_pushed(view_t* view, void* data)
 {
-  lastindex = rand() % sorted->length;
+  lastindex = rand() % vec_srt->length;
 
-  mtmap_t* songmap = sorted->data[lastindex];
+  mtmap_t* songmap = vec_srt->data[lastindex];
 
   view_t* song = view_get_subview(baseview, "song");
   tg_text_add(song, 0x00000000, 0x000000FF, (char*)MGET(songmap, "title"), 0);
@@ -146,11 +148,6 @@ void loop_button_pushed(view_t* view, void* data)
 {
   printf("LOOP\n");
   loop_all = !loop_all;
-}
-
-void search_text(view_t* view, mtstr_t* text)
-{
-  printf("SEARCH TEXT\n");
 }
 
 int comp_artist(void* left, void* right)
@@ -168,24 +165,51 @@ view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index, in
 {
   if (index < 0)
     return NULL; // no items over 0
-  if (index >= sorted->length)
+  if (index >= vec_srt->length)
     return NULL;
   if (rowview == NULL)
     rowview = songitem_new();
 
-  *count = sorted->length;
+  *count = vec_srt->length;
 
-  songitem_update(rowview, index, sorted->data[index], songitem_event);
+  songitem_update(rowview, index, vec_srt->data[index], songitem_event);
   return rowview;
+}
+
+void search_text(view_t* view, mtstr_t* text)
+{
+  printf("SEARCH TEXT\n");
+
+  char* word = mtstr_bytes(text);
+  mtvec_reset(vec_hlp1);
+  mtvec_reset(vec_hlp2);
+  mtvec_reset(vec_srt);
+  mtmap_values(db, vec_hlp1);
+  for (int index = 0; index < vec_hlp1->length; index++)
+  {
+    mtmap_t* entry = vec_hlp1->data[index];
+    mtmap_values(entry, vec_hlp2);
+    for (int vi = 0; vi < vec_hlp2->length; vi++)
+    {
+      char* val = vec_hlp2->data[vi];
+      if (strstr(val, word))
+      {
+        mtvec_add(vec_srt, entry);
+        break;
+      }
+    }
+  }
+  mtvec_sort(vec_srt, comp_artist);
+  eh_list_fill(songlist);
 }
 
 void sort()
 {
-  if (sorted) REL(sorted);
-  sorted = mtmap_values(db);
-  mtvec_sort(sorted, comp_artist);
+  mtvec_reset(vec_srt);
+  mtmap_values(db, vec_srt);
+  mtvec_sort(vec_srt, comp_artist);
   eh_list_fill(songlist);
-  printf("COUNT %i\n", sorted->length);
+  printf("COUNT %i\n", vec_srt->length);
 }
 
 void init(int width, int height)
@@ -265,6 +289,10 @@ void init(int width, int height)
 
   db    = MNEW();
   libch = mtch_new(100);
+
+  vec_srt  = VNEW();
+  vec_hlp1 = VNEW();
+  vec_hlp2 = VNEW();
 
   // read db
   db_read(db);

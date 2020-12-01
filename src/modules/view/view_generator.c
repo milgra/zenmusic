@@ -17,7 +17,8 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath, char* respath);
 
 void view_gen_apply_style(view_t* view, mtmap_t* style, char* respath)
 {
-  mtvec_t* keys = mtmap_keys(style);
+  mtvec_t* keys = VNEW();
+  mtmap_keys(style, keys);
   for (int index = 0; index < keys->length; index++)
   {
     char* key = keys->data[index];

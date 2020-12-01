@@ -57,15 +57,17 @@ void db_read(mtmap_t* db)
 
 void db_write(mtmap_t* db)
 {
-  mtvec_t* vals = mtmap_values(db);
+  mtvec_t* vals = VNEW();
+  mtmap_values(db, vals);
 
   FILE* f = fopen("zenmusic", "w");
 
   for (int index = 0; index < vals->length; index++)
   {
     mtmap_t* entry = vals->data[index];
-    mtvec_t* keys  = mtmap_keys(entry);
-    char*    key;
+    mtvec_t* keys  = VNEW();
+    mtmap_keys(entry, keys);
+    char* key;
     while ((key = VNXT(keys)))
     {
       char* val = MGET(entry, key);

@@ -40,8 +40,8 @@ void     mtmap_reset(mtmap_t* map);
 int      mtmap_put(mtmap_t* map, const char* key, void* value);
 void*    mtmap_get(mtmap_t* map, const char* key);
 void     mtmap_del(mtmap_t* map, const char* key);
-mtvec_t* mtmap_keys(mtmap_t* map);
-mtvec_t* mtmap_values(mtmap_t* map);
+void     mtmap_keys(mtmap_t* map, mtvec_t* res);
+void     mtmap_values(mtmap_t* map, mtvec_t* res);
 void     mtmap_printkeys(mtmap_t* map);
 void     mtmap_describe(void* p, int level);
 
@@ -138,7 +138,8 @@ void mtmap_resize(mtmap_t* map)
 
   // put old values in new map
 
-  mtvec_t* oldkeys = mtmap_keys(map);
+  mtvec_t* oldkeys = VNEW();
+  mtmap_keys(map, oldkeys);
   for (uint32_t index = 0; index < oldkeys->length; index++)
   {
     char* key   = oldkeys->data[index];
@@ -338,15 +339,12 @@ void mtmap_del(mtmap_t* map, const char* key)
 
 /* returns all keys in map */
 
-mtvec_t* mtmap_keys(mtmap_t* map)
+void mtmap_keys(mtmap_t* map, mtvec_t* result)
 {
-  mtvec_t* result = mtvec_alloc();
-
   unsigned int index, bindex;
   bucket_t*    bucket;
   pair_t*      pair;
 
-  if (map == NULL) return NULL;
   bucket = map->buckets;
   index  = 0;
   while (index < map->count_real)
@@ -362,20 +360,16 @@ mtvec_t* mtmap_keys(mtmap_t* map)
     bucket++;
     index++;
   }
-  return result;
 }
 
 /* returns all values in map */
 
-mtvec_t* mtmap_values(mtmap_t* map)
+void mtmap_values(mtmap_t* map, mtvec_t* result)
 {
-  mtvec_t* result = mtvec_alloc();
-
   unsigned int index, bindex;
   bucket_t*    bucket;
   pair_t*      pair;
 
-  if (map == NULL) return NULL;
   bucket = map->buckets;
   index  = 0;
   while (index < map->count_real)
@@ -391,14 +385,14 @@ mtvec_t* mtmap_values(mtmap_t* map)
     bucket++;
     index++;
   }
-  return result;
 }
 
 /* prints keys */
 
 void mtmap_printkeys(mtmap_t* map)
 {
-  mtvec_t* keys = mtmap_keys(map);
+  mtvec_t* keys = VNEW();
+  mtmap_keys(map, keys);
   printf(" \n");
   for (int index = 0; index < keys->length; index++)
     printf(" %s", (char*)keys->data[index]);
@@ -407,7 +401,8 @@ void mtmap_printkeys(mtmap_t* map)
 void mtmap_describe(void* p, int level)
 {
   mtmap_t* map  = p;
-  mtvec_t* keys = mtmap_keys(map);
+  mtvec_t* keys = VNEW();
+  mtmap_keys(map, keys);
   printf("{");
   for (int index = 0; index < keys->length; index++)
   {
