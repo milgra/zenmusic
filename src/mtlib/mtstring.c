@@ -13,9 +13,9 @@
 typedef struct _mtstr_t mtstr_t;
 struct _mtstr_t
 {
-  uint32_t  length;
-  uint32_t  length_real;
-  uint32_t  length_bytes;
+  uint32_t  length;       // current length of codepoint array
+  uint32_t  length_real;  // backing length of codepoint array
+  uint32_t  length_bytes; // needed length of byte array for all codepoints
   uint32_t* codepoints;
 };
 

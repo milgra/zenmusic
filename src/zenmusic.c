@@ -12,6 +12,7 @@
 #include "mtmap.c"
 #include "player.c"
 #include "songitem.c"
+#include "tg_css.c"
 #include "tg_knob.c"
 #include "tg_text.c"
 #include "ui_manager.c"
@@ -147,6 +148,11 @@ void loop_button_pushed(view_t* view, void* data)
   loop_all = !loop_all;
 }
 
+void search_text(view_t* view, mtstr_t* text)
+{
+  printf("SEARCH TEXT\n");
+}
+
 int comp_artist(void* left, void* right)
 {
   mtmap_t* l = left;
@@ -217,8 +223,9 @@ void init(int width, int height)
   view_t* songlistheader = view_get_subview(baseview, "songlistheader");
 
   view_t* filterbar = view_get_subview(baseview, "filterbar");
-  tg_text_add(filterbar, 0xFFFFFFFF, 0x000000FF, "Search/Filter", 1);
-  eh_text_add(filterbar, "placeholder");
+  tg_css_add(filterbar);
+  filterbar->layout.background_color = 0xEFEFEFFF;
+  eh_text_add(filterbar, "Search/Filter (x)", search_text);
 
   view_t* headeritem = songitem_new();
   //songitem_update(headeritem, -1, "Artist", NULL);

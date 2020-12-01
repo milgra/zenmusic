@@ -27,17 +27,17 @@ view_t* songitem_new()
 
   snprintf(idbuffer, 100, "index_item%i", songitem_index);
   view_t* indexview = view_new(idbuffer, (r2_t){0, 0, 80, 35});
-  tg_text_add(indexview, 0xFFFFFFFF, 0x000000FF, "0", 1);
+  tg_text_add(indexview, 0xEFEFEFFF, 0x000000FF, "index", 1);
   indexview->needs_touch = 0;
 
   snprintf(idbuffer, 100, "name_item%i", songitem_index);
   view_t* nameview = view_new(idbuffer, (r2_t){80, 0, 500, 35});
-  tg_text_add(nameview, 0xFFFFFFFF, 0x000000FF, "0", 0);
+  tg_text_add(nameview, 0xEFEFEFFF, 0x000000FF, "name", 0);
   nameview->needs_touch = 0;
 
   snprintf(idbuffer, 100, "type_item%i", songitem_index);
   view_t* typeview = view_new(idbuffer, (r2_t){580, 0, 1000, 35});
-  tg_text_add(typeview, 0xFFFFFFFF, 0x000000FF, "0", 1);
+  tg_text_add(typeview, 0xEFEFEFFF, 0x000000FF, "type", 1);
   typeview->needs_touch = 0;
 
   view_add(rowview, indexview);
