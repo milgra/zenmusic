@@ -29,7 +29,11 @@ typedef struct _eh_text_t
 void eh_text_evt(view_t* view, ev_t ev)
 {
   eh_text_t* data = view->evt_han_data;
-  if (ev.type == EV_TEXT)
+  if (ev.type == EV_MMOVE)
+  {
+    // activate text field, add cursor
+  }
+  else if (ev.type == EV_TEXT)
   {
 
     mtstr_addbytearray(data->text, ev.text);

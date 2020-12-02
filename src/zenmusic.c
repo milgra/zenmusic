@@ -176,20 +176,26 @@ view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index, in
   return rowview;
 }
 
-void search_text(view_t* view, mtstr_t* text)
+void filter(view_t* view, mtstr_t* text)
 {
-  printf("SEARCH TEXT\n");
-
+  int   ei, vi; // entry, value index
   char* word = mtstr_bytes(text);
+
   mtvec_reset(vec_hlp1);
-  mtvec_reset(vec_hlp2);
   mtvec_reset(vec_srt);
   mtmap_values(db, vec_hlp1);
-  for (int index = 0; index < vec_hlp1->length; index++)
+
+  for (ei = 0;
+       ei < vec_hlp1->length;
+       ei++)
   {
-    mtmap_t* entry = vec_hlp1->data[index];
+    mtmap_t* entry = vec_hlp1->data[ei];
+    mtvec_reset(vec_hlp2);
     mtmap_values(entry, vec_hlp2);
-    for (int vi = 0; vi < vec_hlp2->length; vi++)
+
+    for (vi = 0;
+         vi < vec_hlp2->length;
+         vi++)
     {
       char* val = vec_hlp2->data[vi];
       if (strstr(val, word))
@@ -249,7 +255,8 @@ void init(int width, int height)
   view_t* filterbar = view_get_subview(baseview, "filterbar");
   tg_css_add(filterbar);
   filterbar->layout.background_color = 0xEFEFEFFF;
-  eh_text_add(filterbar, "Search/Filter (x)", search_text);
+  eh_text_add(filterbar, "", filter);
+  //eh_text_add(filterbar, "Search/Filter (x)", filter);
 
   view_t* headeritem = songitem_new();
   //songitem_update(headeritem, -1, "Artist", NULL);
