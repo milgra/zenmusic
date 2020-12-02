@@ -45,8 +45,6 @@ uint32_t song_recv_time = 0;
 mtvec_t* files;
 mtmap_t* db;
 mtvec_t* vec_srt;
-mtvec_t* vec_hlp1; // helper vector for speeding up ops by avoiding memory allocation
-mtvec_t* vec_hlp2;
 mtch_t*  libch;
 
 void songitem_event(view_t* view, void* data)
@@ -150,17 +148,6 @@ void loop_button_pushed(view_t* view, void* data)
   loop_all = !loop_all;
 }
 
-int comp_artist(void* left, void* right)
-{
-  mtmap_t* l = left;
-  mtmap_t* r = right;
-
-  char* la = MGET(l, "artist");
-  char* ra = MGET(r, "artist");
-
-  return strcmp(la, ra);
-}
-
 view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index, int* count)
 {
   if (index < 0)
@@ -178,44 +165,16 @@ view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index, in
 
 void filter(view_t* view, mtstr_t* text)
 {
-  int   ei, vi; // entry, value index
   char* word = mtstr_bytes(text);
-
-  mtvec_reset(vec_hlp1);
-  mtvec_reset(vec_srt);
-  mtmap_values(db, vec_hlp1);
-
-  for (ei = 0;
-       ei < vec_hlp1->length;
-       ei++)
-  {
-    mtmap_t* entry = vec_hlp1->data[ei];
-    mtvec_reset(vec_hlp2);
-    mtmap_values(entry, vec_hlp2);
-
-    for (vi = 0;
-         vi < vec_hlp2->length;
-         vi++)
-    {
-      char* val = vec_hlp2->data[vi];
-      if (strstr(val, word))
-      {
-        mtvec_add(vec_srt, entry);
-        break;
-      }
-    }
-  }
-  mtvec_sort(vec_srt, comp_artist);
+  db_filter(db, word, vec_srt);
+  REL(word);
   eh_list_fill(songlist);
 }
 
 void sort()
 {
-  mtvec_reset(vec_srt);
-  mtmap_values(db, vec_srt);
-  mtvec_sort(vec_srt, comp_artist);
+  db_sort(db, vec_srt);
   eh_list_fill(songlist);
-  printf("COUNT %i\n", vec_srt->length);
 }
 
 void init(int width, int height)
@@ -297,9 +256,7 @@ void init(int width, int height)
   db    = MNEW();
   libch = mtch_new(100);
 
-  vec_srt  = VNEW();
-  vec_hlp1 = VNEW();
-  vec_hlp2 = VNEW();
+  vec_srt = VNEW();
 
   // read db
   db_read(db);

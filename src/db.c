@@ -5,6 +5,8 @@
 
 void db_read(mtmap_t* db);
 void db_write(mtmap_t* db);
+void db_sort(mtmap_t* db, mtvec_t* vec);
+void db_filter(mtmap_t* db, char* text, mtvec_t* vec);
 
 #endif
 
@@ -82,6 +84,63 @@ void db_write(mtmap_t* db)
   REL(vals);
 
   printf("LOG db saved");
+}
+
+int db_comp_artist(void* left, void* right)
+{
+  mtmap_t* l = left;
+  mtmap_t* r = right;
+
+  char* la = MGET(l, "artist");
+  char* ra = MGET(r, "artist");
+
+  return strcmp(la, ra);
+}
+
+mtvec_t* vec1 = NULL;
+mtvec_t* vec2 = NULL;
+
+void db_filter(mtmap_t* db, char* text, mtvec_t* res)
+{
+  int ei, vi; // entry, value index
+
+  if (!vec1) vec1 = VNEW();
+  if (!vec2) vec2 = VNEW();
+
+  mtvec_reset(res);
+  mtvec_reset(vec1);
+  mtvec_reset(vec2);
+
+  mtmap_values(db, vec1);
+
+  for (ei = 0;
+       ei < vec1->length;
+       ei++)
+  {
+    mtmap_t* entry = vec1->data[ei];
+    mtvec_reset(vec2);
+    mtmap_values(entry, vec2);
+
+    for (vi = 0;
+         vi < vec2->length;
+         vi++)
+    {
+      char* val = vec2->data[vi];
+      if (strstr(val, text))
+      {
+        mtvec_add(res, entry);
+        break;
+      }
+    }
+  }
+  mtvec_sort(res, db_comp_artist);
+}
+
+void db_sort(mtmap_t* db, mtvec_t* vec)
+{
+  mtvec_reset(vec);
+  mtmap_values(db, vec);
+  mtvec_sort(vec, db_comp_artist);
 }
 
 #endif

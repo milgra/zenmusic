@@ -18,6 +18,7 @@ mem management
 finalize text
 spectrum, bar analyzer, left/right eff button
 
+added-last played-play count
 analyzer progresst mutassa valahol amig zenet hallgatsz
 fix freq analyzer on aacs
 config file - library path, visu state,
