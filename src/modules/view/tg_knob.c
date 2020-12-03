@@ -35,15 +35,29 @@ void tg_knob_gen(view_t* view)
       mtgraphics_circle(tg->back,
                         (view->frame.local.w - 1.0) / 2.0,
                         (view->frame.local.h - 1.0) / 2.0,
-                        (view->frame.local.w / 2.0 - 2.0),
-                        1.0,
-                        0x999999FF);
+                        (view->frame.local.w / 2.0),
+                        5.0,
+                        0x00000044);
+
+      mtgraphics_circle(tg->back,
+                        (view->frame.local.w - 1.0) / 2.0,
+                        (view->frame.local.h - 1.0) / 2.0,
+                        (view->frame.local.w / 2.0 - 5.0),
+                        2.0,
+                        0xFF0000FF);
 
       mtgraphics_circle(tg->fore,
                         (view->frame.local.w - 1.0) / 2.0,
                         (view->frame.local.h - 1.0) / 2.0,
                         30.0,
-                        1.0,
+                        4.0,
+                        0x00000044);
+
+      mtgraphics_circle(tg->fore,
+                        (view->frame.local.w - 1.0) / 2.0,
+                        (view->frame.local.h - 1.0) / 2.0,
+                        26.0,
+                        2.0,
                         0x666666FF);
 
       view_set_texture_bmp(view, bmp);

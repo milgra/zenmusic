@@ -23,18 +23,27 @@ void mtgraphics_circle(bm_t* bitmap, float cx, float cy, float r, float edge, ui
   {
     for (int y = 0; y < bitmap->h; y++)
     {
-      float   dx = cx - (float)x;
-      float   dy = cy - (float)y;
-      float   d  = sqrt(dx * dx + dy * dy);
-      uint8_t a  = 255;
-      if (d < m + edge)
+      int r = (c >> 24) & 0xFF;
+      int g = (c >> 16) & 0xFF;
+      int b = (c >> 8) & 0xFF;
+      int a = (c >> 0) & 0xFF;
+
+      float    dx = cx - (float)x;
+      float    dy = cy - (float)y;
+      float    d  = sqrt(dx * dx + dy * dy);
+      float    sa = (float)(c & 0xFF) / 255.0;
+      uint8_t  ra = a;
+      uint32_t fi = 0;
+      if (d < m)
       {
-        if (d > m)
+        if (d > m - edge)
         {
-          float delta = m + edge - d;
-          a           = (uint8_t)(delta / edge * 255.0);
+          float delta = m - d; // (edge - (d - (m - edge)));
+          float ratio = delta / edge;
+          ra          = (uint8_t)(ratio * sa * 255.0);
         }
-        bm_fill(bitmap, x, y, x + 1, y + 1, (c & 0xFFFFFF00) | a);
+        fi = (r << 24) | (g << 16) | (b << 8) | ra;
+        bm_blend_pixel(bitmap, x, y, fi);
       }
     }
   }

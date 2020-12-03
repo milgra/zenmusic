@@ -25,6 +25,7 @@ void  bm_del(void* bm);
 void  bm_reset(bm_t* bm);
 void  bm_insert(bm_t* the_base, bm_t* bm, int the_x, int the_y);
 void  bm_insert_blend(bm_t* the_base, bm_t* bm, int the_x, int the_y);
+void  bm_blend_pixel(bm_t* bm, int x, int y, uint32_t color);
 void  bm_describe(void* p, int level);
 
 #endif
@@ -152,6 +153,42 @@ bm_t* bm_fill(bm_t*    bm,
   return bm;
 }
 
+void bm_blend_pixel(bm_t* bm, int x, int y, uint32_t color)
+{
+  if (x > bm->w) return;
+  if (y > bm->h) return;
+
+  uint8_t* data = bm->data;
+  int      i    = (y * bm->w + x) * 4;
+
+  int dr = data[i];
+  int dg = data[i + 1];
+  int db = data[i + 2];
+  int da = data[i + 3];
+
+  int sr = (color >> 24) & 0xFF;
+  int sg = (color >> 16) & 0xFF;
+  int sb = (color >> 8) & 0xFF;
+  int sa = color & 0xFF;
+
+  int a = sa + da * (255 - sa) / 255;
+  int r = (sr * sa / 255 + dr * da / 255 * (255 - sa) / 255);
+  int g = (sg * sa / 255 + dg * da / 255 * (255 - sa) / 255);
+  int b = (sb * sa / 255 + db * da / 255 * (255 - sa) / 255);
+
+  if (a > 0)
+  {
+    r = r * 255 / a;
+    g = g * 255 / a;
+    b = b * 255 / a;
+  }
+
+  data[i]     = (uint8_t)(r & 0xFF);
+  data[i + 1] = (uint8_t)(g & 0xFF);
+  data[i + 2] = (uint8_t)(b & 0xFF);
+  data[i + 3] = (uint8_t)(a & 0xFF);
+}
+
 void bm_insert(bm_t* base, bm_t* src, int sx, int sy)
 {
   if (sx < 0) sx = 0;
@@ -175,7 +212,6 @@ void bm_insert(bm_t* base, bm_t* src, int sx, int sy)
 
 void bm_insert_blend(bm_t* base, bm_t* src, int sx, int sy)
 {
-
   int bx = sx + src->w;
   if (bx > base->w) bx = base->w;
   int by = sy + src->h;
