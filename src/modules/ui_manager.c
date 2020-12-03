@@ -58,6 +58,17 @@ void ui_manager_event(ev_t ev)
   {
     if (ev.type == EV_MMOVE)
     {
+      // send mouse move event to previous queue to detect move out
+      for (int i = queue->length - 1; i > -1; i--)
+      {
+        view_t* v = queue->data[i];
+        if (v->needs_touch)
+        {
+          if (v->evt_han) (*v->evt_han)(v, ev);
+          break;
+        }
+      }
+
       mtvec_reset(queue);
       view_coll_touched(root, ev, queue);
     }

@@ -15,6 +15,7 @@ void eh_text_add(view_t* view, char* text, void (*ontext)(view_t* view, mtstr_t*
 #include "eh_anim.c"
 #include "mtcstring.c"
 #include "mtvector.c"
+#include "tg_css.c"
 #include "tg_text.c"
 
 typedef struct _eh_text_t
@@ -23,6 +24,8 @@ typedef struct _eh_text_t
   mtvec_t* paragraphs; // a paragraph contains multiple glyph views or one big pre-rendered paragraph view
   mtvec_t* glyphs;
   mtvec_t* animators;
+  char     editing;
+  view_t*  crsr;
   void (*ontext)(view_t* view, mtstr_t* text);
 } eh_text_t;
 
@@ -32,6 +35,34 @@ void eh_text_evt(view_t* view, ev_t ev)
   if (ev.type == EV_MMOVE)
   {
     // activate text field, add cursor
+    if (ev.x < view->frame.global.x + view->frame.global.w &&
+        ev.x > view->frame.global.x &&
+        ev.y < view->frame.global.y + view->frame.global.h &&
+        ev.y > view->frame.global.y)
+    {
+      if (!data->editing)
+      {
+        data->editing = 1;
+
+        r2_t sf = data->crsr->frame.local;
+        r2_t ef = sf;
+        ef.y    = 2.0;
+        ef.h    = 20.0;
+
+        eh_anim_set(data->crsr, sf, ef, 10, AT_LINEAR);
+      }
+    }
+    else
+    {
+      data->editing = 0;
+
+      r2_t sf = data->crsr->frame.local;
+      r2_t ef = sf;
+      ef.y    = 12.0;
+      ef.h    = 0.0;
+
+      eh_anim_set(data->crsr, sf, ef, 10, AT_LINEAR);
+    }
   }
   else if (ev.type == EV_TEXT)
   {
@@ -101,6 +132,17 @@ void eh_text_add(view_t* view, char* text, void (*ontext)(view_t* view, mtstr_t*
   view->evt_han       = eh_text_evt;
   view->evt_han_data  = data;
   view->texture.state = TS_BLANK;
+
+  // add cursor
+
+  view_t* crsr = view_new("crsr", (r2_t){50, 12, 2, 0});
+
+  crsr->layout.background_color = 0x000000FF;
+  tg_css_add(crsr);
+  eh_anim_add(crsr);
+  view_add(view, crsr);
+
+  data->crsr = crsr;
 
   // generate text
   for (int index = 0; index < data->text->length; index++)
