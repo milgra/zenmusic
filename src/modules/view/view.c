@@ -61,6 +61,10 @@ struct _vlayout_t
   int         border_radius;
   uint32_t    background_color;
   char*       background_image;
+  int         shadow_h;
+  int         shadow_w;
+  int         shadow_blur;
+  int         shadow_color;
 };
 
 typedef enum _texst_t // texture loading state
@@ -92,7 +96,6 @@ typedef struct _texture_t
 
   char full;
   char blur;
-  char shadow;
 } texture_t;
 
 typedef struct _frame_t

@@ -188,11 +188,18 @@
     bottom: 25px;
 }
 
-#video {
+#visuvideo {
     width: 200px;
     height: 200px;
     border-radius: 15px;
     bottom: 0px;
+    background-color: #000000FF;
+}
+
+#video {
+    width: 180px;
+    height: 180px;
+    border-radius: 15px;
 }
 
 #footer {

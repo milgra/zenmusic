@@ -167,11 +167,10 @@ void view_gen_apply_style(view_t* view, mtmap_t* style, char* respath)
     {
       if (strstr(val, "px") != NULL)
       {
-        char* end    = strstr(val, "px");
-        int   len    = end - val;
-        end[len - 1] = '\0';
-        // if value is 0 we have to make layouter know that it is an explicit 0 so all values are increased by 1
-        int pix                    = atoi(val) + 1;
+        char* end                  = strstr(val, "px");
+        int   len                  = end - val;
+        end[len - 1]               = '\0';
+        int pix                    = atoi(val);
         view->layout.border_radius = pix;
       }
     }

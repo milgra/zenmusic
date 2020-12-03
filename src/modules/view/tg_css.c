@@ -54,15 +54,17 @@ void tg_css_gen(view_t* view)
       snprintf(idbuffer, 20, "color %i %i", view->layout.background_color, view->layout.border_radius);
 
       bm_t* bmp = bm_new(view->frame.local.w, view->frame.local.h);
+      //bm_fill(bmp, 0, 0, bmp->w, bmp->h, 0x00000044);
 
-      if (view->layout.border_radius == 1)
+      if (view->layout.border_radius == 0)
       {
         bm_fill(bmp,
                 0,
                 0,
                 view->frame.local.w,
-                view->frame.local.h,
+                view->frame.local.h - 6.0,
                 view->layout.background_color);
+        mtgraphics_grad_v(bmp, 0, bmp->h - 6.0, bmp->w, 6.0, 0x00000033, 0);
       }
       else
       {
@@ -72,7 +74,9 @@ void tg_css_gen(view_t* view)
                                 view->frame.local.w,
                                 view->frame.local.h,
                                 view->layout.border_radius - 1,
-                                view->layout.background_color);
+                                6.0,
+                                view->layout.background_color,
+                                0x00000033);
       }
 
       view_set_texture_bmp(view, bmp);

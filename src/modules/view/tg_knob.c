@@ -32,19 +32,32 @@ void tg_knob_gen(view_t* view)
       tg->back  = bm_new(view->frame.local.w, view->frame.local.h);
       tg->fore  = bm_new(view->frame.local.w, view->frame.local.h);
 
-      mtgraphics_circle(tg->back,
-                        (view->frame.local.w - 1.0) / 2.0,
-                        (view->frame.local.h - 1.0) / 2.0,
-                        (view->frame.local.w / 2.0),
-                        5.0,
-                        0x00000044);
+      mtgraphics_arc_grad(tg->back,
+                          (view->frame.local.w - 1.0) / 2.0,
+                          (view->frame.local.h - 1.0) / 2.0,
+                          (view->frame.local.w / 2.0) - 7.0,
+                          (view->frame.local.w / 2.0),
+                          0,
+                          3.14 * 2,
+                          0x00000044,
+                          0);
 
-      mtgraphics_circle(tg->back,
-                        (view->frame.local.w - 1.0) / 2.0,
-                        (view->frame.local.h - 1.0) / 2.0,
-                        (view->frame.local.w / 2.0 - 5.0),
-                        2.0,
-                        0xFF0000FF);
+      mtgraphics_arc_grad(tg->back,
+                          (view->frame.local.w - 1.0) / 2.0,
+                          (view->frame.local.h - 1.0) / 2.0,
+                          0,
+                          (view->frame.local.w / 2.0) - 7.0,
+                          0,
+                          3.14 * 2,
+                          0xDEDEDEFF,
+                          0xDEDEDEFF);
+
+      /* mtgraphics_circle(tg->back, */
+      /*                   (view->frame.local.w - 1.0) / 2.0, */
+      /*                   (view->frame.local.h - 1.0) / 2.0, */
+      /*                   (view->frame.local.w / 2.0 - 5.0), */
+      /*                   2.0, */
+      /* 0xFF0000FF); */
 
       mtgraphics_circle(tg->fore,
                         (view->frame.local.w - 1.0) / 2.0,
@@ -88,6 +101,7 @@ void tg_knob_gen(view_t* view)
                      0x000000FF,
                      3.14 * 3 / 2,
                      6.28);
+
       mtgraphics_arc(view->texture.bitmap,
                      (view->frame.local.w - 1.0) / 2.0,
                      (view->frame.local.h - 1.0) / 2.0,

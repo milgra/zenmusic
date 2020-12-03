@@ -82,7 +82,7 @@ void ui_generator_add(view_t* view)
                             view->texture.full,
                             view->texture.page > 0,
                             view->texture.blur,
-                            view->texture.shadow,
+                            view->layout.shadow_blur,
                             view->frame.global.w,
                             view->frame.global.h);
   ui_compositor_upd_frame(view->id,
@@ -157,7 +157,7 @@ void ui_generator_resize(int width, int height)
                               view->texture.full,
                               view->texture.page > 0,
                               view->texture.blur,
-                              view->texture.shadow,
+                              view->layout.shadow_blur,
                               view->frame.global.w,
                               view->frame.global.h);
     ui_compositor_upd_frame(view->id, view->frame.global);
