@@ -13,35 +13,51 @@ hook clang-format and gmake to file save hook
 
 ---
 
-search/filter bar - genre is metal, name contains x, year between x and y
-mem management
-finalize text
-spectrum, bar analyzer, left/right eff button
+first version
 
-added-last played-play count
-analyzer progresst mutassa valahol amig zenet hallgatsz
+video maszkolás, analizátor maszkolás
+display font rendering fix, center
+play-pause ikon, mute-unmute ikon, shuffle ikon egy dobokocka legyen, hover-re animaljon 3-6-2 repeat ikon egy gyurus nyil legyen
+rounded scrollbar
+filter bar font center, fix
+additional columns - genre, last played, added, skipped, play count,
+horizontal scrolling, 
+fix leaks
+elso indulasnal analyzer progresst mutassa valahol amig zenet hallgatsz
 fix freq analyzer on aacs
-config file - library path, visu state,
 unicode support files, metadata!!!
-uj event villanjon fel artist helyen, odakattintva event viewer, 
 tilemap is auto-resize legyen duplazassal
-search bar click hozza elo genre/artist listat
-resize textures on window change if needed
+zold/piros listitem background play/pausre, animalt!!!
+
+---
+
+next version
+
+artis/genre selector popup on filter
+search/filter bar - genre is metal, name contains x, year between x and y
+uj event villanjon fel artist helyen, odakattintva event viewer, 
+spectrum, bar analyzer, left/right effect button, unshift bmp?
+config file - library path, visu state,
+
+---
+
+future features
+
+id3 editor
 unit teszter gl_compositorhoz
 ha az egeret a lista item jobb oldalara viszed popupban mutassa id3/song infokat es album artot
 resizable header/songlist border
-unshift bmp - spectrum analyzer shift left
 grid-based warping of video/album cover based on frequence ( bass in the center )
+
+ideas
+
 ujdonsagok video jojjon fel az events windowban, about
-zold/piros listitem background play/pausre, animalt!!!
 analog mutatos output meterek is visualizacioban
-shuffle ikon egy dobokocka legyen, hover-re animaljon 3-6-2
-repeat ikon egy gyurus nyil legyen
 glossy effekt
 scroll-ra lehessen novelni/csokkenteni visuals meretet
 statisztikak - top 10 leghallgatottabb, milyen genre-t hallgatsz foleg elmult 1 honap, stb
 cortex as visualizer - level gen based on freq, LEFT/DOWN!!!
-glFragaCoord ?
+glFragaCoord? glScissor optimized render
 volume fade in/out, cover arton is
 donate button /donate popup after 100 startups
 resync library button
@@ -51,6 +67,7 @@ zen media :
 space start media
 info/hex tab
 binary files shows up immediately as hex in media viewer
+clipboard rect - drag multiple files, preview those files
 
 optimize :
 only update vertexes when frame change
