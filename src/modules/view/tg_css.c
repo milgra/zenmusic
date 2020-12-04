@@ -62,9 +62,9 @@ void tg_css_gen(view_t* view)
                 0,
                 0,
                 view->frame.local.w,
-                view->frame.local.h - 6.0,
+                view->frame.local.h - 4.0,
                 view->layout.background_color);
-        mtgraphics_grad_v(bmp, 0, bmp->h - 6.0, bmp->w, 6.0, 0x00000033, 0);
+        mtgraphics_grad_v(bmp, 0, bmp->h - 4.0, bmp->w, 4.0, 0x00000033, 0);
       }
       else
       {
@@ -74,7 +74,7 @@ void tg_css_gen(view_t* view)
                                 view->frame.local.w,
                                 view->frame.local.h,
                                 view->layout.border_radius - 1,
-                                6.0,
+                                4.0,
                                 view->layout.background_color,
                                 0x00000033);
       }

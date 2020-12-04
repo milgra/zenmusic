@@ -65,6 +65,8 @@ v2_t       v2_triangle_with_bases(v2_t point_a, v2_t point_b, float segmentlengt
 segment2_t v2_collide_and_fragment(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb);
 segment2_t segment2_init(v2_t trans, v2_t basis);
 
+r2_t r2_expand(r2_t rect, float d);
+
 #define kSquareOverlappingNone 0
 #define kSquareOverlappingInside 1
 #define kSquareOverlappingPartial 2
@@ -504,6 +506,16 @@ v2_t v2_triangle_with_bases(v2_t   point_a,
   else
     vector = v2_add(point_a, vector);
   return vector;
+}
+
+r2_t r2_expand(r2_t rect, float d)
+{
+  rect.x -= d;
+  rect.y -= d;
+  rect.w += d;
+  rect.h += d;
+
+  return rect;
 }
 
 segment2_t

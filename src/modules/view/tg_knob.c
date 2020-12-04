@@ -35,7 +35,7 @@ void tg_knob_gen(view_t* view)
       mtgraphics_arc_grad(tg->back,
                           (view->frame.local.w - 1.0) / 2.0,
                           (view->frame.local.h - 1.0) / 2.0,
-                          (view->frame.local.w / 2.0) - 7.0,
+                          (view->frame.local.w / 2.0) - 4.0,
                           (view->frame.local.w / 2.0),
                           0,
                           3.14 * 2,
@@ -46,32 +46,31 @@ void tg_knob_gen(view_t* view)
                           (view->frame.local.w - 1.0) / 2.0,
                           (view->frame.local.h - 1.0) / 2.0,
                           0,
-                          (view->frame.local.w / 2.0) - 7.0,
+                          (view->frame.local.w / 2.0) - 3.0,
                           0,
                           3.14 * 2,
-                          0xDEDEDEFF,
-                          0xDEDEDEFF);
+                          0xEEEEEEFF,
+                          0xEEEEEEFF);
 
-      /* mtgraphics_circle(tg->back, */
-      /*                   (view->frame.local.w - 1.0) / 2.0, */
-      /*                   (view->frame.local.h - 1.0) / 2.0, */
-      /*                   (view->frame.local.w / 2.0 - 5.0), */
-      /*                   2.0, */
-      /* 0xFF0000FF); */
+      mtgraphics_arc_grad(tg->fore,
+                          (view->frame.local.w - 1.0) / 2.0,
+                          (view->frame.local.h - 1.0) / 2.0,
+                          26.0,
+                          30.0,
+                          0,
+                          3.14 * 2,
+                          0x00000044,
+                          0);
 
-      mtgraphics_circle(tg->fore,
-                        (view->frame.local.w - 1.0) / 2.0,
-                        (view->frame.local.h - 1.0) / 2.0,
-                        30.0,
-                        4.0,
-                        0x00000044);
-
-      mtgraphics_circle(tg->fore,
-                        (view->frame.local.w - 1.0) / 2.0,
-                        (view->frame.local.h - 1.0) / 2.0,
-                        26.0,
-                        2.0,
-                        0x666666FF);
+      mtgraphics_arc_grad(tg->fore,
+                          (view->frame.local.w - 1.0) / 2.0,
+                          (view->frame.local.h - 1.0) / 2.0,
+                          0,
+                          27.0,
+                          0,
+                          3.14 * 2,
+                          0xDDDDDDFF,
+                          0xDDDDDDFF);
 
       view_set_texture_bmp(view, bmp);
     }

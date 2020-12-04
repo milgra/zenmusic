@@ -82,11 +82,11 @@ void ui_generator_add(view_t* view)
                             view->texture.full,
                             view->texture.page > 0,
                             view->texture.blur,
-                            view->layout.shadow_blur,
                             view->frame.global.w,
                             view->frame.global.h);
   ui_compositor_upd_frame(view->id,
-                          view->frame.global);
+                          view->frame.global,
+                          view->layout.shadow_blur);
 
   if (view->texture.state == TS_READY)
     ui_compositor_upd_bitmap(view->texture.id,
@@ -111,7 +111,8 @@ void ui_generator_render()
     if (view->frame.changed)
     {
       ui_compositor_upd_frame(view->id,
-                              view->frame.global);
+                              view->frame.global,
+                              view->layout.shadow_blur);
 
       view->frame.changed = 0;
     }
@@ -157,10 +158,11 @@ void ui_generator_resize(int width, int height)
                               view->texture.full,
                               view->texture.page > 0,
                               view->texture.blur,
-                              view->layout.shadow_blur,
                               view->frame.global.w,
                               view->frame.global.h);
-    ui_compositor_upd_frame(view->id, view->frame.global);
+    ui_compositor_upd_frame(view->id,
+                            view->frame.global,
+                            view->layout.shadow_blur);
     if (view->texture.state == TS_READY)
       ui_compositor_upd_bitmap(view->texture.id,
                                view->texture.bitmap);

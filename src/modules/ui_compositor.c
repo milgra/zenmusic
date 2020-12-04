@@ -26,9 +26,9 @@ void ui_compositor_add(char*    rectid,
                        char*    texid,
                        uint32_t index);
 void ui_compositor_rem(char* rectid);
-void ui_compositor_upd_texture(char* id, int page, int full, int ext, int blur, int shadow, int w, int h);
+void ui_compositor_upd_texture(char* id, int page, int full, int ext, int blur, int w, int h);
 void ui_compositor_upd_bitmap(char* texid, bm_t* tex);
-void ui_compositor_upd_frame(char* rectid, r2_t frame);
+void ui_compositor_upd_frame(char* rectid, r2_t frame, float border);
 void ui_compositor_upd_index(char* rectid, int index);
 
 #endif
@@ -154,7 +154,7 @@ void ui_compositor_rem(char* id)
   }
 }
 
-void ui_compositor_upd_texture(char* id, int page, int full, int ext, int blur, int shadow, int w, int h)
+void ui_compositor_upd_texture(char* id, int page, int full, int ext, int blur, int w, int h)
 {
   // printf("ui_compositor_upd_texture %s %i\n", id, page);
   crect_t* rect = mtmap_get(uic.rects_m, id);
@@ -162,7 +162,6 @@ void ui_compositor_upd_texture(char* id, int page, int full, int ext, int blur, 
   if (rect)
   {
     crect_set_blur(rect, blur);
-    crect_set_shadow(rect, shadow);
 
     // TODO set this in individual function
     if (full)
@@ -184,12 +183,13 @@ void ui_compositor_upd_texture(char* id, int page, int full, int ext, int blur, 
   }
 }
 
-void ui_compositor_upd_frame(char* rectid, r2_t frame)
+void ui_compositor_upd_frame(char* rectid, r2_t frame, float border)
 {
   crect_t* rect = mtmap_get(uic.rects_m, rectid);
 
   if (rect)
   {
+    if (border > 0.0) frame = r2_expand(frame, border);
     crect_set_frame(rect, frame);
     uic.upd_geo = 1;
   }

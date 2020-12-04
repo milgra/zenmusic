@@ -64,7 +64,6 @@
     width: 500px;
     height: 100%;
     display: none;
-    background-color: #0000FF0A;
 }
 
 .stretch {
@@ -80,7 +79,7 @@
     left: 20px;
     top: 60px;    
     border-radius: 8px;
-    background-color: #ACACACFF;
+    background-color: #EEEEEEFF;
 }
 
 #nextbtn {
@@ -89,7 +88,7 @@
     left: 72px;
     top: 60px;    
     border-radius: 8px;
-    background-color: #ACACACFF;
+    background-color: #EEEEEEFF;
 }
 
 #randbtn {
@@ -98,7 +97,7 @@
     right: 72px;
     top: 60px;    
     border-radius: 8px;
-    background-color: #ACACACFF;
+    background-color: #EEEEEEFF;
 }
 #loopbtn {
     width: 50px;
@@ -106,7 +105,7 @@
     right: 20px;
     top: 60px;    
     border-radius: 8px;
-    background-color: #ACACACFF;
+    background-color: #EEEEEEFF;
 }
 
 #playbtn {
@@ -140,9 +139,9 @@
     background-color: #DFFFFFFF;
 }
 
-#artist {
+#artista {
     width: 90%;
-    height: 30px;
+    height: 20px;
     background-color: #DFFFFFFF;
 }
 
@@ -186,6 +185,7 @@
     border-radius: 15px;
     left: 10px;
     bottom: 25px;
+    box-shadow: 10px #00000033;
 }
 
 #visuvideo {
