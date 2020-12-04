@@ -512,8 +512,8 @@ r2_t r2_expand(r2_t rect, float d)
 {
   rect.x -= d;
   rect.y -= d;
-  rect.w += d;
-  rect.h += d;
+  rect.w += 2 * d;
+  rect.h += 2 * d;
 
   return rect;
 }

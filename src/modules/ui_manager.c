@@ -48,8 +48,8 @@ void ui_manager_event(ev_t ev)
     view_set_frame(root, (r2_t){0.0, 0.0, (float)ev.w, (float)ev.h});
     ui_generator_resize(ev.w, ev.h);
     view_layout(root);
-    //printf("\nAFTER RESIZE");
-    //view_desc(root, 0);
+    /* printf("\nAFTER RESIZE"); */
+    /* view_desc(root, 0); */
     view_evt(root, ev);
   }
   else if (ev.type == EV_MMOVE ||

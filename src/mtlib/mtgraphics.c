@@ -266,17 +266,20 @@ void mtgraphics_grad_v(bm_t* bm, int sx, int sy, int w, int h, uint32_t c1, uint
 
 void mtgraphics_rounded_rect(bm_t* bitmap, int x, int y, int w, int h, int r, float edge, uint32_t c1, uint32_t c2)
 {
-  int e = (int)edge;
+  float e = edge;
 
-  mtgraphics_arc_grad(bitmap, x + r, y + r, r - edge, r, 3.14, 3.14 * 3 / 2.0, c2, c2 & 0xFFFFFF00);
-  mtgraphics_arc_grad(bitmap, x + w - r - 1, y + r, r - edge, r, 3.14 * 3 / 2.0, 3.14 * 2, c2, c2 & 0xFFFFFF00);
-  mtgraphics_arc_grad(bitmap, x + r, y + h - r - 1, r - edge, r, 3.14 / 2.0, 3.14, c2, c2 & 0xFFFFFF00);
-  mtgraphics_arc_grad(bitmap, x + w - r - 1, y + h - r - 1, r - edge, r, 0, 3.14 / 2.0, c2, c2 & 0xFFFFFF00);
+  if (r > 0)
+  {
+    mtgraphics_arc_grad(bitmap, x + r, y + r, r - e, r, 3.14, 3.14 * 3 / 2.0, c2, c2 & 0xFFFFFF00);
+    mtgraphics_arc_grad(bitmap, x + w - r - 1, y + r, r - e, r, 3.14 * 3 / 2.0, 3.14 * 2, c2, c2 & 0xFFFFFF00);
+    mtgraphics_arc_grad(bitmap, x + r, y + h - r - 1, r - e, r, 3.14 / 2.0, 3.14, c2, c2 & 0xFFFFFF00);
+    mtgraphics_arc_grad(bitmap, x + w - r - 1, y + h - r - 1, r - e, r, 0, 3.14 / 2.0, c2, c2 & 0xFFFFFF00);
 
-  mtgraphics_arc_grad(bitmap, x + r, y + r, 0, r - edge + 1, 3.14, 3.14 * 3 / 2.0, c1, c1);
-  mtgraphics_arc_grad(bitmap, x + w - r - 1, y + r, 0, r - edge + 1, 3.14 * 3 / 2.0, 3.14 * 2, c1, c1);
-  mtgraphics_arc_grad(bitmap, x + r, y + h - r - 1, 0, r - edge + 1, 3.14 / 2.0, 3.14, c1, c1);
-  mtgraphics_arc_grad(bitmap, x + w - r - 1, y + h - r - 1, 0, r - edge + 1, 0, 3.14 / 2.0, c1, c1);
+    mtgraphics_arc_grad(bitmap, x + r, y + r, 0, r - e + 1, 3.14, 3.14 * 3 / 2.0, c1, c1);
+    mtgraphics_arc_grad(bitmap, x + w - r - 1, y + r, 0, r - e + 1, 3.14 * 3 / 2.0, 3.14 * 2, c1, c1);
+    mtgraphics_arc_grad(bitmap, x + r, y + h - r - 1, 0, r - e + 1, 3.14 / 2.0, 3.14, c1, c1);
+    mtgraphics_arc_grad(bitmap, x + w - r - 1, y + h - r - 1, 0, r - e + 1, 0, 3.14 / 2.0, c1, c1);
+  }
 
   mtgraphics_grad_h(bitmap, x, y + r, e, h - r - r, c2 & 0xFFFFFF00, c2);             // left vertical grad
   mtgraphics_grad_h(bitmap, x + w - e, y + r, e - 1, h - r - r, c2, c2 & 0xFFFFFF00); // right vertical grad

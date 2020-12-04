@@ -35,7 +35,7 @@ void tg_knob_gen(view_t* view)
       mtgraphics_arc_grad(tg->back,
                           (view->frame.local.w - 1.0) / 2.0,
                           (view->frame.local.h - 1.0) / 2.0,
-                          (view->frame.local.w / 2.0) - 4.0,
+                          (view->frame.local.w / 2.0) - 3.0,
                           (view->frame.local.w / 2.0),
                           0,
                           3.14 * 2,
@@ -46,16 +46,23 @@ void tg_knob_gen(view_t* view)
                           (view->frame.local.w - 1.0) / 2.0,
                           (view->frame.local.h - 1.0) / 2.0,
                           0,
-                          (view->frame.local.w / 2.0) - 3.0,
+                          (view->frame.local.w / 2.0) - 2.0,
                           0,
                           3.14 * 2,
                           0xEEEEEEFF,
                           0xEEEEEEFF);
 
+      bm_fill(tg->back,
+              (view->frame.local.w - 1.0) / 2.0,
+              3.0,
+              (view->frame.local.w - 1.0) / 2.0 + 2.0,
+              (view->frame.local.h - 1.0) / 2.0 - 28.0,
+              0xAAAAAA33);
+
       mtgraphics_arc_grad(tg->fore,
                           (view->frame.local.w - 1.0) / 2.0,
                           (view->frame.local.h - 1.0) / 2.0,
-                          26.0,
+                          27.0,
                           30.0,
                           0,
                           3.14 * 2,
@@ -66,7 +73,7 @@ void tg_knob_gen(view_t* view)
                           (view->frame.local.w - 1.0) / 2.0,
                           (view->frame.local.h - 1.0) / 2.0,
                           0,
-                          27.0,
+                          28.0,
                           0,
                           3.14 * 2,
                           0xDDDDDDFF,
@@ -86,7 +93,7 @@ void tg_knob_gen(view_t* view)
                      (view->frame.local.h - 1.0) / 2.0,
                      (view->frame.local.w / 2.0 - 2.0),
                      1.0,
-                     0x000000FF,
+                     0x999999FF,
                      3.14 * 3 / 2,
                      tg->angle);
     }
@@ -97,7 +104,7 @@ void tg_knob_gen(view_t* view)
                      (view->frame.local.h - 1.0) / 2.0,
                      (view->frame.local.w / 2.0 - 2.0),
                      1.0,
-                     0x000000FF,
+                     0x999999FF,
                      3.14 * 3 / 2,
                      6.28);
 
@@ -106,17 +113,10 @@ void tg_knob_gen(view_t* view)
                      (view->frame.local.h - 1.0) / 2.0,
                      (view->frame.local.w / 2.0 - 2.0),
                      1.0,
-                     0x000000FF,
+                     0x999999FF,
                      0,
                      tg->angle);
     }
-
-    mtgraphics_circle(view->texture.bitmap,
-                      (view->frame.local.w - 1.0) / 2.0 + 39 * cos(tg->angle),
-                      (view->frame.local.h - 1.0) / 2.0 + 39 * sin(tg->angle),
-                      7.0,
-                      1.0,
-                      0xABABABFF);
 
     bm_insert_blend(view->texture.bitmap, tg->fore, 0, 0);
     view->texture.changed = 1;

@@ -174,6 +174,17 @@ void view_gen_apply_style(view_t* view, mtmap_t* style, char* respath)
         view->layout.border_radius = pix;
       }
     }
+    else if (strcmp(key, "box-shadow") == 0)
+    {
+      if (strstr(val, "px") != NULL)
+      {
+        char* end                = strstr(val, "px");
+        int   len                = end - val;
+        end[len - 1]             = '\0';
+        int pix                  = atoi(val);
+        view->layout.shadow_blur = pix;
+      }
+    }
     else if (strcmp(key, "align-items") == 0)
     {
       if (strcmp(val, "center") == 0)
