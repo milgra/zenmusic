@@ -15,10 +15,8 @@ hook clang-format and gmake to file save hook
 
 first version
 
-video maszkolás, analizátor maszkolás
 display font rendering fix, center
 play-pause ikon, mute-unmute ikon, shuffle ikon egy dobokocka legyen, hover-re animaljon 3-6-2 repeat ikon egy gyurus nyil legyen
-rounded scrollbar
 filter bar font center, fix
 additional columns - genre, last played, added, skipped, play count,
 horizontal scrolling, 

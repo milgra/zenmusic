@@ -60,8 +60,8 @@ void eh_list_move(view_t* view, float dy)
   float h = view->frame.local.h * hratio;
   float p = (view->frame.local.h - h) * pratio;
 
-  view_set_frame(eh->vscr, (r2_t){view->frame.local.w - 10.0, p, 10.0, h});
-  /* view_set_frame(eh->hscr, (r2_t){0, view->frame.local.h - 10.0, 50.0, 10.0}); */
+  view_set_frame(eh->vscr, (r2_t){view->frame.local.w - 16.0, p, 15.0, h});
+  view_set_frame(eh->hscr, (r2_t){0, view->frame.local.h - 10.0, 50.0, 10.0});
 }
 
 void eh_list_evt(view_t* view, ev_t ev)
@@ -243,7 +243,7 @@ void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t
   view_t* hscrc = view_new("hscrc", (r2_t){0, 10, 0, 10});
 
   //tg_css_add(vscr);
-  //tg_css_add(hscr);
+  tg_css_add(hscr);
   tg_css_add(vscrc);
   tg_css_add(hscrc);
 
@@ -251,11 +251,14 @@ void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t
   eh_anim_add(hscrc);
 
   //vscr->layout.background_color  = 0x000000FF;
-  //hscr->layout.background_color  = 0x000000FF;
-  vscr->hidden = 1;
-  hscr->hidden = 1;
+  hscr->layout.background_color = 0x000000FF;
+  vscr->hidden                  = 1;
+  hscr->hidden                  = 1;
 
   vscrc->layout.background_color = 0x000000AA;
+  vscrc->layout.border_radius    = 10;
+  vscrc->layout.shadow_blur      = 3;
+
   hscrc->layout.background_color = 0x000000AA;
 
   view_add(vscr, vscrc);

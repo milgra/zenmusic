@@ -72,11 +72,6 @@ void tg_css_gen(view_t* view)
       view_set_texture_bmp(view, bmp);
     }
   }
-  else
-  {
-    // request regeneration after we have real size
-    view->texture.state = TS_BLANK;
-  }
 }
 
 void tg_css_add(view_t* view)
