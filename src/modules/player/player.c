@@ -24,6 +24,7 @@ void player_draw_video(bm_t* bm);
 void player_draw_video_to_texture(int index, int w, int h);
 void player_draw_waves(int channel, bm_t* bm);
 void player_draw_rdft(int index, int channel, bm_t* bm);
+void player_refresh();
 
 bm_t* player_get_album(const char* path);
 void  player_get_metadata(const char* path, mtmap_t* map);
@@ -123,13 +124,23 @@ void player_set_volume(float ratio)
   is->audio_volume = (int)((float)SDL_MIX_MAXVOLUME * ratio);
 }
 
+void player_refresh()
+{
+  if (is != NULL)
+  {
+    if (is->show_mode != SHOW_MODE_NONE && (!is->paused || is->force_refresh))
+    {
+      video_refresh(is, &remaining_time, 0);
+    }
+  }
+}
+
 void player_draw_video_to_texture(int index, int w, int h)
 {
   if (is != NULL)
   {
     if (is->show_mode != SHOW_MODE_NONE && (!is->paused || is->force_refresh))
     {
-      video_refresh(is, &remaining_time, index);
       video_show(is, index, w, h, NULL);
     }
   }

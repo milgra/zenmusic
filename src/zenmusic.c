@@ -278,6 +278,8 @@ void init(int width, int height)
 void update(ev_t ev)
 {
   // update time, knobs and visualizer
+  player_refresh();
+
   double time = player_time();
   if (time > 0.0)
   {
