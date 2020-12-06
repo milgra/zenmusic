@@ -4,7 +4,6 @@
 #include "eh_knob.c"
 #include "eh_list.c"
 #include "eh_text.c"
-#include "eh_video.c"
 #include "font.c"
 #include "lib.c"
 #include "mtchannel.c"
@@ -201,9 +200,6 @@ void init(int width, int height)
   songlist = view_get_subview(baseview, "songlist");
   eh_list_add(songlist, songlist_item_generator);
 
-  view_t* video = view_get_subview(baseview, "video");
-  eh_video_add(video);
-
   timeview = view_get_subview(baseview, "time");
   tg_text_add(timeview, 0x00000000, 0x000000FF, "00:00", 0);
 
@@ -302,12 +298,13 @@ void update(ev_t ev)
     }
 
     // update visualizer
-    player_draw_waves(0, visuleft->texture.bitmap);
-    player_draw_waves(1, visuright->texture.bitmap);
+    player_draw_waves(0, visuleft->texture.bitmap, 3);
+    player_draw_waves(1, visuright->texture.bitmap, 3);
     visuleft->texture.changed  = 1;
     visuright->texture.changed = 1;
 
-    //player_draw_video(visuvideo->texture.bitmap);
+    player_draw_video(visuvideo->texture.bitmap, 3);
+    visuvideo->texture.changed = 1;
   }
 
   // get analyzed song entries

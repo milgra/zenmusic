@@ -4,8 +4,8 @@
 
 #include "mtbitmap.c"
 
-void video_show(void* opaque, int index, int w, int h, bm_t* bitmap);
-void render_draw_waves(void* opaque, int index, bm_t* bitmap);
+void video_show(void* opaque, int index, int w, int h, bm_t* bitmap, int edge);
+void render_draw_waves(void* opaque, int index, bm_t* bitmap, int edge);
 void video_refresh(void* opaque, double* remaining_time, int index);
 
 #endif
@@ -151,15 +151,15 @@ void check_external_clock_speed(VideoState* is)
   }
 }
 
-static void video_audio_display(VideoState* s, int index, bm_t* bitmap)
+static void video_audio_display(VideoState* s, int index, bm_t* bitmap, int edge)
 {
   int     i, i_start, x, y1, y2, y, ys, delay, n, nb_display_channels;
   int     ch, channels, h, h2;
   int64_t time_diff;
   int     rdft_bits, nb_freq;
 
-  int width  = bitmap->w;
-  int height = bitmap->h;
+  int width  = bitmap->w - 2 * edge;
+  int height = bitmap->h - 2 * edge;
 
   for (rdft_bits = 1; (1 << rdft_bits) < 2 * height; rdft_bits++)
     ;
@@ -218,7 +218,7 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap)
 
   if (s->show_mode == SHOW_MODE_WAVES)
   {
-    bm_fill_rgb(bitmap, 0, 0, bitmap->w, bitmap->h, 0x000000FF);
+    bm_fill_rgb(bitmap, edge, edge, width, height, 0x000000FF);
 
     /* total height for one channel */
     h = height;
@@ -331,7 +331,7 @@ uint8_t* scaledpixels[1];
 
 static unsigned sws_flags = SWS_BICUBIC;
 
-static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, struct SwsContext** img_convert_ctx, int index, int w, int h, bm_t* bitmap)
+static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, struct SwsContext** img_convert_ctx, int index, int w, int h, bm_t* bitmap, int edge)
 {
   int ret = 0;
 
@@ -361,7 +361,14 @@ static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, stru
               scaledpixels,
               pitch);
 
-    gl_upload_to_texture(index, 0, 0, w, h, scaledpixels[0]);
+    if (bitmap)
+    {
+      bm_insert_rgb(bitmap, scaledpixels[0], w, h, edge, edge);
+    }
+    else
+    {
+      gl_upload_to_texture(index, 0, 0, w, h, scaledpixels[0]);
+    }
   }
   return ret;
 }
@@ -399,7 +406,7 @@ static void calculate_display_rect(SDL_Rect*  rect,
   rect->h = FFMAX((int)height, 1);
 }
 
-static void video_image_display(VideoState* is, int index, int w, int h, bm_t* bitmap)
+static void video_image_display(VideoState* is, int index, int w, int h, bm_t* bitmap, int edge)
 {
   Frame*   vp;
   Frame*   sp = NULL;
@@ -464,7 +471,7 @@ static void video_image_display(VideoState* is, int index, int w, int h, bm_t* b
 
   if (!vp->uploaded)
   {
-    if (upload_texture(&is->vid_texture, vp->frame, rect, &is->img_convert_ctx, index, w, h, bitmap) < 0)
+    if (upload_texture(&is->vid_texture, vp->frame, rect, &is->img_convert_ctx, index, w, h, bitmap, edge) < 0)
       return;
     vp->uploaded = 1;
     vp->flip_v   = vp->frame->linesize[0] < 0;
@@ -521,7 +528,7 @@ static int video_open(VideoState* is)
   return 0;
 }
 
-void video_show(void* opaque, int index, int w, int h, bm_t* bitmap)
+void video_show(void* opaque, int index, int w, int h, bm_t* bitmap, int edge)
 {
   VideoState* is = opaque;
 
@@ -543,12 +550,12 @@ void video_show(void* opaque, int index, int w, int h, bm_t* bitmap)
     /* if (is->audio_st && is->show_mode != SHOW_MODE_VIDEO) */
     //video_audio_display(is, index);
     /* else if (is->video_st) */
-    video_image_display(is, index, w, h, bitmap);
+    video_image_display(is, index, w, h, bitmap, edge);
     //SDL_RenderPresent(renderer);
   }
 }
 
-void render_draw_waves(void* opaque, int index, bm_t* bitmap)
+void render_draw_waves(void* opaque, int index, bm_t* bitmap, int edge)
 {
   VideoState* is = opaque;
 
@@ -558,7 +565,7 @@ void render_draw_waves(void* opaque, int index, bm_t* bitmap)
     //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     //SDL_RenderClear(renderer);
     /* if (is->audio_st && is->show_mode != SHOW_MODE_VIDEO) */
-    video_audio_display(is, index, bitmap);
+    video_audio_display(is, index, bitmap, edge);
     /* else if (is->video_st) */
     //video_image_display(is, index);
     //SDL_RenderPresent(renderer);

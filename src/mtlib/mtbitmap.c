@@ -25,6 +25,7 @@ bm_t* bm_fill_rgb(bm_t* bm, int the_sx, int the_sy, int the_ex, int the_ey, uint
 void  bm_del(void* bm);
 void  bm_reset(bm_t* bm);
 void  bm_insert(bm_t* the_base, bm_t* bm, int the_x, int the_y);
+void  bm_insert_rgb(bm_t* the_base, uint8_t* bm, int w, int h, int the_x, int the_y);
 void  bm_insert_blend(bm_t* the_base, bm_t* bm, int the_x, int the_y);
 void  bm_blend_pixel(bm_t* bm, int x, int y, uint32_t color);
 void  bm_describe(void* p, int level);
@@ -241,6 +242,35 @@ void bm_insert(bm_t* base, bm_t* src, int sx, int sy)
     int bi = (y * base->w + sx) * 4;
     int si = (y - sy) * src->w * 4;
     memcpy(base->data + bi, src->data + si, w * 4);
+  }
+}
+
+// TODO maybe move this function elsewhere
+void bm_insert_rgb(bm_t* base, uint8_t* src, int w, int h, int sx, int sy)
+{
+  int bx = sx + w;
+  if (bx > base->w) bx = base->w;
+  int by = sy + h;
+  if (by > base->h) by = base->h;
+
+  uint8_t* sdata = src;        // src data
+  uint8_t* bdata = base->data; // base data
+
+  for (int y = sy; y < by; y++)
+  {
+    for (int x = sx; x < bx; x++)
+    {
+      int si = ((y - sy) * w + (x - sx)) * 4; // src index
+      int bi = (y * base->w + x) * 4;         // base index
+
+      uint8_t r = sdata[si];
+      uint8_t g = sdata[si + 1];
+      uint8_t b = sdata[si + 2];
+
+      bdata[bi]     = r;
+      bdata[bi + 1] = g;
+      bdata[bi + 2] = b;
+    }
   }
 }
 

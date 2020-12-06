@@ -20,9 +20,9 @@ double player_time();
 double player_volume();
 double player_duration();
 
-void player_draw_video(bm_t* bm);
+void player_draw_video(bm_t* bm, int edge);
 void player_draw_video_to_texture(int index, int w, int h);
-void player_draw_waves(int channel, bm_t* bm);
+void player_draw_waves(int channel, bm_t* bm, int edge);
 void player_draw_rdft(int index, int channel, bm_t* bm);
 void player_refresh();
 
@@ -141,30 +141,29 @@ void player_draw_video_to_texture(int index, int w, int h)
   {
     if (is->show_mode != SHOW_MODE_NONE && (!is->paused || is->force_refresh))
     {
-      video_show(is, index, w, h, NULL);
+      video_show(is, index, w, h, NULL, 0);
     }
   }
 }
 
-void player_draw_video(bm_t* bm)
+void player_draw_video(bm_t* bm, int edge)
 {
   if (is != NULL)
   {
     if (is->show_mode != SHOW_MODE_NONE && (!is->paused || is->force_refresh))
     {
-      video_refresh(is, &remaining_time, 0);
-      video_show(is, 0, bm->w, bm->h, bm);
+      video_show(is, 0, bm->w - 2 * edge, bm->h - 2 * edge, bm, 3);
     }
   }
 }
 
-void player_draw_waves(int channel, bm_t* bm)
+void player_draw_waves(int channel, bm_t* bm, int edge)
 {
   if (is != NULL)
   {
     if (is->show_mode != SHOW_MODE_NONE && (!is->paused || is->force_refresh))
     {
-      render_draw_waves(is, channel, bm);
+      render_draw_waves(is, channel, bm, edge);
     }
   }
 }
