@@ -43,6 +43,7 @@ config file - library path, visu state,
 
 future features
 
+search bar csusszon ki header alol ha songlistheaderre megy az eger
 id3 editor
 unit teszter gl_compositorhoz
 ha az egeret a lista item jobb oldalara viszed popupban mutassa id3/song infokat es album artot

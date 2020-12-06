@@ -213,13 +213,13 @@ void init(int width, int height)
 
   view_t* filterbar = view_get_subview(baseview, "filterbar");
   tg_css_add(filterbar);
-  filterbar->layout.background_color = 0xEFEFEFFF;
+  filterbar->layout.background_color = 0xFFFFFFFF;
   eh_text_add(filterbar, "", filter);
   //eh_text_add(filterbar, "Search/Filter (x)", filter);
 
   view_t* headeritem = songitem_new();
   //songitem_update(headeritem, -1, "Artist", NULL);
-  view_add(songlistheader, headeritem);
+  //view_add(songlistheader, headeritem);
 
   playbtn = view_get_subview(baseview, "playbtn");
   tg_knob_add(playbtn);
@@ -303,6 +303,7 @@ void update(ev_t ev)
     visuleft->texture.changed  = 1;
     visuright->texture.changed = 1;
   }
+
   // get analyzed song entries
   mtmap_t* entry;
   while ((entry = mtch_recv(libch)))

@@ -21,6 +21,7 @@ bm_t* bm_new_from_grayscale(int the_w, int the_h, uint32_t backcolor, uint32_t f
 bm_t* bm_from3(bm_t*    bm,
                uint8_t* src);
 bm_t* bm_fill(bm_t* bm, int the_sx, int the_sy, int the_ex, int the_ey, uint32_t color);
+bm_t* bm_fill_rgb(bm_t* bm, int the_sx, int the_sy, int the_ex, int the_ey, uint32_t color);
 void  bm_del(void* bm);
 void  bm_reset(bm_t* bm);
 void  bm_insert(bm_t* the_base, bm_t* bm, int the_x, int the_y);
@@ -147,6 +148,39 @@ bm_t* bm_fill(bm_t*    bm,
       bm->data[position + 1] = g;
       bm->data[position + 2] = b;
       bm->data[position + 3] = a;
+    }
+  }
+
+  return bm;
+}
+
+bm_t* bm_fill_rgb(bm_t*    bm,
+                  int      sx,
+                  int      sy,
+                  int      ex,
+                  int      ey,
+                  uint32_t color)
+{
+  if (ex < sx) return bm;
+  if (ey < sy) return bm;
+  if (sx < 0) sx = 0;
+  if (sy < 0) sy = 0;
+  if (ex >= bm->w) ex = bm->w;
+  if (ey >= bm->h) ey = bm->h;
+
+  int r = color >> 24 & 0xFF;
+  int g = color >> 16 & 0xFF;
+  int b = color >> 8 & 0xFF;
+
+  for (int y = sy; y < ey; y++)
+  {
+    for (int x = sx; x < ex; x++)
+    {
+      int position = (y * bm->w + x) * 4;
+
+      bm->data[position]     = r;
+      bm->data[position + 1] = g;
+      bm->data[position + 2] = b;
     }
   }
 

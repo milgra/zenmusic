@@ -218,7 +218,7 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap)
 
   if (s->show_mode == SHOW_MODE_WAVES)
   {
-    bm_fill(bitmap, 0, 0, bitmap->w, bitmap->h, 0x000000FF);
+    bm_fill_rgb(bitmap, 0, 0, bitmap->w, bitmap->h, 0x000000FF);
 
     /* total height for one channel */
     h = height;
@@ -245,7 +245,7 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap)
           ys = y1;
           y2 = ys + y;
         }
-        bm_fill(bitmap, s->xleft + x, y2, s->xleft + x + 1, y2 + 2, 0xFFFFFFFF);
+        bm_fill_rgb(bitmap, s->xleft + x, y2, s->xleft + x + 1, y2 + 2, 0xFFFFFFFF);
 
         i += channels;
         if (i >= SAMPLE_ARRAY_SIZE)
