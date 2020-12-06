@@ -33,6 +33,7 @@ view_t* baseview;
 view_t* timeview;
 view_t* visuleft;
 view_t* visuright;
+view_t* visuvideo;
 double  lasttime = 0.0;
 view_t* playbtn;
 view_t* volbtn;
@@ -248,6 +249,7 @@ void init(int width, int height)
 
   visuleft  = view_get_subview(baseview, "visuleft");
   visuright = view_get_subview(baseview, "visuright");
+  visuvideo = view_get_subview(baseview, "visuvideo");
 
   /* view_t* texmapview       = view_new("texmapview", (r2_t){500, 500, 200, 200}); */
   /* texmapview->texture.full = 1; */
@@ -298,10 +300,12 @@ void update(ev_t ev)
     }
 
     // update visualizer
-    player_draw_waves(visuleft->texture.page, 0, visuleft->texture.bitmap);
-    player_draw_waves(visuright->texture.page, 1, visuright->texture.bitmap);
+    player_draw_waves(0, visuleft->texture.bitmap);
+    player_draw_waves(1, visuright->texture.bitmap);
     visuleft->texture.changed  = 1;
     visuright->texture.changed = 1;
+
+    //player_draw_video(visuvideo->texture.bitmap);
   }
 
   // get analyzed song entries

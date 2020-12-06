@@ -20,8 +20,9 @@ double player_time();
 double player_volume();
 double player_duration();
 
-void player_draw_video(int index, int w, int h);
-void player_draw_waves(int index, int channel, bm_t* bm);
+void player_draw_video(bm_t* bm);
+void player_draw_video_to_texture(int index, int w, int h);
+void player_draw_waves(int channel, bm_t* bm);
 void player_draw_rdft(int index, int channel, bm_t* bm);
 
 bm_t* player_get_album(const char* path);
@@ -122,19 +123,31 @@ void player_set_volume(float ratio)
   is->audio_volume = (int)((float)SDL_MIX_MAXVOLUME * ratio);
 }
 
-void player_draw_video(int index, int w, int h)
+void player_draw_video_to_texture(int index, int w, int h)
 {
   if (is != NULL)
   {
     if (is->show_mode != SHOW_MODE_NONE && (!is->paused || is->force_refresh))
     {
       video_refresh(is, &remaining_time, index);
-      video_show(is, index, w, h);
+      video_show(is, index, w, h, NULL);
     }
   }
 }
 
-void player_draw_waves(int index, int channel, bm_t* bm)
+void player_draw_video(bm_t* bm)
+{
+  if (is != NULL)
+  {
+    if (is->show_mode != SHOW_MODE_NONE && (!is->paused || is->force_refresh))
+    {
+      video_refresh(is, &remaining_time, 0);
+      video_show(is, 0, bm->w, bm->h, bm);
+    }
+  }
+}
+
+void player_draw_waves(int channel, bm_t* bm)
 {
   if (is != NULL)
   {

@@ -4,7 +4,7 @@
 
 #include "mtbitmap.c"
 
-void video_show(void* opaque, int index, int w, int h);
+void video_show(void* opaque, int index, int w, int h, bm_t* bitmap);
 void render_draw_waves(void* opaque, int index, bm_t* bitmap);
 void video_refresh(void* opaque, double* remaining_time, int index);
 
@@ -331,7 +331,7 @@ uint8_t* scaledpixels[1];
 
 static unsigned sws_flags = SWS_BICUBIC;
 
-static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, struct SwsContext** img_convert_ctx, int index, int w, int h)
+static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, struct SwsContext** img_convert_ctx, int index, int w, int h, bm_t* bitmap)
 {
   int ret = 0;
 
@@ -399,7 +399,7 @@ static void calculate_display_rect(SDL_Rect*  rect,
   rect->h = FFMAX((int)height, 1);
 }
 
-static void video_image_display(VideoState* is, int index, int w, int h)
+static void video_image_display(VideoState* is, int index, int w, int h, bm_t* bitmap)
 {
   Frame*   vp;
   Frame*   sp = NULL;
@@ -464,7 +464,7 @@ static void video_image_display(VideoState* is, int index, int w, int h)
 
   if (!vp->uploaded)
   {
-    if (upload_texture(&is->vid_texture, vp->frame, rect, &is->img_convert_ctx, index, w, h) < 0)
+    if (upload_texture(&is->vid_texture, vp->frame, rect, &is->img_convert_ctx, index, w, h, bitmap) < 0)
       return;
     vp->uploaded = 1;
     vp->flip_v   = vp->frame->linesize[0] < 0;
@@ -521,7 +521,7 @@ static int video_open(VideoState* is)
   return 0;
 }
 
-void video_show(void* opaque, int index, int w, int h)
+void video_show(void* opaque, int index, int w, int h, bm_t* bitmap)
 {
   VideoState* is = opaque;
 
@@ -543,7 +543,7 @@ void video_show(void* opaque, int index, int w, int h)
     /* if (is->audio_st && is->show_mode != SHOW_MODE_VIDEO) */
     //video_audio_display(is, index);
     /* else if (is->video_st) */
-    video_image_display(is, index, w, h);
+    video_image_display(is, index, w, h, bitmap);
     //SDL_RenderPresent(renderer);
   }
 }

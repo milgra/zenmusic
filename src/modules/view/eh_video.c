@@ -24,7 +24,7 @@ void eh_video_evt(view_t* view, ev_t ev)
   {
     eh_video_t* eh = view->evt_han_data;
 
-    player_draw_video(view->texture.page, (int)view->frame.local.w, (int)view->frame.local.h);
+    player_draw_video_to_texture(view->texture.page, (int)view->frame.local.w, (int)view->frame.local.h);
   }
 }
 
