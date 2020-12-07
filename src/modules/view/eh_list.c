@@ -181,25 +181,21 @@ void eh_list_evt(view_t* view, ev_t ev)
       view_t* head = mtvec_head(eh->items);
       view_t* tail = mtvec_tail(eh->items);
 
+      // horizontal bounce
+
+      if (eh->hpos > 0.0001)
+        eh->hpos += -eh->hpos / 5.0;
+      else if (eh->hpos < -0.0001 && eh->hpos + eh->width < view->frame.local.w)
+        eh->hpos += (view->frame.local.w - eh->width - eh->hpos) / 5.0;
+
       // vertical bounce
 
       if (head->frame.local.y > 0.0001)
         eh_list_move(view, -head->frame.local.y / 5.0);
       else if (head->frame.local.y < -0.0001 && tail->frame.local.y + tail->frame.local.h < view->frame.local.h)
         eh_list_move(view, (view->frame.local.h - tail->frame.local.h - tail->frame.local.y) / 5.0);
-
-      // horizontal bounce
-
-      if (eh->hpos > 0.0001)
-      {
-        eh->hpos += -eh->hpos / 5.0;
+      else if (eh->hpos > 0.0001 || eh->hpos < -0.0001)
         eh_list_move(view, 0);
-      }
-      else if (eh->hpos < -0.0001 && eh->hpos + eh->width < view->frame.local.w)
-      {
-        eh->hpos += (view->frame.local.w - tail->frame.local.w - tail->frame.local.x) / 5.0;
-        eh_list_move(view, 0);
-      }
     }
     // close scrollbars
     if (eh->vtimeout > 0 && eh->vtimeout < ev.time)
@@ -229,6 +225,25 @@ void eh_list_evt(view_t* view, ev_t ev)
   {
     if (eh->items->length > 0)
     {
+      if (ev.dx != 0.0)
+      {
+        eh->hpos += ev.dx;
+
+        if (eh->htimeout == 0)
+        {
+          eh->htimeout = ev.time + 1000;
+
+          r2_t ef = eh->hscr->frame.local;
+          r2_t sf = ef;
+          sf.x    = sf.x + sf.w / 2.0;
+          sf.w    = 0.0;
+
+          eh_anim_set(eh->hscr, sf, ef, 10, AT_LINEAR);
+        }
+        else
+          eh->htimeout = ev.time + 1000;
+      }
+
       if (ev.dy != 0.0)
       {
         eh_list_move(view, ev.dy);
@@ -248,26 +263,8 @@ void eh_list_evt(view_t* view, ev_t ev)
         else
           eh->vtimeout = ev.time + 1000;
       }
-
-      if (ev.dx != 0.0)
-      {
-        eh->hpos += ev.dx;
+      else if (ev.dx != 0)
         eh_list_move(view, 0);
-
-        if (eh->htimeout == 0)
-        {
-          eh->htimeout = ev.time + 1000;
-
-          r2_t ef = eh->hscr->frame.local;
-          r2_t sf = ef;
-          sf.x    = sf.x + sf.w / 2.0;
-          sf.w    = 0.0;
-
-          eh_anim_set(eh->hscr, sf, ef, 10, AT_LINEAR);
-        }
-        else
-          eh->htimeout = ev.time + 1000;
-      }
     }
   }
   else if (ev.type == EV_RESIZE)
