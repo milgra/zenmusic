@@ -18,8 +18,6 @@ typedef struct _eh_list_t
 
   view_t* vscr;
   view_t* hscr;
-  view_t* vscrc;
-  view_t* hscrc;
 
   uint32_t vtimeout;
   uint32_t htimeout;
@@ -181,13 +179,11 @@ void eh_list_evt(view_t* view, ev_t ev)
       eh->vtimeout = 0;
 
       r2_t sf = eh->vscr->frame.local;
-      sf.x    = 0;
-      sf.y    = 0;
       r2_t ef = sf;
-      ef.y    = ef.h / 2.0;
+      ef.y    = ef.y + ef.h / 2.0;
       ef.h    = 0.0;
 
-      eh_anim_set(eh->vscrc, sf, ef, 10, AT_LINEAR);
+      eh_anim_set(eh->vscr, sf, ef, 10, AT_LINEAR);
     }
   }
   else if (ev.type == EV_SCROLL)
@@ -200,13 +196,11 @@ void eh_list_evt(view_t* view, ev_t ev)
       eh->vtimeout = ev.time + 1000;
 
       r2_t ef = eh->vscr->frame.local;
-      ef.x    = 0;
-      ef.y    = 0;
       r2_t sf = ef;
-      sf.y    = sf.h / 2.0;
+      sf.y    = sf.y + sf.h / 2.0;
       sf.h    = 0.0;
 
-      eh_anim_set(eh->vscrc, sf, ef, 10, AT_LINEAR);
+      eh_anim_set(eh->vscr, sf, ef, 10, AT_LINEAR);
     }
     else
       eh->vtimeout = ev.time + 1000;
@@ -229,48 +223,36 @@ void eh_list_fill(view_t* view)
   eh->filled    = 0;
 }
 
-void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t* rowview, int index, int* count))
+void eh_list_add(view_t* view,
+                 view_t* (*row_generator)(view_t* listview, view_t* rowview, int index, int* count))
 {
   eh_list_t* eh     = mtmem_calloc(sizeof(eh_list_t), "eh_list", eh_list_del, NULL);
   eh->items         = VNEW();
   eh->cache         = VNEW();
   eh->row_generator = row_generator;
 
-  view_t* vscr = view_new("vscr", (r2_t){0, 0, 10, 50});
+  view_t* vscr = view_new("vscr", (r2_t){0, 0, 15, 50});
   view_t* hscr = view_new("hscr", (r2_t){0, 10, 50, 10});
 
-  view_t* vscrc = view_new("vscrc", (r2_t){0, 0, 10, 0});
-  view_t* hscrc = view_new("hscrc", (r2_t){0, 10, 0, 10});
-
-  //tg_css_add(vscr);
   tg_css_add(hscr);
-  tg_css_add(vscrc);
-  tg_css_add(hscrc);
+  tg_css_add(vscr);
 
-  eh_anim_add(vscrc);
-  eh_anim_add(hscrc);
+  eh_anim_add(vscr);
+  eh_anim_add(hscr);
 
-  //vscr->layout.background_color  = 0x000000FF;
-  hscr->layout.background_color = 0x000000FF;
-  vscr->hidden                  = 1;
-  hscr->hidden                  = 1;
+  vscr->layout.background_color = 0x000000AA;
+  vscr->layout.border_radius    = 5;
+  //vscr->layout.shadow_blur      = 3;
 
-  vscrc->layout.background_color = 0x000000AA;
-  vscrc->layout.border_radius    = 10;
-  vscrc->layout.shadow_blur      = 3;
-
-  hscrc->layout.background_color = 0x000000AA;
-
-  view_add(vscr, vscrc);
-  view_add(hscr, hscrc);
+  hscr->layout.background_color = 0x000000AA;
+  hscr->layout.border_radius    = 5;
+  //hscr->layout.shadow_blur      = 3;
 
   view_add(view, vscr);
   view_add(view, hscr);
 
-  eh->vscr  = vscr;
-  eh->hscr  = hscr;
-  eh->vscrc = vscrc;
-  eh->hscrc = hscrc;
+  eh->vscr = vscr;
+  eh->hscr = hscr;
 
   view->needs_scroll = 1;
   view->evt_han_data = eh;
