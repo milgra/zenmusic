@@ -70,6 +70,7 @@ void eh_list_move(view_t* view, float dy)
   if (wratio > 1) w = 1;
   float wrat = -eh->hpos / (eh->width - view->frame.global.w);
   p          = (view->frame.local.w - w) * wrat;
+
   view_set_frame(eh->hscr, (r2_t){p, view->frame.local.h - 15.0, w, 15.0});
 }
 
@@ -200,7 +201,7 @@ void eh_list_evt(view_t* view, ev_t ev)
         eh_list_move(view, 0);
       }
     }
-    // close scrollbar
+    // close scrollbars
     if (eh->vtimeout > 0 && eh->vtimeout < ev.time)
     {
       eh->vtimeout = 0;
@@ -211,6 +212,17 @@ void eh_list_evt(view_t* view, ev_t ev)
       ef.h    = 0.0;
 
       eh_anim_set(eh->vscr, sf, ef, 10, AT_LINEAR);
+    }
+    if (eh->htimeout > 0 && eh->htimeout < ev.time)
+    {
+      eh->htimeout = 0;
+
+      r2_t sf = eh->hscr->frame.local;
+      r2_t ef = sf;
+      ef.x    = ef.x + ef.w / 2.0;
+      ef.w    = 0.0;
+
+      eh_anim_set(eh->hscr, sf, ef, 10, AT_LINEAR);
     }
   }
   else if (ev.type == EV_SCROLL)
@@ -241,6 +253,20 @@ void eh_list_evt(view_t* view, ev_t ev)
       {
         eh->hpos += ev.dx;
         eh_list_move(view, 0);
+
+        if (eh->htimeout == 0)
+        {
+          eh->htimeout = ev.time + 1000;
+
+          r2_t ef = eh->hscr->frame.local;
+          r2_t sf = ef;
+          sf.x    = sf.x + sf.w / 2.0;
+          sf.w    = 0.0;
+
+          eh_anim_set(eh->hscr, sf, ef, 10, AT_LINEAR);
+        }
+        else
+          eh->htimeout = ev.time + 1000;
       }
     }
   }
