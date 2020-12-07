@@ -14,7 +14,9 @@ typedef struct _eh_list_t
   int  tail_index;
   char filled;
 
-  int count;
+  int   count;
+  float width;
+  float hpos;
 
   view_t* vscr;
   view_t* hscr;
@@ -48,10 +50,12 @@ void eh_list_move(view_t* view, float dy)
   while ((sview = VNXT(eh->items)))
   {
     r2_t frame = sview->frame.local;
+    frame.x    = eh->hpos;
     frame.y += dy;
     view_set_frame(sview, frame);
   }
 
+  // vertical scroller
   float hratio = (float)(eh->tail_index - eh->head_index) / (float)eh->count;
   float pratio = (float)(eh->tail_index) / (float)(eh->count - (eh->tail_index - eh->head_index));
   if (hratio < 0.1) hratio = 0.1;
@@ -59,7 +63,14 @@ void eh_list_move(view_t* view, float dy)
   float p = (view->frame.local.h - h) * pratio;
 
   view_set_frame(eh->vscr, (r2_t){view->frame.local.w - 16.0, p, 15.0, h});
-  view_set_frame(eh->hscr, (r2_t){0, view->frame.local.h - 10.0, 50.0, 10.0});
+
+  // horizontal scroller
+  float wratio = view->frame.local.w / eh->width;
+  float w      = view->frame.local.w * wratio;
+  if (wratio > 1) w = 1;
+  float wrat = -eh->hpos / (eh->width - view->frame.global.w);
+  p          = (view->frame.local.w - w) * wrat;
+  view_set_frame(eh->hscr, (r2_t){p, view->frame.local.h - 15.0, w, 15.0});
 }
 
 void eh_list_evt(view_t* view, ev_t ev)
@@ -77,6 +88,7 @@ void eh_list_evt(view_t* view, ev_t ev)
 
         if (rowitem)
         {
+          eh->width = rowitem->frame.global.w; // store maximum width
           VREM(eh->cache, rowitem);
           VADD(eh->items, rowitem);
           view_insert(view, rowitem, 0);
@@ -98,7 +110,8 @@ void eh_list_evt(view_t* view, ev_t ev)
 
           if (rowitem)
           {
-            eh->filled = 0; // there is probably more to come
+            eh->filled = 0;                       // there is probably more to come
+            eh->width  = rowitem->frame.global.w; // store maximum width
 
             VREM(eh->cache, rowitem);
             mtvec_addatindex(eh->items, rowitem, 0);
@@ -121,7 +134,8 @@ void eh_list_evt(view_t* view, ev_t ev)
 
           if (rowitem)
           {
-            eh->filled = 0; // there is probably more to come
+            eh->filled = 0;                       // there is probably more to come
+            eh->width  = rowitem->frame.global.w; // store maximum width
 
             VREM(eh->cache, rowitem);
             VADD(eh->items, rowitem);
@@ -166,12 +180,25 @@ void eh_list_evt(view_t* view, ev_t ev)
       view_t* head = mtvec_head(eh->items);
       view_t* tail = mtvec_tail(eh->items);
 
-      // add items if needed
+      // vertical bounce
 
       if (head->frame.local.y > 0.0001)
         eh_list_move(view, -head->frame.local.y / 5.0);
       else if (head->frame.local.y < -0.0001 && tail->frame.local.y + tail->frame.local.h < view->frame.local.h)
         eh_list_move(view, (view->frame.local.h - tail->frame.local.h - tail->frame.local.y) / 5.0);
+
+      // horizontal bounce
+
+      if (eh->hpos > 0.0001)
+      {
+        eh->hpos += -eh->hpos / 5.0;
+        eh_list_move(view, 0);
+      }
+      else if (eh->hpos < -0.0001 && eh->hpos + eh->width < view->frame.local.w)
+      {
+        eh->hpos += (view->frame.local.w - tail->frame.local.w - tail->frame.local.x) / 5.0;
+        eh_list_move(view, 0);
+      }
     }
     // close scrollbar
     if (eh->vtimeout > 0 && eh->vtimeout < ev.time)
@@ -188,22 +215,34 @@ void eh_list_evt(view_t* view, ev_t ev)
   }
   else if (ev.type == EV_SCROLL)
   {
-    eh_list_move(view, ev.dy);
-    eh->filled = 0;
-
-    if (eh->vtimeout == 0)
+    if (eh->items->length > 0)
     {
-      eh->vtimeout = ev.time + 1000;
+      if (ev.dy != 0.0)
+      {
+        eh_list_move(view, ev.dy);
+        eh->filled = 0;
 
-      r2_t ef = eh->vscr->frame.local;
-      r2_t sf = ef;
-      sf.y    = sf.y + sf.h / 2.0;
-      sf.h    = 0.0;
+        if (eh->vtimeout == 0)
+        {
+          eh->vtimeout = ev.time + 1000;
 
-      eh_anim_set(eh->vscr, sf, ef, 10, AT_LINEAR);
+          r2_t ef = eh->vscr->frame.local;
+          r2_t sf = ef;
+          sf.y    = sf.y + sf.h / 2.0;
+          sf.h    = 0.0;
+
+          eh_anim_set(eh->vscr, sf, ef, 10, AT_LINEAR);
+        }
+        else
+          eh->vtimeout = ev.time + 1000;
+      }
+
+      if (ev.dx != 0.0)
+      {
+        eh->hpos += ev.dx;
+        eh_list_move(view, 0);
+      }
     }
-    else
-      eh->vtimeout = ev.time + 1000;
   }
   else if (ev.type == EV_RESIZE)
   {
@@ -241,12 +280,12 @@ void eh_list_add(view_t* view,
   eh_anim_add(hscr);
 
   vscr->layout.background_color = 0x000000AA;
-  vscr->layout.border_radius    = 5;
-  //vscr->layout.shadow_blur      = 3;
+  //vscr->layout.border_radius    = 5;
+  //vscr->layout.shadow_blur = 3;
 
   hscr->layout.background_color = 0x000000AA;
-  hscr->layout.border_radius    = 5;
-  //hscr->layout.shadow_blur      = 3;
+  //hscr->layout.border_radius    = 5;
+  //hscr->layout.shadow_blur = 3;
 
   view_add(view, vscr);
   view_add(view, hscr);
