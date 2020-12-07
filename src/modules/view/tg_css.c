@@ -29,7 +29,8 @@ void tg_css_add(view_t* view);
 
 void tg_css_gen(view_t* view)
 {
-  if (view->frame.local.w > 0 && view->frame.local.h > 0)
+  if (view->frame.local.w >= 1.0 &&
+      view->frame.local.h >= 1.0)
   {
     if (view->layout.background_image)
     {

@@ -15,23 +15,24 @@ hook clang-format and gmake to file save hook
 
 first version
 
+horizontal scrolling
+button icons, rounded triangle, 40x40
 display font rendering fix, center
-play-pause ikon, mute-unmute ikon, shuffle ikon egy dobokocka legyen, hover-re animaljon 3-6-2 repeat ikon egy gyurus nyil legyen
 filter bar font center, fix
+artists/genres button (A, G karika ket oldalon? )
 additional columns - genre, last played, added, skipped, play count,
-horizontal scrolling, 
 fix leaks
 elso indulasnal analyzer progresst mutassa valahol amig zenet hallgatsz
 fix freq analyzer on aacs
 unicode support files, metadata!!!
 tilemap is auto-resize legyen duplazassal
 zold/piros listitem background play/pausre, animalt!!!
+scrollbar drag
 
 ---
 
 next version
 
-artis/genre selector popup on filter
 search/filter bar - genre is metal, name contains x, year between x and y
 uj event villanjon fel artist helyen, odakattintva event viewer, 
 spectrum, bar analyzer, left/right effect button, unshift bmp?

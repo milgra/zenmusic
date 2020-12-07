@@ -264,7 +264,7 @@ void view_set_frame(view_t* view, r2_t frame)
 
   if (view->frame.local.w != frame.w || view->frame.local.h != frame.h)
   {
-    if (frame.w > 0.0 && frame.h > 0.0)
+    if (frame.w >= 1.0 && frame.h >= 1.0)
     {
       if (view->texture.type == TT_MANAGED) view->texture.state = TS_BLANK;
     }

@@ -46,7 +46,7 @@ void eh_text_evt(view_t* view, ev_t ev)
 
         r2_t sf = data->crsr->frame.local;
         r2_t ef = sf;
-        ef.y    = 2.0;
+        ef.y    = 8.0;
         ef.h    = 20.0;
 
         eh_anim_set(data->crsr, sf, ef, 10, AT_LINEAR);
@@ -58,7 +58,7 @@ void eh_text_evt(view_t* view, ev_t ev)
 
       r2_t sf = data->crsr->frame.local;
       r2_t ef = sf;
-      ef.y    = 12.0;
+      ef.y    = 18.0;
       ef.h    = 0.0;
 
       eh_anim_set(data->crsr, sf, ef, 10, AT_LINEAR);
