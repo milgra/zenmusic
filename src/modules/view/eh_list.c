@@ -10,13 +10,15 @@ typedef struct _eh_list_t
   mtvec_t* items;
   mtvec_t* cache;
 
-  int  head_index;
-  int  tail_index;
-  char filled;
+  int head_index;
+  int tail_index;
+  int item_count;
+  int full;
 
-  int   count;
-  float width;
-  float hpos;
+  float item_wth;
+  float item_pos;
+
+  // scrollers
 
   view_t* vscr;
   view_t* hscr;
@@ -24,10 +26,10 @@ typedef struct _eh_list_t
   uint32_t vtimeout;
   uint32_t htimeout;
 
-  view_t* (*row_generator)(view_t* listview, view_t* rowview, int index, int* count); /* event handler for view */
+  view_t* (*row_generator)(view_t* listview, view_t* rowview, int index, int* item_count); /* event handler for view */
 } eh_list_t;
 
-void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t* rowview, int index, int* count));
+void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t* rowview, int index, int* item_count));
 void eh_list_fill(view_t* view);
 
 #endif
@@ -45,33 +47,43 @@ void eh_list_fill(view_t* view);
 
 void eh_list_move(view_t* view, float dy)
 {
+  view_t* sview;
+
   eh_list_t* eh = view->evt_han_data;
-  view_t*    sview;
   while ((sview = VNXT(eh->items)))
   {
     r2_t frame = sview->frame.local;
-    frame.x    = eh->hpos;
+
+    frame.x = eh->item_pos;
     frame.y += dy;
+
     view_set_frame(sview, frame);
   }
 
-  // vertical scroller
-  float hratio = (float)(eh->tail_index - eh->head_index) / (float)eh->count;
-  float pratio = (float)(eh->tail_index) / (float)(eh->count - (eh->tail_index - eh->head_index));
-  if (hratio < 0.1) hratio = 0.1;
-  float h = view->frame.local.h * hratio;
-  float p = (view->frame.local.h - h) * pratio;
+  float sr; // size ratio
+  float pr; // position ratio
+  float s;  // size
+  float p;  // position
 
-  view_set_frame(eh->vscr, (r2_t){view->frame.local.w - 16.0, p, 15.0, h});
+  // vertical scroller
+  sr = (float)(eh->tail_index - eh->head_index) / (float)eh->item_count;
+  pr = (float)(eh->tail_index) / (float)(eh->item_count - (eh->tail_index - eh->head_index));
+
+  if (sr < 0.1) sr = 0.1;
+  s = view->frame.local.h * sr;
+  p = (view->frame.local.h - s) * pr;
+
+  view_set_frame(eh->vscr, (r2_t){view->frame.local.w - 16.0, p, 15.0, s});
 
   // horizontal scroller
-  float wratio = view->frame.local.w / eh->width;
-  float w      = view->frame.local.w * wratio;
-  if (wratio > 1) w = 1;
-  float wrat = -eh->hpos / (eh->width - view->frame.global.w);
-  p          = (view->frame.local.w - w) * wrat;
+  sr = view->frame.local.w / eh->item_wth;
+  pr = -eh->item_pos / (eh->item_wth - view->frame.global.w);
 
-  view_set_frame(eh->hscr, (r2_t){p, view->frame.local.h - 15.0, w, 15.0});
+  if (sr < 0.1) sr = 0.1;
+  s = view->frame.local.w * sr;
+  p = (view->frame.local.w - s) * pr;
+
+  view_set_frame(eh->hscr, (r2_t){p, view->frame.local.h - 15.0, s, 15.0});
 }
 
 void eh_list_evt(view_t* view, ev_t ev)
@@ -80,22 +92,22 @@ void eh_list_evt(view_t* view, ev_t ev)
   if (ev.type == EV_TIME)
   {
     // fill up if needed
-    while (eh->filled == 0)
+    while (eh->full == 0)
     {
       if (eh->items->length == 0)
       {
         view_t* cacheitem = mtvec_head(eh->cache);
-        view_t* rowitem   = (*eh->row_generator)(view, cacheitem, 0, &eh->count);
+        view_t* rowitem   = (*eh->row_generator)(view, cacheitem, 0, &eh->item_count);
 
         if (rowitem)
         {
-          eh->width = rowitem->frame.global.w; // store maximum width
+          eh->item_wth = rowitem->frame.global.w; // store maximum width
           VREM(eh->cache, rowitem);
           VADD(eh->items, rowitem);
           view_insert(view, rowitem, 0);
         }
         else
-          eh->filled = 1;
+          eh->full = 1;
       }
       else
       {
@@ -107,12 +119,12 @@ void eh_list_evt(view_t* view, ev_t ev)
         if (head->frame.local.y > 0.0 - PRELOAD_DISTANCE)
         {
           view_t* cacheitem = mtvec_head(eh->cache);
-          view_t* rowitem   = (*eh->row_generator)(view, cacheitem, eh->head_index - 1, &eh->count);
+          view_t* rowitem   = (*eh->row_generator)(view, cacheitem, eh->head_index - 1, &eh->item_count);
 
           if (rowitem)
           {
-            eh->filled = 0;                       // there is probably more to come
-            eh->width  = rowitem->frame.global.w; // store maximum width
+            eh->full     = 0;                       // there is probably more to come
+            eh->item_wth = rowitem->frame.global.w; // store maximum width
 
             VREM(eh->cache, rowitem);
             mtvec_addatindex(eh->items, rowitem, 0);
@@ -123,20 +135,20 @@ void eh_list_evt(view_t* view, ev_t ev)
             eh->head_index -= 1;
           }
           else
-            eh->filled = 1;
+            eh->full = 1;
         }
         else
-          eh->filled = 1;
+          eh->full = 1;
 
         if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h + PRELOAD_DISTANCE)
         {
           view_t* cacheitem = mtvec_head(eh->cache);
-          view_t* rowitem   = (*eh->row_generator)(view, cacheitem, eh->tail_index + 1, &eh->count);
+          view_t* rowitem   = (*eh->row_generator)(view, cacheitem, eh->tail_index + 1, &eh->item_count);
 
           if (rowitem)
           {
-            eh->filled = 0;                       // there is probably more to come
-            eh->width  = rowitem->frame.global.w; // store maximum width
+            eh->full     = 0;                       // there is probably more to come
+            eh->item_wth = rowitem->frame.global.w; // store maximum width
 
             VREM(eh->cache, rowitem);
             VADD(eh->items, rowitem);
@@ -147,19 +159,17 @@ void eh_list_evt(view_t* view, ev_t ev)
             eh->tail_index += 1;
           }
           else
-            eh->filled &= 1;
+            eh->full &= 1;
         }
         else
-          eh->filled &= 1;
+          eh->full &= 1;
 
         // remove items if needed
 
         if (head->frame.local.y + head->frame.local.h < 0.0 - PRELOAD_DISTANCE && eh->items->length > 1)
         {
           VADD(eh->cache, head);
-
           VREM(eh->items, head);
-          //view_remove(view, head);
 
           eh->head_index += 1;
         }
@@ -167,9 +177,7 @@ void eh_list_evt(view_t* view, ev_t ev)
         if (tail->frame.local.y > view->frame.local.h + PRELOAD_DISTANCE && eh->items->length > 1)
         {
           VADD(eh->cache, tail);
-
           VREM(eh->items, tail);
-          //view_remove(view, tail);
 
           eh->tail_index -= 1;
         }
@@ -183,10 +191,10 @@ void eh_list_evt(view_t* view, ev_t ev)
 
       // horizontal bounce
 
-      if (eh->hpos > 0.0001)
-        eh->hpos += -eh->hpos / 5.0;
-      else if (eh->hpos < -0.0001 && eh->hpos + eh->width < view->frame.local.w)
-        eh->hpos += (view->frame.local.w - eh->width - eh->hpos) / 5.0;
+      if (eh->item_pos > 0.0001)
+        eh->item_pos += -eh->item_pos / 5.0;
+      else if (eh->item_pos < -0.0001 && eh->item_pos + eh->item_wth < view->frame.local.w)
+        eh->item_pos += (view->frame.local.w - eh->item_wth - eh->item_pos) / 5.0;
 
       // vertical bounce
 
@@ -194,7 +202,7 @@ void eh_list_evt(view_t* view, ev_t ev)
         eh_list_move(view, -head->frame.local.y / 5.0);
       else if (head->frame.local.y < -0.0001 && tail->frame.local.y + tail->frame.local.h < view->frame.local.h)
         eh_list_move(view, (view->frame.local.h - tail->frame.local.h - tail->frame.local.y) / 5.0);
-      else if (eh->hpos > 0.0001 || eh->hpos < -0.0001)
+      else if (eh->item_pos > 0.0001 || eh->item_pos < -0.0001)
         eh_list_move(view, 0);
     }
     // close scrollbars
@@ -227,7 +235,7 @@ void eh_list_evt(view_t* view, ev_t ev)
     {
       if (ev.dx != 0.0)
       {
-        eh->hpos += ev.dx;
+        eh->item_pos += ev.dx;
 
         if (eh->htimeout == 0)
         {
@@ -247,7 +255,7 @@ void eh_list_evt(view_t* view, ev_t ev)
       if (ev.dy != 0.0)
       {
         eh_list_move(view, ev.dy);
-        eh->filled = 0;
+        eh->full = 0;
 
         if (eh->vtimeout == 0)
         {
@@ -269,7 +277,7 @@ void eh_list_evt(view_t* view, ev_t ev)
   }
   else if (ev.type == EV_RESIZE)
   {
-    eh->filled = 0;
+    eh->full = 0;
   }
 }
 
@@ -282,11 +290,11 @@ void eh_list_del(void* p)
 void eh_list_fill(view_t* view)
 {
   eh_list_t* eh = view->evt_han_data;
-  eh->filled    = 0;
+  eh->full      = 0;
 }
 
 void eh_list_add(view_t* view,
-                 view_t* (*row_generator)(view_t* listview, view_t* rowview, int index, int* count))
+                 view_t* (*row_generator)(view_t* listview, view_t* rowview, int index, int* item_count))
 {
   eh_list_t* eh     = mtmem_calloc(sizeof(eh_list_t), "eh_list", eh_list_del, NULL);
   eh->items         = VNEW();
