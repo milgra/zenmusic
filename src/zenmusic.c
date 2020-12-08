@@ -30,6 +30,11 @@ view_t* songlist;
 view_t* coverview;
 view_t* baseview;
 view_t* timeview;
+
+view_t* song;
+view_t* artist;
+view_t* info;
+
 view_t* visuleft;
 view_t* visuright;
 view_t* visuvideo;
@@ -53,9 +58,9 @@ void songitem_event(view_t* view, void* data)
   // printf("songitem event %i %i %s\n", ev.type, index, (char*)files->data[index]);
 
   mtmap_t* songmap = vec_srt->data[lastindex];
-
-  view_t* song = view_get_subview(baseview, "song");
-  tg_text_add(song, 0x00000000, 0x000000FF, (char*)MGET(songmap, "title"), 0);
+  tg_text_set(song, (char*)MGET(songmap, "title"));
+  tg_text_set(artist, (char*)MGET(songmap, "artist"));
+  tg_text_set(info, "started playing song");
 
   //bm_t* bitmap = player_get_album(files->data[lastindex]);
   //tg_bitmap_add(coverview, NULL, bitmap, "album");
@@ -110,9 +115,8 @@ void prev_button_pushed(view_t* view, void* data)
   if (lastindex < 0) lastindex = 0;
 
   mtmap_t* songmap = vec_srt->data[lastindex];
-
-  view_t* song = view_get_subview(baseview, "song");
-  tg_text_add(song, 0x00000000, 0x000000FF, (char*)MGET(songmap, "title"), 0);
+  tg_text_set(song, (char*)MGET(songmap, "title"));
+  tg_text_set(artist, (char*)MGET(songmap, "artist"));
 
   player_play(MGET(songmap, "path"));
 }
@@ -123,9 +127,8 @@ void next_button_pushed(view_t* view, void* data)
   if (lastindex == vec_srt->length) lastindex = files->length - 1;
 
   mtmap_t* songmap = vec_srt->data[lastindex];
-
-  view_t* song = view_get_subview(baseview, "song");
-  tg_text_add(song, 0x00000000, 0x000000FF, (char*)MGET(songmap, "title"), 0);
+  tg_text_set(song, (char*)MGET(songmap, "title"));
+  tg_text_set(artist, (char*)MGET(songmap, "artist"));
 
   player_play(MGET(songmap, "path"));
 }
@@ -135,16 +138,14 @@ void rand_button_pushed(view_t* view, void* data)
   lastindex = rand() % vec_srt->length;
 
   mtmap_t* songmap = vec_srt->data[lastindex];
-
-  view_t* song = view_get_subview(baseview, "song");
-  tg_text_add(song, 0x00000000, 0x000000FF, (char*)MGET(songmap, "title"), 0);
+  tg_text_set(song, (char*)MGET(songmap, "title"));
+  tg_text_set(artist, (char*)MGET(songmap, "artist"));
 
   player_play(MGET(songmap, "path"));
 }
 
 void loop_button_pushed(view_t* view, void* data)
 {
-  printf("LOOP\n");
   loop_all = !loop_all;
 }
 
@@ -201,10 +202,32 @@ void init(int width, int height)
   eh_list_add(songlist, songlist_item_generator);
 
   timeview = view_get_subview(baseview, "time");
-  tg_text_add(timeview, 0xFF000055, 0x000000FF, "00:00", 0);
 
-  /* view_t* song = view_get_subview(baseview, "song"); */
-  /* tg_text_add(song, 0x00000000, 0x000000FF, "-", 1); */
+  textstyle_t ts = {0};
+  ts.align       = 1;
+  ts.textsize    = 30.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0;
+
+  tg_text_add(timeview, "00:00", ts);
+
+  song = view_get_subview(baseview, "song");
+
+  ts.textsize = 20.0;
+
+  tg_text_add(song, "-", ts);
+
+  artist = view_get_subview(baseview, "artist");
+
+  ts.textsize = 20.0;
+
+  tg_text_add(artist, "-", ts);
+
+  info = view_get_subview(baseview, "info");
+
+  ts.textsize = 20.0;
+
+  tg_text_add(info, "-", ts);
 
   view_t* songlistheader = view_get_subview(baseview, "songlistheader");
 
@@ -286,7 +309,7 @@ void update(ev_t ev)
 
       char timebuff[20];
       snprintf(timebuff, 20, "%.2i:%.2i", (int)floor(lasttime / 60.0), (int)lasttime % 60);
-      tg_text_set(timeview, 0x00000000, 0x000000FF, timebuff, 0);
+      tg_text_set(timeview, timebuff);
 
       double posratio = time / player_duration();
       tg_knob_set_angle(playbtn, posratio * 6.28 - 3.14 / 2.0);

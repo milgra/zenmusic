@@ -19,6 +19,12 @@ uint32_t songitem_index = 0;
 
 view_t* songitem_new()
 {
+  textstyle_t ts = {0};
+  ts.align       = 0;
+  ts.textsize    = 20.0;
+  ts.textcolor   = 0xFFFFFFFF;
+  ts.backcolor   = 0x00000000;
+
   char idbuffer[100] = {0};
   snprintf(idbuffer, 100, "list_item%i", songitem_index);
 
@@ -27,17 +33,17 @@ view_t* songitem_new()
 
   snprintf(idbuffer, 100, "index_item%i", songitem_index);
   view_t* indexview = view_new(idbuffer, (r2_t){0, 0, 80, 35});
-  tg_text_add(indexview, 0xEFEFEFFF, 0x000000FF, "index", 1);
+  tg_text_add(indexview, "index", ts);
   indexview->needs_touch = 0;
 
   snprintf(idbuffer, 100, "name_item%i", songitem_index);
   view_t* nameview = view_new(idbuffer, (r2_t){80, 0, 500, 35});
-  tg_text_add(nameview, 0xEFEFEFFF, 0x000000FF, "name", 0);
+  tg_text_add(nameview, "name", ts);
   nameview->needs_touch = 0;
 
   snprintf(idbuffer, 100, "type_item%i", songitem_index);
   view_t* typeview = view_new(idbuffer, (r2_t){580, 0, 1000, 35});
-  tg_text_add(typeview, 0xEFEFEFFF, 0x000000FF, "type", 1);
+  tg_text_add(typeview, "type", ts);
   typeview->needs_touch = 0;
 
   view_add(rowview, indexview);
@@ -63,11 +69,28 @@ void songitem_update(view_t* rowview, int index, mtmap_t* file, void (*event)(vi
   else
     snprintf(indbuffer, 6, "No.");
 
-  tg_text_set(rowview->views->data[0], color1, 0x000000FF, indbuffer, 1);
+  view_t* idview     = rowview->views->data[0];
+  view_t* artistview = rowview->views->data[1];
+  view_t* titleview  = rowview->views->data[2];
 
-  tg_text_set(rowview->views->data[1], color1, 0x000000FF, MGET(file, "artist"), 0);
+  tg_text_t* tg       = idview->tex_gen_data;
+  tg->style.align     = 1;
+  tg->style.backcolor = color1;
+  tg->style.textcolor = 0x000000FF;
 
-  tg_text_set(rowview->views->data[2], color1, 0x000000FF, MGET(file, "title"), 0);
+  tg                  = artistview->tex_gen_data;
+  tg->style.backcolor = color1;
+  tg->style.textcolor = 0x000000FF;
+
+  tg                  = titleview->tex_gen_data;
+  tg->style.backcolor = color1;
+  tg->style.textcolor = 0x000000FF;
+
+  tg_text_set(idview, indbuffer);
+
+  tg_text_set(artistview, MGET(file, "artist"));
+
+  tg_text_set(titleview, MGET(file, "title"));
 }
 
 #endif

@@ -75,9 +75,15 @@ void eh_text_evt(view_t* view, ev_t ev)
     char idbuffer[100] = {0};
     snprintf(idbuffer, 100, "glyphview %s", ev.text);
 
+    textstyle_t ts = {0};
+    ts.align       = 0;
+    ts.textsize    = 15.0;
+    ts.textcolor   = 0xFFFFFFFF;
+    ts.backcolor   = 0x00000022;
+
     // TODO get glyph width first
     view_t* glyphview = view_new(idbuffer, (r2_t){0, 0, 20, 20});
-    tg_text_add(glyphview, 0xFEFEFEFF, 0x000000FF, ev.text, 0);
+    tg_text_add(glyphview, ev.text, ts);
 
     view_add(view, glyphview);
 
@@ -155,9 +161,15 @@ void eh_text_add(view_t* view, char* text, void (*ontext)(view_t* view, mtstr_t*
     char idbuffer[100] = {0};
     snprintf(idbuffer, 100, "glyphview %s", mtstr_bytes(str));
 
+    textstyle_t ts = {0};
+    ts.align       = 0;
+    ts.textsize    = 15.0;
+    ts.textcolor   = 0xFFFFFFFF;
+    ts.backcolor   = 0x00000022;
+
     // TODO get glyph width first
     view_t* glyphview = view_new(idbuffer, (r2_t){0, 0, 20, 20});
-    tg_text_add(glyphview, 0xFEFEFEFF, 0x000000FF, mtstr_bytes(str), 0);
+    tg_text_add(glyphview, mtstr_bytes(str), ts);
 
     view_add(view, glyphview);
 
