@@ -534,7 +534,6 @@ void video_show(void* opaque, int index, int w, int h, bm_t* bitmap, int edge)
 
   if (!display_disable && is->pictq.rindex_shown)
   {
-
     if (is->width != w)
     {
       printf("resetting is width and height for video");
@@ -544,7 +543,6 @@ void video_show(void* opaque, int index, int w, int h, bm_t* bitmap, int edge)
 
       scaledpixels[0] = malloc(w * h * 4);
     }
-
     //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     //SDL_RenderClear(renderer);
     /* if (is->audio_st && is->show_mode != SHOW_MODE_VIDEO) */
@@ -559,9 +557,8 @@ void render_draw_waves(void* opaque, int index, bm_t* bitmap, int edge)
 {
   VideoState* is = opaque;
 
-  if (!display_disable && is->pictq.rindex_shown)
+  if (!display_disable)
   {
-
     //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     //SDL_RenderClear(renderer);
     /* if (is->audio_st && is->show_mode != SHOW_MODE_VIDEO) */

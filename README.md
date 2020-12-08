@@ -21,14 +21,12 @@ artists/genres button (A, G karika ket oldalon? )
 additional columns - genre, last played, added, skipped, play count,
 fix leaks
 elso indulasnal analyzer progresst mutassa valahol amig zenet hallgatsz
-fix freq analyzer on aacs
 unicode support files, metadata!!!
 tilemap is auto-resize legyen duplazassal
 zold/piros listitem background play/pausre, animalt!!!
 scrollbar drag
 with the help of C & EMACS 
 ui color shade selector
-space play/pause
 
 ---
 

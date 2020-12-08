@@ -350,6 +350,16 @@ void update(ev_t ev)
       db_write(db);
     }
   }
+
+  else if (ev.type == EV_KDOWN)
+  {
+    if (ev.keycode == SDLK_SPACE)
+    {
+      // play/pause
+      player_toggle_pause();
+    }
+  }
+
   // update ui
   ui_manager_event(ev);
 }
