@@ -52,13 +52,6 @@ void tg_knob_gen(view_t* view)
                           0xEEEEEEFF,
                           0xEEEEEEFF);
 
-      bm_fill(tg->back,
-              (view->frame.local.w - 1.0) / 2.0,
-              3.0,
-              (view->frame.local.w - 1.0) / 2.0 + 2.0,
-              (view->frame.local.h - 1.0) / 2.0 - 28.0,
-              0xAAAAAA33);
-
       mtgraphics_arc_grad(tg->fore,
                           (view->frame.local.w - 1.0) / 2.0,
                           (view->frame.local.h - 1.0) / 2.0,
@@ -88,34 +81,37 @@ void tg_knob_gen(view_t* view)
 
     if (tg->angle > 3.14 * 3 / 2)
     {
-      mtgraphics_arc(view->texture.bitmap,
-                     (view->frame.local.w - 1.0) / 2.0,
-                     (view->frame.local.h - 1.0) / 2.0,
-                     (view->frame.local.w / 2.0 - 2.0),
-                     1.0,
-                     0x999999FF,
-                     3.14 * 3 / 2,
-                     tg->angle);
+      mtgraphics_arc_grad(view->texture.bitmap,
+                          (view->frame.local.w - 1.0) / 2.0,
+                          (view->frame.local.h - 1.0) / 2.0,
+                          27.0,
+                          35.0,
+                          3.14 * 3 / 2,
+                          tg->angle,
+                          0x999999FF,
+                          0x999999FF);
     }
     else
     {
-      mtgraphics_arc(view->texture.bitmap,
-                     (view->frame.local.w - 1.0) / 2.0,
-                     (view->frame.local.h - 1.0) / 2.0,
-                     (view->frame.local.w / 2.0 - 2.0),
-                     1.0,
-                     0x999999FF,
-                     3.14 * 3 / 2,
-                     6.28);
+      mtgraphics_arc_grad(view->texture.bitmap,
+                          (view->frame.local.w - 1.0) / 2.0,
+                          (view->frame.local.h - 1.0) / 2.0,
+                          27.0,
+                          35.0,
+                          3.14 * 3 / 2,
+                          6.28,
+                          0x999999FF,
+                          0x999999FF);
 
-      mtgraphics_arc(view->texture.bitmap,
-                     (view->frame.local.w - 1.0) / 2.0,
-                     (view->frame.local.h - 1.0) / 2.0,
-                     (view->frame.local.w / 2.0 - 2.0),
-                     1.0,
-                     0x999999FF,
-                     0,
-                     tg->angle);
+      mtgraphics_arc_grad(view->texture.bitmap,
+                          (view->frame.local.w - 1.0) / 2.0,
+                          (view->frame.local.h - 1.0) / 2.0,
+                          27.0,
+                          35.0,
+                          0,
+                          tg->angle,
+                          0x999999FF,
+                          0x999999FF);
     }
 
     bm_insert_blend(view->texture.bitmap, tg->fore, 0, 0);

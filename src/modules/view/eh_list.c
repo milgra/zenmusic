@@ -301,8 +301,8 @@ void eh_list_add(view_t* view,
   eh->cache         = VNEW();
   eh->row_generator = row_generator;
 
-  view_t* vscr = view_new("vscr", (r2_t){0, 0, 15, 50});
-  view_t* hscr = view_new("hscr", (r2_t){0, 10, 50, 10});
+  view_t* vscr = view_new("vscr", (r2_t){0, 0, 15, 0});
+  view_t* hscr = view_new("hscr", (r2_t){0, 10, 0, 10});
 
   tg_css_add(hscr);
   tg_css_add(vscr);

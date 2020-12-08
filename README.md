@@ -15,10 +15,8 @@ hook clang-format and gmake to file save hook
 
 first version
 
-horizontal scrolling
-button icons, rounded triangle, 40x40
+button on/off alpha change on icon
 display font rendering fix, center
-filter bar font center, fix
 artists/genres button (A, G karika ket oldalon? )
 additional columns - genre, last played, added, skipped, play count,
 fix leaks
@@ -28,6 +26,9 @@ unicode support files, metadata!!!
 tilemap is auto-resize legyen duplazassal
 zold/piros listitem background play/pausre, animalt!!!
 scrollbar drag
+with the help of C & EMACS 
+ui color shade selector
+space play/pause
 
 ---
 

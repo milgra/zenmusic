@@ -33,8 +33,7 @@
     width: 100%;
     height: 150px;
     display: flex;
-    flex-direction: row;
-    
+    flex-direction: row;    
     border-radius: 3px;
     box-shadow: 3px;
 }
@@ -91,6 +90,12 @@
     box-shadow: 3px;
 }
 
+#previcon {
+    width: 40px;
+    height: 40px;
+    background-image: url("prev.png");
+}
+
 #nextbtn {
     width: 40px;
     height: 40px;
@@ -101,7 +106,13 @@
     box-shadow: 3px;
 }
 
-#randbtn {
+#nexticon {
+    width: 40px;
+    height: 40px;
+    background-image: url("next.png");
+}
+
+#shufflebtn {
     width: 40px;
     height: 40px;
     right: 62px;
@@ -109,6 +120,12 @@
     border-radius: 8px;
     background-color: #EEEEEEFF;
     box-shadow: 3px;
+}
+
+#shuffleicon {
+    width: 40px;
+    height: 40px;
+    background-image: url("shuffle.png");
 }
 
 #loopbtn {
@@ -121,11 +138,33 @@
     box-shadow: 3px;
 }
 
+#loopicon {
+    width: 40px;
+    height: 40px;
+    background-image: url("loop.png");
+}
+
 #playbtn {
     width: 100px;
     height: 100px;
     margin: auto;
     padding: 15px;
+}
+
+#playicon {
+    width: 40px;
+    height: 40px;
+    top: 30px;
+    left: 32px;
+    background-image: url("play.png");
+}
+
+#pauseicon {
+    width: 40px;
+    height: 40px;
+    top: 30px;
+    left: 32px;
+    background-image: url("pause.png");
 }
 
 #volbtn {
@@ -135,34 +174,61 @@
     padding: 15px;
 }
 
+#muteicon {
+    width: 40px;
+    height: 40px;
+    top: 30px;
+    left: 28px;
+    background-image: url("mute.png");
+}
+
+#unmuteicon {
+    width: 40px;
+    height: 40px;
+    top: 30px;
+    left: 28px;
+    background-image: url("unmute.png");
+}
+
 #display {
     width: 100%;
     height: 100%;
     margin: 10px;
     border-radius: 15px;
     background-color: #FFFFFFFF;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
     box-shadow: 3px;
 }
 
 #time {
-    width: 50%;
-    height: 50px;
-    background-color: #DFFFFFFF;
+    width: 59%;
+    height: 42px;
+    margin: auto;
+    top: 8px;
+    background-color: #FF0000FF;
 }
 
-#artista {
-    width: 90%;
+#artist {
+    width: 97%;
     height: 20px;
-    background-color: #DFFFFFFF;
+    margin: auto;
+    top: 55px;
+    background-color: #00FF00FF;
 }
 
 #song {
-    width: 90%;
-    height: 30px;
-    background-color: #DFFFFFFF;
+    width: 97%;
+    height: 20px;
+    margin: auto;
+    top: 78px;
+    background-color: #0000FFFF;
+}
+
+#info {
+    width: 97%;
+    height: 20px;
+    margin: auto;
+    top: 101px;
+    background-color: #00FFFFFF;
 }
 
 #search {

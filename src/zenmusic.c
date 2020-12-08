@@ -201,10 +201,10 @@ void init(int width, int height)
   eh_list_add(songlist, songlist_item_generator);
 
   timeview = view_get_subview(baseview, "time");
-  tg_text_add(timeview, 0x00000000, 0x000000FF, "00:00", 0);
+  tg_text_add(timeview, 0xFF000055, 0x000000FF, "00:00", 0);
 
-  view_t* song = view_get_subview(baseview, "song");
-  tg_text_add(song, 0x00000000, 0x000000FF, "-", 1);
+  /* view_t* song = view_get_subview(baseview, "song"); */
+  /* tg_text_add(song, 0x00000000, 0x000000FF, "-", 1); */
 
   view_t* songlistheader = view_get_subview(baseview, "songlistheader");
 
@@ -228,7 +228,7 @@ void init(int width, int height)
 
   view_t* prevbtn = view_get_subview(baseview, "prevbtn");
   view_t* nextbtn = view_get_subview(baseview, "nextbtn");
-  view_t* randbtn = view_get_subview(baseview, "randbtn");
+  view_t* randbtn = view_get_subview(baseview, "shufflebtn");
   view_t* loopbtn = view_get_subview(baseview, "loopbtn");
 
   eh_button_add(prevbtn, NULL, prev_button_pushed);

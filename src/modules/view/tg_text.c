@@ -6,6 +6,7 @@
 #ifndef texgen_text_h
 #define texgen_text_h
 
+#include "font.c"
 #include "view.c"
 
 typedef struct _tg_text_t
@@ -15,6 +16,7 @@ typedef struct _tg_text_t
   uint32_t fc;
   uint32_t bc;
 
+  textstyle_t style;
 } tg_text_t;
 
 void tg_text_add(view_t* view, uint32_t bc, uint32_t fc, char* text, char align);
@@ -25,7 +27,6 @@ void tg_text_set(view_t* view, uint32_t bc, uint32_t fc, char* text, char align)
 #if __INCLUDE_LEVEL__ == 0
 
 #include "common.c"
-#include "font.c"
 #include "mtbitmap.c"
 #include "mtcstring.c"
 #include "mtstring.c"
