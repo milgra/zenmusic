@@ -35,6 +35,7 @@ int font_lineheight(font_t* the_font, float textsize);
 
 #include "mtcstring.c"
 #include "mtmemory.c"
+#include "paragraph.c"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -184,6 +185,44 @@ bm_t* font_render_glyph(
   if (rawmap != NULL) free(rawmap);
 
   return result;
+}
+
+char          buffer[24 << 20];
+unsigned char screen[20][79];
+
+// render text into bitmap
+void font_render_ttext(
+    mtstr_t*     ttext,
+    mtvec_t*     metrics,
+    ttextstyle_t style,
+    font_t*      font,
+    bm_t*        bitmap)
+{
+
+  int   i, j, ascent, baseline, ch = 0;
+  float scale, xpos = 2;       // leave a little padding in case the character extends left
+  char* text = "Heljo World!"; // intentionally misspelled to show 'lj' brokenness
+
+  scale = stbtt_ScaleForPixelHeight(&font->info, 15);
+  stbtt_GetFontVMetrics(&font->info, &ascent, 0, 0);
+  baseline = (int)(ascent * scale);
+
+  while (text[ch])
+  {
+    int   advance, lsb, x0, y0, x1, y1;
+    float x_shift = xpos - (float)floor(xpos);
+    stbtt_GetCodepointHMetrics(&font->info, text[ch], &advance, &lsb);
+    stbtt_GetCodepointBitmapBoxSubpixel(&font->info, text[ch], scale, scale, x_shift, 0, &x0, &y0, &x1, &y1);
+    stbtt_MakeCodepointBitmapSubpixel(&font->info, &screen[baseline + y0][(int)xpos + x0], x1 - x0, y1 - y0, 79, scale, scale, x_shift, 0, text[ch]);
+    // note that this stomps the old data, so where character boxes overlap (e.g. 'lj') it's wrong
+    // because this API is really for baking character bitmaps into textures. if you want to render
+    // a sequence of characters, you really need to render each bitmap to a temp buffer, then
+    // "alpha blend" that into the working buffer
+    xpos += (advance * scale);
+    if (text[ch + 1])
+      xpos += scale * stbtt_GetCodepointKernAdvance(&font->info, text[ch], text[ch + 1]);
+    ++ch;
+  }
 }
 
 /* render text TODO !!! CLEANUP, REFACTOR */

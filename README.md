@@ -27,6 +27,7 @@ zold/piros listitem background play/pausre, animalt!!!
 scrollbar drag
 with the help of C & EMACS 
 ui color shade selector
+jobb halfra vive az egeret song folott id3 editor
 
 ---
 
@@ -36,6 +37,7 @@ search/filter bar - genre is metal, name contains x, year between x and y
 uj event villanjon fel artist helyen, odakattintva event viewer, 
 spectrum, bar analyzer, left/right effect button, unshift bmp?
 config file - library path, visu state,
+speed up font rendering by using glyph indexes instead of codepoints
 
 ---
 
