@@ -5,6 +5,7 @@
 #include "mtbitmap.c"
 #include "mtstring.c"
 #include "mtvector.c"
+#include "paragraph.c"
 #include "stb_truetype.h"
 #include "text.c"
 #include <stdint.h>
@@ -24,6 +25,13 @@ void    font_dealloc(void* the_font);
 bm_t*   font_render_text(int width, int height, mtstr_t* string, font_t* the_font, textstyle_t text, glyphmetrics_t* glyphmetrics, mtvec_t* selections);
 bm_t*   font_render_glyph(font_t* the_font, uint32_t codepoint, float textsize, uint32_t textcolor, uint32_t backcolor, int* xoff, int* yoff);
 int     font_kerning(font_t* the_font, float textsize, uint32_t codepoint_a, uint32_t codepoint_b);
+
+bm_t* font_render_ttext(
+    mtstr_t*     ttext,
+    mtvec_t*     metrics,
+    ttextstyle_t style,
+    font_t*      font,
+    bm_t*        bitmap);
 
 int font_asc(font_t* the_font, float textsize);
 int font_desc(font_t* the_font, float textsize);
@@ -191,7 +199,7 @@ char          buffer[24 << 20];
 unsigned char screen[20][79];
 
 // render text into bitmap
-void font_render_ttext(
+bm_t* font_render_ttext(
     mtstr_t*     ttext,
     mtvec_t*     metrics,
     ttextstyle_t style,
@@ -207,22 +215,62 @@ void font_render_ttext(
   stbtt_GetFontVMetrics(&font->info, &ascent, 0, 0);
   baseline = (int)(ascent * scale);
 
+  printf("rendering text %s scale %f baseline %i\n", text, scale, baseline);
+
   while (text[ch])
   {
-    int   advance, lsb, x0, y0, x1, y1;
+    int   lsb;     // left side bearing, from current pos to the left edge of the glyph
+    int   advance; // advance width from current pos to next pos
+    int   x0, y0, x1, y1;
     float x_shift = xpos - (float)floor(xpos);
-    stbtt_GetCodepointHMetrics(&font->info, text[ch], &advance, &lsb);
-    stbtt_GetCodepointBitmapBoxSubpixel(&font->info, text[ch], scale, scale, x_shift, 0, &x0, &y0, &x1, &y1);
-    stbtt_MakeCodepointBitmapSubpixel(&font->info, &screen[baseline + y0][(int)xpos + x0], x1 - x0, y1 - y0, 79, scale, scale, x_shift, 0, text[ch]);
+
+    stbtt_GetCodepointHMetrics(&font->info,
+                               text[ch],
+                               &advance,
+                               &lsb);
+
+    printf("codepoint h metrics %c advance %i left side bearing %i\n", text[ch], advance, lsb);
+
+    stbtt_GetCodepointBitmapBoxSubpixel(&font->info,
+                                        text[ch],
+                                        scale,
+                                        scale,
+                                        x_shift,
+                                        0,
+                                        &x0,
+                                        &y0,
+                                        &x1,
+                                        &y1);
+
+    printf("bitmap subpixel %i x0 %i y0 %i x1 %i y1 %i\n", text[ch], x0, y0, x1, y1);
+
+    stbtt_MakeCodepointBitmapSubpixel(&font->info,
+                                      &screen[baseline + y0][(int)xpos + x0],
+                                      x1 - x0, // out widht
+                                      y1 - y0, // out height
+                                      79,      // out stride
+                                      scale,   // scale x
+                                      scale,   // scale y
+                                      x_shift, // shift x
+                                      0,       // shift y
+                                      text[ch]);
+
+    printf("make subpixel at xpos %f array indexes %i %i x_shift %f\n", xpos, (baseline + y0), (int)xpos + x0, x_shift);
+
     // note that this stomps the old data, so where character boxes overlap (e.g. 'lj') it's wrong
     // because this API is really for baking character bitmaps into textures. if you want to render
     // a sequence of characters, you really need to render each bitmap to a temp buffer, then
     // "alpha blend" that into the working buffer
+
     xpos += (advance * scale);
     if (text[ch + 1])
       xpos += scale * stbtt_GetCodepointKernAdvance(&font->info, text[ch], text[ch + 1]);
     ++ch;
   }
+
+  bm_t* bm = bm_new_from_grayscale(79, 20, 0x0F0000FF, 0xFFFFFFFF, &screen);
+
+  return bm;
 }
 
 /* render text TODO !!! CLEANUP, REFACTOR */

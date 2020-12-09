@@ -274,6 +274,22 @@ void init(int width, int height)
   /* texmapview->texture.full = 1; */
   /* ui_manager_add(texmapview); */
 
+  view_t* fontview = view_new("fontview", (r2_t){0, 0, 79, 20});
+
+  bm_t* fontmap = font_render_ttext(
+      NULL,
+      NULL,
+      (ttextstyle_t){0},
+      common_font,
+      fontmap);
+
+  /* bm_t* fontmap = bm_new(79, 20); */
+  /* bm_fill(fontmap, 0, 0, 79, 20, 0x000000FF); */
+
+  view_set_texture_bmp(fontview, fontmap);
+
+  ui_manager_add(fontview);
+
   db    = MNEW();
   libch = mtch_new(100);
 
