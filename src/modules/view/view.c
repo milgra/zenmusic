@@ -162,7 +162,6 @@ extern char reindex;
 #include "common.c"
 #include "mtcstring.c"
 #include "mtmemory.c"
-#include "text.c"
 
 char reindex = 1;
 

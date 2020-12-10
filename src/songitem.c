@@ -19,11 +19,11 @@ uint32_t songitem_index = 0;
 
 view_t* songitem_new()
 {
-  textstyle_t ts = {0};
-  ts.align       = 0;
-  ts.textsize    = 20.0;
-  ts.textcolor   = 0xFFFFFFFF;
-  ts.backcolor   = 0x00000000;
+  ttextstyle_t ts = {0};
+  ts.align        = 0;
+  ts.size         = 20.0;
+  ts.textcolor    = 0xFFFFFFFF;
+  ts.backcolor    = 0x00000000;
 
   char idbuffer[100] = {0};
   snprintf(idbuffer, 100, "list_item%i", songitem_index);

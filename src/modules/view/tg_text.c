@@ -6,16 +6,16 @@
 #ifndef texgen_text_h
 #define texgen_text_h
 
-#include "font.c"
+#include "paragraph.c"
 #include "view.c"
 
 typedef struct _tg_text_t
 {
-  char*       text;
-  textstyle_t style;
+  char*        text;
+  ttextstyle_t style;
 } tg_text_t;
 
-void tg_text_add(view_t* view, char* text, textstyle_t style);
+void tg_text_add(view_t* view, char* text, ttextstyle_t style);
 void tg_text_set(view_t* view, char* text);
 
 #endif
@@ -50,7 +50,7 @@ void tg_text_gen(view_t* view)
   }
 }
 
-void tg_text_add(view_t* view, char* text, textstyle_t style)
+void tg_text_add(view_t* view, char* text, ttextstyle_t style)
 {
   tg_text_t* gen = mtmem_alloc(sizeof(tg_text_t), "tg_text_t", NULL, NULL);
 

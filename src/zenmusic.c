@@ -203,29 +203,29 @@ void init(int width, int height)
 
   timeview = view_get_subview(baseview, "time");
 
-  textstyle_t ts = {0};
-  ts.align       = 1;
-  ts.textsize    = 30.0;
-  ts.textcolor   = 0x000000FF;
-  ts.backcolor   = 0;
+  ttextstyle_t ts = {0};
+  ts.align        = 1;
+  ts.size         = 30.0;
+  ts.textcolor    = 0x000000FF;
+  ts.backcolor    = 0;
 
   tg_text_add(timeview, "00:00", ts);
 
   song = view_get_subview(baseview, "song");
 
-  ts.textsize = 20.0;
+  ts.size = 20.0;
 
   tg_text_add(song, "-", ts);
 
   artist = view_get_subview(baseview, "artist");
 
-  ts.textsize = 20.0;
+  ts.size = 20.0;
 
   tg_text_add(artist, "-", ts);
 
   info = view_get_subview(baseview, "info");
 
-  ts.textsize = 20.0;
+  ts.size = 20.0;
 
   tg_text_add(info, "-", ts);
 
