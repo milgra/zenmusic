@@ -4,7 +4,6 @@
 #include "eh_knob.c"
 #include "eh_list.c"
 #include "eh_text.c"
-#include "font.c"
 #include "lib.c"
 #include "mtchannel.c"
 #include "mtcstring.c"
@@ -47,6 +46,7 @@ int     loop_all  = 0;
 char     song_refr_flag = 0;
 uint32_t song_recv_time = 0;
 
+char*    fontpath;
 mtvec_t* files;
 mtmap_t* db;
 mtvec_t* vec_srt;
@@ -156,7 +156,7 @@ view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index, in
   if (index >= vec_srt->length)
     return NULL;
   if (rowview == NULL)
-    rowview = songitem_new();
+    rowview = songitem_new(fontpath);
 
   *count = vec_srt->length;
 
@@ -187,13 +187,14 @@ void init(int width, int height)
   char* respath  = SDL_GetBasePath();
   char* csspath  = mtcstr_fromformat("%s/../res/main.css", respath, NULL);
   char* htmlpath = mtcstr_fromformat("%s/../res/main.html", respath, NULL);
-  char* fontpath = mtcstr_fromformat("%s/../res/Ubuntu-Regular.ttf", respath, NULL);
+  fontpath       = mtcstr_fromformat("%s/../res/Ubuntu-Regular.ttf", respath, NULL);
 
   mtvec_t* views = view_gen_load(htmlpath, csspath, respath);
   baseview       = mtvec_head(views);
 
   common_respath = respath;
-  common_font    = font_alloc(fontpath);
+
+  text_init();
 
   ui_manager_init(width, height);
   ui_manager_add(baseview);
@@ -203,11 +204,12 @@ void init(int width, int height)
 
   timeview = view_get_subview(baseview, "time");
 
-  ttextstyle_t ts = {0};
-  ts.align        = 1;
-  ts.size         = 30.0;
-  ts.textcolor    = 0x000000FF;
-  ts.backcolor    = 0;
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = 1;
+  ts.size        = 30.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0;
 
   tg_text_add(timeview, "00:00", ts);
 
@@ -277,11 +279,10 @@ void init(int width, int height)
   view_t* fontview = view_new("fontview", (r2_t){0, 0, 79, 20});
 
   bm_t* fontmap = bm_new(90, 20);
-  font_render_ttext(
+  text_render(
       mtstr_frombytes("jHeljo World!"),
       NULL,
-      (ttextstyle_t){0},
-      common_font,
+      ts,
       fontmap);
 
   /* bm_t* fontmap = bm_new(79, 20); */

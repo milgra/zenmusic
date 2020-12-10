@@ -22,7 +22,6 @@ void tg_text_set(view_t* view, char* text);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "common.c"
 #include "mtbitmap.c"
 #include "mtcstring.c"
 #include "mtstring.c"
@@ -39,11 +38,10 @@ void tg_text_gen(view_t* view)
 
     bm_t* fontmap = bm_new((int)view->frame.local.w, (int)view->frame.local.h);
 
-    font_render_ttext(
+    text_render(
         str,
         NULL,
-        (textstyle_t){0},
-        common_font,
+        gen->style,
         fontmap);
 
     view_set_texture_bmp(view, fontmap);

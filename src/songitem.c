@@ -17,13 +17,14 @@ void    songitem_update(view_t* rowview, int index, mtmap_t* file, void (*event)
 
 uint32_t songitem_index = 0;
 
-view_t* songitem_new()
+view_t* songitem_new(char* fontpath)
 {
-  ttextstyle_t ts = {0};
-  ts.align        = 0;
-  ts.size         = 20.0;
-  ts.textcolor    = 0xFFFFFFFF;
-  ts.backcolor    = 0x00000000;
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = 0;
+  ts.size        = 20.0;
+  ts.textcolor   = 0xFFFFFFFF;
+  ts.backcolor   = 0x00000000;
 
   char idbuffer[100] = {0};
   snprintf(idbuffer, 100, "list_item%i", songitem_index);
