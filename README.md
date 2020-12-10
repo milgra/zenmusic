@@ -11,10 +11,17 @@ development :
 pkg install sdl2 ffmpeg opengl gmake clang-format
 hook clang-format and gmake to file save hook
 
+libraries used :
+
+FFMPEG / media parsing
+SDL2 / window/graphics context handling
+stb_truetype / text generation
+
 ---
 
 first version
 
+swithc between multiple glyph views in paragraph/one multiglyph view in paragraph  
 button on/off alpha change on icon
 display font rendering fix, center
 artists/genres button (A, G karika ket oldalon? )

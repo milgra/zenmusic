@@ -35,6 +35,7 @@ void  bm_describe(void* p, int level);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "mtmemory.c"
+#include <assert.h>
 #include <string.h>
 
 bm_t* bm_new(int the_w, int the_h)
@@ -276,6 +277,10 @@ void bm_insert_rgb(bm_t* base, uint8_t* src, int w, int h, int sx, int sy)
 
 void bm_insert_blend(bm_t* base, bm_t* src, int sx, int sy)
 {
+  assert(base->w > 0);
+  assert(base->h > 0);
+  assert(src->w > 0);
+  assert(src->h > 0);
   int bx = sx + src->w;
   if (bx > base->w) bx = base->w;
   int by = sy + src->h;

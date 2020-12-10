@@ -195,9 +195,6 @@ bm_t* font_render_glyph(
   return result;
 }
 
-char          buffer[24 << 20];
-unsigned char screen[20][79];
-
 // render text into bitmap
 bm_t* font_render_ttext(
     mtstr_t*     ttext,
@@ -207,27 +204,40 @@ bm_t* font_render_ttext(
     bm_t*        bitmap)
 {
 
-  int   i, j, ascent, baseline, ch = 0;
-  float scale, xpos = 2;       // leave a little padding in case the character extends left
-  char* text = "Heljo World!"; // intentionally misspelled to show 'lj' brokenness
+  int   i, j, ascent, descent, linegap, advancey, baseline, ch = 0;
+  float scale, xpos = 2;        // leave a little padding in case the character extends left
+  char* text = "jHeljo World!"; // intentionally misspelled to show 'lj' brokenness
+
+  bm_t* result = bm_new(90, 20);
+
+  // so you should advance the vertical position by "*ascent - *descent + *lineGap"
+  //   these are expressed in unscaled coordinates, so you must multiply by
 
   scale = stbtt_ScaleForPixelHeight(&font->info, 15);
-  stbtt_GetFontVMetrics(&font->info, &ascent, 0, 0);
+  stbtt_GetFontVMetrics(&font->info, &ascent, &descent, &linegap);
   baseline = (int)(ascent * scale);
+  advancey = ascent - descent + linegap;
 
-  printf("rendering text %s scale %f baseline %i\n", text, scale, baseline);
+  printf("rendering text %s scale %f ascent %i descent %i linegap %i baseline %i advancey %i\n", text, scale, ascent, descent, linegap, baseline, advancey);
 
   while (text[ch])
   {
     int   lsb;     // left side bearing, from current pos to the left edge of the glyph
     int   advance; // advance width from current pos to next pos
     int   x0, y0, x1, y1;
-    float x_shift = xpos - (float)floor(xpos);
+    float x_shift = xpos - (float)floor(xpos); // subpixel shift
 
     stbtt_GetCodepointHMetrics(&font->info,
                                text[ch],
-                               &advance,
-                               &lsb);
+                               &advance, // advance from base x pos to next base pos
+                               &lsb);    // left side bearing
+
+    // increase xpos with left side bearing if first character in line
+    if (xpos == 0 && lsb < 0)
+    {
+      xpos    = (float)-lsb * scale;
+      x_shift = xpos - (float)floor(xpos); // subpixel shift
+    }
 
     printf("codepoint h metrics %c advance %i left side bearing %i\n", text[ch], advance, lsb);
 
@@ -235,42 +245,53 @@ bm_t* font_render_ttext(
                                         text[ch],
                                         scale,
                                         scale,
-                                        x_shift,
-                                        0,
-                                        &x0,
-                                        &y0,
-                                        &x1,
-                                        &y1);
+                                        x_shift, // x axis subpixel shift
+                                        0,       // y axis subpixel shift
+                                        &x0,     // left edge of the glyph from origin
+                                        &y0,     // top edge of the glyph from origin
+                                        &x1,     // right edge of the glyph from origin
+                                        &y1);    // bottom edge of the glyph from origin
 
-    printf("bitmap subpixel %i x0 %i y0 %i x1 %i y1 %i\n", text[ch], x0, y0, x1, y1);
+    printf("bitmap subpixel %c x0 %i y0 %i x1 %i y1 %i\n", text[ch], x0, y0, x1, y1);
 
-    stbtt_MakeCodepointBitmapSubpixel(&font->info,
-                                      &screen[baseline + y0][(int)xpos + x0],
-                                      x1 - x0, // out widht
-                                      y1 - y0, // out height
-                                      79,      // out stride
-                                      scale,   // scale x
-                                      scale,   // scale y
-                                      x_shift, // shift x
-                                      0,       // shift y
-                                      text[ch]);
+    int w = x1 - x0;
+    int h = y1 - y0;
 
-    printf("make subpixel at xpos %f array indexes %i %i x_shift %f\n", xpos, (baseline + y0), (int)xpos + x0, x_shift);
+    // don't write bitmap in case of empty glyphs ( space )
+    if (w > 0 && h > 0)
+    {
+      unsigned char* tmpbmp = calloc(1, sizeof(unsigned char) * w * h);
 
-    // note that this stomps the old data, so where character boxes overlap (e.g. 'lj') it's wrong
-    // because this API is really for baking character bitmaps into textures. if you want to render
-    // a sequence of characters, you really need to render each bitmap to a temp buffer, then
-    // "alpha blend" that into the working buffer
+      stbtt_MakeCodepointBitmapSubpixel(&font->info,
+                                        tmpbmp,
+                                        w,       // out widht
+                                        h,       // out height
+                                        w,       // out stride
+                                        scale,   // scale x
+                                        scale,   // scale y
+                                        x_shift, // shift x
+                                        0,       // shift y
+                                        text[ch]);
 
+      bm_t* tmpbm = bm_new_from_grayscale(w, h, 0x00000000, 0x000000FF, tmpbmp);
+      free(tmpbmp);
+
+      bm_insert_blend(result, tmpbm, xpos + x0, baseline + y0);
+
+      REL(tmpbm);
+
+      // printf("write glyph %c at xpos %f w %i h %i baseline(y) %i (x) %i x_shift %f\n", text[ch], xpos, x1 - x0, y1 - y0, baseline, (int)xpos + x0, x_shift);
+    }
+
+    // advance x axis
     xpos += (advance * scale);
+    // advance with kerning
     if (text[ch + 1])
       xpos += scale * stbtt_GetCodepointKernAdvance(&font->info, text[ch], text[ch + 1]);
     ++ch;
   }
 
-  bm_t* bm = bm_new_from_grayscale(79, 20, 0x0F0000FF, 0xFFFFFFFF, &screen);
-
-  return bm;
+  return result;
 }
 
 /* render text TODO !!! CLEANUP, REFACTOR */
