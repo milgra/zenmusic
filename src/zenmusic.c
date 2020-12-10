@@ -276,8 +276,9 @@ void init(int width, int height)
 
   view_t* fontview = view_new("fontview", (r2_t){0, 0, 79, 20});
 
-  bm_t* fontmap = font_render_ttext(
-      NULL,
+  bm_t* fontmap = bm_new(90, 20);
+  font_render_ttext(
+      mtstr_frombytes("jHeljo World!"),
       NULL,
       (ttextstyle_t){0},
       common_font,

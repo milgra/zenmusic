@@ -205,10 +205,7 @@ bm_t* font_render_ttext(
 {
 
   int   i, j, ascent, descent, linegap, advancey, baseline, ch = 0;
-  float scale, xpos = 2;        // leave a little padding in case the character extends left
-  char* text = "jHeljo World!"; // intentionally misspelled to show 'lj' brokenness
-
-  bm_t* result = bm_new(90, 20);
+  float scale, xpos = 2; // leave a little padding in case the character extends left
 
   // so you should advance the vertical position by "*ascent - *descent + *lineGap"
   //   these are expressed in unscaled coordinates, so you must multiply by
@@ -218,17 +215,20 @@ bm_t* font_render_ttext(
   baseline = (int)(ascent * scale);
   advancey = ascent - descent + linegap;
 
-  printf("rendering text %s scale %f ascent %i descent %i linegap %i baseline %i advancey %i\n", text, scale, ascent, descent, linegap, baseline, advancey);
+  // printf("rendering text %s scale %f ascent %i descent %i linegap %i baseline %i advancey %i\n", text, scale, ascent, descent, linegap, baseline, advancey);
 
-  while (text[ch])
+  for (int index = 0; index < ttext->length; index++)
   {
+    int cp  = ttext->codepoints[index];
+    int ncp = index < ttext->length - 1 ? ttext->codepoints[index + 1] : 0;
+
     int   lsb;     // left side bearing, from current pos to the left edge of the glyph
     int   advance; // advance width from current pos to next pos
     int   x0, y0, x1, y1;
     float x_shift = xpos - (float)floor(xpos); // subpixel shift
 
     stbtt_GetCodepointHMetrics(&font->info,
-                               text[ch],
+                               cp,
                                &advance, // advance from base x pos to next base pos
                                &lsb);    // left side bearing
 
@@ -239,10 +239,10 @@ bm_t* font_render_ttext(
       x_shift = xpos - (float)floor(xpos); // subpixel shift
     }
 
-    printf("codepoint h metrics %c advance %i left side bearing %i\n", text[ch], advance, lsb);
+    printf("codepoint h metrics %c advance %i left side bearing %i\n", cp, advance, lsb);
 
     stbtt_GetCodepointBitmapBoxSubpixel(&font->info,
-                                        text[ch],
+                                        cp,
                                         scale,
                                         scale,
                                         x_shift, // x axis subpixel shift
@@ -252,7 +252,7 @@ bm_t* font_render_ttext(
                                         &x1,     // right edge of the glyph from origin
                                         &y1);    // bottom edge of the glyph from origin
 
-    printf("bitmap subpixel %c x0 %i y0 %i x1 %i y1 %i\n", text[ch], x0, y0, x1, y1);
+    printf("bitmap subpixel %c x0 %i y0 %i x1 %i y1 %i\n", cp, x0, y0, x1, y1);
 
     int w = x1 - x0;
     int h = y1 - y0;
@@ -260,6 +260,7 @@ bm_t* font_render_ttext(
     // don't write bitmap in case of empty glyphs ( space )
     if (w > 0 && h > 0)
     {
+      // TODO use one tmp bitmap for all glyphs
       unsigned char* tmpbmp = calloc(1, sizeof(unsigned char) * w * h);
 
       stbtt_MakeCodepointBitmapSubpixel(&font->info,
@@ -271,13 +272,15 @@ bm_t* font_render_ttext(
                                         scale,   // scale y
                                         x_shift, // shift x
                                         0,       // shift y
-                                        text[ch]);
+                                        cp);
 
       bm_t* tmpbm = bm_new_from_grayscale(w, h, 0x00000000, 0x000000FF, tmpbmp);
+
+      // TODO replace with blend_alpha with int calculations
+      bm_insert_blend(bitmap, tmpbm, xpos + x0, baseline + y0);
+
+      // cleanup
       free(tmpbmp);
-
-      bm_insert_blend(result, tmpbm, xpos + x0, baseline + y0);
-
       REL(tmpbm);
 
       // printf("write glyph %c at xpos %f w %i h %i baseline(y) %i (x) %i x_shift %f\n", text[ch], xpos, x1 - x0, y1 - y0, baseline, (int)xpos + x0, x_shift);
@@ -286,12 +289,10 @@ bm_t* font_render_ttext(
     // advance x axis
     xpos += (advance * scale);
     // advance with kerning
-    if (text[ch + 1])
-      xpos += scale * stbtt_GetCodepointKernAdvance(&font->info, text[ch], text[ch + 1]);
+    if (ncp > 0)
+      xpos += scale * stbtt_GetCodepointKernAdvance(&font->info, cp, ncp);
     ++ch;
   }
-
-  return result;
 }
 
 /* render text TODO !!! CLEANUP, REFACTOR */
