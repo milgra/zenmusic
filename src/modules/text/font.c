@@ -5,8 +5,8 @@
 #include "mtbitmap.c"
 #include "mtstring.c"
 #include "mtvector.c"
-#include "paragraph.c"
 #include "stb_truetype.h"
+#include "text.c"
 #include <stdint.h>
 
 typedef struct _font_t font_t;
@@ -23,11 +23,11 @@ font_t* font_alloc(char* the_font_path);
 void    font_dealloc(void* the_font);
 
 void font_render_ttext(
-    mtstr_t*     ttext,
-    mtvec_t*     metrics,
-    ttextstyle_t style,
-    font_t*      font,
-    bm_t*        bitmap);
+    mtstr_t*    ttext,
+    mtvec_t*    metrics,
+    textstyle_t style,
+    font_t*     font,
+    bm_t*       bitmap);
 
 #endif
 
@@ -35,7 +35,6 @@ void font_render_ttext(
 
 #include "mtcstring.c"
 #include "mtmemory.c"
-#include "paragraph.c"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -98,11 +97,11 @@ void font_dealloc(void* pointer)
 
 // render text into bitmap
 void font_render_ttext(
-    mtstr_t*     ttext,
-    mtvec_t*     metrics,
-    ttextstyle_t style,
-    font_t*      font,
-    bm_t*        bitmap)
+    mtstr_t*    ttext,
+    mtvec_t*    metrics,
+    textstyle_t style,
+    font_t*     font,
+    bm_t*       bitmap)
 {
 
   int   i, j, ascent, descent, linegap, advancey, baseline, cursorh, ch = 0;
