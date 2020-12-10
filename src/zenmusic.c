@@ -187,7 +187,7 @@ void init(int width, int height)
   char* respath  = SDL_GetBasePath();
   char* csspath  = mtcstr_fromformat("%s/../res/main.css", respath, NULL);
   char* htmlpath = mtcstr_fromformat("%s/../res/main.html", respath, NULL);
-  fontpath       = mtcstr_fromformat("%s/../res/Ubuntu-Regular.ttf", respath, NULL);
+  fontpath       = mtcstr_fromformat("%s/../res/Avenir.ttc", respath, NULL);
 
   mtvec_t* views = view_gen_load(htmlpath, csspath, respath);
   baseview       = mtvec_head(views);
@@ -275,22 +275,6 @@ void init(int width, int height)
   /* view_t* texmapview       = view_new("texmapview", (r2_t){500, 500, 200, 200}); */
   /* texmapview->texture.full = 1; */
   /* ui_manager_add(texmapview); */
-
-  view_t* fontview = view_new("fontview", (r2_t){0, 0, 79, 20});
-
-  bm_t* fontmap = bm_new(90, 20);
-  text_render(
-      mtstr_frombytes("jHeljo World!"),
-      NULL,
-      ts,
-      fontmap);
-
-  /* bm_t* fontmap = bm_new(79, 20); */
-  /* bm_fill(fontmap, 0, 0, 79, 20, 0x000000FF); */
-
-  view_set_texture_bmp(fontview, fontmap);
-
-  ui_manager_add(fontview);
 
   db    = MNEW();
   libch = mtch_new(100);

@@ -22,7 +22,7 @@ view_t* songitem_new(char* fontpath)
   textstyle_t ts = {0};
   ts.font        = fontpath;
   ts.align       = 0;
-  ts.size        = 20.0;
+  ts.size        = 25.0;
   ts.textcolor   = 0xFFFFFFFF;
   ts.backcolor   = 0x00000000;
 

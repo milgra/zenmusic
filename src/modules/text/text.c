@@ -78,15 +78,13 @@ void text_font_load(char* path)
       unsigned char* data = malloc((size_t)filestat.st_size);
       fread(data, (size_t)filestat.st_size, 1, file);
 
-      printf("Fonts in font file : %i\n", stbtt_GetNumberOfFonts(data));
-
       stbtt_fontinfo font;
       stbtt_InitFont(&font, data, stbtt_GetFontOffsetForIndex(data, 0));
 
       void* fontp = HEAP(font, "stbtt_fontinfo");
       MPUT(fonts, path, fontp);
 
-      printf("storing font %s\n", path);
+      printf("Font loaded %s fonts in file %i\n", path, stbtt_GetNumberOfFonts(data));
     }
     else
       printf("cannot open font %s\n", path);
@@ -101,6 +99,9 @@ void text_render(
     textstyle_t style,
     bm_t*       bitmap)
 {
+
+  bm_fill(bitmap, 0, 0, bitmap->w, bitmap->h, style.backcolor);
+
   stbtt_fontinfo* font = MGET(fonts, style.font);
   if (font == NULL)
   {
@@ -109,10 +110,10 @@ void text_render(
     if (!font) return;
   }
 
-  int   i, j, ascent, descent, linegap, advancey, baseline, cursorh, ch = 0;
+  int   i, j, ascent, descent, linegap, advancey, baseline, cursorh;
   float scale, xpos = 2; // leave a little padding in case the character extends left
 
-  scale = stbtt_ScaleForPixelHeight(font, 15);
+  scale = stbtt_ScaleForPixelHeight(font, style.size);
   stbtt_GetFontVMetrics(font, &ascent, &descent, &linegap);
   baseline = (int)(ascent * scale);
   advancey = ascent - descent + linegap;
@@ -177,7 +178,7 @@ void text_render(
                                         0,       // shift y
                                         cp);
 
-      bm_t* tmpbm = bm_new_from_grayscale(w, h, 0x00000000, 0x000000FF, tmpbmp);
+      bm_t* tmpbm = bm_new_from_grayscale(w, h, 0, style.textcolor, tmpbmp);
 
       // TODO replace with blend_alpha with int calculations
       bm_insert_blend(bitmap, tmpbm, xpos + x0, baseline + y0);
@@ -191,10 +192,10 @@ void text_render(
 
     // advance x axis
     xpos += (advancex * scale);
+
     // advance with kerning
     if (ncp > 0)
       xpos += scale * stbtt_GetCodepointKernAdvance(font, cp, ncp);
-    ++ch;
   }
 }
 
