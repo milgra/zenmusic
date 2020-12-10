@@ -37,8 +37,16 @@ void tg_text_gen(view_t* view)
 
     mtstr_t* str = mtstr_frombytes(gen->text);
 
-    bm_t* bmp = font_render_text((int)view->frame.local.w, (int)view->frame.local.h, str, common_font, gen->style, NULL, NULL);
-    view_set_texture_bmp(view, bmp);
+    bm_t* fontmap = bm_new((int)view->frame.local.w, (int)view->frame.local.h);
+
+    font_render_ttext(
+        str,
+        NULL,
+        (ttextstyle_t){0},
+        common_font,
+        fontmap);
+
+    view_set_texture_bmp(view, fontmap);
   }
 }
 
