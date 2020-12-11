@@ -42,7 +42,7 @@ void tg_css_gen(view_t* view)
         memcpy(imagebmp->data, imagebytes, imagebmp->size);
         stbi_image_free(imagebytes);
         bm_t* texbmp = bm_new(view->frame.local.w, view->frame.local.h);
-        bm_insert(texbmp, imagebmp, 0, 0);
+        gfx_insert(texbmp, imagebmp, 0, 0);
         REL(imagebmp);
         view_set_texture_bmp(view, texbmp);
       }
@@ -59,15 +59,15 @@ void tg_css_gen(view_t* view)
 
       bm_t* bmp = bm_new(w, h);
 
-      mtgraphics_rounded_rect(bmp,
-                              0,
-                              0,
-                              w,
-                              h,
-                              view->layout.border_radius,
-                              view->layout.shadow_blur,
-                              view->layout.background_color,
-                              0x00000033);
+      gfx_rounded_rect(bmp,
+                       0,
+                       0,
+                       w,
+                       h,
+                       view->layout.border_radius,
+                       view->layout.shadow_blur,
+                       view->layout.background_color,
+                       0x00000033);
 
       view_set_texture_bmp(view, bmp);
     }

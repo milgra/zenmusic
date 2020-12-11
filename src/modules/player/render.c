@@ -219,7 +219,7 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap, int edge
 
   if (s->show_mode == SHOW_MODE_WAVES)
   {
-    mtgraphics_rect(bitmap, edge, edge, width, height, 0x000000FF, 1);
+    gfx_rect(bitmap, edge, edge, width, height, 0x000000FF, 1);
 
     /* total height for one channel */
     h = height;
@@ -247,7 +247,7 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap, int edge
           y2 = ys + y;
         }
 
-        mtgraphics_rect(bitmap, s->xleft + x, y2, 1, 2, 0xFFFFFFFF, 1);
+        gfx_rect(bitmap, s->xleft + x, y2, 1, 2, 0xFFFFFFFF, 1);
 
         i += channels;
         if (i >= SAMPLE_ARRAY_SIZE)
@@ -316,7 +316,7 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap, int edge
         pixels -= pitch;
         uint32_t color = ((a << 16) + (b << 8) + ((a + b) >> 1)) << 8 | 0xFF;
 
-        mtgraphics_rect(bitmap, s->xpos, y, 1, 1, color, 0);
+        gfx_rect(bitmap, s->xpos, y, 1, 1, color, 0);
         /*}*/
         /* SDL_UnlockTexture(s->vis_texture); */
       }
@@ -365,7 +365,7 @@ static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, stru
 
     if (bitmap)
     {
-      bm_insert_rgb(bitmap, scaledpixels[0], w, h, edge, edge);
+      gfx_insert_rgb(bitmap, scaledpixels[0], w, h, edge, edge);
     }
     else
     {

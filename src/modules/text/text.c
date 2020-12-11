@@ -105,7 +105,7 @@ void text_render(
     bm_t*       bitmap)
 {
 
-  mtgraphics_rect(bitmap, 0, 0, bitmap->w, bitmap->h, style.backcolor, 0);
+  gfx_rect(bitmap, 0, 0, bitmap->w, bitmap->h, style.backcolor, 0);
 
   stbtt_fontinfo* font = MGET(fonts, style.font);
   if (font == NULL)
@@ -189,7 +189,7 @@ void text_render(
                                         0,       // shift y
                                         cp);
 
-      bm_blend_8(bitmap, xpos + x0, baseline + y0, style.textcolor, gbytes, w, h);
+      gfx_blend_8(bitmap, xpos + x0, baseline + y0, style.textcolor, gbytes, w, h);
 
       // printf("write glyph %c at xpos %f w %i h %i baseline(y) %i (x) %i x_shift %f\n", text[ch], xpos, x1 - x0, y1 - y0, baseline, (int)xpos + x0, x_shift);
     }

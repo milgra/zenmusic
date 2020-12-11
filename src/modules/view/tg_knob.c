@@ -32,89 +32,89 @@ void tg_knob_gen(view_t* view)
       tg->back  = bm_new(view->frame.local.w, view->frame.local.h);
       tg->fore  = bm_new(view->frame.local.w, view->frame.local.h);
 
-      mtgraphics_arc_grad(tg->back,
-                          (view->frame.local.w - 1.0) / 2.0,
-                          (view->frame.local.h - 1.0) / 2.0,
-                          (view->frame.local.w / 2.0) - 3.0,
-                          (view->frame.local.w / 2.0),
-                          0,
-                          3.14 * 2,
-                          0x00000044,
-                          0);
+      gfx_arc_grad(tg->back,
+                   (view->frame.local.w - 1.0) / 2.0,
+                   (view->frame.local.h - 1.0) / 2.0,
+                   (view->frame.local.w / 2.0) - 3.0,
+                   (view->frame.local.w / 2.0),
+                   0,
+                   3.14 * 2,
+                   0x00000044,
+                   0);
 
-      mtgraphics_arc_grad(tg->back,
-                          (view->frame.local.w - 1.0) / 2.0,
-                          (view->frame.local.h - 1.0) / 2.0,
-                          0,
-                          (view->frame.local.w / 2.0) - 2.0,
-                          0,
-                          3.14 * 2,
-                          0xEEEEEEFF,
-                          0xEEEEEEFF);
+      gfx_arc_grad(tg->back,
+                   (view->frame.local.w - 1.0) / 2.0,
+                   (view->frame.local.h - 1.0) / 2.0,
+                   0,
+                   (view->frame.local.w / 2.0) - 2.0,
+                   0,
+                   3.14 * 2,
+                   0xEEEEEEFF,
+                   0xEEEEEEFF);
 
-      mtgraphics_arc_grad(tg->fore,
-                          (view->frame.local.w - 1.0) / 2.0,
-                          (view->frame.local.h - 1.0) / 2.0,
-                          27.0,
-                          30.0,
-                          0,
-                          3.14 * 2,
-                          0x00000044,
-                          0);
+      gfx_arc_grad(tg->fore,
+                   (view->frame.local.w - 1.0) / 2.0,
+                   (view->frame.local.h - 1.0) / 2.0,
+                   27.0,
+                   30.0,
+                   0,
+                   3.14 * 2,
+                   0x00000044,
+                   0);
 
-      mtgraphics_arc_grad(tg->fore,
-                          (view->frame.local.w - 1.0) / 2.0,
-                          (view->frame.local.h - 1.0) / 2.0,
-                          0,
-                          28.0,
-                          0,
-                          3.14 * 2,
-                          0xDDDDDDFF,
-                          0xDDDDDDFF);
+      gfx_arc_grad(tg->fore,
+                   (view->frame.local.w - 1.0) / 2.0,
+                   (view->frame.local.h - 1.0) / 2.0,
+                   0,
+                   28.0,
+                   0,
+                   3.14 * 2,
+                   0xDDDDDDFF,
+                   0xDDDDDDFF);
 
       view_set_texture_bmp(view, bmp);
     }
 
     if (tg->angle < 0) tg->angle += 6.28;
 
-    bm_insert(view->texture.bitmap, tg->back, 0, 0);
+    gfx_insert(view->texture.bitmap, tg->back, 0, 0);
 
     if (tg->angle > 3.14 * 3 / 2)
     {
-      mtgraphics_arc_grad(view->texture.bitmap,
-                          (view->frame.local.w - 1.0) / 2.0,
-                          (view->frame.local.h - 1.0) / 2.0,
-                          27.0,
-                          35.0,
-                          3.14 * 3 / 2,
-                          tg->angle,
-                          0x999999FF,
-                          0x999999FF);
+      gfx_arc_grad(view->texture.bitmap,
+                   (view->frame.local.w - 1.0) / 2.0,
+                   (view->frame.local.h - 1.0) / 2.0,
+                   27.0,
+                   35.0,
+                   3.14 * 3 / 2,
+                   tg->angle,
+                   0x999999FF,
+                   0x999999FF);
     }
     else
     {
-      mtgraphics_arc_grad(view->texture.bitmap,
-                          (view->frame.local.w - 1.0) / 2.0,
-                          (view->frame.local.h - 1.0) / 2.0,
-                          27.0,
-                          35.0,
-                          3.14 * 3 / 2,
-                          6.28,
-                          0x999999FF,
-                          0x999999FF);
+      gfx_arc_grad(view->texture.bitmap,
+                   (view->frame.local.w - 1.0) / 2.0,
+                   (view->frame.local.h - 1.0) / 2.0,
+                   27.0,
+                   35.0,
+                   3.14 * 3 / 2,
+                   6.28,
+                   0x999999FF,
+                   0x999999FF);
 
-      mtgraphics_arc_grad(view->texture.bitmap,
-                          (view->frame.local.w - 1.0) / 2.0,
-                          (view->frame.local.h - 1.0) / 2.0,
-                          27.0,
-                          35.0,
-                          0,
-                          tg->angle,
-                          0x999999FF,
-                          0x999999FF);
+      gfx_arc_grad(view->texture.bitmap,
+                   (view->frame.local.w - 1.0) / 2.0,
+                   (view->frame.local.h - 1.0) / 2.0,
+                   27.0,
+                   35.0,
+                   0,
+                   tg->angle,
+                   0x999999FF,
+                   0x999999FF);
     }
 
-    bm_blend_rgba(view->texture.bitmap, 0, 0, tg->fore);
+    gfx_blend_rgba(view->texture.bitmap, 0, 0, tg->fore);
     view->texture.changed = 1;
   }
 }

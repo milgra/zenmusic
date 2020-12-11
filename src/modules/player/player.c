@@ -37,6 +37,7 @@ void  player_get_metadata(const char* path, mtmap_t* map);
 #include "libavformat/avformat.h"
 #include "libavutil/imgutils.h"
 #include "mtcstring.c"
+#include "mtgraphics.c"
 #include "render.c"
 #include "strcomm.c"
 #include "stream.c"
@@ -241,7 +242,7 @@ bm_t* player_get_album(const char* path)
       /* unsigned char* bytes = stbi_load_from_memory(pkt.data, pkt.size, &w, &h, &components, 4); */
 
       result = bm_new(image->w, image->h);
-      bm_insert_rgb(result, image->pixels, image->w, image->h, 0, 0);
+      gfx_insert_rgb(result, image->pixels, image->w, image->h, 0, 0);
       //memcpy(result->data, image->pixels, image->w * image->h * 4);
 
       av_packet_unref(&pkt);
