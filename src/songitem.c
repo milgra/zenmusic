@@ -5,7 +5,7 @@
 #include "view.c"
 
 view_t* songitem_new();
-void    songitem_update(view_t* rowview, int index, mtmap_t* file, void (*event)(view_t* view, void* data));
+void    songitem_update(view_t* rowview, int index, map_t* file, void (*event)(view_t* view, void* data));
 
 #endif
 
@@ -56,7 +56,7 @@ view_t* songitem_new(char* fontpath)
   return rowview;
 }
 
-void songitem_update(view_t* rowview, int index, mtmap_t* file, void (*event)(view_t* view, void* data))
+void songitem_update(view_t* rowview, int index, map_t* file, void (*event)(view_t* view, void* data))
 {
   uint32_t color1 = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
   uint32_t color2 = (index % 2 == 0) ? 0xE5E5E5FF : 0xEFEFEFFF;

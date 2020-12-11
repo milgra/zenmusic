@@ -119,7 +119,7 @@ struct _view_t
   char needs_scroll; /* accepts scroll events */
 
   char*    id;     /* identifier for handling view */
-  mtvec_t* views;  /* subviews */
+  vec_t*   views;  /* subviews */
   view_t*  parent; /* parent view */
   uint32_t index;  /* depth */
 
@@ -139,7 +139,7 @@ void    view_insert(view_t* view, view_t* subview, uint32_t index);
 void    view_remove(view_t* view, view_t* subview);
 
 void view_evt(view_t* view, ev_t ev); /* general event, sending to all views */
-void view_coll_touched(view_t* view, ev_t ev, mtvec_t* queue);
+void view_coll_touched(view_t* view, ev_t ev, vec_t* queue);
 void view_gen_texture(view_t* view);
 
 void view_set_frame(view_t* view, r2_t frame);
@@ -178,13 +178,13 @@ void view_del(void* pointer)
 
 view_t* view_new(char* id, r2_t frame)
 {
-  view_t* view       = mtmem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
-  view->id           = mtcstr_fromcstring(id);
+  view_t* view       = mem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
+  view->id           = cstr_fromcstring(id);
   view->views        = VNEW();
   view->frame.local  = frame;
   view->frame.global = frame;
   view->texture.page = -1;
-  view->texture.id   = mtcstr_fromcstring(id);
+  view->texture.id   = cstr_fromcstring(id);
   view->needs_touch  = 1;
 
   return view;
@@ -204,7 +204,7 @@ void view_insert(view_t* view, view_t* subview, uint32_t index)
 {
   reindex = 1;
 
-  mtvec_addatindex(view->views, subview, index);
+  vec_addatindex(view->views, subview, index);
   subview->parent = view;
 
   view_calc_global(view);
@@ -218,7 +218,7 @@ void view_remove(view_t* view, view_t* subview)
   subview->parent = NULL;
 }
 
-void view_coll_touched(view_t* view, ev_t ev, mtvec_t* queue)
+void view_coll_touched(view_t* view, ev_t ev, vec_t* queue)
 {
   if (ev.x < view->frame.global.x + view->frame.global.w &&
       ev.x > view->frame.global.x &&
@@ -285,7 +285,7 @@ void view_set_texture_bmp(view_t* view, bm_t* bitmap)
 void view_set_texture_id(view_t* view, char* id)
 {
   REL(view->texture.id);
-  view->texture.id = mtcstr_fromcstring(id);
+  view->texture.id = cstr_fromcstring(id);
 }
 
 void view_set_texture_page(view_t* view, uint32_t page)

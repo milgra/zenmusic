@@ -27,7 +27,7 @@ void player_draw_rdft(int index, int channel, bm_t* bm);
 void player_refresh();
 
 bm_t* player_get_album(const char* path);
-void  player_get_metadata(const char* path, mtmap_t* map);
+void  player_get_metadata(const char* path, map_t* map);
 
 #endif
 
@@ -173,7 +173,7 @@ void player_draw_rdft(int index, int channel, bm_t* bm)
 {
 }
 
-void player_get_metadata(const char* path, mtmap_t* map)
+void player_get_metadata(const char* path, map_t* map)
 {
   assert(path != NULL);
 
@@ -197,7 +197,7 @@ void player_get_metadata(const char* path, mtmap_t* map)
 
   while ((tag = av_dict_get(pFormatCtx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
   {
-    char* value = mtcstr_fromcstring(tag->value);
+    char* value = cstr_fromcstring(tag->value);
     MPUT(map, tag->key, value);
     REL(value);
   }

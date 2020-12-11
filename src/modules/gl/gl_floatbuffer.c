@@ -26,8 +26,8 @@ void  fb_add(fb_t* fb, GLfloat* data, size_t count);
 
 fb_t* fb_new()
 {
-  fb_t* fb = mtmem_calloc(sizeof(fb_t), "fb_t", fb_del, NULL);
-  fb->data = mtmem_calloc(sizeof(GLfloat) * 10, "GLfloat*", NULL, NULL);
+  fb_t* fb = mem_calloc(sizeof(fb_t), "fb_t", fb_del, NULL);
+  fb->data = mem_calloc(sizeof(GLfloat) * 10, "GLfloat*", NULL, NULL);
   fb->pos  = 0;
   fb->cap  = 10;
 
@@ -37,7 +37,7 @@ fb_t* fb_new()
 void fb_del(void* pointer)
 {
   fb_t* fb = pointer;
-  mtmem_release(fb->data);
+  mem_release(fb->data);
 }
 
 void fb_reset(fb_t* fb)
@@ -49,7 +49,7 @@ void fb_expand(fb_t* fb)
 {
   assert(fb->cap < UINT32_MAX / 2);
   fb->cap *= 2;
-  fb->data = mtmem_realloc(fb->data, sizeof(void*) * fb->cap);
+  fb->data = mem_realloc(fb->data, sizeof(void*) * fb->cap);
 }
 
 void fb_add(fb_t* fb, GLfloat* data, size_t count)

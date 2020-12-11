@@ -46,18 +46,18 @@ int     loop_all  = 0;
 char     song_refr_flag = 0;
 uint32_t song_recv_time = 0;
 
-char*    fontpath;
-mtvec_t* files;
-mtmap_t* db;
-mtvec_t* vec_srt;
-mtch_t*  libch;
+char*  fontpath;
+vec_t* files;
+map_t* db;
+vec_t* vec_srt;
+ch_t*  libch;
 
 void songitem_event(view_t* view, void* data)
 {
   lastindex = (size_t)data;
   // printf("songitem event %i %i %s\n", ev.type, index, (char*)files->data[index]);
 
-  mtmap_t* songmap = vec_srt->data[lastindex];
+  map_t* songmap = vec_srt->data[lastindex];
   tg_text_set(song, (char*)MGET(songmap, "title"));
   tg_text_set(artist, (char*)MGET(songmap, "artist"));
   tg_text_set(info, "started playing song");
@@ -114,7 +114,7 @@ void prev_button_pushed(view_t* view, void* data)
   lastindex = lastindex - 1;
   if (lastindex < 0) lastindex = 0;
 
-  mtmap_t* songmap = vec_srt->data[lastindex];
+  map_t* songmap = vec_srt->data[lastindex];
   tg_text_set(song, (char*)MGET(songmap, "title"));
   tg_text_set(artist, (char*)MGET(songmap, "artist"));
 
@@ -126,7 +126,7 @@ void next_button_pushed(view_t* view, void* data)
   lastindex = lastindex + 1;
   if (lastindex == vec_srt->length) lastindex = files->length - 1;
 
-  mtmap_t* songmap = vec_srt->data[lastindex];
+  map_t* songmap = vec_srt->data[lastindex];
   tg_text_set(song, (char*)MGET(songmap, "title"));
   tg_text_set(artist, (char*)MGET(songmap, "artist"));
 
@@ -137,7 +137,7 @@ void rand_button_pushed(view_t* view, void* data)
 {
   lastindex = rand() % vec_srt->length;
 
-  mtmap_t* songmap = vec_srt->data[lastindex];
+  map_t* songmap = vec_srt->data[lastindex];
   tg_text_set(song, (char*)MGET(songmap, "title"));
   tg_text_set(artist, (char*)MGET(songmap, "artist"));
 
@@ -185,12 +185,12 @@ void init(int width, int height)
   srand((unsigned int)time(NULL));
 
   char* respath  = SDL_GetBasePath();
-  char* csspath  = mtcstr_fromformat("%s/../res/main.css", respath, NULL);
-  char* htmlpath = mtcstr_fromformat("%s/../res/main.html", respath, NULL);
-  fontpath       = mtcstr_fromformat("%s/../res/Avenir.ttc", respath, NULL);
+  char* csspath  = cstr_fromformat("%s/../res/main.css", respath, NULL);
+  char* htmlpath = cstr_fromformat("%s/../res/main.html", respath, NULL);
+  fontpath       = cstr_fromformat("%s/../res/Avenir.ttc", respath, NULL);
 
-  mtvec_t* views = view_gen_load(htmlpath, csspath, respath);
-  baseview       = mtvec_head(views);
+  vec_t* views = view_gen_load(htmlpath, csspath, respath);
+  baseview     = vec_head(views);
 
   common_respath = respath;
 
@@ -277,7 +277,7 @@ void init(int width, int height)
   /* ui_manager_add(texmapview); */
 
   db    = MNEW();
-  libch = mtch_new(100);
+  libch = ch_new(100);
 
   vec_srt = VNEW();
 
@@ -333,8 +333,8 @@ void update(ev_t ev)
   }
 
   // get analyzed song entries
-  mtmap_t* entry;
-  while ((entry = mtch_recv(libch)))
+  map_t* entry;
+  while ((entry = ch_recv(libch)))
   {
     char* path = MGET(entry, "path");
     MPUT(db, path, entry);

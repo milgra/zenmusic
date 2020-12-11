@@ -21,9 +21,9 @@ void eh_text_add(view_t* view, char* text, void (*ontext)(view_t* view, mtstr_t*
 typedef struct _eh_text_t
 {
   mtstr_t* text;
-  mtvec_t* paragraphs; // a paragraph contains multiple glyph views or one big pre-rendered paragraph view
-  mtvec_t* glyphs;
-  mtvec_t* animators;
+  vec_t*   paragraphs; // a paragraph contains multiple glyph views or one big pre-rendered paragraph view
+  vec_t*   glyphs;
+  vec_t*   animators;
   char     editing;
   view_t*  crsr;
   void (*ontext)(view_t* view, mtstr_t* text);
@@ -115,7 +115,7 @@ void eh_text_evt(view_t* view, ev_t ev)
   {
     if (ev.keycode == SDLK_BACKSPACE)
     {
-      view_t* last = mtvec_tail(data->glyphs);
+      view_t* last = vec_tail(data->glyphs);
       view_remove(view, last);
       VREM(data->glyphs, last);
     }
@@ -128,9 +128,9 @@ void eh_text_evt(view_t* view, ev_t ev)
 
 void eh_text_add(view_t* view, char* text, void (*ontext)(view_t* view, mtstr_t* text))
 {
-  eh_text_t* data = mtmem_calloc(sizeof(eh_text_t), "eh_text", NULL, NULL);
+  eh_text_t* data = mem_calloc(sizeof(eh_text_t), "eh_text", NULL, NULL);
   data->text      = mtstr_frombytes(text);
-  data->glyphs    = mtvec_alloc();
+  data->glyphs    = vec_alloc();
   data->ontext    = ontext;
 
   view->needs_key     = 1;

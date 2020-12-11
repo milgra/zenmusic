@@ -39,6 +39,8 @@ void gfx_blend_pixel(bm_t* bm, int x, int y, uint32_t color);
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include <string.h>
+
 void gfx_circle(bm_t* bitmap, float cx, float cy, float r, float edge, uint32_t c)
 {
   float m = r;

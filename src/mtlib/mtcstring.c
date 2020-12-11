@@ -7,13 +7,13 @@
 #include <stdint.h>
 #include <stdio.h>
 
-char*    mtcstr_fromformat(char* format, ...);
-char*    mtcstr_fromcstring(char* string);
-char*    mtcstr_fromfile(char* path);
-uint32_t mtcstr_color_from_cstring(char* string);
-char*    mtcstr_generate_readablec(uint32_t length);
-char*    mtcstr_generate_alphanumeric(uint32_t length);
-void     mtcstr_describe(void* p, int level);
+char*    cstr_fromformat(char* format, ...);
+char*    cstr_fromcstring(char* string);
+char*    cstr_fromfile(char* path);
+uint32_t cstr_color_from_cstring(char* string);
+char*    cstr_generate_readablec(uint32_t length);
+char*    cstr_generate_alphanumeric(uint32_t length);
+void     cstr_describe(void* p, int level);
 
 #endif
 
@@ -39,7 +39,7 @@ static char hexa[] =
 
 /* returns uint value based on digits */
 
-uint32_t mtcstr_color_from_cstring(char* string)
+uint32_t cstr_color_from_cstring(char* string)
 {
   uint32_t result = 0;
   while (*string != 0)
@@ -50,7 +50,7 @@ uint32_t mtcstr_color_from_cstring(char* string)
 /* creates string from utf8 bytearray */
 /* PARAMETER LIST MUST END WITH NULL!!! */
 
-char* mtcstr_fromformat(char* format, ...)
+char* cstr_fromformat(char* format, ...)
 {
   va_list ap;
   char*   text;
@@ -62,7 +62,7 @@ char* mtcstr_fromformat(char* format, ...)
   length += 1;
   va_end(ap);
 
-  char* result = mtmem_calloc(sizeof(char) * length, "char*", NULL, mtcstr_describe);
+  char* result = mem_calloc(sizeof(char) * length, "char*", NULL, cstr_describe);
   va_start(ap, format);
   vsnprintf(result, length, format, ap);
   va_end(ap);
@@ -72,12 +72,12 @@ char* mtcstr_fromformat(char* format, ...)
 
 /* copies c string with managed memory space */
 
-char* mtcstr_fromcstring(char* string)
+char* cstr_fromcstring(char* string)
 {
   char* result = NULL;
   if (string != NULL)
   {
-    result = mtmem_calloc((strlen(string) + 1) * sizeof(char), "char*", NULL, mtcstr_describe);
+    result = mem_calloc((strlen(string) + 1) * sizeof(char), "char*", NULL, cstr_describe);
     memcpy(result, string, strlen(string));
   }
   return result;
@@ -85,7 +85,7 @@ char* mtcstr_fromcstring(char* string)
 
 /* reads up text file */
 
-char* mtcstr_fromfile(char* path)
+char* cstr_fromfile(char* path)
 {
 
   char* buffer = NULL;
@@ -102,7 +102,7 @@ char* mtcstr_fromfile(char* path)
     rewind(handler);
 
     // Allocate a string that can hold it all
-    buffer = (char*)mtmem_calloc(sizeof(char) * (string_size + 1), "char*", NULL, NULL);
+    buffer = (char*)mem_calloc(sizeof(char) * (string_size + 1), "char*", NULL, NULL);
 
     // Read it all in one operation
     read_size = fread(buffer, sizeof(char), string_size, handler);
@@ -131,9 +131,9 @@ char* mtcstr_fromfile(char* path)
 char* vowels     = "aeiou";
 char* consonants = "bcdefghijklmnpqrstvwxyz";
 
-char* mtcstr_generate_readablec(uint32_t length)
+char* cstr_generate_readablec(uint32_t length)
 {
-  char* result = mtmem_calloc(sizeof(char) * (length + 1), "char*", NULL, mtcstr_describe);
+  char* result = mem_calloc(sizeof(char) * (length + 1), "char*", NULL, cstr_describe);
   for (int index = 0; index < length; index += 2)
   {
     result[index] = consonants[rand() % strlen(consonants)];
@@ -144,22 +144,22 @@ char* mtcstr_generate_readablec(uint32_t length)
 
 /* generates alphanumeric string */
 
-char* mtcstr_alphanumeric =
+char* cstr_alphanumeric =
     "0123456789"
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     "abcdefghijklmnopqrstuvwxyz";
 
-char* mtcstr_generate_alphanumeric(uint32_t length)
+char* cstr_generate_alphanumeric(uint32_t length)
 {
-  char* result = mtmem_calloc(sizeof(char) * (length + 1), "char*", NULL, mtcstr_describe);
+  char* result = mem_calloc(sizeof(char) * (length + 1), "char*", NULL, cstr_describe);
   for (int index = 0; index < length; index++)
   {
-    result[index] = mtcstr_alphanumeric[rand() % strlen(mtcstr_alphanumeric)];
+    result[index] = cstr_alphanumeric[rand() % strlen(cstr_alphanumeric)];
   }
   return result;
 }
 
-void mtcstr_describe(void* p, int level)
+void cstr_describe(void* p, int level)
 {
   printf("%s", (char*)p);
 }

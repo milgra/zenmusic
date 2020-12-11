@@ -21,14 +21,14 @@ struct _tm_coords_t
 typedef struct _tm_t tm_t;
 struct _tm_t
 {
-  mtmap_t* coords;
-  int      cx; // cursor x
-  int      cy; // cursor y
-  int      ch; // cursor height
-  char     is_full;
-  char     did_change;
-  int      width;
-  int      height;
+  map_t* coords;
+  int    cx; // cursor x
+  int    cy; // cursor y
+  int    ch; // cursor height
+  char   is_full;
+  char   did_change;
+  int    width;
+  int    height;
 };
 
 tm_t*       tm_new(int w, int h);
@@ -46,8 +46,8 @@ int         tm_put(tm_t* tm, char* id, int w, int h);
 
 tm_t* tm_new(int w, int h)
 {
-  tm_t* tm   = mtmem_calloc(sizeof(tm_t), "tm_t", tm_del, NULL);
-  tm->coords = mtmap_alloc();
+  tm_t* tm   = mem_calloc(sizeof(tm_t), "tm_t", tm_del, NULL);
+  tm->coords = map_alloc();
   tm->width  = w;
   tm->height = h;
 
@@ -62,7 +62,7 @@ void tm_del(void* p)
 
 void tm_reset(tm_t* tm)
 {
-  mtmap_reset(tm->coords);
+  map_reset(tm->coords);
   tm->cx         = 0;
   tm->cy         = 0;
   tm->ch         = 0;
@@ -72,14 +72,14 @@ void tm_reset(tm_t* tm)
 
 char tm_has(tm_t* tm, char* id)
 {
-  v4_t* coords = mtmap_get(tm->coords, id);
+  v4_t* coords = map_get(tm->coords, id);
   if (coords) return 1;
   return 0;
 }
 
 tm_coords_t tm_get(tm_t* tm, char* id)
 {
-  tm_coords_t* coords = mtmap_get(tm->coords, id);
+  tm_coords_t* coords = map_get(tm->coords, id);
   if (coords) return *coords;
   return (tm_coords_t){0};
 }
@@ -131,7 +131,7 @@ int tm_put(tm_t* tm, char* id, int w, int h)
                                             .h   = h}),
                              "float*");
 
-  mtmap_put(tm->coords, id, coords);
+  map_put(tm->coords, id, coords);
 
   tm->cx = rbx;
   tm->cy = ncy;

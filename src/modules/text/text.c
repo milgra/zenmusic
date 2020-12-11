@@ -39,7 +39,7 @@ void text_init();
 
 void text_render(
     mtstr_t*    text,
-    mtvec_t*    metrics,
+    vec_t*      metrics,
     textstyle_t style,
     bm_t*       bitmap);
 
@@ -57,7 +57,7 @@ void text_render(
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
 
-mtmap_t*       fonts  = NULL;
+map_t*         fonts  = NULL;
 unsigned char* gbytes = NULL; // byte array for glyph baking
 size_t         gcount = 0;    // byte array size for glyph baking
 
@@ -100,7 +100,7 @@ void text_font_load(char* path)
 
 void text_render(
     mtstr_t*    text,
-    mtvec_t*    metrics,
+    vec_t*      metrics,
     textstyle_t style,
     bm_t*       bitmap)
 {
@@ -202,7 +202,7 @@ void text_render(
   }
 }
 
-void para_metrics(mtstr_t* text, r2_t rect, textstyle_t style, mtvec_t* metrics)
+void para_metrics(mtstr_t* text, r2_t rect, textstyle_t style, vec_t* metrics)
 {
 }
 

@@ -121,7 +121,7 @@ void tg_knob_gen(view_t* view)
 
 void tg_knob_add(view_t* view)
 {
-  tg_knob_t* tg = mtmem_calloc(sizeof(tg_knob_t), "tg_knob", NULL, NULL);
+  tg_knob_t* tg = mem_calloc(sizeof(tg_knob_t), "tg_knob", NULL, NULL);
   tg->angle     = 3 * 3.14 / 2;
 
   view->tex_gen_data = tg;

@@ -50,10 +50,10 @@ void tg_text_gen(view_t* view)
 
 void tg_text_add(view_t* view, char* text, textstyle_t style)
 {
-  tg_text_t* gen = mtmem_alloc(sizeof(tg_text_t), "tg_text_t", NULL, NULL);
+  tg_text_t* gen = mem_alloc(sizeof(tg_text_t), "tg_text_t", NULL, NULL);
 
   gen->style = style;
-  gen->text  = mtcstr_fromcstring(text);
+  gen->text  = cstr_fromcstring(text);
 
   view->texture.state = TS_BLANK;
   view->tex_gen_data  = gen;
@@ -67,7 +67,7 @@ void tg_text_set(view_t* view, char* text)
   if (strcmp(text, gen->text) != 0)
   {
     REL(gen->text);
-    gen->text           = mtcstr_fromcstring(text);
+    gen->text           = cstr_fromcstring(text);
     view->texture.state = TS_BLANK;
   }
 }

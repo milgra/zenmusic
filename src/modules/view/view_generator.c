@@ -4,7 +4,7 @@
 #include "mtvector.c"
 #include "view.c"
 
-mtvec_t* view_gen_load(char* htmlpath, char* csspath, char* respath);
+vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath);
 
 #endif
 
@@ -15,10 +15,10 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath, char* respath);
 #include "tg_css.c"
 #include <limits.h>
 
-void view_gen_apply_style(view_t* view, mtmap_t* style, char* respath)
+void view_gen_apply_style(view_t* view, map_t* style, char* respath)
 {
-  mtvec_t* keys = VNEW();
-  mtmap_keys(style, keys);
+  vec_t* keys = VNEW();
+  map_keys(style, keys);
   for (int index = 0; index < keys->length; index++)
   {
     char* key = keys->data[index];
@@ -35,9 +35,9 @@ void view_gen_apply_style(view_t* view, mtmap_t* style, char* respath)
     {
       if (strstr(val, "url") != NULL)
       {
-        char* url = mtmem_calloc(sizeof(char) * strlen(val), "char*", NULL, NULL);
+        char* url = mem_calloc(sizeof(char) * strlen(val), "char*", NULL, NULL);
         memcpy(url, val + 5, strlen(val) - 7);
-        char* imagepath               = mtcstr_fromformat("%s/../res/%s", respath, url, NULL);
+        char* imagepath               = cstr_fromformat("%s/../res/%s", respath, url, NULL);
         view->layout.background_image = imagepath;
         REL(url);
         tg_css_add(view);
@@ -205,7 +205,7 @@ void view_gen_apply_style(view_t* view, mtmap_t* style, char* respath)
   //printf("\n");
 }
 
-mtvec_t* view_gen_load(char* htmlpath, char* csspath, char* respath)
+vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath)
 {
   char* html = html_read(htmlpath);
   char* css  = html_read(csspath);
@@ -214,18 +214,18 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath, char* respath)
   prop_t* view_styles    = html_parse_css(css);
 
   // create style map
-  mtmap_t* styles = MNEW();
-  prop_t*  props  = view_styles;
+  map_t*  styles = MNEW();
+  prop_t* props  = view_styles;
   while ((*props).class.len > 0)
   {
     prop_t t   = *props;
-    char*  cls = mtmem_calloc(sizeof(char) * t.class.len + 1, "char*", NULL, mtcstr_describe);
-    char*  key = mtmem_calloc(sizeof(char) * t.key.len + 1, "char*", NULL, mtcstr_describe);
-    char*  val = mtmem_calloc(sizeof(char) * t.value.len + 1, "char*", NULL, mtcstr_describe);
+    char*  cls = mem_calloc(sizeof(char) * t.class.len + 1, "char*", NULL, cstr_describe);
+    char*  key = mem_calloc(sizeof(char) * t.key.len + 1, "char*", NULL, cstr_describe);
+    char*  val = mem_calloc(sizeof(char) * t.value.len + 1, "char*", NULL, cstr_describe);
     memcpy(cls, css + t.class.pos, t.class.len);
     memcpy(key, css + t.key.pos, t.key.len);
     memcpy(val, css + t.value.pos, t.value.len);
-    mtmap_t* style = MGET(styles, cls);
+    map_t* style = MGET(styles, cls);
     if (style == NULL)
     {
       style = MNEW();
@@ -236,14 +236,14 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath, char* respath)
   }
 
   // create view structure
-  mtvec_t* views = VNEW();
-  tag_t*   tags  = view_structure;
+  vec_t* views = VNEW();
+  tag_t* tags  = view_structure;
   while ((*tags).len > 0)
   {
     tag_t t = *tags;
     if (t.id.len > 0)
     {
-      char* id = mtmem_calloc(sizeof(char) * t.id.len + 1, "char*", NULL, NULL);
+      char* id = mem_calloc(sizeof(char) * t.id.len + 1, "char*", NULL, NULL);
       memcpy(id, html + t.id.pos + 1, t.id.len);
       view_t* view = view_new(id, (r2_t){0});
       VADD(views, view);
@@ -257,7 +257,7 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath, char* respath)
       char cssid[100] = {0};
       snprintf(cssid, 100, "#%s", id);
 
-      mtmap_t* style = MGET(styles, cssid);
+      map_t* style = MGET(styles, cssid);
       if (style)
       {
         view_gen_apply_style(view, style, respath);
@@ -265,7 +265,7 @@ mtvec_t* view_gen_load(char* htmlpath, char* csspath, char* respath)
 
       if (t.class.len > 0)
       {
-        char* class = mtmem_calloc(sizeof(char) * t.class.len + 1, "char*", NULL, NULL);
+        char* class = mem_calloc(sizeof(char) * t.class.len + 1, "char*", NULL, NULL);
         memcpy(class, html + t.class.pos + 1, t.class.len);
 
         char csscls[100] = {0};

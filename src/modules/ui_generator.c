@@ -38,9 +38,9 @@ int ui_generator_workloop(void* mypointer);
 
 struct _ui_generator_t
 {
-  mtvec_t*    views;
+  vec_t*      views;
   SDL_Thread* thread;
-  mtch_t*     channel;
+  ch_t*       channel;
 } uig = {0};
 
 int ui_generator_init(int width, int height)
@@ -48,7 +48,7 @@ int ui_generator_init(int width, int height)
   ui_compositor_init(width, height);
 
   uig.views   = VNEW();
-  uig.channel = mtch_new(50);
+  uig.channel = ch_new(50);
   uig.thread  = SDL_CreateThread(ui_generator_workloop, "generator", NULL);
 
   return (uig.thread != NULL);
@@ -57,7 +57,7 @@ int ui_generator_init(int width, int height)
 void ui_generator_reset()
 {
   ui_compositor_reset();
-  mtvec_reset(uig.views);
+  vec_reset(uig.views);
 }
 
 void ui_generator_add(view_t* view)
@@ -106,7 +106,7 @@ void ui_generator_render()
   {
     if (view->texture.type == TT_MANAGED && view->texture.state == TS_BLANK)
     {
-      if (mtch_send(uig.channel, view)) view->texture.state = TS_PENDING;
+      if (ch_send(uig.channel, view)) view->texture.state = TS_PENDING;
     }
     if (view->frame.changed)
     {
@@ -134,7 +134,7 @@ int ui_generator_workloop()
 
   while (1)
   {
-    while ((view = mtch_recv(uig.channel)))
+    while ((view = ch_recv(uig.channel)))
     {
       view_gen_texture(view);
     }

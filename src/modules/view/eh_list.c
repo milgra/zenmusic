@@ -7,8 +7,8 @@
 
 typedef struct _eh_list_t
 {
-  mtvec_t* items;
-  mtvec_t* cache;
+  vec_t* items;
+  vec_t* cache;
 
   int head_index;
   int tail_index;
@@ -96,7 +96,7 @@ void eh_list_evt(view_t* view, ev_t ev)
     {
       if (eh->items->length == 0)
       {
-        view_t* cacheitem = mtvec_head(eh->cache);
+        view_t* cacheitem = vec_head(eh->cache);
         view_t* rowitem   = (*eh->row_generator)(view, cacheitem, 0, &eh->item_count);
 
         if (rowitem)
@@ -111,14 +111,14 @@ void eh_list_evt(view_t* view, ev_t ev)
       }
       else
       {
-        view_t* head = mtvec_head(eh->items);
-        view_t* tail = mtvec_tail(eh->items);
+        view_t* head = vec_head(eh->items);
+        view_t* tail = vec_tail(eh->items);
 
         // add items if needed
 
         if (head->frame.local.y > 0.0 - PRELOAD_DISTANCE)
         {
-          view_t* cacheitem = mtvec_head(eh->cache);
+          view_t* cacheitem = vec_head(eh->cache);
           view_t* rowitem   = (*eh->row_generator)(view, cacheitem, eh->head_index - 1, &eh->item_count);
 
           if (rowitem)
@@ -127,7 +127,7 @@ void eh_list_evt(view_t* view, ev_t ev)
             eh->item_wth = rowitem->frame.global.w; // store maximum width
 
             VREM(eh->cache, rowitem);
-            mtvec_addatindex(eh->items, rowitem, 0);
+            vec_addatindex(eh->items, rowitem, 0);
 
             if (rowitem->parent == NULL) view_insert(view, rowitem, 0);
             view_set_frame(rowitem, (r2_t){0, head->frame.local.y - rowitem->frame.local.h, rowitem->frame.local.w, rowitem->frame.local.h});
@@ -142,7 +142,7 @@ void eh_list_evt(view_t* view, ev_t ev)
 
         if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h + PRELOAD_DISTANCE)
         {
-          view_t* cacheitem = mtvec_head(eh->cache);
+          view_t* cacheitem = vec_head(eh->cache);
           view_t* rowitem   = (*eh->row_generator)(view, cacheitem, eh->tail_index + 1, &eh->item_count);
 
           if (rowitem)
@@ -186,8 +186,8 @@ void eh_list_evt(view_t* view, ev_t ev)
     // scroll bounce if needed
     if (eh->items->length > 0)
     {
-      view_t* head = mtvec_head(eh->items);
-      view_t* tail = mtvec_tail(eh->items);
+      view_t* head = vec_head(eh->items);
+      view_t* tail = vec_tail(eh->items);
 
       // horizontal bounce
 
@@ -296,7 +296,7 @@ void eh_list_fill(view_t* view)
 void eh_list_add(view_t* view,
                  view_t* (*row_generator)(view_t* listview, view_t* rowview, int index, int* item_count))
 {
-  eh_list_t* eh     = mtmem_calloc(sizeof(eh_list_t), "eh_list", eh_list_del, NULL);
+  eh_list_t* eh     = mem_calloc(sizeof(eh_list_t), "eh_list", eh_list_del, NULL);
   eh->items         = VNEW();
   eh->cache         = VNEW();
   eh->row_generator = row_generator;

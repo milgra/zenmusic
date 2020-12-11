@@ -26,8 +26,8 @@ void ui_manager_render();
 #include "ui_generator.c"
 #include "view_layout.c"
 
-view_t*  root;
-mtvec_t* queue;
+view_t* root;
+vec_t*  queue;
 
 void ui_manager_init(int width, int height)
 {
@@ -69,7 +69,7 @@ void ui_manager_event(ev_t ev)
         }
       }
 
-      mtvec_reset(queue);
+      vec_reset(queue);
       view_coll_touched(root, ev, queue);
     }
 

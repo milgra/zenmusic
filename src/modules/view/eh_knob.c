@@ -66,7 +66,7 @@ void eh_knob_add(view_t* view,
                  void (*ratio_changed)(view_t* view, float ratio),
                  void (*button_pushed)(view_t* view))
 {
-  eh_knob_t* eh = mtmem_calloc(sizeof(eh_knob_t), "eh_knob", NULL, NULL);
+  eh_knob_t* eh = mem_calloc(sizeof(eh_knob_t), "eh_knob", NULL, NULL);
 
   eh->ratio_changed = ratio_changed;
   eh->button_pushed = button_pushed;

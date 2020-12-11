@@ -48,7 +48,7 @@ char* html_read(char* path)
   long fsize = ftell(f);
   fseek(f, 0, SEEK_SET);
 
-  char* string = mtmem_alloc(fsize + 1, "char*", NULL, mtcstr_describe);
+  char* string = mem_alloc(fsize + 1, "char*", NULL, cstr_describe);
 
   fread(string, 1, fsize, f);
   fclose(f);
@@ -162,7 +162,7 @@ void analyze_tags(char* html, tag_t* tags, uint32_t count)
 tag_t* html_parse_html(char* html)
 {
   uint32_t cnt  = count_tags(html);
-  tag_t*   tags = mtmem_calloc(sizeof(tag_t) * (cnt + 1), "tag_t*", NULL, NULL);
+  tag_t*   tags = mem_calloc(sizeof(tag_t) * (cnt + 1), "tag_t*", NULL, NULL);
 
   extract_tags(html, tags);
   analyze_tags(html, tags, cnt);
@@ -238,9 +238,9 @@ void analyze_classes(char* css, prop_t* props)
 
 prop_t* html_parse_css(char* css)
 {
-  mtmap_t* map   = mtmap_alloc();
+  map_t*   map   = map_alloc();
   uint32_t cnt   = count_props(css);
-  prop_t*  props = mtmem_calloc(sizeof(prop_t) * (cnt + 1), "prop_t*", NULL, NULL);
+  prop_t*  props = mem_calloc(sizeof(prop_t) * (cnt + 1), "prop_t*", NULL, NULL);
 
   analyze_classes(css, props);
 

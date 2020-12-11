@@ -82,7 +82,7 @@ void eh_anim_set(view_t* view, r2_t sf, r2_t ef, int steps, animtype_t type)
 
 void eh_anim_add(view_t* view)
 {
-  eh_anim_t* eh = mtmem_calloc(sizeof(eh_anim_t), "eh_anim", NULL, NULL);
+  eh_anim_t* eh = mem_calloc(sizeof(eh_anim_t), "eh_anim", NULL, NULL);
 
   view->evt_han      = eh_anim_evt;
   view->evt_han_data = eh;

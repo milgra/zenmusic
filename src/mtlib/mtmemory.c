@@ -9,13 +9,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define RPL(X, Y) mtmem_replace((void**)&X, Y)
+#define RPL(X, Y) mem_replace((void**)&X, Y)
 #define SET(X, Y) X = Y
-#define RET(X) mtmem_retain(X)
-#define REL(X) mtmem_release(X)
-#define HEAP(X, T) mtmem_stack_to_heap(sizeof(X), T, NULL, NULL, (uint8_t*)&X)
+#define RET(X) mem_retain(X)
+#define REL(X) mem_release(X)
+#define HEAP(X, T) mem_stack_to_heap(sizeof(X), T, NULL, NULL, (uint8_t*)&X)
 
-struct mtmem_head
+struct mem_head
 {
   char type[10];
   void (*destructor)(void*);
@@ -23,17 +23,17 @@ struct mtmem_head
   size_t retaincount;
 };
 
-void*  mtmem_alloc(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*, int));
-void*  mtmem_calloc(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*, int));
-void*  mtmem_realloc(void* pointer, size_t size);
-void*  mtmem_retain(void* pointer);
-char   mtmem_release(void* pointer);
-char   mtmem_releaseeach(void* first, ...);
-size_t mtmem_retaincount(void* pointer);
-void   mtmem_replace(void** address, void* data);
-void*  mtmem_stack_to_heap(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*, int), uint8_t* data);
-void   mtmem_describe(void* pointer, int level);
-void   mtmem_exit(char* text, char* type);
+void*  mem_alloc(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*, int));
+void*  mem_calloc(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*, int));
+void*  mem_realloc(void* pointer, size_t size);
+void*  mem_retain(void* pointer);
+char   mem_release(void* pointer);
+char   mem_releaseeach(void* first, ...);
+size_t mem_retaincount(void* pointer);
+void   mem_replace(void** address, void* data);
+void*  mem_stack_to_heap(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*, int), uint8_t* data);
+void   mem_describe(void* pointer, int level);
+void   mem_exit(char* text, char* type);
 
 #endif
 
@@ -41,91 +41,91 @@ void   mtmem_exit(char* text, char* type);
 
 #include <string.h>
 
-void* mtmem_alloc(size_t size,                    /* size of data to store */
-                  char*  type,                    /* short descriptoon of data to show for describing memory map*/
-                  void (*destructor)(void*),      /* optional destructor */
-                  void (*descriptor)(void*, int)) /* optional descriptor for describing memory map*/
+void* mem_alloc(size_t size,                    /* size of data to store */
+                char*  type,                    /* short descriptoon of data to show for describing memory map*/
+                void (*destructor)(void*),      /* optional destructor */
+                void (*descriptor)(void*, int)) /* optional descriptor for describing memory map*/
 {
-  if (size == 0) mtmem_exit("Ttrying to allocate 0 bytes for", type);
-  uint8_t* bytes = malloc(sizeof(struct mtmem_head) + size);
-  if (bytes == NULL) mtmem_exit("Out of RAM \\_(o)_/ for", type);
+  if (size == 0) mem_exit("Ttrying to allocate 0 bytes for", type);
+  uint8_t* bytes = malloc(sizeof(struct mem_head) + size);
+  if (bytes == NULL) mem_exit("Out of RAM \\_(o)_/ for", type);
 
-  struct mtmem_head* head = (struct mtmem_head*)bytes;
+  struct mem_head* head = (struct mem_head*)bytes;
 
   memcpy(head->type, type, 9);
   head->destructor  = destructor;
   head->descriptor  = descriptor;
   head->retaincount = 1;
 
-  return bytes + sizeof(struct mtmem_head);
+  return bytes + sizeof(struct mem_head);
 }
 
-void* mtmem_calloc(size_t size,                    /* size of data to store */
-                   char*  type,                    /* short descriptoon of data to show for describing memory map*/
-                   void (*destructor)(void*),      /* optional destructor */
-                   void (*descriptor)(void*, int)) /* optional descriptor for describing memory map*/
+void* mem_calloc(size_t size,                    /* size of data to store */
+                 char*  type,                    /* short descriptoon of data to show for describing memory map*/
+                 void (*destructor)(void*),      /* optional destructor */
+                 void (*descriptor)(void*, int)) /* optional descriptor for describing memory map*/
 {
-  if (size == 0) mtmem_exit("Ttrying to allocate 0 bytes for", type);
-  uint8_t* bytes = calloc(1, sizeof(struct mtmem_head) + size);
-  if (bytes == NULL) mtmem_exit("Out of RAM \\_(o)_/ for", type);
+  if (size == 0) mem_exit("Ttrying to allocate 0 bytes for", type);
+  uint8_t* bytes = calloc(1, sizeof(struct mem_head) + size);
+  if (bytes == NULL) mem_exit("Out of RAM \\_(o)_/ for", type);
 
-  struct mtmem_head* head = (struct mtmem_head*)bytes;
+  struct mem_head* head = (struct mem_head*)bytes;
 
   memcpy(head->type, type, 9);
   head->destructor  = destructor;
   head->descriptor  = descriptor;
   head->retaincount = 1;
 
-  return bytes + sizeof(struct mtmem_head);
+  return bytes + sizeof(struct mem_head);
 }
 
-void* mtmem_stack_to_heap(size_t size,
-                          char*  type,
-                          void (*destructor)(void*),
-                          void (*descriptor)(void*, int),
-                          uint8_t* data)
+void* mem_stack_to_heap(size_t size,
+                        char*  type,
+                        void (*destructor)(void*),
+                        void (*descriptor)(void*, int),
+                        uint8_t* data)
 {
-  uint8_t* bytes = mtmem_alloc(size, type, destructor, descriptor);
-  if (bytes == NULL) mtmem_exit("Out of RAM \\_(o)_/ for", type);
+  uint8_t* bytes = mem_alloc(size, type, destructor, descriptor);
+  if (bytes == NULL) mem_exit("Out of RAM \\_(o)_/ for", type);
   memcpy(bytes, data, size);
   return bytes;
 }
 
-void* mtmem_realloc(void* pointer, size_t size)
+void* mem_realloc(void* pointer, size_t size)
 {
   assert(pointer != NULL);
 
   uint8_t* bytes = (uint8_t*)pointer;
-  bytes -= sizeof(struct mtmem_head);
-  bytes = realloc(bytes, sizeof(struct mtmem_head) + size);
-  if (bytes == NULL) mtmem_exit("Out of RAM \\_(o)_/ when realloc", "");
+  bytes -= sizeof(struct mem_head);
+  bytes = realloc(bytes, sizeof(struct mem_head) + size);
+  if (bytes == NULL) mem_exit("Out of RAM \\_(o)_/ when realloc", "");
 
-  return bytes + sizeof(struct mtmem_head);
+  return bytes + sizeof(struct mem_head);
 }
 
-void* mtmem_retain(void* pointer)
+void* mem_retain(void* pointer)
 {
   assert(pointer != NULL);
 
   uint8_t* bytes = (uint8_t*)pointer;
-  bytes -= sizeof(struct mtmem_head);
-  struct mtmem_head* head = (struct mtmem_head*)bytes;
+  bytes -= sizeof(struct mem_head);
+  struct mem_head* head = (struct mem_head*)bytes;
 
   head->retaincount += 1;
-  if (head->retaincount == SIZE_MAX) mtmem_exit("Maximum retain count reached \\(o)_/ for", head->type);
+  if (head->retaincount == SIZE_MAX) mem_exit("Maximum retain count reached \\(o)_/ for", head->type);
 
   return pointer;
 }
 
-char mtmem_release(void* pointer)
+char mem_release(void* pointer)
 {
   assert(pointer != NULL);
 
   uint8_t* bytes = (uint8_t*)pointer;
-  bytes -= sizeof(struct mtmem_head);
-  struct mtmem_head* head = (struct mtmem_head*)bytes;
+  bytes -= sizeof(struct mem_head);
+  struct mem_head* head = (struct mem_head*)bytes;
 
-  if (head->retaincount == 0) mtmem_exit("Tried to release already released memory for", head->type);
+  if (head->retaincount == 0) mem_exit("Tried to release already released memory for", head->type);
 
   head->retaincount -= 1;
 
@@ -139,7 +139,7 @@ char mtmem_release(void* pointer)
   return 0;
 }
 
-char mtmem_releaseeach(void* first, ...)
+char mem_releaseeach(void* first, ...)
 {
   va_list ap;
   void*   actual;
@@ -147,37 +147,37 @@ char mtmem_releaseeach(void* first, ...)
   va_start(ap, first);
   for (actual = first; actual != NULL; actual = va_arg(ap, void*))
   {
-    released &= mtmem_release(actual);
+    released &= mem_release(actual);
   }
   va_end(ap);
   return released;
 }
 
-size_t mtmem_retaincount(void* pointer)
+size_t mem_retaincount(void* pointer)
 {
   assert(pointer != NULL);
 
   uint8_t* bytes = (uint8_t*)pointer;
-  bytes -= sizeof(struct mtmem_head);
-  struct mtmem_head* head = (struct mtmem_head*)bytes;
+  bytes -= sizeof(struct mem_head);
+  struct mem_head* head = (struct mem_head*)bytes;
 
   return head->retaincount;
 }
 
-void mtmem_replace(void** address, void* data)
+void mem_replace(void** address, void* data)
 {
-  if (*address != NULL) mtmem_release(*address);
-  mtmem_retain(data);
+  if (*address != NULL) mem_release(*address);
+  mem_retain(data);
   *address = data;
 }
 
-void mtmem_describe(void* pointer, int level)
+void mem_describe(void* pointer, int level)
 {
   assert(pointer != NULL);
 
   uint8_t* bytes = (uint8_t*)pointer;
-  bytes -= sizeof(struct mtmem_head);
-  struct mtmem_head* head = (struct mtmem_head*)bytes;
+  bytes -= sizeof(struct mem_head);
+  struct mem_head* head = (struct mem_head*)bytes;
 
   if (head->descriptor != NULL)
   {
@@ -189,7 +189,7 @@ void mtmem_describe(void* pointer, int level)
   }
 }
 
-void mtmem_exit(char* text, char* type)
+void mem_exit(char* text, char* type)
 {
   printf("%s %s\n", text, type);
   exit(EXIT_FAILURE);

@@ -66,15 +66,15 @@ void     crect_set_texture(crect_t* rect, float tlx, float tly, float brx, float
 
 struct uic_t
 {
-  fb_t*    fb;      // float buffer
-  tm_t*    tm;      // texture map
-  mtvec_t* rects_v; // rectangle vector
-  mtvec_t* final_v; // rectangle vector for quick sort
-  mtmap_t* rects_m; // rectangle map
-  int      width;
-  int      height;
-  int      tex_page;
-  int      upd_geo; // update geometry
+  fb_t*  fb;      // float buffer
+  tm_t*  tm;      // texture map
+  vec_t* rects_v; // rectangle vector
+  vec_t* final_v; // rectangle vector for quick sort
+  map_t* rects_m; // rectangle map
+  int    width;
+  int    height;
+  int    tex_page;
+  int    upd_geo; // update geometry
 } uic = {0};
 
 void ui_compositor_init(int width, int height)
@@ -103,9 +103,9 @@ void ui_compositor_reset()
   fb_reset(uic.fb);
   tm_reset(uic.tm);
 
-  mtvec_reset(uic.rects_v);
-  mtvec_reset(uic.final_v);
-  mtmap_reset(uic.rects_m);
+  vec_reset(uic.rects_v);
+  vec_reset(uic.final_v);
+  map_reset(uic.rects_m);
 }
 
 void ui_compositor_resize(int width, int height)
@@ -142,7 +142,7 @@ void ui_compositor_add(char* rectid, char* texid, uint32_t index)
 void ui_compositor_rem(char* id)
 {
   // printf("ui_compositor_rem %s\n", id);
-  crect_t* rect = mtmap_get(uic.rects_m, id);
+  crect_t* rect = map_get(uic.rects_m, id);
 
   if (rect)
   {
@@ -157,7 +157,7 @@ void ui_compositor_rem(char* id)
 void ui_compositor_upd_texture(char* id, int page, int full, int ext, int blur, int w, int h)
 {
   // printf("ui_compositor_upd_texture %s %i\n", id, page);
-  crect_t* rect = mtmap_get(uic.rects_m, id);
+  crect_t* rect = map_get(uic.rects_m, id);
 
   if (rect)
   {
@@ -185,7 +185,7 @@ void ui_compositor_upd_texture(char* id, int page, int full, int ext, int blur, 
 
 void ui_compositor_upd_frame(char* rectid, r2_t frame, float border)
 {
-  crect_t* rect = mtmap_get(uic.rects_m, rectid);
+  crect_t* rect = map_get(uic.rects_m, rectid);
 
   if (rect)
   {
@@ -230,7 +230,7 @@ void ui_compositor_upd_bitmap(char* texid, bm_t* bm)
 
 void ui_compositor_upd_index(char* rectid, int index)
 {
-  crect_t* rect = mtmap_get(uic.rects_m, rectid);
+  crect_t* rect = map_get(uic.rects_m, rectid);
 
   if (rect)
   {
@@ -250,7 +250,7 @@ void ui_compositor_render()
     // set sequence
     while ((rect = VNXT(uic.rects_v)))
     {
-      if (rect->index < uic.final_v->length) mtvec_replaceatindex(uic.final_v, rect, rect->index);
+      if (rect->index < uic.final_v->length) vec_replaceatindex(uic.final_v, rect, rect->index);
     }
 
     while ((rect = VNXT(uic.final_v)))
@@ -335,10 +335,10 @@ void ui_compositor_render()
 
 crect_t* crect_new(char* id, char* texid, uint32_t index)
 {
-  crect_t* r = mtmem_calloc(sizeof(crect_t), "crect_t", crect_del, NULL);
+  crect_t* r = mem_calloc(sizeof(crect_t), "crect_t", crect_del, NULL);
 
-  r->id     = mtcstr_fromcstring(id);
-  r->tex_id = mtcstr_fromcstring(texid);
+  r->id     = cstr_fromcstring(id);
+  r->tex_id = cstr_fromcstring(texid);
   r->index  = index;
 
   return r;

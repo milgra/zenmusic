@@ -766,7 +766,7 @@ void m4_extract(m4_t trafo, v3_t* scale, v3_t* rotation, v3_t* translation)
 v3_t v4_quadrelativecoors(v4_t ulc, v4_t urc, v4_t llc, v3_t point_is)
 {
   v3_t plane_a, plane_b, plane_d;
-  v3_t mtvec_ab, mtvec_ad, mtvec_n, mtvec_ai;
+  v3_t vec_ab, vec_ad, vec_n, vec_ai;
 
   plane_a = v3_init(ulc.x, ulc.y, ulc.z);
   plane_b = v3_init(llc.x, llc.y, llc.z);
@@ -774,24 +774,24 @@ v3_t v4_quadrelativecoors(v4_t ulc, v4_t urc, v4_t llc, v3_t point_is)
 
   // create plane vectors and normal
 
-  mtvec_ab = v3_sub(plane_b, plane_a);
-  mtvec_ad = v3_sub(plane_d, plane_a);
-  mtvec_n  = v3_cross(mtvec_ab, mtvec_ad);
+  vec_ab = v3_sub(plane_b, plane_a);
+  vec_ad = v3_sub(plane_d, plane_a);
+  vec_n  = v3_cross(vec_ab, vec_ad);
 
   // get angle of AI from AB and AC to build up the frame square in its actual
   // position
 
-  mtvec_ai = v3_sub(point_is, plane_a);
+  vec_ai = v3_sub(point_is, plane_a);
 
-  float angle_ab_ai     = v3_angle(mtvec_ab, mtvec_ai);
-  float angle_ad_ai     = v3_angle(mtvec_ad, mtvec_ai);
-  float length_mtvec_ai = v3_length(mtvec_ai);
+  float angle_ab_ai   = v3_angle(vec_ab, vec_ai);
+  float angle_ad_ai   = v3_angle(vec_ad, vec_ai);
+  float length_vec_ai = v3_length(vec_ai);
 
   // get relative coordinates
 
   v3_t relative;
-  relative.x = cos(angle_ad_ai) * length_mtvec_ai;
-  relative.y = -sin(angle_ad_ai) * length_mtvec_ai;
+  relative.x = cos(angle_ad_ai) * length_vec_ai;
+  relative.y = -sin(angle_ad_ai) * length_vec_ai;
 
   // check quarters
 
@@ -800,8 +800,8 @@ v3_t v4_quadrelativecoors(v4_t ulc, v4_t urc, v4_t llc, v3_t point_is)
   else if (angle_ab_ai > M_PI / 2 && angle_ad_ai < M_PI / 2)
     relative.y *= -1;
 
-  if (relative.x > 0.0 && relative.x < v3_length(mtvec_ad) &&
-      relative.y < 0.0 && relative.y > -v3_length(mtvec_ab))
+  if (relative.x > 0.0 && relative.x < v3_length(vec_ad) &&
+      relative.y < 0.0 && relative.y > -v3_length(vec_ab))
   {
     return relative;
   }
@@ -814,7 +814,7 @@ v3_t v4_quadrelativecoors(v4_t ulc, v4_t urc, v4_t llc, v3_t point_is)
 v3_t v4_quadlineintersection(v4_t ulc, v4_t urc, v4_t llc, v3_t linea, v3_t lineb)
 {
   v3_t plane_a, plane_b, plane_d;
-  v3_t mtvec_ab, mtvec_ad, mtvec_n, mtvec_ai, point_is;
+  v3_t vec_ab, vec_ad, vec_n, vec_ai, point_is;
 
   plane_a = v3_init(ulc.x, ulc.y, ulc.z);
   plane_b = v3_init(llc.x, llc.y, llc.z);
@@ -822,27 +822,27 @@ v3_t v4_quadlineintersection(v4_t ulc, v4_t urc, v4_t llc, v3_t linea, v3_t line
 
   // create plane vectors and normal
 
-  mtvec_ab = v3_sub(plane_b, plane_a);
-  mtvec_ad = v3_sub(plane_d, plane_a);
-  mtvec_n  = v3_cross(mtvec_ab, mtvec_ad);
+  vec_ab = v3_sub(plane_b, plane_a);
+  vec_ad = v3_sub(plane_d, plane_a);
+  vec_n  = v3_cross(vec_ab, vec_ad);
 
   // get intersection point
 
-  point_is = v3_intersectwithplane(linea, lineb, plane_a, mtvec_n);
+  point_is = v3_intersectwithplane(linea, lineb, plane_a, vec_n);
 
   // get angle of AI from AB and AC to build up the frame square in its actual
   // position
 
-  mtvec_ai = v3_sub(point_is, plane_a);
+  vec_ai = v3_sub(point_is, plane_a);
 
-  float angle_ab_ai     = v3_angle(mtvec_ab, mtvec_ai);
-  float angle_ad_ai     = v3_angle(mtvec_ad, mtvec_ai);
-  float length_mtvec_ai = v3_length(mtvec_ai);
+  float angle_ab_ai   = v3_angle(vec_ab, vec_ai);
+  float angle_ad_ai   = v3_angle(vec_ad, vec_ai);
+  float length_vec_ai = v3_length(vec_ai);
 
   // get relative coordinates
 
-  float x = cos(angle_ad_ai) * length_mtvec_ai;
-  float y = -sin(angle_ad_ai) * length_mtvec_ai;
+  float x = cos(angle_ad_ai) * length_vec_ai;
+  float y = -sin(angle_ad_ai) * length_vec_ai;
 
   // check quarters
 
@@ -851,7 +851,7 @@ v3_t v4_quadlineintersection(v4_t ulc, v4_t urc, v4_t llc, v3_t linea, v3_t line
   else if (angle_ab_ai > M_PI / 2 && angle_ad_ai < M_PI / 2)
     y *= -1;
 
-  if (x > 0.0 && x < v3_length(mtvec_ad) && y < 0.0 && y > -v3_length(mtvec_ab))
+  if (x > 0.0 && x < v3_length(vec_ad) && y < 0.0 && y > -v3_length(vec_ab))
     return point_is;
   else
     return v3_init(FLT_MAX, FLT_MAX, FLT_MAX);
