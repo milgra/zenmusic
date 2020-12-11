@@ -170,7 +170,7 @@ void text_render(
     // increase glyph baking bitmap size if needed
     if (size > gcount)
     {
-      gcount = 100;
+      gcount = size;
       gbytes = realloc(gbytes, gcount);
     }
 
@@ -188,15 +188,7 @@ void text_render(
                                         0,       // shift y
                                         cp);
 
-      //bm_t* tmpbm = bm_new_from_grayscale(w, h, 0, style.textcolor, gbytes);
-
       bm_blend_alpha(bitmap, xpos + x0, baseline + y0, gbytes, w, h);
-
-      // TODO replace with blend_alpha with int calculations
-      //bm_insert_blend(bitmap, tmpbm, xpos + x0, baseline + y0);
-
-      // cleanup
-      //REL(tmpbm);
 
       // printf("write glyph %c at xpos %f w %i h %i baseline(y) %i (x) %i x_shift %f\n", text[ch], xpos, x1 - x0, y1 - y0, baseline, (int)xpos + x0, x_shift);
     }

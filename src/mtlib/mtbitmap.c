@@ -266,7 +266,13 @@ void bm_blend_alpha(bm_t* bm, int nx, int ny, unsigned char* ndata, int nw, int 
       unsigned char oa = odata[oi + 3]; // original alpha
       unsigned char na = ndata[ni];     // new alpha
 
-      if (na > 0) odata[oi + 3] = oa + (na - oa) / 2;
+      if (na > 0)
+      {
+        if (oa == 0)
+          odata[oi + 3] = na;
+        else
+          odata[oi + 3] = oa + (na - oa) / 2;
+      }
     }
   }
 }
