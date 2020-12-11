@@ -68,7 +68,7 @@ void eh_text_evt(view_t* view, ev_t ev)
   {
 
     str_addbytearray(data->text, ev.text);
-    printf("text %s\n", str_bytes(data->text));
+    printf("text %s\n", str_cstring(data->text));
 
     // add new glyph view/update paragraph view
 
@@ -129,9 +129,11 @@ void eh_text_evt(view_t* view, ev_t ev)
 void eh_text_add(view_t* view, char* text, void (*ontext)(view_t* view, str_t* text))
 {
   eh_text_t* data = mem_calloc(sizeof(eh_text_t), "eh_text", NULL, NULL);
-  data->text      = str_frombytes(text);
+  data->text      = str_new();
   data->glyphs    = vec_alloc();
   data->ontext    = ontext;
+
+  str_addbytearray(data->text, text);
 
   view->needs_key     = 1;
   view->needs_text    = 1;
@@ -155,11 +157,11 @@ void eh_text_add(view_t* view, char* text, void (*ontext)(view_t* view, str_t* t
   {
     uint32_t cp = data->text->codepoints[index];
 
-    str_t* str = str_alloc();
+    str_t* str = str_new();
     str_addcodepoint(str, cp);
 
     char idbuffer[100] = {0};
-    snprintf(idbuffer, 100, "glyphview %s", str_bytes(str));
+    snprintf(idbuffer, 100, "glyphview %s", str_cstring(str));
 
     textstyle_t ts = {0};
     ts.align       = 0;
@@ -169,7 +171,7 @@ void eh_text_add(view_t* view, char* text, void (*ontext)(view_t* view, str_t* t
 
     // TODO get glyph width first
     view_t* glyphview = view_new(idbuffer, (r2_t){0, 0, 20, 20});
-    tg_text_add(glyphview, str_bytes(str), ts);
+    tg_text_add(glyphview, str_cstring(str), ts);
 
     view_add(view, glyphview);
 
