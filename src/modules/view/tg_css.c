@@ -58,7 +58,6 @@ void tg_css_gen(view_t* view)
       float h = view->frame.local.h + 2 * view->layout.shadow_blur;
 
       bm_t* bmp = bm_new(w, h);
-      //bm_fill(bmp, 0, 0, bmp->w, bmp->h, 0x00000044);
 
       mtgraphics_rounded_rect(bmp,
                               0,

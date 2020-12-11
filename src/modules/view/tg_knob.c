@@ -114,7 +114,7 @@ void tg_knob_gen(view_t* view)
                           0x999999FF);
     }
 
-    bm_insert_blend(view->texture.bitmap, tg->fore, 0, 0);
+    bm_blend_rgba(view->texture.bitmap, 0, 0, tg->fore);
     view->texture.changed = 1;
   }
 }

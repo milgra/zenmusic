@@ -18,6 +18,7 @@ void video_refresh(void* opaque, double* remaining_time, int index);
 #include "libswresample/swresample.h"
 #include "libswscale/swscale.h"
 #include "mtbitmap.c"
+#include "mtgraphics.c"
 #include "options.c"
 #include "strcomm.c"
 #include "video.c"
@@ -218,7 +219,7 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap, int edge
 
   if (s->show_mode == SHOW_MODE_WAVES)
   {
-    bm_fill_rgb(bitmap, edge, edge, width, height, 0x000000FF);
+    mtgraphics_rect(bitmap, edge, edge, width, height, 0x000000FF, 1);
 
     /* total height for one channel */
     h = height;
@@ -245,7 +246,8 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap, int edge
           ys = y1;
           y2 = ys + y;
         }
-        bm_fill_rgb(bitmap, s->xleft + x, y2, s->xleft + x + 1, y2 + 2, 0xFFFFFFFF);
+
+        mtgraphics_rect(bitmap, s->xleft + x, y2, 1, 2, 0xFFFFFFFF, 1);
 
         i += channels;
         if (i >= SAMPLE_ARRAY_SIZE)
@@ -314,7 +316,7 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap, int edge
         pixels -= pitch;
         uint32_t color = ((a << 16) + (b << 8) + ((a + b) >> 1)) << 8 | 0xFF;
 
-        bm_fill(bitmap, s->xpos, y, s->xpos + 1, y + 1, color);
+        mtgraphics_rect(bitmap, s->xpos, y, 1, 1, color, 0);
         /*}*/
         /* SDL_UnlockTexture(s->vis_texture); */
       }

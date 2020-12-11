@@ -241,7 +241,7 @@ bm_t* player_get_album(const char* path)
       /* unsigned char* bytes = stbi_load_from_memory(pkt.data, pkt.size, &w, &h, &components, 4); */
 
       result = bm_new(image->w, image->h);
-      bm_from3(result, image->pixels);
+      bm_insert_rgb(result, image->pixels, image->w, image->h, 0, 0);
       //memcpy(result->data, image->pixels, image->w * image->h * 4);
 
       av_packet_unref(&pkt);

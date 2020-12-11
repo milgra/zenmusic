@@ -22,6 +22,13 @@ void mtgraphics_arc_grad(bm_t*    bm,
                          uint32_t c2);
 void mtgraphics_grad_v(bm_t* bm, int sx, int sy, int w, int h, uint32_t c1, uint32_t c2);
 void mtgraphics_grad_h(bm_t* bm, int sx, int sy, int w, int h, uint32_t c1, uint32_t c2);
+void mtgraphics_rect(bm_t*    bm,
+                     int      sx,
+                     int      sy,
+                     int      w,
+                     int      h,
+                     uint32_t color,
+                     char     la); // leave alpha channel untouched
 
 #endif
 
@@ -93,14 +100,14 @@ void mtgraphics_arc(bm_t* bitmap, float cx, float cy, float r, float edge, uint3
 }
 
 void mtgraphics_arc_grad(bm_t*    bm,
-                         float    cx,
-                         float    cy,
-                         float    d1,
-                         float    d2,
-                         float    a1,
-                         float    a2,
-                         uint32_t c1,
-                         uint32_t c2)
+                         float    cx, // center x
+                         float    cy, // center y
+                         float    d1, // distance 1
+                         float    d2, // distance 2
+                         float    a1, // angle 1
+                         float    a2, // angle 2
+                         uint32_t c1, // color 1
+                         uint32_t c2) // color 2
 {
   int sx = (int)cx - d2 - 1;
   int sy = (int)cy - d2 - 1;
@@ -173,7 +180,7 @@ void mtgraphics_tile(bm_t* bitmap)
     {
       uint32_t index = row * bitmap->w + col;
       uint32_t color = (row % 2 == 0 && col % 2 == 1) ? 0xFFFFFFFF : 0x000000FF;
-      bm_fill(bitmap, col, row, col + 1, row + 1, color);
+      mtgraphics_rect(bitmap, color, row, 1, 1, color, 0);
     }
   }
 }
@@ -286,8 +293,40 @@ void mtgraphics_rounded_rect(bm_t* bitmap, int x, int y, int w, int h, int r, fl
   mtgraphics_grad_v(bitmap, x + r, y, w - r - r, e, c2 & 0xFFFFFF00, c2);             // top horizontal grad
   mtgraphics_grad_v(bitmap, x + r, y + h - e, w - r - r, e - 1, c2, c2 & 0xFFFFFF00); // bottom horizontal grad
 
-  bm_fill(bitmap, x + e, y + r, x + w - e, y + h - r, c1); // center
-  bm_fill(bitmap, x + r, y + e, x + w - r, y + h - e, c1); // center
+  mtgraphics_rect(bitmap, x + e, y + r, w - 2 * e, h - 2 * r, c1, 0);
+  mtgraphics_rect(bitmap, x + r, y + e, w - 2 * r, h - 2 * e, c1, 0);
+}
+
+void mtgraphics_rect(bm_t*    bm,
+                     int      sx,
+                     int      sy,
+                     int      w,
+                     int      h,
+                     uint32_t color,
+                     char     la) // leave alpha channel untouched
+{
+  int ex = sx + w;
+  if (ex > bm->w) ex = bm->w;
+  int ey = sy + h;
+  if (ey > bm->h) ey = bm->h;
+
+  int r = color >> 24 & 0xFF;
+  int g = color >> 16 & 0xFF;
+  int b = color >> 8 & 0xFF;
+  int a = color & 0xFF;
+
+  for (int y = sy; y < ey; y++)
+  {
+    for (int x = sx; x < ex; x++)
+    {
+      int position = (y * bm->w + x) * 4;
+
+      bm->data[position]     = r;
+      bm->data[position + 1] = g;
+      bm->data[position + 2] = b;
+      if (!la) bm->data[position + 3] = a;
+    }
+  }
 }
 
 #endif

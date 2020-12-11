@@ -47,6 +47,7 @@ void text_render(
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "mtgraphics.c"
 #include "mtmap.c"
 #include "mtmath2.c"
 #include <stdio.h>
@@ -104,7 +105,7 @@ void text_render(
     bm_t*       bitmap)
 {
 
-  bm_fill(bitmap, 0, 0, bitmap->w, bitmap->h, 0);
+  mtgraphics_rect(bitmap, 0, 0, bitmap->w, bitmap->h, style.backcolor, 0);
 
   stbtt_fontinfo* font = MGET(fonts, style.font);
   if (font == NULL)
@@ -188,7 +189,7 @@ void text_render(
                                         0,       // shift y
                                         cp);
 
-      bm_blend_alpha(bitmap, xpos + x0, baseline + y0, gbytes, w, h);
+      bm_blend_8(bitmap, xpos + x0, baseline + y0, style.textcolor, gbytes, w, h);
 
       // printf("write glyph %c at xpos %f w %i h %i baseline(y) %i (x) %i x_shift %f\n", text[ch], xpos, x1 - x0, y1 - y0, baseline, (int)xpos + x0, x_shift);
     }
@@ -197,8 +198,7 @@ void text_render(
     xpos += (advancex * scale);
 
     // advance with kerning
-    if (ncp > 0)
-      xpos += scale * stbtt_GetCodepointKernAdvance(font, cp, ncp);
+    if (ncp > 0) xpos += scale * stbtt_GetCodepointKernAdvance(font, cp, ncp);
   }
 }
 
