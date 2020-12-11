@@ -255,7 +255,6 @@
     background-color: #000000FF;
     border-radius: 15px;
     right: 10px;
-    bottom: 25px;
     box-shadow: 3px;
 }
 
@@ -265,15 +264,13 @@
     background-color: #000000FF;
     border-radius: 15px;
     left: 10px;
-    bottom: 25px;
     box-shadow: 3px;
 }
 
 #visuvideo {
-    width: 200px;
-    height: 200px;
+    width: 150px;
+    height: 150px;
     border-radius: 15px;
-    bottom: 0px;
     background-color: #000000FF;
     box-shadow: 3px;
 }
@@ -286,9 +283,9 @@
 
 #footer {
     position: absolute;
-    bottom: 10px;
+    bottom: 0px;
     width: 100%;
-    height: 200px;
+    height: 170px;
     display: flex;
     flex-direction: row;
 }
@@ -300,7 +297,7 @@
 }
 
 .footcenter {
-    width: 200px;
+    width: 150px;
     height: 100%;
     background-color: #0000FF01;
 }

@@ -15,6 +15,13 @@ typedef enum _textalign_t
   TA_JUSTIFY,
 } textalign_t;
 
+typedef enum _vertalign_t
+{
+  VA_CENTER,
+  VA_TOP,
+  VA_BOTTOM,
+} vertalign_t;
+
 typedef enum _autosize_t
 {
   AS_FIX,
@@ -25,6 +32,7 @@ typedef struct _textstyle_t
 {
   char*       font;
   textalign_t align;
+  vertalign_t valign;
   autosize_t  autosize;
   char        multiline;
 
@@ -116,13 +124,17 @@ void text_render(
   }
 
   int   i, j, ascent, descent, linegap, advancey, baseline, cursorh;
-  float scale, xpos = 2; // leave a little padding in case the character extends left
+  float scale, xpos = 0; // leave a little padding in case the character extends left
 
   scale = stbtt_ScaleForPixelHeight(font, style.size);
   stbtt_GetFontVMetrics(font, &ascent, &descent, &linegap);
+  cursorh = ascent - descent;
+
   baseline = (int)(ascent * scale);
+
+  if (style.valign == VA_CENTER) baseline += (bitmap->h - (scale * cursorh)) / 2;
+
   advancey = ascent - descent + linegap;
-  cursorh  = ascent - descent;
 
   // printf("rendering text %s scale %f ascent %i descent %i linegap %i baseline %i advancey %i\n", text, scale, ascent, descent, linegap, baseline, advancey);
 
@@ -200,10 +212,6 @@ void text_render(
     // advance with kerning
     if (ncp > 0) xpos += scale * stbtt_GetCodepointKernAdvance(font, cp, ncp);
   }
-}
-
-void para_metrics(str_t* text, r2_t rect, textstyle_t style, vec_t* metrics)
-{
 }
 
 #endif
