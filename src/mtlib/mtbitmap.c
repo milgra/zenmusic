@@ -29,6 +29,7 @@ void  bm_insert_rgb(bm_t* the_base, uint8_t* bm, int w, int h, int the_x, int th
 void  bm_insert_blend(bm_t* the_base, bm_t* bm, int the_x, int the_y);
 void  bm_blend_pixel(bm_t* bm, int x, int y, uint32_t color);
 void  bm_describe(void* p, int level);
+void  bm_blend_alpha(bm_t* bm, int nx, int ny, unsigned char* ndata, int nw, int nh);
 
 #endif
 
@@ -243,6 +244,30 @@ void bm_insert(bm_t* base, bm_t* src, int sx, int sy)
     int bi = (y * base->w + sx) * 4;
     int si = (y - sy) * src->w * 4;
     memcpy(base->data + bi, src->data + si, w * 4);
+  }
+}
+
+void bm_blend_alpha(bm_t* bm, int nx, int ny, unsigned char* ndata, int nw, int nh)
+{
+  int ex = nx + nw;
+  if (ex > bm->w) ex = bm->w;
+  int ey = ny + nh;
+  if (ey > bm->h) ey = bm->h;
+
+  uint8_t* odata = bm->data;
+
+  for (int y = ny; y < ey; y++)
+  {
+    for (int x = nx; x < ex; x++)
+    {
+      int ni = (y - ny) * nw + (x - nx); // new map index
+      int oi = (y * bm->w + x) * 4;      // original map index
+
+      unsigned char oa = odata[oi + 3]; // original alpha
+      unsigned char na = ndata[ni];     // new alpha
+
+      if (na > 0) odata[oi + 3] = oa + (na - oa) / 2;
+    }
   }
 }
 

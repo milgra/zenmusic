@@ -56,11 +56,15 @@ void text_render(
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "stb_truetype.h"
 
-mtmap_t* fonts = NULL;
+mtmap_t*       fonts  = NULL;
+unsigned char* gbytes = NULL; // byte array for glyph baking
+size_t         gcount = 0;    // byte array size for glyph baking
 
 void text_init()
 {
-  fonts = MNEW();
+  fonts  = MNEW();
+  gbytes = malloc(sizeof(unsigned char));
+  gcount = 1;
 }
 
 void text_font_load(char* path)
@@ -100,7 +104,7 @@ void text_render(
     bm_t*       bitmap)
 {
 
-  bm_fill(bitmap, 0, 0, bitmap->w, bitmap->h, style.backcolor);
+  bm_fill(bitmap, 0, 0, bitmap->w, bitmap->h, 0);
 
   stbtt_fontinfo* font = MGET(fonts, style.font);
   if (font == NULL)
@@ -161,14 +165,20 @@ void text_render(
     int w = x1 - x0;
     int h = y1 - y0;
 
+    int size = w * h;
+
+    // increase glyph baking bitmap size if needed
+    if (size > gcount)
+    {
+      gcount = 100;
+      gbytes = realloc(gbytes, gcount);
+    }
+
     // don't write bitmap in case of empty glyphs ( space )
     if (w > 0 && h > 0)
     {
-      // TODO use one tmp bitmap for all glyphs
-      unsigned char* tmpbmp = calloc(1, sizeof(unsigned char) * w * h);
-
       stbtt_MakeCodepointBitmapSubpixel(font,
-                                        tmpbmp,
+                                        gbytes,
                                         w,       // out widht
                                         h,       // out height
                                         w,       // out stride
@@ -178,14 +188,15 @@ void text_render(
                                         0,       // shift y
                                         cp);
 
-      bm_t* tmpbm = bm_new_from_grayscale(w, h, 0, style.textcolor, tmpbmp);
+      //bm_t* tmpbm = bm_new_from_grayscale(w, h, 0, style.textcolor, gbytes);
+
+      bm_blend_alpha(bitmap, xpos + x0, baseline + y0, gbytes, w, h);
 
       // TODO replace with blend_alpha with int calculations
-      bm_insert_blend(bitmap, tmpbm, xpos + x0, baseline + y0);
+      //bm_insert_blend(bitmap, tmpbm, xpos + x0, baseline + y0);
 
       // cleanup
-      free(tmpbmp);
-      REL(tmpbm);
+      //REL(tmpbm);
 
       // printf("write glyph %c at xpos %f w %i h %i baseline(y) %i (x) %i x_shift %f\n", text[ch], xpos, x1 - x0, y1 - y0, baseline, (int)xpos + x0, x_shift);
     }
