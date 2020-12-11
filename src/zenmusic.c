@@ -164,9 +164,9 @@ view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index, in
   return rowview;
 }
 
-void filter(view_t* view, mtstr_t* text)
+void filter(view_t* view, str_t* text)
 {
-  char* word = mtstr_bytes(text);
+  char* word = str_bytes(text);
   db_filter(db, word, vec_srt);
   REL(word);
   eh_list_fill(songlist);

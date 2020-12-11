@@ -10,8 +10,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct _mtstr_t mtstr_t;
-struct _mtstr_t
+typedef struct _str_t str_t;
+struct _str_t
 {
   uint32_t  length;       // current length of codepoint array
   uint32_t  length_real;  // backing length of codepoint array
@@ -19,30 +19,30 @@ struct _mtstr_t
   uint32_t* codepoints;
 };
 
-mtstr_t* mtstr_alloc(void);
-void     mtstr_dealloc(void* string);
-void     mtstr_reset(mtstr_t* string);
-mtstr_t* mtstr_fromformat(char* format, ...);
-mtstr_t* mtstr_frombytes(char* bytes);
-mtstr_t* mtstr_fromstring(mtstr_t* string);
-mtstr_t* mtstr_substring(mtstr_t* string, int start, int end);
-mtstr_t* mtstr_replace(mtstr_t* string, mtstr_t* newstring, int start, int end);
-mtstr_t* mtstr_compactemojis(mtstr_t* string);
-void     mtstr_addstring(mtstr_t* mtstra, mtstr_t* mtstrb);
-void     mtstr_addbytearray(mtstr_t* string, char* bytearray);
-void     mtstr_addcodepoint(mtstr_t* string, uint32_t codepoint);
-void     mtstr_removecodepointatindex(mtstr_t* string, uint32_t index);
-void     mtstr_removecodepointsinrange(mtstr_t* string, uint32_t start, uint32_t end);
-void     mtstr_replacecodepoints(mtstr_t* string, uint32_t oldcp, uint32_t newcp);
-int8_t   mtstr_compare(mtstr_t* mtstra, mtstr_t* mtstrb);
-int      mtstr_intvalue(mtstr_t* string);
-float    mtstr_floatvalue(mtstr_t* string);
-uint32_t mtstr_unsignedvalue(mtstr_t* string);
-vec_t*   mtstr_split(mtstr_t* string, char character);
-map_t*   mtstr_tokenize(mtstr_t* descriptor);
-uint32_t mtstr_find(mtstr_t* string, mtstr_t* substring, uint32_t from);
-char*    mtstr_bytes(mtstr_t* string);
-void     mtstr_describe(void* p, int level);
+str_t*   str_alloc(void);
+void     str_dealloc(void* string);
+void     str_reset(str_t* string);
+str_t*   str_fromformat(char* format, ...);
+str_t*   str_frombytes(char* bytes);
+str_t*   str_fromstring(str_t* string);
+str_t*   str_substring(str_t* string, int start, int end);
+str_t*   str_replace(str_t* string, str_t* newstring, int start, int end);
+str_t*   str_compactemojis(str_t* string);
+void     str_addstring(str_t* stra, str_t* strb);
+void     str_addbytearray(str_t* string, char* bytearray);
+void     str_addcodepoint(str_t* string, uint32_t codepoint);
+void     str_removecodepointatindex(str_t* string, uint32_t index);
+void     str_removecodepointsinrange(str_t* string, uint32_t start, uint32_t end);
+void     str_replacecodepoints(str_t* string, uint32_t oldcp, uint32_t newcp);
+int8_t   str_compare(str_t* stra, str_t* strb);
+int      str_intvalue(str_t* string);
+float    str_floatvalue(str_t* string);
+uint32_t str_unsignedvalue(str_t* string);
+vec_t*   str_split(str_t* string, char character);
+map_t*   str_tokenize(str_t* descriptor);
+uint32_t str_find(str_t* string, str_t* substring, uint32_t from);
+char*    str_bytes(str_t* string);
+void     str_describe(void* p, int level);
 
 #endif
 #if __INCLUDE_LEVEL__ == 0
@@ -54,9 +54,9 @@ void     mtstr_describe(void* p, int level);
 
 /* creates string */
 
-mtstr_t* mtstr_alloc()
+str_t* str_alloc()
 {
-  mtstr_t* string = mem_calloc(sizeof(mtstr_t), "mtstr_t", mtstr_dealloc, mtstr_describe);
+  str_t* string = mem_calloc(sizeof(str_t), "str_t", str_dealloc, str_describe);
 
   string->length       = 0;  // current length of codepoint array
   string->length_real  = 10; // backing length of codepoint array
@@ -68,15 +68,15 @@ mtstr_t* mtstr_alloc()
 
 /* deletes string */
 
-void mtstr_dealloc(void* pointer)
+void str_dealloc(void* pointer)
 {
-  mtstr_t* string = pointer;
+  str_t* string = pointer;
   mem_release(string->codepoints);
 }
 
 /* resets string */
 
-void mtstr_reset(mtstr_t* string)
+void str_reset(str_t* string)
 {
   string->length       = 0;
   string->length_real  = 10;
@@ -87,7 +87,7 @@ void mtstr_reset(mtstr_t* string)
 
 /* creates string from utf8 bytearray */
 
-mtstr_t* mtstr_fromformat(char* format, ...)
+str_t* str_fromformat(char* format, ...)
 {
   va_list ap;
   char*   text;
@@ -104,7 +104,7 @@ mtstr_t* mtstr_fromformat(char* format, ...)
   vsnprintf(result, length, format, ap);
   va_end(ap);
 
-  mtstr_t* resstring = mtstr_frombytes(result);
+  str_t* resstring = str_frombytes(result);
   mem_release(result);
 
   return resstring;
@@ -112,12 +112,12 @@ mtstr_t* mtstr_fromformat(char* format, ...)
 
 /* creates string from utf8 bytearray */
 
-mtstr_t* mtstr_frombytes(char* bytes)
+str_t* str_frombytes(char* bytes)
 {
   if (bytes != NULL)
   {
-    mtstr_t* string = mtstr_alloc();
-    mtstr_addbytearray(string, bytes);
+    str_t* string = str_alloc();
+    str_addbytearray(string, bytes);
     return string;
   }
   else
@@ -126,22 +126,22 @@ mtstr_t* mtstr_frombytes(char* bytes)
 
 /* creates string from string */
 
-mtstr_t* mtstr_fromstring(mtstr_t* string)
+str_t* str_fromstring(str_t* string)
 {
-  mtstr_t* result = mtstr_alloc();
-  mtstr_addstring(result, string);
+  str_t* result = str_alloc();
+  str_addstring(result, string);
   return result;
 }
 
 /* returns substring of string */
 
-mtstr_t* mtstr_substring(mtstr_t* string, int start, int end)
+str_t* str_substring(str_t* string, int start, int end)
 {
-  mtstr_t* result = mtstr_alloc();
+  str_t* result = str_alloc();
 
   for (int index = start; index < end; index++)
   {
-    mtstr_addcodepoint(result, string->codepoints[index]);
+    str_addcodepoint(result, string->codepoints[index]);
   }
 
   return result;
@@ -149,22 +149,22 @@ mtstr_t* mtstr_substring(mtstr_t* string, int start, int end)
 
 /* replaces substring in string */
 
-mtstr_t* mtstr_replace(mtstr_t* string, mtstr_t* newstring, int start, int end)
+str_t* str_replace(str_t* string, str_t* newstring, int start, int end)
 {
-  mtstr_t* part1 = mtstr_substring(string, 0, start);
-  mtstr_t* part2 = mtstr_substring(string, end, string->length);
+  str_t* part1 = str_substring(string, 0, start);
+  str_t* part2 = str_substring(string, end, string->length);
 
-  mtstr_addstring(part1, newstring);
-  mtstr_addstring(part1, part2);
+  str_addstring(part1, newstring);
+  str_addstring(part1, part2);
 
   return part1;
 }
 
 /* compact :) and :( to their unicode codepoints */
 
-mtstr_t* mtstr_compactemojis(mtstr_t* string)
+str_t* str_compactemojis(str_t* string)
 {
-  mtstr_t* result = mtstr_alloc();
+  str_t* result = str_alloc();
 
   for (int index = 0; index < string->length; index++)
   {
@@ -172,45 +172,45 @@ mtstr_t* mtstr_compactemojis(mtstr_t* string)
     {
       if (string->codepoints[index] == ':' && string->codepoints[index + 1] == ')')
       {
-        mtstr_addcodepoint(result, 0x1F601);
+        str_addcodepoint(result, 0x1F601);
         index++;
       }
       else if (string->codepoints[index] == ':' && string->codepoints[index + 1] == '(')
       {
-        mtstr_addcodepoint(result, 0x1F61E);
+        str_addcodepoint(result, 0x1F61E);
         index++;
       }
       else
-        mtstr_addcodepoint(result, string->codepoints[index]);
+        str_addcodepoint(result, string->codepoints[index]);
     }
     else
-      mtstr_addcodepoint(result, string->codepoints[index]);
+      str_addcodepoint(result, string->codepoints[index]);
   }
   return result;
 }
 
 /* adds string to string */
 
-void mtstr_addstring(mtstr_t* mtstra, mtstr_t* mtstrb)
+void str_addstring(str_t* stra, str_t* strb)
 {
-  if (mtstrb != NULL)
+  if (strb != NULL)
   {
-    uint32_t newlength       = mtstra->length + mtstrb->length;
-    uint32_t newlength_real  = mtstra->length_real + mtstrb->length_real;
-    uint32_t newlength_bytes = mtstra->length_bytes + mtstrb->length_bytes;
+    uint32_t newlength       = stra->length + strb->length;
+    uint32_t newlength_real  = stra->length_real + strb->length_real;
+    uint32_t newlength_bytes = stra->length_bytes + strb->length_bytes;
 
-    mtstra->codepoints = mem_realloc(mtstra->codepoints, sizeof(uint32_t) * newlength_real);
-    memcpy((void*)(mtstra->codepoints + mtstra->length), (void*)mtstrb->codepoints, mtstrb->length * sizeof(uint32_t));
+    stra->codepoints = mem_realloc(stra->codepoints, sizeof(uint32_t) * newlength_real);
+    memcpy((void*)(stra->codepoints + stra->length), (void*)strb->codepoints, strb->length * sizeof(uint32_t));
 
-    mtstra->length       = newlength;
-    mtstra->length_real  = newlength_real;
-    mtstra->length_bytes = newlength_bytes;
+    stra->length       = newlength;
+    stra->length_real  = newlength_real;
+    stra->length_bytes = newlength_bytes;
   }
 }
 
 /* returns byte count for codepoint */
 
-uint8_t mtstrgetcodebytelength(uint32_t codepoint)
+uint8_t strgetcodebytelength(uint32_t codepoint)
 {
   uint8_t codelength = 4;
   if (codepoint < 0x80)
@@ -224,7 +224,7 @@ uint8_t mtstrgetcodebytelength(uint32_t codepoint)
 
 /* adds buffer containing bytes for one codepoint */
 
-void mtstr_addbuffer(mtstr_t* string, char* buffer, char length)
+void str_addbuffer(str_t* string, char* buffer, char length)
 {
   // filter byte order mark
   if (strcmp(buffer, UTF8_BOM) != 0)
@@ -240,13 +240,13 @@ void mtstr_addbuffer(mtstr_t* string, char* buffer, char length)
     else if (length == 4)
       codepoint = (buffer[0] & 0x7) << 18 | (buffer[1] & 0x3F) << 12 | (buffer[2] & 0x3F) << 6 | (buffer[3] & 0x3F);
     // add codepoint
-    mtstr_addcodepoint(string, codepoint);
+    str_addcodepoint(string, codepoint);
   }
 }
 
 /* adds utf8 encoded byte array */
 
-void mtstr_addbytearray(mtstr_t* string, char* bytearray)
+void str_addbytearray(str_t* string, char* bytearray)
 {
   char buffer[4]       = {0};
   char buffer_position = 0;
@@ -257,7 +257,7 @@ void mtstr_addbytearray(mtstr_t* string, char* bytearray)
     {
       if (buffer_position > 0)
       {
-        mtstr_addbuffer(string, buffer, buffer_position);
+        str_addbuffer(string, buffer, buffer_position);
         // reset unicode buffer
         memset(&buffer, 0, 4);
         buffer_position = 0;
@@ -271,14 +271,14 @@ void mtstr_addbytearray(mtstr_t* string, char* bytearray)
     if (buffer_position == 5) return;
   }
   // add remaining buffer content
-  if (buffer_position > 0) mtstr_addbuffer(string, buffer, buffer_position);
+  if (buffer_position > 0) str_addbuffer(string, buffer, buffer_position);
 }
 
 /* adds code point */
 
-void mtstr_addcodepoint(mtstr_t* string, uint32_t codepoint)
+void str_addcodepoint(str_t* string, uint32_t codepoint)
 {
-  uint8_t codelength = mtstrgetcodebytelength(codepoint);
+  uint8_t codelength = strgetcodebytelength(codepoint);
 
   // expand
   if (string->length_real == string->length)
@@ -294,10 +294,10 @@ void mtstr_addcodepoint(mtstr_t* string, uint32_t codepoint)
 
 /* removes codepoint */
 
-void mtstr_removecodepointatindex(mtstr_t* string, uint32_t index)
+void str_removecodepointatindex(str_t* string, uint32_t index)
 {
   uint32_t codepoint  = string->codepoints[index];
-  uint8_t  codelength = mtstrgetcodebytelength(codepoint);
+  uint8_t  codelength = strgetcodebytelength(codepoint);
 
   string->length_bytes -= codelength;
   memmove(string->codepoints + index, string->codepoints + index + 1, (string->length - index - 1) * sizeof(uint32_t));
@@ -306,14 +306,14 @@ void mtstr_removecodepointatindex(mtstr_t* string, uint32_t index)
 
 /* removes codepoints in range */
 
-void mtstr_removecodepointsinrange(mtstr_t* string, uint32_t start, uint32_t end)
+void str_removecodepointsinrange(str_t* string, uint32_t start, uint32_t end)
 {
   if (end > string->length) end = string->length;
 
   for (int index = start; index < end; index++)
   {
     uint32_t codepoint  = string->codepoints[index];
-    uint8_t  codelength = mtstrgetcodebytelength(codepoint);
+    uint8_t  codelength = strgetcodebytelength(codepoint);
     string->length_bytes -= codelength;
   }
 
@@ -330,7 +330,7 @@ void mtstr_removecodepointsinrange(mtstr_t* string, uint32_t start, uint32_t end
 
 /* replaces codepoints */
 
-void mtstr_replacecodepoints(mtstr_t* string, uint32_t oldcp, uint32_t newcp)
+void str_replacecodepoints(str_t* string, uint32_t oldcp, uint32_t newcp)
 {
   for (int index = 0; index < string->length; index++)
   {
@@ -340,10 +340,10 @@ void mtstr_replacecodepoints(mtstr_t* string, uint32_t oldcp, uint32_t newcp)
 
 /* compares two string */
 
-int8_t mtstr_compare(mtstr_t* mtstra, mtstr_t* mtstrb)
+int8_t str_compare(str_t* stra, str_t* strb)
 {
-  char* bytes_a = mtstr_bytes(mtstra);
-  char* bytes_b = mtstr_bytes(mtstrb);
+  char* bytes_a = str_bytes(stra);
+  char* bytes_b = str_bytes(strb);
 
   int8_t result = strcmp(bytes_a, bytes_b);
 
@@ -355,9 +355,9 @@ int8_t mtstr_compare(mtstr_t* mtstra, mtstr_t* mtstrb)
 
 /* returns intvalue */
 
-int mtstr_intvalue(mtstr_t* string)
+int str_intvalue(str_t* string)
 {
-  char* viewindexc = mtstr_bytes(string);
+  char* viewindexc = str_bytes(string);
   int   viewindex  = atoi(viewindexc);
   mem_release(viewindexc);
   return viewindex;
@@ -365,9 +365,9 @@ int mtstr_intvalue(mtstr_t* string)
 
 /* returns floatvalue */
 
-float mtstr_floatvalue(mtstr_t* string)
+float str_floatvalue(str_t* string)
 {
-  char* viewindexc = mtstr_bytes(string);
+  char* viewindexc = str_bytes(string);
   float viewindex  = atof(viewindexc);
   mem_release(viewindexc);
   return viewindex;
@@ -375,9 +375,9 @@ float mtstr_floatvalue(mtstr_t* string)
 
 /* returns unsigned value */
 
-uint32_t mtstr_unsignedvalue(mtstr_t* string)
+uint32_t str_unsignedvalue(str_t* string)
 {
-  char*         valuec = mtstr_bytes(string);
+  char*         valuec = str_bytes(string);
   unsigned long value  = strtoul(valuec, NULL, 0);
   mem_release(valuec);
   return (uint32_t)value;
@@ -385,10 +385,10 @@ uint32_t mtstr_unsignedvalue(mtstr_t* string)
 
 /* splits string at codepoint to a vector */
 
-vec_t* mtstr_split(mtstr_t* string, char codepoint)
+vec_t* str_split(str_t* string, char codepoint)
 {
-  vec_t*   vector  = vec_alloc();
-  mtstr_t* segment = mtstr_alloc();
+  vec_t* vector  = vec_alloc();
+  str_t* segment = str_alloc();
   for (int index = 0; index < string->length; index++)
   {
     if (string->codepoints[index] == codepoint)
@@ -398,11 +398,11 @@ vec_t* mtstr_split(mtstr_t* string, char codepoint)
       {
         vec_add(vector, segment);
         mem_release(segment);
-        segment = mtstr_alloc();
+        segment = str_alloc();
       }
     }
     else
-      mtstr_addcodepoint(segment, string->codepoints[index]);
+      str_addcodepoint(segment, string->codepoints[index]);
   }
   // add word to result
   if (segment->length > 0) vec_add(vector, segment);
@@ -412,13 +412,13 @@ vec_t* mtstr_split(mtstr_t* string, char codepoint)
 
 /* splits string at spaces and creates key-value pairs */
 
-map_t* mtstr_tokenize(mtstr_t* descriptor)
+map_t* str_tokenize(str_t* descriptor)
 {
   map_t* map    = map_alloc();
-  vec_t* tokens = mtstr_split(descriptor, ' ');
+  vec_t* tokens = str_split(descriptor, ' ');
   for (int index = 0; index < tokens->length; index += 2)
   {
-    char* key = mtstr_bytes(tokens->data[index]);
+    char* key = str_bytes(tokens->data[index]);
     map_put(map, key, tokens->data[index + 1]);
     mem_release(key);
   }
@@ -428,7 +428,7 @@ map_t* mtstr_tokenize(mtstr_t* descriptor)
 
 /* finds substring in string from given index */
 
-uint32_t mtstr_find(mtstr_t* string, mtstr_t* substring, uint32_t from)
+uint32_t str_find(str_t* string, str_t* substring, uint32_t from)
 {
   if (string == NULL) return UINT32_MAX;
   if (substring == NULL) return UINT32_MAX;
@@ -451,7 +451,7 @@ uint32_t mtstr_find(mtstr_t* string, mtstr_t* substring, uint32_t from)
 
 /* returns backing bytearray */
 
-char* mtstr_bytes(mtstr_t* string)
+char* str_bytes(str_t* string)
 {
   if (string == NULL) return NULL;
   char*    bytes    = mem_calloc((string->length_bytes + 1) * sizeof(char), "char*", NULL, NULL);
@@ -485,9 +485,9 @@ char* mtstr_bytes(mtstr_t* string)
   return bytes;
 }
 
-void mtstr_describe(void* p, int level)
+void str_describe(void* p, int level)
 {
-  mtstr_t* str = p;
+  str_t* str = p;
   printf("length %u", str->length);
 }
 

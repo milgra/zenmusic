@@ -34,7 +34,7 @@ void tg_text_gen(view_t* view)
   {
     tg_text_t* gen = view->tex_gen_data;
 
-    mtstr_t* str = mtstr_frombytes(gen->text);
+    str_t* str = str_frombytes(gen->text);
 
     bm_t* fontmap = bm_new((int)view->frame.local.w, (int)view->frame.local.h);
 

@@ -38,7 +38,7 @@ typedef struct _textstyle_t
 void text_init();
 
 void text_render(
-    mtstr_t*    text,
+    str_t*      text,
     vec_t*      metrics,
     textstyle_t style,
     bm_t*       bitmap);
@@ -99,7 +99,7 @@ void text_font_load(char* path)
 }
 
 void text_render(
-    mtstr_t*    text,
+    str_t*      text,
     vec_t*      metrics,
     textstyle_t style,
     bm_t*       bitmap)
@@ -202,7 +202,7 @@ void text_render(
   }
 }
 
-void para_metrics(mtstr_t* text, r2_t rect, textstyle_t style, vec_t* metrics)
+void para_metrics(str_t* text, r2_t rect, textstyle_t style, vec_t* metrics)
 {
 }
 
