@@ -22,6 +22,7 @@ stb_truetype / text generation
 first version
 
 swithc between multiple glyph views in paragraph/one multiglyph view in paragraph  
+prev/next play melle, rand 2-color icon legyen a displayen belul, jobbra settings/donate
 button on/off alpha change on icon
 display font rendering fix, center
 artists/genres button (A, G karika ket oldalon? )

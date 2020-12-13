@@ -237,16 +237,25 @@
     background-color: #998899FF;
 }
 
-#visuals {
+#footer {
     position: absolute;
-    margin: auto;
-    width: 700px;
-    height: 150px;
-    background-color: #AA00AAFF;
-    margin: auto;
     bottom: 0px;
+    width: 100%;
+    height: 170px;
     display: flex;
     flex-direction: row;
+}
+    
+.footedge {
+    width: 100%;
+    height: 100%;
+    background-color: #00FF0001;
+}
+
+.footcenter {
+    width: 150px;
+    height: 100%;
+    background-color: #0000FF01;
 }
 
 #visuleft {
@@ -273,31 +282,4 @@
     border-radius: 15px;
     background-color: #000000FF;
     box-shadow: 3px;
-}
-
-#video {
-    width: 180px;
-    height: 180px;
-    border-radius: 15px;
-}
-
-#footer {
-    position: absolute;
-    bottom: 0px;
-    width: 100%;
-    height: 170px;
-    display: flex;
-    flex-direction: row;
-}
-    
-.footedge {
-    width: 100%;
-    height: 100%;
-    background-color: #00FF0001;
-}
-
-.footcenter {
-    width: 150px;
-    height: 100%;
-    background-color: #0000FF01;
 }

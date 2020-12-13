@@ -5,7 +5,7 @@
 #include "view.c"
 #include "wm_event.c"
 
-void eh_text_add(view_t* view, char* text, void (*ontext)(view_t* view, str_t* text));
+void eh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t* view, str_t* text));
 
 #endif
 
@@ -20,12 +20,13 @@ void eh_text_add(view_t* view, char* text, void (*ontext)(view_t* view, str_t* t
 
 typedef struct _eh_text_t
 {
-  str_t*  text;
-  vec_t*  paragraphs; // a paragraph contains multiple glyph views or one big pre-rendered paragraph view
-  vec_t*  glyphs;
-  vec_t*  animators;
-  char    editing;
-  view_t* crsr;
+  str_t*      text;
+  textstyle_t style;
+  vec_t*      paragraphs; // a paragraph contains multiple glyph views or one big pre-rendered paragraph view
+  vec_t*      glyphs;
+  vec_t*      animators;
+  char        editing;
+  view_t*     crsr;
   void (*ontext)(view_t* view, str_t* text);
 } eh_text_t;
 
@@ -75,15 +76,9 @@ void eh_text_evt(view_t* view, ev_t ev)
     char idbuffer[100] = {0};
     snprintf(idbuffer, 100, "glyphview %s", ev.text);
 
-    textstyle_t ts = {0};
-    ts.align       = 0;
-    ts.size        = 15.0;
-    ts.textcolor   = 0xFFFFFFFF;
-    ts.backcolor   = 0x00000022;
-
     // TODO get glyph width first
     view_t* glyphview = view_new(idbuffer, (r2_t){0, 0, 20, 20});
-    tg_text_add(glyphview, ev.text, ts);
+    tg_text_add(glyphview, ev.text, data->style);
 
     view_add(view, glyphview);
 
@@ -126,12 +121,20 @@ void eh_text_evt(view_t* view, ev_t ev)
   }
 }
 
-void eh_text_add(view_t* view, char* text, void (*ontext)(view_t* view, str_t* text))
+void eh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t* view, str_t* text))
 {
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = 0;
+  ts.size        = 25.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0x00000000;
+
   eh_text_t* data = mem_calloc(sizeof(eh_text_t), "eh_text", NULL, NULL);
   data->text      = str_new();
   data->glyphs    = vec_alloc();
   data->ontext    = ontext;
+  data->style     = ts;
 
   str_addbytearray(data->text, text);
 

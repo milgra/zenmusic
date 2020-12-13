@@ -43,6 +43,19 @@ typedef struct _textstyle_t
   uint32_t backcolor;
 } textstyle_t;
 
+typedef struct _glyph_t
+{
+  int      x;
+  int      y;
+  int      w;
+  int      h;
+  float    x_scale;
+  float    y_scale;
+  float    x_shift;
+  float    y_shift;
+  uint32_t cp;
+} glyph_t;
+
 void text_init();
 
 void text_render(
@@ -106,6 +119,104 @@ void text_font_load(char* path)
     printf("cannot open font %s\n", path);
 }
 
+// breaks text into lines in given rect
+// first step for further alignment
+void text_break(
+    str_t*      text,
+    textstyle_t style,
+    int         w,
+    int         h)
+{
+
+  stbtt_fontinfo* font = MGET(fonts, style.font);
+  if (font == NULL)
+  {
+    text_font_load(style.font);
+    font = MGET(fonts, style.font);
+    if (!font) return;
+  }
+
+  int   asc, desc, lgap;     // glyph ascent, descent, linegap
+  int   lsb, advx;           // left side bearing, glyph advance
+  int   basey, fonth, lineh; // baseline position, base height, line height
+  float scale, xpos;         // font scale, position
+
+  stbtt_GetFontVMetrics(font, &asc, &desc, &lgap);
+  scale = stbtt_ScaleForPixelHeight(font, style.size);
+
+  fonth = asc - desc;
+  lineh = fonth + lgap;
+
+  basey = (int)(asc * scale);
+
+  for (int index = 0; index < text->length; index++)
+  {
+    int cp  = text->codepoints[index];
+    int ncp = index < text->length - 1 ? text->codepoints[index + 1] : 0;
+
+    int   x0, y0, x1, y1;
+    float x_shift = xpos - (float)floor(xpos); // subpixel shift
+
+    stbtt_GetCodepointHMetrics(font,
+                               cp,
+                               &advx, // advance from base x pos to next base pos
+                               &lsb); // left side bearing
+
+    // increase xpos with left side bearing if first character in line
+    if (xpos == 0 && lsb < 0)
+    {
+      xpos    = (float)-lsb * scale;
+      x_shift = xpos - (float)floor(xpos); // subpixel shift
+    }
+
+    stbtt_GetCodepointBitmapBoxSubpixel(font,
+                                        cp,
+                                        scale,
+                                        scale,
+                                        x_shift, // x axis subpixel shift
+                                        0,       // y axis subpixel shift
+                                        &x0,     // left edge of the glyph from origin
+                                        &y0,     // top edge of the glyph from origin
+                                        &x1,     // right edge of the glyph from origin
+                                        &y1);    // bottom edge of the glyph from origin
+
+    int w = x1 - x0;
+    int h = y1 - y0;
+
+    int size = w * h;
+
+    // increase glyph baking bitmap size if needed
+    if (size > gcount)
+    {
+      gcount = size;
+      gbytes = realloc(gbytes, gcount);
+    }
+
+    // don't write bitmap in case of empty glyphs ( space )
+    if (w > 0 && h > 0)
+    {
+      glyph_t glyph = {0};
+      glyph.x       = xpos + x0;
+      glyph.y       = basey + y0;
+      glyph.w       = w;
+      glyph.h       = h;
+      glyph.x_scale = scale;
+      glyph.y_scale = scale;
+      glyph.x_shift = x_shift;
+      glyph.y_shift = 0;
+      glyph.cp      = cp;
+
+      // printf("write glyph %c at xpos %f w %i h %i basey(y) %i (x) %i x_shift %f\n", text[ch], xpos, x1 - x0, y1 - y0, basey, (int)xpos + x0, x_shift);
+    }
+
+    // advance x axis
+    xpos += (advx * scale);
+
+    // advance with kerning
+    if (ncp > 0) xpos += scale * stbtt_GetCodepointKernAdvance(font, cp, ncp);
+  }
+}
+
 void text_render(
     str_t*      text,
     vec_t*      metrics,
@@ -123,16 +234,16 @@ void text_render(
     if (!font) return;
   }
 
-  int   i, j, ascent, descent, linegap, advancey, baseline, cursorh;
+  int   ascent, descent, linegap, advancey, baseline, baseheight;
   float scale, xpos = 0; // leave a little padding in case the character extends left
 
   scale = stbtt_ScaleForPixelHeight(font, style.size);
   stbtt_GetFontVMetrics(font, &ascent, &descent, &linegap);
-  cursorh = ascent - descent;
+  baseheight = ascent - descent;
 
   baseline = (int)(ascent * scale);
 
-  if (style.valign == VA_CENTER) baseline += (bitmap->h - (scale * cursorh)) / 2;
+  if (style.valign == VA_CENTER) baseline += (bitmap->h - (scale * baseheight)) / 2;
 
   advancey = ascent - descent + linegap;
 
