@@ -244,7 +244,7 @@ void text_align_glyphs(glyph_t*    glyphs,
     glyph_t g = glyphs[i];
     float   x = g.x;
     float   y = g.y;
-    // get last glyph in row and row width
+    // get last glyph in row for row width
     float ex = x; // end x
     float rw = 0; // row width
     int   ri;     // row index
@@ -273,8 +273,8 @@ void text_align_glyphs(glyph_t*    glyphs,
 
 void text_render_glyphs(glyph_t*    glyphs,
                         int         count,
-                        bm_t*       bitmap,
-                        textstyle_t style)
+                        textstyle_t style,
+                        bm_t*       bitmap)
 {
   gfx_rect(bitmap, 0, 0, bitmap->w, bitmap->h, style.backcolor, 0);
 
@@ -324,6 +324,18 @@ void text_render_glyphs(glyph_t*    glyphs,
                   g.h);
     }
   }
+}
+
+void text_render_a(
+    str_t*      text,
+    textstyle_t style,
+    bm_t*       bitmap)
+{
+  glyph_t* glyphs = malloc(sizeof(glyph_t) * text->length);
+  for (int i = 0; i < text->length; i++) glyphs[i].cp = text->codepoints[i];
+  text_break_glyphs(glyphs, text->length, style, bitmap->w, bitmap->h);
+  text_align_glyphs(glyphs, text->length, style, bitmap->w, bitmap->h);
+  text_render_glyphs(glyphs, text->length, style, bitmap);
 }
 
 void text_render(
