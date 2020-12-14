@@ -121,8 +121,9 @@ void text_font_load(char* path)
 
 // breaks text into lines in given rect
 // first step for further alignment
-void text_break(
-    str_t*      text,
+void text_break_glyphs(
+    glyph_t*    glyphs,
+    int         count,
     textstyle_t style,
     int         w,
     int         h)
@@ -149,10 +150,12 @@ void text_break(
 
   basey = (int)(asc * scale);
 
-  for (int index = 0; index < text->length; index++)
+  for (int index = 0; index < count; index++)
   {
-    int cp  = text->codepoints[index];
-    int ncp = index < text->length - 1 ? text->codepoints[index + 1] : 0;
+    glyph_t glyph = glyphs[index];
+
+    int cp  = glyphs[index].cp;
+    int ncp = index < count - 1 ? glyphs[index + 1].cp : 0;
 
     int   x0, y0, x1, y1;
     float x_shift = xpos - (float)floor(xpos); // subpixel shift
@@ -195,7 +198,6 @@ void text_break(
     // don't write bitmap in case of empty glyphs ( space )
     if (w > 0 && h > 0)
     {
-      glyph_t glyph = {0};
       glyph.x       = xpos + x0;
       glyph.y       = basey + y0;
       glyph.w       = w;
@@ -208,12 +210,119 @@ void text_break(
 
       // printf("write glyph %c at xpos %f w %i h %i basey(y) %i (x) %i x_shift %f\n", text[ch], xpos, x1 - x0, y1 - y0, basey, (int)xpos + x0, x_shift);
     }
+    else
+    {
+      glyph.x = xpos + x0;
+      glyph.y = basey + y0;
+      glyph.w = 0;
+      glyph.h = 0;
+    }
 
     // advance x axis
     xpos += (advx * scale);
 
     // advance with kerning
     if (ncp > 0) xpos += scale * stbtt_GetCodepointKernAdvance(font, cp, ncp);
+
+    // line break
+    if (cp == '\n' || cp == '\r')
+    {
+      xpos = 0;
+      basey += lineh;
+    }
+  }
+}
+
+void text_align_glyphs(glyph_t*    glyphs,
+                       int         count,
+                       textstyle_t style,
+                       int         w,
+                       int         h)
+{
+  for (int i = 0; i < count; i++)
+  {
+    glyph_t g = glyphs[i];
+    float   x = g.x;
+    float   y = g.y;
+    // get last glyph in row and row width
+    float ex = x; // end x
+    float rw = 0; // row width
+    int   ri;     // row index
+    int   sc;     // space count
+    for (ri = i; ri < count; ri++)
+    {
+      glyph_t rg = glyphs[ri];
+      if (rg.y != y)
+      {
+        rw = ex - x;
+        break;
+      }
+      ex = rg.x + rg.w;
+      if (rg.cp == ' ') sc += 1; // count spaces
+    }
+    // align row
+    float s = 0; // space
+    if (style.align == TA_RIGHT) s = (float)w - rw;
+    if (style.align == TA_CENTER) s = ((float)w - rw) / 2.0; // space
+    if (style.align == TA_JUSTIFY) s = ((float)w - rw) / sc; // space
+    for (int ni = i; ni < ri; ni++) glyphs[ni].x += s;
+    // jump to next row
+    i = ri;
+  }
+}
+
+void text_render_glyphs(glyph_t*    glyphs,
+                        int         count,
+                        bm_t*       bitmap,
+                        textstyle_t style)
+{
+  gfx_rect(bitmap, 0, 0, bitmap->w, bitmap->h, style.backcolor, 0);
+
+  // get or load font
+  stbtt_fontinfo* font = MGET(fonts, style.font);
+  if (font == NULL)
+  {
+    text_font_load(style.font);
+    font = MGET(fonts, style.font);
+    if (!font) return;
+  }
+
+  // draw glyphs
+  for (int i = 0; i < count; i++)
+  {
+    glyph_t g = glyphs[i];
+
+    // don't write bitmap in case of empty glyphs ( space )
+    if (g.w > 0 && g.h > 0)
+    {
+      int size = g.w * g.h;
+
+      // increase glyph baking bitmap size if needed
+      if (size > gcount)
+      {
+        gcount = size;
+        gbytes = realloc(gbytes, gcount);
+      }
+
+      stbtt_MakeCodepointBitmapSubpixel(font,
+                                        gbytes,
+                                        g.w,       // out widht
+                                        g.h,       // out height
+                                        g.w,       // out stride
+                                        g.x_scale, // scale x
+                                        g.y_scale, // scale y
+                                        g.x_shift, // shift x
+                                        g.y_shift, // shift y
+                                        g.cp);
+
+      gfx_blend_8(bitmap,
+                  g.x,
+                  g.y,
+                  style.textcolor,
+                  gbytes,
+                  g.w,
+                  g.h);
+    }
   }
 }
 
