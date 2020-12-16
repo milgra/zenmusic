@@ -60,7 +60,7 @@ void songitem_event(view_t* view, void* data)
   map_t* songmap = vec_srt->data[lastindex];
   tg_text_set(song, (char*)MGET(songmap, "title"));
   tg_text_set(artist, (char*)MGET(songmap, "artist"));
-  tg_text_set(info, "started playing song");
+  //tg_text_set(info, "started playing song");
 
   //bm_t* bitmap = player_get_album(files->data[lastindex]);
   //tg_bitmap_add(coverview, NULL, bitmap, "album");
@@ -207,7 +207,7 @@ void init(int width, int height)
   textstyle_t ts = {0};
   ts.font        = fontpath;
   ts.align       = 1;
-  ts.size        = 30.0;
+  ts.size        = 40.0;
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0;
 
@@ -215,21 +215,21 @@ void init(int width, int height)
 
   song = view_get_subview(baseview, "song");
 
-  ts.size = 20.0;
+  ts.size = 30.0;
 
   tg_text_add(song, "-", ts);
 
   artist = view_get_subview(baseview, "artist");
 
-  ts.size = 20.0;
+  ts.size = 30.0;
 
   tg_text_add(artist, "-", ts);
 
-  info = view_get_subview(baseview, "info");
+  //info = view_get_subview(baseview, "info");
 
   ts.size = 20.0;
 
-  tg_text_add(info, "-", ts);
+  //tg_text_add(info, "-", ts);
 
   view_t* songlistheader = view_get_subview(baseview, "songlistheader");
 
@@ -251,15 +251,17 @@ void init(int width, int height)
   tg_knob_add(volbtn);
   eh_knob_add(volbtn, vol_ratio_changed, mute_button_pushed);
 
-  view_t* prevbtn = view_get_subview(baseview, "prevbtn");
-  view_t* nextbtn = view_get_subview(baseview, "nextbtn");
-  view_t* randbtn = view_get_subview(baseview, "shufflebtn");
-  view_t* loopbtn = view_get_subview(baseview, "loopbtn");
+  view_t* prevbtn = view_get_subview(baseview, "previcon");
+  view_t* nextbtn = view_get_subview(baseview, "nexticon");
+  view_t* randbtn = view_get_subview(baseview, "shuffleicon");
 
   eh_button_add(prevbtn, NULL, prev_button_pushed);
   eh_button_add(nextbtn, NULL, next_button_pushed);
   eh_button_add(randbtn, NULL, rand_button_pushed);
-  eh_button_add(loopbtn, NULL, loop_button_pushed);
+
+  view_t* settingsbtn = view_get_subview(baseview, "settingsicon");
+  view_t* donatebtn   = view_get_subview(baseview, "donateicon");
+  view_t* eventsbtn   = view_get_subview(baseview, "eventsicon");
 
   view_t* main      = view_get_subview(baseview, "main");
   main->needs_touch = 0;
@@ -271,6 +273,12 @@ void init(int width, int height)
   visuleft  = view_get_subview(baseview, "visuleft");
   visuright = view_get_subview(baseview, "visuright");
   visuvideo = view_get_subview(baseview, "visuvideo");
+
+  view_t* playicon = view_get_subview(baseview, "playicon");
+  view_t* muteicon = view_get_subview(baseview, "muteicon");
+
+  playicon->needs_touch = 0;
+  muteicon->needs_touch = 0;
 
   /* view_t* texmapview       = view_new("texmapview", (r2_t){500, 500, 200, 200}); */
   /* texmapview->texture.full = 1; */

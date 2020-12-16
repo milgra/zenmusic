@@ -21,10 +21,11 @@ stb_truetype / text generation
 
 first version
 
-swithc between multiple glyph views in paragraph/one multiglyph view in paragraph  
-prev/next play melle, rand 2-color icon legyen a displayen belul, jobbra settings/donate
-button on/off alpha change on icon
 display font rendering fix, center
+close/maximize button, prev/next balra
+highlight row
+swithc between multiple glyph views in paragraph/one multiglyph view in paragraph  
+button on/off alpha change on icon
 artists/genres button (A, G karika ket oldalon? )
 additional columns - genre, last played, added, skipped, play count,
 fix leaks
@@ -34,7 +35,7 @@ tilemap is auto-resize legyen duplazassal
 zold/piros listitem background play/pausre, animalt!!!
 scrollbar drag
 with the help of C & EMACS 
-ui color shade selector
+ui color shade selector, darknal invertalja a jelenlegi semat
 jobb halfra vive az egeret song folott id3 editor
 
 ---

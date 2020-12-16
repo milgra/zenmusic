@@ -59,7 +59,7 @@
 }
 
 .headedge {
-    width: 150px;
+    width: 100%;
     height: 100%;
     display: none;
     background-color: #00FF000A;
@@ -81,52 +81,102 @@
 }
 
 #prevbtn {
-    width: 40px;
-    height: 40px;
-    left: 20px;
+    width: 30px;
+    height: 30px;
+    right: 15px;
     top: 20px;    
-    border-radius: 8px;
+    border-radius: 17px;
     background-color: #EEEEEEFF;
     box-shadow: 3px;
 }
 
 #previcon {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     background-image: url("prev.png");
 }
 
 #nextbtn {
-    width: 40px;
-    height: 40px;
-    left: 62px;
-    top: 20px;    
-    border-radius: 8px;
+    width: 30px;
+    height: 30px;
+    right: 15px;
+    top: 60px;    
+    border-radius: 17px;
     background-color: #EEEEEEFF;
     box-shadow: 3px;
 }
 
 #nexticon {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     background-image: url("next.png");
 }
 
 #shufflebtn {
-    width: 40px;
-    height: 40px;
-    right: 62px;
-    top: 20px;    
-    border-radius: 8px;
+    width: 30px;
+    height: 30px;
+    right: 15px;
+    top: 100px;    
+    border-radius: 17px;
     background-color: #EEEEEEFF;
     box-shadow: 3px;
 }
 
 #shuffleicon {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     background-image: url("shuffle.png");
 }
+
+
+#settingsbtn {
+    width: 30px;
+    height: 30px;
+    left: 15px;
+    top: 20px;    
+    border-radius: 17px;
+    background-color: #EEEEEEFF;
+    box-shadow: 3px;
+}
+
+#settingsicon {
+    width: 30px;
+    height: 30px;
+    background-image: url("settings.png");
+}
+
+#donatebtn {
+    width: 30px;
+    height: 30px;
+    left: 15px;
+    top: 60px;    
+    border-radius: 17px;
+    background-color: #EEEEEEFF;
+    box-shadow: 3px;
+}
+
+#donateicon {
+    width: 30px;
+    height: 30px;
+    background-image: url("donate.png");
+}
+
+#eventsbtn {
+    width: 30px;
+    height: 30px;
+    left: 15px;
+    top: 100px;    
+    border-radius: 17px;
+    background-color: #EEEEEEFF;
+    box-shadow: 3px;
+}
+
+#eventsicon {
+    width: 30px;
+    height: 30px;
+    background-image: url("events.png");
+}
+
 
 #loopbtn {
     width: 40px;
@@ -209,7 +259,7 @@
 
 #artist {
     width: 97%;
-    height: 20px;
+    height: 30px;
     margin: auto;
     top: 55px;
     background-color: #00FF00FF;
@@ -217,18 +267,10 @@
 
 #song {
     width: 97%;
-    height: 20px;
+    height: 30px;
     margin: auto;
-    top: 78px;
+    top: 90px;
     background-color: #0000FFFF;
-}
-
-#info {
-    width: 97%;
-    height: 20px;
-    margin: auto;
-    top: 101px;
-    background-color: #00FFFFFF;
 }
 
 #search {
