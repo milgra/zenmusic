@@ -27,6 +27,7 @@ typedef struct _eh_text_t
   vec_t*      animators;
   char        editing;
   view_t*     crsr;
+  view_t*     para;
   void (*ontext)(view_t* view, str_t* text);
 } eh_text_t;
 
@@ -67,9 +68,10 @@ void eh_text_evt(view_t* view, ev_t ev)
   }
   else if (ev.type == EV_TEXT)
   {
-
     str_addbytearray(data->text, ev.text);
     printf("text %s\n", str_cstring(data->text));
+
+    tg_text_set(data->para, str_cstring(data->text));
 
     // add new glyph view/update paragraph view
 
@@ -125,7 +127,7 @@ void eh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t
 {
   textstyle_t ts = {0};
   ts.font        = fontpath;
-  ts.align       = 0;
+  ts.align       = TA_CENTER;
   ts.size        = 25.0;
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0x00000000;
@@ -138,11 +140,22 @@ void eh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t
 
   str_addbytearray(data->text, text);
 
-  view->needs_key     = 1;
-  view->needs_text    = 1;
-  view->evt_han       = eh_text_evt;
-  view->evt_han_data  = data;
-  view->texture.state = TS_BLANK;
+  view->needs_key    = 1;
+  view->needs_text   = 1;
+  view->evt_han      = eh_text_evt;
+  view->evt_han_data = data;
+
+  // add paragraph
+
+  view_t* para = view_new("para", (r2_t){0, 0, 40, 20});
+
+  para->layout.w_per = 1.0;
+  para->layout.h_per = 1.0;
+  para->needs_touch  = 0;
+  tg_text_add(para, "A", ts);
+  view_add(view, para);
+
+  data->para = para;
 
   // add cursor
 
