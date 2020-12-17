@@ -198,31 +198,18 @@ void text_break_glyphs(
       gbytes = realloc(gbytes, gcount);
     }
 
-    // don't write bitmap in case of empty glyphs ( space )
-    if (w > 0 && h > 0)
-    {
-      glyph.x       = xpos + x0;
-      glyph.y       = ypos + y0;
-      glyph.w       = w;
-      glyph.h       = h;
-      glyph.x_scale = scale;
-      glyph.y_scale = scale;
-      glyph.x_shift = x_shift;
-      glyph.y_shift = y_shift;
-      glyph.base_y  = ypos;
-      glyph.asc     = (float)asc * scale;
-      glyph.desc    = (float)desc * scale;
-      glyph.cp      = cp;
-
-      // printf("write glyph %c at xpos %f w %i h %i basey(y) %i (x) %i x_shift %f\n", text[ch], xpos, x1 - x0, y1 - y0, basey, (int)xpos + x0, x_shift);
-    }
-    else
-    {
-      glyph.x = xpos + x0;
-      glyph.y = ypos + y0;
-      glyph.w = 0;
-      glyph.h = 0;
-    }
+    glyph.x       = xpos + x0;
+    glyph.y       = ypos + y0;
+    glyph.w       = w;
+    glyph.h       = h;
+    glyph.x_scale = scale;
+    glyph.y_scale = scale;
+    glyph.x_shift = x_shift;
+    glyph.y_shift = y_shift;
+    glyph.base_y  = ypos;
+    glyph.asc     = (float)asc * scale;
+    glyph.desc    = (float)desc * scale;
+    glyph.cp      = cp;
 
     // advance x axis
     xpos += (advx * scale);
@@ -263,7 +250,6 @@ void text_align_glyphs(glyph_t*    glyphs,
     {
       glyph_t g = glyphs[i];
       float   x = g.x;
-      float   y = g.y;
       // get last glyph in row for row width
       float ex = x; // end x
       float rw = 0; // row width
@@ -272,14 +258,11 @@ void text_align_glyphs(glyph_t*    glyphs,
       for (ri = i; ri < count; ri++)
       {
         glyph_t rg = glyphs[ri];
-        if (rg.y != y)
-        {
-          rw = ex - x;
-          break;
-        }
+        if (rg.base_y != g.base_y) break;
         ex = rg.x + rg.w;
         if (rg.cp == ' ') sc += 1; // count spaces
       }
+      rw = ex - x;
       // calculate horizontal shift
       float hs = 0; // space
       if (style.align == TA_RIGHT) hs = (float)w - rw;

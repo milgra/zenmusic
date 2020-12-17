@@ -206,7 +206,7 @@ void init(int width, int height)
 
   textstyle_t ts = {0};
   ts.font        = fontpath;
-  ts.align       = 1;
+  ts.align       = TA_CENTER;
   ts.size        = 35.0;
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0;
