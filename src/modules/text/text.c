@@ -60,7 +60,6 @@ void text_init();
 
 void text_render(
     str_t*      text,
-    vec_t*      metrics,
     textstyle_t style,
     bm_t*       bitmap);
 
@@ -137,10 +136,10 @@ void text_break_glyphs(
     if (!font) return;
   }
 
-  int   asc, desc, lgap;     // glyph ascent, descent, linegap
-  int   lsb, advx;           // left side bearing, glyph advance
-  int   basey, fonth, lineh; // baseline position, base height, line height
-  float scale, xpos;         // font scale, position
+  int   asc, desc, lgap;   // glyph ascent, descent, linegap
+  int   lsb, advx;         // left side bearing, glyph advance
+  int   fonth, lineh;      // baseline position, base height, line height
+  float scale, xpos, ypos; // font scale, position
 
   stbtt_GetFontVMetrics(font, &asc, &desc, &lgap);
   scale = stbtt_ScaleForPixelHeight(font, style.size);
@@ -148,7 +147,7 @@ void text_break_glyphs(
   fonth = asc - desc;
   lineh = fonth + lgap;
 
-  basey = (int)(asc * scale);
+  ypos = (float)asc * scale;
 
   for (int index = 0; index < count; index++)
   {
@@ -159,6 +158,7 @@ void text_break_glyphs(
 
     int   x0, y0, x1, y1;
     float x_shift = xpos - (float)floor(xpos); // subpixel shift
+    float y_shift = ypos - (float)floor(ypos);
 
     stbtt_GetCodepointHMetrics(font,
                                cp,
@@ -177,7 +177,7 @@ void text_break_glyphs(
                                         scale,
                                         scale,
                                         x_shift, // x axis subpixel shift
-                                        0,       // y axis subpixel shift
+                                        y_shift, // y axis subpixel shift
                                         &x0,     // left edge of the glyph from origin
                                         &y0,     // top edge of the glyph from origin
                                         &x1,     // right edge of the glyph from origin
@@ -199,13 +199,13 @@ void text_break_glyphs(
     if (w > 0 && h > 0)
     {
       glyph.x       = xpos + x0;
-      glyph.y       = basey + y0;
+      glyph.y       = ypos + y0;
       glyph.w       = w;
       glyph.h       = h;
       glyph.x_scale = scale;
       glyph.y_scale = scale;
       glyph.x_shift = x_shift;
-      glyph.y_shift = 0;
+      glyph.y_shift = y_shift;
       glyph.cp      = cp;
 
       // printf("write glyph %c at xpos %f w %i h %i basey(y) %i (x) %i x_shift %f\n", text[ch], xpos, x1 - x0, y1 - y0, basey, (int)xpos + x0, x_shift);
@@ -213,7 +213,7 @@ void text_break_glyphs(
     else
     {
       glyph.x = xpos + x0;
-      glyph.y = basey + y0;
+      glyph.y = ypos + y0;
       glyph.w = 0;
       glyph.h = 0;
     }
@@ -227,9 +227,12 @@ void text_break_glyphs(
     // line break
     if (cp == '\n' || cp == '\r')
     {
-      xpos = 0;
-      basey += lineh;
+      xpos = 0.0;
+      ypos += (float)lineh * scale;
     }
+
+    // store glyph
+    glyphs[index] = glyph;
   }
 }
 
@@ -239,6 +242,9 @@ void text_align_glyphs(glyph_t*    glyphs,
                        int         w,
                        int         h)
 {
+  // calculate vertical shift
+  float vs = 0; // vertical shift
+
   for (int i = 0; i < count; i++)
   {
     glyph_t g = glyphs[i];
@@ -260,12 +266,17 @@ void text_align_glyphs(glyph_t*    glyphs,
       ex = rg.x + rg.w;
       if (rg.cp == ' ') sc += 1; // count spaces
     }
-    // align row
-    float s = 0; // space
-    if (style.align == TA_RIGHT) s = (float)w - rw;
-    if (style.align == TA_CENTER) s = ((float)w - rw) / 2.0; // space
-    if (style.align == TA_JUSTIFY) s = ((float)w - rw) / sc; // space
-    for (int ni = i; ni < ri; ni++) glyphs[ni].x += s;
+    // calculate horizontal shift
+    float hs = 0; // space
+    if (style.align == TA_RIGHT) hs = (float)w - rw;
+    if (style.align == TA_CENTER) hs = ((float)w - rw) / 2.0; // space
+    if (style.align == TA_JUSTIFY) hs = ((float)w - rw) / sc; // space
+    // shift glyphs in both direction
+    for (int ni = i; ni < ri; ni++)
+    {
+      glyphs[ni].x += (int)hs;
+      glyphs[ni].y += (int)hs;
+    }
     // jump to next row
     i = ri;
   }
@@ -326,21 +337,32 @@ void text_render_glyphs(glyph_t*    glyphs,
   }
 }
 
-void text_render_a(
+void text_describe_glyphs(glyph_t* glyphs, int count)
+{
+  for (int i = 0; i < count; i++)
+  {
+    glyph_t g = glyphs[i];
+    printf("%i cp %i xy %i %i wh %i %i\n", i, g.cp, g.x, g.y, g.w, g.h);
+  }
+}
+
+void text_render(
     str_t*      text,
     textstyle_t style,
     bm_t*       bitmap)
 {
   glyph_t* glyphs = malloc(sizeof(glyph_t) * text->length);
   for (int i = 0; i < text->length; i++) glyphs[i].cp = text->codepoints[i];
+
   text_break_glyphs(glyphs, text->length, style, bitmap->w, bitmap->h);
-  text_align_glyphs(glyphs, text->length, style, bitmap->w, bitmap->h);
+
+  //  text_align_glyphs(glyphs, text->length, style, bitmap->w, bitmap->h);
+
   text_render_glyphs(glyphs, text->length, style, bitmap);
 }
 
-void text_render(
+void text_render_a(
     str_t*      text,
-    vec_t*      metrics,
     textstyle_t style,
     bm_t*       bitmap)
 {

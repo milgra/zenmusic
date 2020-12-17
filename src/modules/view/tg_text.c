@@ -41,7 +41,6 @@ void tg_text_gen(view_t* view)
 
     text_render(
         str,
-        NULL,
         gen->style,
         fontmap);
 

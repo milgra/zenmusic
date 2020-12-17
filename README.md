@@ -17,6 +17,10 @@ FFMPEG / media parsing
 SDL2 / window/graphics context handling
 stb_truetype / text generation
 
+programs used :
+
+Inkscape for the icons
+
 ---
 
 first version
@@ -58,6 +62,7 @@ unit teszter gl_compositorhoz
 ha az egeret a lista item jobb oldalara viszed popupban mutassa id3/song infokat es album artot
 resizable header/songlist border
 grid-based warping of video/album cover based on frequence ( bass in the center )
+andromeda:  monolith-like particle visu
 
 ideas
 
