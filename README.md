@@ -25,7 +25,7 @@ Inkscape for the icons
 
 first version
 
-display font rendering fix, center
+list reload on filter, scrollbar anim off thread
 close/maximize button, prev/next balra
 highlight row
 swithc between multiple glyph views in paragraph/one multiglyph view in paragraph  

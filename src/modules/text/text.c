@@ -61,10 +61,23 @@ typedef struct _glyph_t
 
 void text_init();
 
-void text_render(
-    str_t*      text,
+void text_break_glyphs(
+    glyph_t*    glyphs,
+    int         count,
     textstyle_t style,
-    bm_t*       bitmap);
+    int         w,
+    int         h);
+
+void text_align_glyphs(glyph_t*    glyphs,
+                       int         count,
+                       textstyle_t style,
+                       int         w,
+                       int         h);
+
+void text_render_glyphs(glyph_t*    glyphs,
+                        int         count,
+                        textstyle_t style,
+                        bm_t*       bitmap);
 
 #endif
 
@@ -213,6 +226,7 @@ void text_break_glyphs(
 
     // advance x axis
     xpos += (advx * scale);
+    if (w == 0) glyph.w = xpos - glyph.x;
 
     // advance with kerning
     if (ncp > 0) xpos += scale * stbtt_GetCodepointKernAdvance(font, cp, ncp);
@@ -273,6 +287,7 @@ void text_align_glyphs(glyph_t*    glyphs,
       {
         glyphs[ni].x += (int)hs;
         glyphs[ni].y += (int)vs;
+        glyphs[ni].base_y += (int)vs;
       }
       // jump to next row
       i = ri - 1;

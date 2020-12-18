@@ -15,6 +15,7 @@ void eh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t
 #include "eh_anim.c"
 #include "mtcstring.c"
 #include "mtvector.c"
+#include "text.c"
 #include "tg_css.c"
 #include "tg_text.c"
 
@@ -23,22 +24,41 @@ typedef struct _eh_text_t
   str_t*      text;
   textstyle_t style;
   char        editing;
-  view_t*     crsr;
+  r2_t        crsr_f;
+  view_t*     crsr_v;
   view_t*     para;
   void (*ontext)(view_t* view, str_t* text);
 } eh_text_t;
 
 void eh_text_upd(view_t* view)
 {
-  eh_text_t* data = view->evt_han_data;
-  str_t*     text = data->text;
+  eh_text_t* data  = view->evt_han_data;
+  str_t*     text  = data->text;
+  r2_t       frame = view->frame.local;
 
-  /* glyph_t* glyphs = malloc(sizeof(glyph_t) * text->length); */
-  /* for (int i = 0; i < text->length; i++) glyphs[i].cp = text->codepoints[i]; */
+  glyph_t* glyphs = malloc(sizeof(glyph_t) * text->length);
 
-  /* text_break_glyphs(glyphs, text->length, style, bitmap->w, bitmap->h); */
-  /* text_align_glyphs(glyphs, text->length, style, bitmap->w, bitmap->h); */
-  /* text_render_glyphs(glyphs, text->length, style, bitmap); */
+  for (int i = 0; i < text->length; i++) glyphs[i].cp = text->codepoints[i];
+
+  text_break_glyphs(glyphs, text->length, data->style, frame.w, frame.h);
+  text_align_glyphs(glyphs, text->length, data->style, frame.w, frame.h);
+
+  // update cursor position
+
+  glyph_t last = {0};
+  if (text->length > 0)
+    last = glyphs[text->length - 1];
+
+  r2_t crsr_f = {0};
+  crsr_f.x    = last.x + last.w + 1;
+  crsr_f.y    = last.base_y - last.asc;
+  crsr_f.w    = 2;
+  crsr_f.h    = last.asc - last.desc;
+
+  data->crsr_f = crsr_f;
+  view_set_frame(data->crsr_v, crsr_f);
+
+  //text_render_glyphs(glyphs, text->length, style, bitmap);
 
   tg_text_set(data->para, str_cstring(data->text));
 }
@@ -58,24 +78,24 @@ void eh_text_evt(view_t* view, ev_t ev)
       {
         data->editing = 1;
 
-        r2_t sf = data->crsr->frame.local;
+        r2_t sf = data->crsr_f;
         r2_t ef = sf;
-        ef.y    = 8.0;
-        ef.h    = 20.0;
+        sf.h    = 0;
+        sf.y    = ef.y + ef.h / 2.0;
 
-        eh_anim_set(data->crsr, sf, ef, 10, AT_LINEAR);
+        eh_anim_set(data->crsr_v, sf, ef, 10, AT_LINEAR);
       }
     }
     else
     {
       data->editing = 0;
 
-      r2_t sf = data->crsr->frame.local;
+      r2_t sf = data->crsr_f;
       r2_t ef = sf;
-      ef.y    = 18.0;
-      ef.h    = 0.0;
+      ef.h    = 0;
+      ef.y    = sf.y + sf.h / 2.0;
 
-      eh_anim_set(data->crsr, sf, ef, 10, AT_LINEAR);
+      eh_anim_set(data->crsr_v, sf, ef, 10, AT_LINEAR);
     }
   }
   else if (ev.type == EV_TEXT)
@@ -121,7 +141,7 @@ void eh_text_evt(view_t* view, ev_t ev)
   }
   else if (ev.type == EV_KDOWN)
   {
-    if (ev.keycode == SDLK_BACKSPACE)
+    if (ev.keycode == SDLK_BACKSPACE && data->text->length > 0)
     {
       str_removecodepointatindex(data->text, data->text->length - 1);
       eh_text_upd(view);
@@ -169,14 +189,14 @@ void eh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t
 
   // add cursor
 
-  view_t* crsr = view_new("crsr", (r2_t){50, 12, 2, 0});
+  view_t* crsr_v = view_new("crsr_v", (r2_t){50, 12, 2, 0});
 
-  crsr->layout.background_color = 0x000000FF;
-  tg_css_add(crsr);
-  eh_anim_add(crsr);
-  view_add(view, crsr);
+  crsr_v->layout.background_color = 0x666666FF;
+  tg_css_add(crsr_v);
+  eh_anim_add(crsr_v);
+  view_add(view, crsr_v);
 
-  data->crsr = crsr;
+  data->crsr_v = crsr_v;
 
   /* // generate text */
   /* for (int index = 0; index < data->text->length; index++) */
