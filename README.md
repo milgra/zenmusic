@@ -25,7 +25,7 @@ Inkscape for the icons
 
 first version
 
-list reload on filter, scrollbar anim off thread
+genre/tag switcher balra, artist jobbra
 close/maximize button, prev/next balra
 queue frame size changes for scroller
 highlight row

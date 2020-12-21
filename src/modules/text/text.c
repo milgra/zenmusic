@@ -79,6 +79,11 @@ void text_render_glyphs(glyph_t*    glyphs,
                         textstyle_t style,
                         bm_t*       bitmap);
 
+void text_render(
+    str_t*      text,
+    textstyle_t style,
+    bm_t*       bitmap);
+
 #endif
 
 #if __INCLUDE_LEVEL__ == 0

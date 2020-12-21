@@ -38,9 +38,9 @@ void eh_list_reset(view_t* view);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "eh_anim.c"
+#include "eh_sbar.c"
 #include "mtcstring.c"
 #include "mtstring.c"
-#include "tg_css.c"
 #include "tg_text.c"
 #include <math.h>
 
@@ -210,24 +210,12 @@ void eh_list_evt(view_t* view, ev_t ev)
     if (eh->vtimeout > 0 && eh->vtimeout < ev.time)
     {
       eh->vtimeout = 0;
-
-      r2_t sf = eh->vscr->frame.local;
-      r2_t ef = sf;
-      ef.y    = ef.y + ef.h / 2.0;
-      ef.h    = 0.0;
-
-      eh_anim_set(eh->vscr, sf, ef, 10, AT_LINEAR);
+      eh_sbar_close(eh->vscr);
     }
     if (eh->htimeout > 0 && eh->htimeout < ev.time)
     {
       eh->htimeout = 0;
-
-      r2_t sf = eh->hscr->frame.local;
-      r2_t ef = sf;
-      ef.x    = ef.x + ef.w / 2.0;
-      ef.w    = 0.0;
-
-      eh_anim_set(eh->hscr, sf, ef, 10, AT_LINEAR);
+      eh_sbar_close(eh->hscr);
     }
   }
   else if (ev.type == EV_SCROLL)
@@ -241,13 +229,7 @@ void eh_list_evt(view_t* view, ev_t ev)
         if (eh->htimeout == 0)
         {
           eh->htimeout = ev.time + 1000;
-
-          r2_t ef = eh->hscr->frame.local;
-          r2_t sf = ef;
-          sf.x    = sf.x + sf.w / 2.0;
-          sf.w    = 0.0;
-
-          eh_anim_set(eh->hscr, sf, ef, 10, AT_LINEAR);
+          eh_sbar_open(eh->hscr);
         }
         else
           eh->htimeout = ev.time + 1000;
@@ -261,13 +243,7 @@ void eh_list_evt(view_t* view, ev_t ev)
         if (eh->vtimeout == 0)
         {
           eh->vtimeout = ev.time + 1000;
-
-          r2_t ef = eh->vscr->frame.local;
-          r2_t sf = ef;
-          sf.y    = sf.y + sf.h / 2.0;
-          sf.h    = 0.0;
-
-          eh_anim_set(eh->vscr, sf, ef, 10, AT_LINEAR);
+          eh_sbar_open(eh->vscr);
         }
         else
           eh->vtimeout = ev.time + 1000;
@@ -330,19 +306,8 @@ void eh_list_add(view_t* view,
   view_t* vscr = view_new("vscr", (r2_t){0, 0, 15, 0});
   view_t* hscr = view_new("hscr", (r2_t){0, 10, 0, 10});
 
-  tg_css_add(hscr);
-  tg_css_add(vscr);
-
-  eh_anim_add(vscr);
-  eh_anim_add(hscr);
-
-  vscr->layout.background_color = 0x000000AA;
-  //vscr->layout.border_radius    = 5;
-  //vscr->layout.shadow_blur = 3;
-
-  hscr->layout.background_color = 0x000000AA;
-  //hscr->layout.border_radius    = 5;
-  //hscr->layout.shadow_blur = 3;
+  eh_sbar_add(vscr, SBAR_V, 30);
+  eh_sbar_add(hscr, SBAR_H, 30);
 
   view_add(view, vscr);
   view_add(view, hscr);

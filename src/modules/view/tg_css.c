@@ -34,6 +34,16 @@ void tg_css_gen(view_t* view)
   {
     if (view->layout.background_image)
     {
+      bm_t* bm = view->texture.bitmap;
+
+      if (bm == NULL ||
+          bm->w != (int)view->frame.local.w ||
+          bm->h != (int)view->frame.local.h)
+      {
+        bm = bm_new((int)view->frame.local.w, (int)view->frame.local.h);
+        view_set_texture_bmp(view, bm);
+      }
+
       int            c, w, h;
       unsigned char* imagebytes = stbi_load(view->layout.background_image, &w, &h, &c, 4);
       if (imagebytes != NULL)
@@ -41,10 +51,9 @@ void tg_css_gen(view_t* view)
         bm_t* imagebmp = bm_new(w, h);
         memcpy(imagebmp->data, imagebytes, imagebmp->size);
         stbi_image_free(imagebytes);
-        bm_t* texbmp = bm_new(view->frame.local.w, view->frame.local.h);
-        gfx_insert(texbmp, imagebmp, 0, 0);
+        gfx_insert(bm, imagebmp, 0, 0);
         REL(imagebmp);
-        view_set_texture_bmp(view, texbmp);
+        view->texture.changed = 1;
       }
       else
         printf("invalid image : %s\n", view->layout.background_image);
@@ -57,9 +66,17 @@ void tg_css_gen(view_t* view)
       float w = view->frame.local.w + 2 * view->layout.shadow_blur;
       float h = view->frame.local.h + 2 * view->layout.shadow_blur;
 
-      bm_t* bmp = bm_new(w, h);
+      bm_t* bm = view->texture.bitmap;
 
-      gfx_rounded_rect(bmp,
+      if (bm == NULL ||
+          bm->w != (int)w ||
+          bm->h != (int)h)
+      {
+        bm = bm_new((int)w, (int)h);
+        view_set_texture_bmp(view, bm);
+      }
+
+      gfx_rounded_rect(bm,
                        0,
                        0,
                        w,
@@ -69,7 +86,7 @@ void tg_css_gen(view_t* view)
                        view->layout.background_color,
                        0x00000033);
 
-      view_set_texture_bmp(view, bmp);
+      view->texture.changed = 1;
     }
   }
 }
