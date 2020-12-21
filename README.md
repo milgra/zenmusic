@@ -27,6 +27,7 @@ first version
 
 list reload on filter, scrollbar anim off thread
 close/maximize button, prev/next balra
+queue frame size changes for scroller
 highlight row
 swithc between multiple glyph views in paragraph/one multiglyph view in paragraph  
 button on/off alpha change on icon

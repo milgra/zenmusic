@@ -128,20 +128,27 @@ void ui_compositor_add(char* rectid, char* texid, uint32_t index)
 {
   // printf("ui_compositor_add rectid %s texid %s index %i\n", rectid, texid, index);
 
-  crect_t* rect = crect_new(rectid, texid, index);
+  crect_t* rect = map_get(uic.rects_m, rectid);
 
-  VADD(uic.rects_v, rect);
-  VADD(uic.final_v, rect);
-  MPUT(uic.rects_m, rectid, rect);
+  if (rect == NULL)
+  {
+    crect_t* rect = crect_new(rectid, texid, index);
 
-  REL(rect);
+    VADD(uic.rects_v, rect);
+    VADD(uic.final_v, rect);
+    MPUT(uic.rects_m, rectid, rect);
 
-  uic.upd_geo = 1;
+    REL(rect);
+
+    uic.upd_geo = 1;
+  }
+  else
+    printf("EXISTING CRECT IN UI COMPOSITOR : %s\n", rectid);
 }
 
 void ui_compositor_rem(char* id)
 {
-  // printf("ui_compositor_rem %s\n", id);
+  // printf("REMOVE ui_compositor_rem %s\n", id);
   crect_t* rect = map_get(uic.rects_m, id);
 
   if (rect)

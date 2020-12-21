@@ -31,6 +31,7 @@ typedef struct _eh_list_t
 
 void eh_list_add(view_t* view, view_t* (*row_generator)(view_t* listview, view_t* rowview, int index, int* item_count));
 void eh_list_fill(view_t* view);
+void eh_list_reset(view_t* view);
 
 #endif
 
@@ -104,7 +105,7 @@ void eh_list_evt(view_t* view, ev_t ev)
           eh->item_wth = rowitem->frame.global.w; // store maximum width
           VREM(eh->cache, rowitem);
           VADD(eh->items, rowitem);
-          view_insert(view, rowitem, 0);
+          if (rowitem->parent == NULL) view_insert(view, rowitem, 0);
         }
         else
           eh->full = 1;
@@ -291,6 +292,31 @@ void eh_list_fill(view_t* view)
 {
   eh_list_t* eh = view->evt_han_data;
   eh->full      = 0;
+}
+
+void eh_list_reset(view_t* view)
+{
+  eh_list_t* eh = view->evt_han_data;
+
+  // add all items to cache
+  vec_addinvector(eh->cache, eh->items);
+  vec_reset(eh->items);
+
+  eh->head_index = 0;
+  eh->tail_index = 0;
+  eh->item_count = 0;
+  eh->full       = 0;
+
+  // move cache items out of screen
+  for (int index = 0;
+       index < eh->cache->length;
+       index++)
+  {
+    view_t* view  = eh->cache->data[index];
+    r2_t    frame = view->frame.local;
+    frame.y       = -frame.h;
+    view_set_frame(view, frame);
+  }
 }
 
 void eh_list_add(view_t* view,

@@ -24,9 +24,12 @@ typedef struct _eh_text_t
   str_t*      text;
   textstyle_t style;
   char        editing;
-  r2_t        crsr_f;
-  view_t*     crsr_v;
-  view_t*     para;
+
+  r2_t     crsr_f;
+  view_t*  crsr_v;
+  uint32_t crsr_i;
+
+  view_t* para;
   void (*ontext)(view_t* view, str_t* text);
 } eh_text_t;
 
@@ -46,8 +49,7 @@ void eh_text_upd(view_t* view)
   // update cursor position
 
   glyph_t last = {0};
-  if (text->length > 0)
-    last = glyphs[text->length - 1];
+  if (text->length > 0) last = glyphs[text->length - 1];
 
   r2_t crsr_f = {0};
   crsr_f.x    = last.x + last.w + 1;
@@ -145,6 +147,7 @@ void eh_text_evt(view_t* view, ev_t ev)
     {
       str_removecodepointatindex(data->text, data->text->length - 1);
       eh_text_upd(view);
+      (*data->ontext)(view, data->text);
     }
   }
   else if (ev.type == EV_TIME)
@@ -166,6 +169,7 @@ void eh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t
   data->text      = str_new();
   data->ontext    = ontext;
   data->style     = ts;
+  data->crsr_i    = 0; // cursor index
 
   str_addbytearray(data->text, text);
 

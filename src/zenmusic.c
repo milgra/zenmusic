@@ -169,7 +169,7 @@ void filter(view_t* view, str_t* text)
   char* word = str_cstring(text);
   db_filter(db, word, vec_srt);
   REL(word);
-  eh_list_fill(songlist);
+  eh_list_reset(songlist);
 }
 
 void sort()

@@ -194,6 +194,12 @@ void view_add(view_t* view, view_t* subview)
 {
   reindex = 1;
 
+  for (int i = 0; i < view->views->length; i++)
+  {
+    view_t* sview = view->views->data[i];
+    if (strcmp(sview->id, subview->id) == 0) printf("DUPLICATE SUBVIEW %s\n", subview->id);
+  }
+
   VADD(view->views, subview);
   subview->parent = view;
 
@@ -203,6 +209,12 @@ void view_add(view_t* view, view_t* subview)
 void view_insert(view_t* view, view_t* subview, uint32_t index)
 {
   reindex = 1;
+
+  for (int i = 0; i < view->views->length; i++)
+  {
+    view_t* sview = view->views->data[i];
+    if (strcmp(sview->id, subview->id) == 0) printf("DUPLICATE SUBVIEW %s\n", subview->id);
+  }
 
   vec_addatindex(view->views, subview, index);
   subview->parent = view;
@@ -252,12 +264,13 @@ void view_calc_global(view_t* view)
   view->frame.changed  = 1;
 
   view_t* v;
-  while ((v = VNXT(view->views)))
-    view_calc_global(v);
+  while ((v = VNXT(view->views))) view_calc_global(v);
 }
 
 void view_set_frame(view_t* view, r2_t frame)
 {
+  // printf("set frame %s\n", view->id);
+
   // force rerender
   // TODO this will cause problems when eh's render textures instead of tg's
 
