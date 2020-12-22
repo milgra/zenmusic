@@ -149,6 +149,15 @@ void loop_button_pushed(view_t* view, void* data)
   loop_all = !loop_all;
 }
 
+void max_button_pushed(view_t* view, void* data)
+{
+  wm_toggle_fullscreen();
+}
+void close_button_pushed(view_t* view, void* data)
+{
+  wm_close();
+}
+
 view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index, int* count)
 {
   if (index < 0)
@@ -233,7 +242,7 @@ void init(int width, int height)
 
   view_t* songlistheader = view_get_subview(baseview, "songlistheader");
 
-  view_t* filterbar = view_get_subview(baseview, "filterbar");
+  view_t* filterbar = view_get_subview(baseview, "filterfield");
   tg_css_add(filterbar);
   filterbar->layout.background_color = 0xFFFFFFFF;
   eh_text_add(filterbar, "", fontpath, filter);
@@ -283,6 +292,21 @@ void init(int width, int height)
   /* view_t* texmapview       = view_new("texmapview", (r2_t){500, 500, 200, 200}); */
   /* texmapview->texture.full = 1; */
   /* ui_manager_add(texmapview); */
+
+  ts.size      = 25.0;
+  ts.backcolor = 0xEFEFEFFF;
+
+  view_t* genrebtn  = view_get_subview(baseview, "genrebtn");
+  view_t* artistbtn = view_get_subview(baseview, "artistbtn");
+
+  tg_text_add(genrebtn, "genre/tags", ts);
+  tg_text_add(artistbtn, "artists", ts);
+
+  view_t* maxbtn   = view_get_subview(baseview, "maxicon");
+  view_t* closebtn = view_get_subview(baseview, "closeicon");
+
+  eh_button_add(maxbtn, NULL, max_button_pushed);
+  eh_button_add(closebtn, NULL, close_button_pushed);
 
   db    = MNEW();
   libch = ch_new(100);

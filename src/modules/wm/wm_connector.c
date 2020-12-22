@@ -11,6 +11,8 @@
 #include "wm_event.c"
 
 void wm_init(void (*init)(int, int), void (*update)(ev_t), void (*render)(), void (*destroy)());
+void wm_close();
+void wm_toggle_fullscreen();
 
 #endif
 
@@ -27,6 +29,9 @@ void wm_init(void (*init)(int, int), void (*update)(ev_t), void (*render)(), voi
 #define SCROLL_TOUCHED_TIMEOUT 300       // when to stop scrolling after last pressed touch scroll event
 #define SCROLL_SLOWDOWN_MULTIPLIER 0.998 // slowdown ratio is multiplied by this value with every step to produce a parabolic slowdown
 #define SCROLL_MINIMUM_DELTA 0.1         // scroll events aren't dispatched under this scroll delta value
+
+char        wm_quit = 0;
+SDL_Window* wm_window;
 
 void wm_init(void (*init)(int, int),
              void (*update)(ev_t),
@@ -55,17 +60,17 @@ void wm_init(void (*init)(int, int),
     int32_t width  = displaymode.w;
     int32_t height = displaymode.h;
 
-    SDL_Window* window = SDL_CreateWindow("Zen Music",
-                                          SDL_WINDOWPOS_UNDEFINED,
-                                          SDL_WINDOWPOS_UNDEFINED,
-                                          width,
-                                          height,
-                                          SDL_WINDOW_OPENGL |
-                                              SDL_WINDOW_SHOWN |
-                                              SDL_WINDOW_ALLOW_HIGHDPI |
-                                              SDL_WINDOW_RESIZABLE);
+    wm_window = SDL_CreateWindow("Zen Music",
+                                 SDL_WINDOWPOS_UNDEFINED,
+                                 SDL_WINDOWPOS_UNDEFINED,
+                                 width,
+                                 height,
+                                 SDL_WINDOW_OPENGL |
+                                     SDL_WINDOW_SHOWN |
+                                     SDL_WINDOW_ALLOW_HIGHDPI |
+                                     SDL_WINDOW_RESIZABLE);
 
-    if (window == NULL)
+    if (wm_window == NULL)
     {
       printf("SDL Window could not be created! SDL_Error: %s\n", SDL_GetError());
     }
@@ -73,7 +78,7 @@ void wm_init(void (*init)(int, int),
     {
       printf("SDL Window Init Success\n");
 
-      SDL_GLContext* context = SDL_GL_CreateContext(window);
+      SDL_GLContext* context = SDL_GL_CreateContext(wm_window);
       if (context == NULL)
       {
         printf("SDL Context could not be created! SDL_Error: %s\n", SDL_GetError());
@@ -85,7 +90,7 @@ void wm_init(void (*init)(int, int),
         int nw;
         int nh;
 
-        SDL_GL_GetDrawableSize(window, &nw, &nh);
+        SDL_GL_GetDrawableSize(wm_window, &nw, &nh);
 
         float scale = nw / width;
 
@@ -97,8 +102,7 @@ void wm_init(void (*init)(int, int),
 
         (*init)(width, height);
 
-        char      quit = 0;
-        ev_t      ev   = {0}; // zen event
+        ev_t      ev = {0}; // zen event
         SDL_Event event;
         uint32_t  lastticks = SDL_GetTicks();
 
@@ -112,7 +116,7 @@ void wm_init(void (*init)(int, int),
           uint32_t time_last;
         } scroll = {0};
 
-        while (!quit)
+        while (!wm_quit)
         {
           ev.type = EV_EMPTY;
           ev.time = SDL_GetTicks();
@@ -157,7 +161,7 @@ void wm_init(void (*init)(int, int),
             }
             else if (event.type == SDL_QUIT)
             {
-              quit = 1;
+              wm_quit = 1;
             }
             else if (event.type == SDL_WINDOWEVENT)
             {
@@ -220,7 +224,7 @@ void wm_init(void (*init)(int, int),
 
           (*update)(ev);
           (*render)();
-          SDL_GL_SwapWindow(window);
+          SDL_GL_SwapWindow(wm_window);
         }
 
         (*destroy)();
@@ -230,9 +234,26 @@ void wm_init(void (*init)(int, int),
       }
     }
 
-    SDL_DestroyWindow(window);
+    SDL_DestroyWindow(wm_window);
     SDL_Quit();
   }
+}
+
+void wm_close()
+{
+  wm_quit = 1;
+}
+
+void wm_toggle_fullscreen()
+{
+  int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE;
+
+  char fullscreen = SDL_GetWindowFlags(wm_window) & SDL_WINDOW_FULLSCREEN;
+
+  if (fullscreen == 1)
+    SDL_SetWindowFullscreen(wm_window, flags);
+  else
+    SDL_SetWindowFullscreen(wm_window, flags | SDL_WINDOW_FULLSCREEN);
 }
 
 #endif

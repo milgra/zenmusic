@@ -25,11 +25,8 @@ Inkscape for the icons
 
 first version
 
-genre/tag switcher balra, artist jobbra
-close/maximize button, prev/next balra
-queue frame size changes for scroller
+multiple columns, sorting
 highlight row
-swithc between multiple glyph views in paragraph/one multiglyph view in paragraph  
 button on/off alpha change on icon
 artists/genres button (A, G karika ket oldalon? )
 additional columns - genre, last played, added, skipped, play count,
@@ -64,6 +61,7 @@ ha az egeret a lista item jobb oldalara viszed popupban mutassa id3/song infokat
 resizable header/songlist border
 grid-based warping of video/album cover based on frequence ( bass in the center )
 andromeda:  monolith-like particle visu
+swithc between multiple glyph views in paragraph/one multiglyph view in paragraph  
 
 ideas
 
