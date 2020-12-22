@@ -40,33 +40,33 @@
 
 #closebtn {
     background-color: #EEEEEEFF;
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     left: 5px;
     top: 5px;
-    border-radius: 10px;
+    border-radius: 17px;
     box-shadow: 3px;
 }
 
 #maxbtn {
     background-color: #EEEEEEFF;
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     top:5px;
     right:5px;
-    border-radius: 10px;
+    border-radius: 17px;
     box-shadow: 3px;
 }
 
 #closeicon {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     background-image: url("close.png");
 }
 
 #maxicon {
-    width: 20px;
-    height: 20px;
+    width: 30px;
+    height: 30px;
     background-image: url("max.png");
 }
 
