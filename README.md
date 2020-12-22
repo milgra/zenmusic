@@ -4,7 +4,7 @@ Main goals : operating transparency - all events are logged in event viewer
 
 zen media - offline file/media viewer and manager / preview area, file info area
 zen music - offline music player manager and visualizer / video/album area, two spectrum/freq analyzer for stereo channels
-zen video - offline photo/video viewer and library manager / video/image area, location area, info area
+zen image - offline photo/video viewer and library manager / video/image area, location area, info area
 
 development :
 
@@ -20,6 +20,8 @@ stb_truetype / text generation
 programs used :
 
 Inkscape for the icons
+emacs for programming
+freebsd for os
 
 ---
 
@@ -27,17 +29,13 @@ first version
 
 multiple columns, sorting
 highlight row
-button on/off alpha change on icon
-artists/genres button (A, G karika ket oldalon? )
+zold/piros listitem background play/pausre, animalt!!!
 additional columns - genre, last played, added, skipped, play count,
 fix leaks
 elso indulasnal analyzer progresst mutassa valahol amig zenet hallgatsz
 unicode support files, metadata!!!
 tilemap is auto-resize legyen duplazassal
-zold/piros listitem background play/pausre, animalt!!!
 scrollbar drag
-with the help of C & EMACS 
-ui color shade selector, darknal invertalja a jelenlegi semat
 jobb halfra vive az egeret song folott id3 editor
 
 ---
@@ -54,6 +52,8 @@ speed up font rendering by using glyph indexes instead of codepoints
 
 future features
 
+ui color shade selector, darknal invertalja a jelenlegi semat
+button on/off alpha change on icon
 search bar csusszon ki header alol ha songlistheaderre megy az eger
 id3 editor
 unit teszter gl_compositorhoz
