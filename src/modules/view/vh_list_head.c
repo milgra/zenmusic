@@ -16,10 +16,11 @@ typedef struct _lheadcell_t
 
 typedef struct _vh_lhead_t
 {
-  vec_t*  cells;
-  view_t* view;
-  int     height;
-  int     index;
+  vec_t*       cells;
+  view_t*      view;
+  lheadcell_t* dragged;
+  int          height;
+  int          index;
   void (*on_select)(view_t* view, uint32_t index);
 } vh_lhead_t;
 
@@ -47,10 +48,28 @@ void vh_lhead_evt(view_t* view, ev_t ev)
   if (ev.type == EV_MDOWN)
   {
     // check cell or cell border intersection
+    vh_lhead_t* vh = view->handler_data;
+    for (int i = 0; i < vh->cells->length; i++)
+    {
+      lheadcell_t* cell = vh->cells->data[i];
+      r2_t         f    = cell->view->frame.local;
+      if (f.x < ev.x && f.x + f.w > ev.x)
+      {
+        printf("ON CELL %s\n", cell->id);
+        vh->dragged = cell;
+      }
+    }
   }
   else if (ev.type == EV_MMOVE)
   {
     // resize or move cell
+    if (ev.drag)
+    {
+      vh_lhead_t* vh = view->handler_data;
+      r2_t        f  = vh->dragged->view->frame.local;
+      f.x            = ev.x;
+      view_set_frame(vh->dragged->view, f);
+    }
   }
   else if (ev.type == EV_MUP)
   {
