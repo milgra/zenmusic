@@ -1,5 +1,5 @@
-#ifndef vh_item_h
-#define vh_item_h
+#ifndef vh_list_item_h
+#define vh_list_item_h
 
 #include "mtcstring.c"
 #include "mtmap.c"
@@ -14,20 +14,20 @@ typedef struct _cell_t
   view_t* view;
 } cell_t;
 
-typedef struct _vh_item_t
+typedef struct _vh_litem_t
 {
   vec_t*  cells;
   view_t* view;
   int     index;
   void (*on_select)(view_t* view, uint32_t index);
-} vh_item_t;
+} vh_litem_t;
 
-void vh_item_add(view_t* view, int h, void (*on_select)(view_t* view, uint32_t index));
-void vh_item_upd(view_t* view, int index);
-void vh_item_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* view, void* data));
-void vh_item_upd_cell(view_t* view, char* id, int size, void* data);
-void vh_item_rem_cell(char* id);
-void vh_item_swp_cell(char* ida, char* idb);
+void vh_litem_add(view_t* view, int h, void (*on_select)(view_t* view, uint32_t index));
+void vh_litem_upd(view_t* view, int index);
+void vh_litem_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* view, void* data));
+void vh_litem_upd_cell(view_t* view, char* id, int size, void* data);
+void vh_litem_rem_cell(char* id);
+void vh_litem_swp_cell(char* ida, char* idb);
 
 #endif
 
@@ -35,40 +35,40 @@ void vh_item_swp_cell(char* ida, char* idb);
 
 #include "tg_css.c"
 
-void vh_item_del(void* p)
+void vh_litem_del(void* p)
 {
-  vh_item_t* list = p;
+  vh_litem_t* list = p;
   REL(list->cells);
 }
 
-void vh_item_evt(view_t* view, ev_t ev)
+void vh_litem_evt(view_t* view, ev_t ev)
 {
   if (ev.type == EV_MDOWN)
   {
-    vh_item_t* vh = view->handler_data;
+    vh_litem_t* vh = view->handler_data;
     (*vh->on_select)(view, vh->index);
   }
 }
 
-void vh_item_add(view_t* view, int h, void (*on_select)(view_t* view, uint32_t index))
+void vh_litem_add(view_t* view, int h, void (*on_select)(view_t* view, uint32_t index))
 {
-  vh_item_t* vh = mem_calloc(sizeof(vh_item_t), "vh_item_t", vh_item_del, NULL);
-  vh->cells     = VNEW();
-  vh->on_select = on_select;
+  vh_litem_t* vh = mem_calloc(sizeof(vh_litem_t), "vh_litem_t", vh_litem_del, NULL);
+  vh->cells      = VNEW();
+  vh->on_select  = on_select;
 
   view->handler_data = vh;
-  view->handler      = vh_item_evt;
+  view->handler      = vh_litem_evt;
 }
 
-void vh_item_upd(view_t* view, int index)
+void vh_litem_upd(view_t* view, int index)
 {
-  vh_item_t* vh = view->handler_data;
-  vh->index     = index;
+  vh_litem_t* vh = view->handler_data;
+  vh->index      = index;
 }
 
-void vh_item_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* view, void* data))
+void vh_litem_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* view, void* data))
 {
-  vh_item_t* vh = view->handler_data;
+  vh_litem_t* vh = view->handler_data;
 
   cell_t* cell = mem_alloc(sizeof(cell_t), "cell_t", NULL, NULL);
   cell->id     = cstr_fromcstring(id);
@@ -92,9 +92,9 @@ void vh_item_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* view
   view_set_frame(view, local);
 }
 
-void vh_item_upd_cell(view_t* view, char* id, int size, void* data)
+void vh_litem_upd_cell(view_t* view, char* id, int size, void* data)
 {
-  vh_item_t* vh = view->handler_data;
+  vh_litem_t* vh = view->handler_data;
 
   for (int i = 0; i < vh->cells->length; i++)
   {

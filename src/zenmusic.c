@@ -1,4 +1,5 @@
 #include "common.c"
+#include "cr_text.c"
 #include "db.c"
 #include "lib.c"
 #include "mtchannel.c"
@@ -13,6 +14,7 @@
 #include "vh_button.c"
 #include "vh_knob.c"
 #include "vh_list.c"
+#include "vh_list_head.c"
 #include "vh_text.c"
 #include "view.c"
 #include "view_generator.c"
@@ -236,8 +238,6 @@ void init(int width, int height)
 
   //tg_text_add(info, "-", ts);
 
-  view_t* songlistheader = view_get_subview(baseview, "songlistheader");
-
   view_t* filterbar = view_get_subview(baseview, "filterfield");
   tg_css_add(filterbar);
   filterbar->layout.background_color = 0xFFFFFFFF;
@@ -303,6 +303,24 @@ void init(int width, int height)
 
   vh_button_add(maxbtn, NULL, max_button_pushed);
   vh_button_add(closebtn, NULL, close_button_pushed);
+
+  view_t* songlistheader = view_get_subview(baseview, "songlistheader");
+
+  ts.font      = fontpath;
+  ts.align     = 0;
+  ts.size      = 25.0;
+  ts.textcolor = 0x000000FF;
+  ts.backcolor = 0xEFEFEFFF;
+
+  vh_lhead_add(songlistheader, 31, NULL);
+
+  vh_lhead_add_cell(songlistheader, "index", 50, cr_text_upd);
+  vh_lhead_add_cell(songlistheader, "artist", 300, cr_text_upd);
+  vh_lhead_add_cell(songlistheader, "title", 300, cr_text_upd);
+
+  vh_lhead_upd_cell(songlistheader, "index", 30, &((cr_text_data_t){.style = ts, .text = "index"}));
+  vh_lhead_upd_cell(songlistheader, "artist", 200, &((cr_text_data_t){.style = ts, .text = "artist"}));
+  vh_lhead_upd_cell(songlistheader, "title", 300, &((cr_text_data_t){.style = ts, .text = "title"}));
 
   db    = MNEW();
   libch = ch_new(100);

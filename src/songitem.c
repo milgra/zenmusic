@@ -16,7 +16,7 @@ void    songitem_update(view_t* rowview, int index, map_t* file, char* fontpath)
 #include "vh_button.c"
 
 #include "cr_text.c"
-#include "vh_item.c"
+#include "vh_list_item.c"
 
 uint32_t songitem_index = 0;
 
@@ -35,11 +35,11 @@ view_t* songitem_new(char* fontpath, void (*on_select)(view_t* view, uint32_t in
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
   rowview->hidden = 1;
 
-  vh_item_add(rowview, 35, on_select);
+  vh_litem_add(rowview, 35, on_select);
 
-  vh_item_add_cell(rowview, "index", 50, cr_text_upd);
-  vh_item_add_cell(rowview, "artist", 300, cr_text_upd);
-  vh_item_add_cell(rowview, "title", 300, cr_text_upd);
+  vh_litem_add_cell(rowview, "index", 50, cr_text_upd);
+  vh_litem_add_cell(rowview, "artist", 300, cr_text_upd);
+  vh_litem_add_cell(rowview, "title", 300, cr_text_upd);
 
   return rowview;
 }
@@ -62,10 +62,10 @@ void songitem_update(view_t* rowview, int index, map_t* file, char* fontpath)
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = color1;
 
-  vh_item_upd(rowview, index);
-  vh_item_upd_cell(rowview, "index", 30, &((cr_text_data_t){.style = ts, .text = indbuffer}));
-  vh_item_upd_cell(rowview, "artist", 200, &((cr_text_data_t){.style = ts, .text = MGET(file, "artist")}));
-  vh_item_upd_cell(rowview, "title", 300, &((cr_text_data_t){.style = ts, .text = MGET(file, "title")}));
+  vh_litem_upd(rowview, index);
+  vh_litem_upd_cell(rowview, "index", 30, &((cr_text_data_t){.style = ts, .text = indbuffer}));
+  vh_litem_upd_cell(rowview, "artist", 200, &((cr_text_data_t){.style = ts, .text = MGET(file, "artist")}));
+  vh_litem_upd_cell(rowview, "title", 300, &((cr_text_data_t){.style = ts, .text = MGET(file, "title")}));
 }
 
 #endif
