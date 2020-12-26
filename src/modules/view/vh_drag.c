@@ -1,16 +1,16 @@
-#ifndef evthan_drag_h
-#define evthan_drag_h
+#ifndef vh_drag_h
+#define vh_drag_h
 
 #include "view.c"
 #include "wm_event.c"
 
-void eh_drag_add(view_t* view);
+void vh_drag_add(view_t* view);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-void eh_drag_evt(view_t* view, ev_t ev)
+void vh_drag_evt(view_t* view, ev_t ev)
 {
   if (ev.type == EV_MMOVE && ev.drag)
   {
@@ -21,9 +21,9 @@ void eh_drag_evt(view_t* view, ev_t ev)
   }
 }
 
-void eh_drag_add(view_t* view)
+void vh_drag_add(view_t* view)
 {
-  view->evt_han_data = eh_drag_evt;
+  view->handler_data = vh_drag_evt;
 }
 
 #endif

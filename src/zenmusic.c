@@ -1,9 +1,5 @@
 #include "common.c"
 #include "db.c"
-#include "eh_button.c"
-#include "eh_knob.c"
-#include "eh_list.c"
-#include "eh_text.c"
 #include "lib.c"
 #include "mtchannel.c"
 #include "mtcstring.c"
@@ -14,6 +10,10 @@
 #include "tg_knob.c"
 #include "tg_text.c"
 #include "ui_manager.c"
+#include "vh_button.c"
+#include "vh_knob.c"
+#include "vh_list.c"
+#include "vh_text.c"
 #include "view.c"
 #include "view_generator.c"
 #include "view_util.c"
@@ -178,13 +178,13 @@ void filter(view_t* view, str_t* text)
   char* word = str_cstring(text);
   db_filter(db, word, vec_srt);
   REL(word);
-  eh_list_reset(songlist);
+  vh_list_reset(songlist);
 }
 
 void sort()
 {
   db_sort(db, vec_srt);
-  eh_list_fill(songlist);
+  vh_list_fill(songlist);
 }
 
 void init(int width, int height)
@@ -209,7 +209,7 @@ void init(int width, int height)
   ui_manager_add(baseview);
 
   songlist = view_get_subview(baseview, "songlist");
-  eh_list_add(songlist, songlist_item_generator);
+  vh_list_add(songlist, songlist_item_generator);
 
   timeview = view_get_subview(baseview, "time");
 
@@ -245,8 +245,8 @@ void init(int width, int height)
   view_t* filterbar = view_get_subview(baseview, "filterfield");
   tg_css_add(filterbar);
   filterbar->layout.background_color = 0xFFFFFFFF;
-  eh_text_add(filterbar, "", fontpath, filter);
-  //eh_text_add(filterbar, "Search/Filter (x)", filter);
+  vh_text_add(filterbar, "", fontpath, filter);
+  //vh_text_add(filterbar, "Search/Filter (x)", filter);
 
   view_t* headeritem = songitem_new();
   //songitem_update(headeritem, -1, "Artist", NULL);
@@ -254,19 +254,19 @@ void init(int width, int height)
 
   playbtn = view_get_subview(baseview, "playbtn");
   tg_knob_add(playbtn);
-  eh_knob_add(playbtn, seek_ratio_changed, play_button_pushed);
+  vh_knob_add(playbtn, seek_ratio_changed, play_button_pushed);
 
   volbtn = view_get_subview(baseview, "volbtn");
   tg_knob_add(volbtn);
-  eh_knob_add(volbtn, vol_ratio_changed, mute_button_pushed);
+  vh_knob_add(volbtn, vol_ratio_changed, mute_button_pushed);
 
   view_t* prevbtn = view_get_subview(baseview, "previcon");
   view_t* nextbtn = view_get_subview(baseview, "nexticon");
   view_t* randbtn = view_get_subview(baseview, "shuffleicon");
 
-  eh_button_add(prevbtn, NULL, prev_button_pushed);
-  eh_button_add(nextbtn, NULL, next_button_pushed);
-  eh_button_add(randbtn, NULL, rand_button_pushed);
+  vh_button_add(prevbtn, NULL, prev_button_pushed);
+  vh_button_add(nextbtn, NULL, next_button_pushed);
+  vh_button_add(randbtn, NULL, rand_button_pushed);
 
   view_t* settingsbtn = view_get_subview(baseview, "settingsicon");
   view_t* donatebtn   = view_get_subview(baseview, "donateicon");
@@ -305,8 +305,8 @@ void init(int width, int height)
   view_t* maxbtn   = view_get_subview(baseview, "maxicon");
   view_t* closebtn = view_get_subview(baseview, "closeicon");
 
-  eh_button_add(maxbtn, NULL, max_button_pushed);
-  eh_button_add(closebtn, NULL, close_button_pushed);
+  vh_button_add(maxbtn, NULL, max_button_pushed);
+  vh_button_add(closebtn, NULL, close_button_pushed);
 
   db    = MNEW();
   libch = ch_new(100);

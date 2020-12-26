@@ -11,12 +11,12 @@ void    songitem_update(view_t* rowview, int index, map_t* file, void (*event)(v
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "eh_button.c"
 #include "tg_css.c"
 #include "tg_text.c"
+#include "vh_button.c"
 
 #include "cr_text.c"
-#include "eh_item.c"
+#include "vh_item.c"
 
 uint32_t songitem_index = 0;
 
@@ -35,11 +35,11 @@ view_t* songitem_new(char* fontpath)
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
   rowview->hidden = 1;
 
-  eh_item_add(rowview, 35);
+  vh_item_add(rowview, 35, NULL);
 
-  eh_item_add_cell(rowview, "index", 50, cr_text_upd);
-  eh_item_add_cell(rowview, "artist", 300, cr_text_upd);
-  eh_item_add_cell(rowview, "title", 300, cr_text_upd);
+  vh_item_add_cell(rowview, "index", 50, cr_text_upd);
+  vh_item_add_cell(rowview, "artist", 300, cr_text_upd);
+  vh_item_add_cell(rowview, "title", 300, cr_text_upd);
 
   return rowview;
 }
@@ -50,7 +50,7 @@ void songitem_update(view_t* rowview, int index, map_t* file, void (*event)(view
   uint32_t color2 = (index % 2 == 0) ? 0xE5E5E5FF : 0xEFEFEFFF;
 
   /* size_t sind = index; */
-  /* eh_button_add(rowview, (void*)sind, event); */
+  /* vh_button_add(rowview, (void*)sind, event); */
 
   char indbuffer[6];
   if (index > -1)
@@ -65,9 +65,9 @@ void songitem_update(view_t* rowview, int index, map_t* file, void (*event)(view
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = color1;
 
-  eh_item_upd_cell(rowview, "index", 30, &((cr_text_data_t){.style = ts, .text = indbuffer}));
-  eh_item_upd_cell(rowview, "artist", 200, &((cr_text_data_t){.style = ts, .text = MGET(file, "artist")}));
-  eh_item_upd_cell(rowview, "title", 300, &((cr_text_data_t){.style = ts, .text = MGET(file, "title")}));
+  vh_item_upd_cell(rowview, "index", 30, &((cr_text_data_t){.style = ts, .text = indbuffer}));
+  vh_item_upd_cell(rowview, "artist", 200, &((cr_text_data_t){.style = ts, .text = MGET(file, "artist")}));
+  vh_item_upd_cell(rowview, "title", 300, &((cr_text_data_t){.style = ts, .text = MGET(file, "title")}));
 }
 
 #endif

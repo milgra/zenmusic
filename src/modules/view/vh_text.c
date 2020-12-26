@@ -1,25 +1,25 @@
-#ifndef evthan_text_h
-#define evthan_text_h
+#ifndef vhand_text_h
+#define vh_text_h
 
 #include "mtstring.c"
 #include "view.c"
 #include "wm_event.c"
 
-void eh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t* view, str_t* text));
+void vh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t* view, str_t* text));
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
 #include "SDL.h"
-#include "eh_anim.c"
 #include "mtcstring.c"
 #include "mtvector.c"
 #include "text.c"
 #include "tg_css.c"
 #include "tg_text.c"
+#include "vh_anim.c"
 
-typedef struct _eh_text_t
+typedef struct _vh_text_t
 {
   str_t*      text;
   textstyle_t style;
@@ -31,11 +31,11 @@ typedef struct _eh_text_t
 
   view_t* para;
   void (*ontext)(view_t* view, str_t* text);
-} eh_text_t;
+} vh_text_t;
 
-void eh_text_upd(view_t* view)
+void vh_text_upd(view_t* view)
 {
-  eh_text_t* data  = view->evt_han_data;
+  vh_text_t* data  = view->handler_data;
   str_t*     text  = data->text;
   r2_t       frame = view->frame.local;
 
@@ -65,9 +65,9 @@ void eh_text_upd(view_t* view)
   tg_text_set(data->para, str_cstring(data->text));
 }
 
-void eh_text_evt(view_t* view, ev_t ev)
+void vh_text_evt(view_t* view, ev_t ev)
 {
-  eh_text_t* data = view->evt_han_data;
+  vh_text_t* data = view->handler_data;
   if (ev.type == EV_MMOVE)
   {
     // activate text field, add cursor
@@ -85,7 +85,7 @@ void eh_text_evt(view_t* view, ev_t ev)
         sf.h    = 0;
         sf.y    = ef.y + ef.h / 2.0;
 
-        eh_anim_set(data->crsr_v, sf, ef, 10, AT_LINEAR);
+        vh_anim_set(data->crsr_v, sf, ef, 10, AT_LINEAR);
       }
     }
     else
@@ -97,14 +97,14 @@ void eh_text_evt(view_t* view, ev_t ev)
       ef.h    = 0;
       ef.y    = sf.y + sf.h / 2.0;
 
-      eh_anim_set(data->crsr_v, sf, ef, 10, AT_LINEAR);
+      vh_anim_set(data->crsr_v, sf, ef, 10, AT_LINEAR);
     }
   }
   else if (ev.type == EV_TEXT)
   {
     str_addbytearray(data->text, ev.text);
 
-    eh_text_upd(view);
+    vh_text_upd(view);
 
     /* // add new glyph view/update paragraph view */
 
@@ -136,8 +136,8 @@ void eh_text_evt(view_t* view, ev_t ev)
     /* ef.x += 10.0; */
     /* ef.w = 20.0; */
 
-    /* eh_anim_add(glyphview); */
-    /* eh_anim_set(glyphview, sf, ef, 10, AT_LINEAR); */
+    /* vh_anim_add(glyphview); */
+    /* vh_anim_set(glyphview, sf, ef, 10, AT_LINEAR); */
 
     (*data->ontext)(view, data->text);
   }
@@ -146,7 +146,7 @@ void eh_text_evt(view_t* view, ev_t ev)
     if (ev.keycode == SDLK_BACKSPACE && data->text->length > 0)
     {
       str_removecodepointatindex(data->text, data->text->length - 1);
-      eh_text_upd(view);
+      vh_text_upd(view);
       (*data->ontext)(view, data->text);
     }
   }
@@ -156,7 +156,7 @@ void eh_text_evt(view_t* view, ev_t ev)
   }
 }
 
-void eh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t* view, str_t* text))
+void vh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t* view, str_t* text))
 {
   textstyle_t ts = {0};
   ts.font        = fontpath;
@@ -165,7 +165,7 @@ void eh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0x00000000;
 
-  eh_text_t* data = mem_calloc(sizeof(eh_text_t), "eh_text", NULL, NULL);
+  vh_text_t* data = mem_calloc(sizeof(vh_text_t), "vh_text", NULL, NULL);
   data->text      = str_new();
   data->ontext    = ontext;
   data->style     = ts;
@@ -175,8 +175,8 @@ void eh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t
 
   view->needs_key    = 1;
   view->needs_text   = 1;
-  view->evt_han      = eh_text_evt;
-  view->evt_han_data = data;
+  view->handler      = vh_text_evt;
+  view->handler_data = data;
 
   // add paragraph
 
@@ -197,7 +197,7 @@ void eh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t
 
   crsr_v->layout.background_color = 0x666666FF;
   tg_css_add(crsr_v);
-  eh_anim_add(crsr_v);
+  vh_anim_add(crsr_v);
   view_add(view, crsr_v);
 
   data->crsr_v = crsr_v;

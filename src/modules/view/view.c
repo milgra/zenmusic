@@ -127,9 +127,9 @@ struct _view_t
   vlayout_t layout;
   texture_t texture;
 
-  void (*evt_han)(view_t*, ev_t); /* event handler for view */
+  void (*handler)(view_t*, ev_t); /* view handler for view */
   void (*tex_gen)(view_t*);       /* texture generator for view */
-  void* evt_han_data;             /* data for event handler */
+  void* handler_data;             /* data for event handler */
   void* tex_gen_data;             /* data for texture generator */
 };
 
@@ -252,7 +252,7 @@ void view_evt(view_t* view, ev_t ev)
   while ((v = VNXT(view->views)))
     view_evt(v, ev);
 
-  if (view->evt_han) (*view->evt_han)(view, ev);
+  if (view->handler) (*view->handler)(view, ev);
 }
 
 void view_calc_global(view_t* view)

@@ -1,5 +1,5 @@
-#ifndef eh_sbar_h
-#define ev_sbar_h
+#ifndef vh_sbar_h
+#define vh_sbar_h
 
 #include "view.c"
 
@@ -9,9 +9,9 @@ typedef enum _sbartype_t
   SBAR_V,
 } sbartype_t;
 
-void eh_sbar_add(view_t* view, sbartype_t type, int steps);
-void eh_sbar_open(view_t* view);
-void eh_sbar_close(view_t* view);
+void vh_sbar_add(view_t* view, sbartype_t type, int steps);
+void vh_sbar_open(view_t* view);
+void vh_sbar_close(view_t* view);
 
 #endif
 
@@ -20,22 +20,22 @@ void eh_sbar_close(view_t* view);
 #include "mtgraphics.c"
 #include <stdio.h>
 
-typedef struct _eh_sbar_t
+typedef struct _vh_sbar_t
 {
   sbartype_t type;
   int        step;
   int        steps;
   int        delta;
-} eh_sbar_t;
+} vh_sbar_t;
 
-void eh_sbar_evt(view_t* view, ev_t ev)
+void vh_sbar_evt(view_t* view, ev_t ev)
 {
   if (ev.type == EV_TIME)
   {
-    eh_sbar_t* eh = view->evt_han_data;
+    vh_sbar_t* vh = view->handler_data;
 
     // animation is not ready
-    if (eh->step > 0 && eh->step < eh->steps)
+    if (vh->step > 0 && vh->step < vh->steps)
     {
       // avoid invalid bitmaps
       if (view->frame.local.w >= 1.0 &&
@@ -52,13 +52,13 @@ void eh_sbar_evt(view_t* view, ev_t ev)
         }
 
         float ratio;
-        if (eh->step < eh->steps / 3)
+        if (vh->step < vh->steps / 3)
         {
           // dot state
-          ratio = (float)eh->step / ((float)eh->steps / 3.0);
+          ratio = (float)vh->step / ((float)vh->steps / 3.0);
           bm_reset(bm);
 
-          if (eh->type == SBAR_V)
+          if (vh->type == SBAR_V)
           {
             float radius = view->frame.local.w * ratio * 0.5;
             gfx_circle(bm, bm->w / 2, bm->h / 2, radius, 1, 0x000000FF);
@@ -73,10 +73,10 @@ void eh_sbar_evt(view_t* view, ev_t ev)
         else
         {
           // bar state
-          ratio = (float)(eh->step - eh->steps / 3) / (float)(eh->steps / 3 * 2);
+          ratio = (float)(vh->step - vh->steps / 3) / (float)(vh->steps / 3 * 2);
           bm_reset(bm);
 
-          if (eh->type == SBAR_V)
+          if (vh->type == SBAR_V)
           {
             float height = (view->frame.local.h - view->frame.local.w) * ratio;
 
@@ -95,35 +95,35 @@ void eh_sbar_evt(view_t* view, ev_t ev)
           view->texture.changed = 1;
         }
 
-        eh->step += eh->delta;
+        vh->step += vh->delta;
       }
     }
   }
 }
 
-void eh_sbar_add(view_t* view, sbartype_t type, int steps)
+void vh_sbar_add(view_t* view, sbartype_t type, int steps)
 {
-  eh_sbar_t* eh = mem_calloc(sizeof(eh_sbar_t), "eh_sbar", NULL, NULL);
+  vh_sbar_t* vh = mem_calloc(sizeof(vh_sbar_t), "vh_sbar", NULL, NULL);
 
-  eh->type  = type;
-  eh->steps = steps;
+  vh->type  = type;
+  vh->steps = steps;
 
-  view->evt_han_data = eh;
-  view->evt_han      = eh_sbar_evt;
+  view->handler_data = vh;
+  view->handler      = vh_sbar_evt;
 }
 
-void eh_sbar_open(view_t* view)
+void vh_sbar_open(view_t* view)
 {
-  eh_sbar_t* eh = view->evt_han_data;
-  eh->delta     = 1;
-  eh->step      = 1;
+  vh_sbar_t* vh = view->handler_data;
+  vh->delta     = 1;
+  vh->step      = 1;
 }
 
-void eh_sbar_close(view_t* view)
+void vh_sbar_close(view_t* view)
 {
-  eh_sbar_t* eh = view->evt_han_data;
-  eh->delta     = -1;
-  eh->step      = eh->steps - 1;
+  vh_sbar_t* vh = view->handler_data;
+  vh->delta     = -1;
+  vh->step      = vh->steps - 1;
 }
 
 #endif

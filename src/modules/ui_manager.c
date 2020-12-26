@@ -64,7 +64,7 @@ void ui_manager_event(ev_t ev)
         view_t* v = queue->data[i];
         if (v->needs_touch)
         {
-          if (v->evt_han) (*v->evt_han)(v, ev);
+          if (v->handler) (*v->handler)(v, ev);
           break;
         }
       }
@@ -78,7 +78,7 @@ void ui_manager_event(ev_t ev)
       view_t* v = queue->data[i];
       if (v->needs_touch)
       {
-        if (v->evt_han) (*v->evt_han)(v, ev);
+        if (v->handler) (*v->handler)(v, ev);
         break;
       }
     }
@@ -90,7 +90,7 @@ void ui_manager_event(ev_t ev)
       view_t* v = queue->data[i];
       if (v->needs_scroll)
       {
-        if (v->evt_han) (*v->evt_han)(v, ev);
+        if (v->handler) (*v->handler)(v, ev);
         break;
       }
     }
@@ -102,7 +102,7 @@ void ui_manager_event(ev_t ev)
       view_t* v = queue->data[i];
       if (v->needs_key)
       {
-        if (v->evt_han) (*v->evt_han)(v, ev);
+        if (v->handler) (*v->handler)(v, ev);
         break;
       }
     }
@@ -114,7 +114,7 @@ void ui_manager_event(ev_t ev)
       view_t* v = queue->data[i];
       if (v->needs_text)
       {
-        if (v->evt_han) (*v->evt_han)(v, ev);
+        if (v->handler) (*v->handler)(v, ev);
         break;
       }
     }
