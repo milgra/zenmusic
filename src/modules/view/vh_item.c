@@ -16,14 +16,14 @@ typedef struct _cell_t
 
 typedef struct _vh_item_t
 {
-  vec_t*   cells;
-  view_t*  view;
-  uint32_t index;
+  vec_t*  cells;
+  view_t* view;
+  int     index;
   void (*on_select)(view_t* view, uint32_t index);
 } vh_item_t;
 
 void vh_item_add(view_t* view, int h, void (*on_select)(view_t* view, uint32_t index));
-void vh_item_set_index(view_t* view, uint32_t index);
+void vh_item_upd(view_t* view, int index);
 void vh_item_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* view, void* data));
 void vh_item_upd_cell(view_t* view, char* id, int size, void* data);
 void vh_item_rem_cell(char* id);
@@ -60,6 +60,12 @@ void vh_item_add(view_t* view, int h, void (*on_select)(view_t* view, uint32_t i
   view->handler      = vh_item_evt;
 }
 
+void vh_item_upd(view_t* view, int index)
+{
+  vh_item_t* vh = view->handler_data;
+  vh->index     = index;
+}
+
 void vh_item_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* view, void* data))
 {
   vh_item_t* vh = view->handler_data;
@@ -72,6 +78,8 @@ void vh_item_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* view
   view_t* cellview = view_new(cstr_fromformat("%s%s", view->id, id, NULL), (r2_t){view->frame.local.w, 0, size, view->frame.local.h});
 
   cell->view = cellview;
+
+  cellview->needs_touch = 0;
 
   view_add(view, cellview);
 

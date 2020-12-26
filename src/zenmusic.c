@@ -52,18 +52,14 @@ map_t* db;
 vec_t* vec_srt;
 ch_t*  libch;
 
-void songitem_event(view_t* view, void* data)
+void songitem_on_select(view_t* view, uint32_t index)
 {
-  lastindex = (size_t)data;
-  // printf("songitem event %i %i %s\n", ev.type, index, (char*)files->data[index]);
+  map_t* songmap = vec_srt->data[index];
 
-  map_t* songmap = vec_srt->data[lastindex];
   tg_text_set(song, (char*)MGET(songmap, "title"));
   tg_text_set(artist, (char*)MGET(songmap, "artist"));
-  //tg_text_set(info, "started playing song");
 
-  //bm_t* bitmap = player_get_album(files->data[lastindex]);
-  //tg_bitmap_add(coverview, NULL, bitmap, "album");
+  // LOG started playing xy
 
   player_play(MGET(songmap, "path"));
 }
@@ -165,11 +161,11 @@ view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index, in
   if (index >= vec_srt->length)
     return NULL;
   if (rowview == NULL)
-    rowview = songitem_new(fontpath);
+    rowview = songitem_new(fontpath, songitem_on_select);
 
   *count = vec_srt->length;
 
-  songitem_update(rowview, index, vec_srt->data[index], songitem_event, fontpath);
+  songitem_update(rowview, index, vec_srt->data[index], fontpath);
   return rowview;
 }
 
@@ -248,7 +244,7 @@ void init(int width, int height)
   vh_text_add(filterbar, "", fontpath, filter);
   //vh_text_add(filterbar, "Search/Filter (x)", filter);
 
-  view_t* headeritem = songitem_new();
+  //view_t* headeritem = songitem_new();
   //songitem_update(headeritem, -1, "Artist", NULL);
   //view_add(songlistheader, headeritem);
 

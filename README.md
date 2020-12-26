@@ -29,6 +29,8 @@ first version
 
 multiple columns, sorting
 highlight row
+messages window, log messages
+move songs to folders
 zold/piros listitem background play/pausre, animalt!!!
 additional columns - genre, last played, added, skipped, play count,
 fix leaks
