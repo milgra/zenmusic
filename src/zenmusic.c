@@ -169,7 +169,7 @@ view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index, in
 
   *count = vec_srt->length;
 
-  songitem_update(rowview, index, vec_srt->data[index], songitem_event);
+  songitem_update(rowview, index, vec_srt->data[index], songitem_event, fontpath);
   return rowview;
 }
 
