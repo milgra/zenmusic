@@ -151,6 +151,24 @@ void close_button_pushed(view_t* view, void* data)
 void songitem_on_select(view_t* view, uint32_t index)
 {
   // indicate list item
+  vec_t*  items = vh_list_items(songlist);
+  view_t* item;
+  while ((item = VNXT(items)))
+  {
+    vh_litem_t* vh = item->handler_data;
+    if (vh->index == index)
+    {
+      printf("FOUND!\n");
+      textstyle_t ts = {0};
+      ts.font        = fontpath;
+      ts.align       = 0;
+      ts.size        = 25.0;
+      ts.textcolor   = 0x000000FF;
+      ts.backcolor   = 0xFF0000FF;
+
+      vh_litem_upd_cell(item, "index", &((cr_text_data_t){.style = ts, .text = "e"}));
+    }
+  }
 
   // update display
   map_t* songmap = vec_srt->data[index];
@@ -198,14 +216,14 @@ void sort(char* field)
   vh_list_reset(songlist);
 }
 
-void on_select(view_t* view, char* id)
+void on_header_field_select(view_t* view, char* id)
 {
-  printf("on_select %s\n", id);
+  printf("on_header_field_select %s\n", id);
   // filter db by field id
   sort(id);
 }
 
-void on_insert(view_t* view, int src, int tgt)
+void on_header_field_insert(view_t* view, int src, int tgt)
 {
   // update in fields so new items will use updated order
   sitem_cell_t* cell = songlist_fields->data[src];
@@ -227,7 +245,7 @@ void on_insert(view_t* view, int src, int tgt)
   }
 }
 
-void on_resize(view_t* view, char* id, int size)
+void on_header_field_resize(view_t* view, char* id, int size)
 {
   // update in fields so new items will use updated size
   for (int i = 0; i < songlist_fields->length; i++)
@@ -401,7 +419,7 @@ void init(int width, int height)
   ts.textcolor = 0x000000FF;
   ts.backcolor = 0xEFEFEFFF;
 
-  vh_lhead_add(songlistheader, 30, on_select, on_insert, on_resize);
+  vh_lhead_add(songlistheader, 30, on_header_field_select, on_header_field_insert, on_header_field_resize);
 
   vh_lhead_add_cell(songlistheader, "index", 50, cr_text_upd);
   vh_lhead_add_cell(songlistheader, "artist", 300, cr_text_upd);
