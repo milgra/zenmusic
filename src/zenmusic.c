@@ -54,6 +54,8 @@ map_t* db;
 vec_t* vec_srt;
 ch_t*  libch;
 
+vec_t* songlist_fields;
+
 void songitem_on_select(view_t* view, uint32_t index)
 {
   map_t* songmap = vec_srt->data[index];
@@ -181,6 +183,11 @@ void on_insert(view_t* view, char* src_id, char* tgt_id)
   printf("on_insert %s %s\n", src_id, tgt_id);
 }
 
+void on_resize(view_t* view, char* id, int width)
+{
+  printf("on_resize %s %i\n", id, width);
+}
+
 void filter(view_t* view, str_t* text)
 {
   char* word = str_cstring(text);
@@ -217,7 +224,16 @@ void init(int width, int height)
   ui_manager_add(baseview);
 
   songlist = view_get_subview(baseview, "songlist");
+
   vh_list_add(songlist, songlist_item_generator);
+
+  /* songlist_fields = VNEW(); */
+  /* VADD(songlist_fields, "index"); */
+  /* VADD(songlist_fields, "artist"); */
+  /* VADD(songlist_fields, "title"); */
+  /* VADD(songlist_fields, "date"); */
+  /* VADD(songlist_fields, "track"); */
+  /* VADD(songlist_fields, "disc"); */
 
   timeview = view_get_subview(baseview, "time");
 
@@ -322,7 +338,7 @@ void init(int width, int height)
   ts.textcolor = 0x000000FF;
   ts.backcolor = 0xEFEFEFFF;
 
-  vh_lhead_add(songlistheader, 30, on_select, on_insert);
+  vh_lhead_add(songlistheader, 30, on_select, on_insert, on_resize);
 
   vh_lhead_add_cell(songlistheader, "index", 50, cr_text_upd);
   vh_lhead_add_cell(songlistheader, "artist", 300, cr_text_upd);
