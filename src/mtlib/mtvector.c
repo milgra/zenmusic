@@ -29,7 +29,7 @@ struct _vec_t
 vec_t*   vec_alloc(void);
 void     vec_dealloc(void* vector);
 void     vec_reset(vec_t* vector);
-void     vec_decrese_item_retcount(vec_t* vector);
+void     vec_dec_retcount(vec_t* vector);
 void     vec_add(vec_t* vector, void* data);
 void*    vec_next(vec_t* vector);
 void     vec_addatindex(vec_t* vector, void* data, size_t index);
@@ -102,7 +102,7 @@ void* vec_next(vec_t* vector)
 /* decreases retain count of items. use when you add items inline and don't want to release every item
         one by one. Be careful with it, don't release them til dealloc!*/
 
-void vec_decrese_item_retcount(vec_t* vector)
+void vec_dec_retcount(vec_t* vector)
 {
   for (uint32_t index = 0; index < vector->length; index++)
     mem_release(vector->data[index]);

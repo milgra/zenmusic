@@ -1,8 +1,17 @@
 #ifndef songitem_h
 #define songitem_h
 
+typedef struct _sitem_cell_t
+{
+  char* id;
+  int   size;
+  int   index;
+} sitem_cell_t;
+
 #include "mtmap.c"
 #include "view.c"
+
+sitem_cell_t* sitem_cell_new(char* id, int size, int index);
 
 view_t* songitem_new(char* fontpath, void (*on_select)(view_t* view, uint32_t index));
 void    songitem_update(view_t* rowview, int index, map_t* file, char* fontpath);
@@ -19,6 +28,17 @@ void    songitem_update(view_t* rowview, int index, map_t* file, char* fontpath)
 #include "vh_list_item.c"
 
 uint32_t songitem_index = 0;
+
+sitem_cell_t* sitem_cell_new(char* id, int size, int index)
+{
+  sitem_cell_t* cell = mem_calloc(sizeof(sitem_cell_t), "sitem_cell_t", NULL, NULL);
+
+  cell->id    = cstr_fromcstring(id);
+  cell->size  = size;
+  cell->index = index;
+
+  return cell;
+}
 
 view_t* songitem_new(char* fontpath, void (*on_select)(view_t* view, uint32_t index))
 {

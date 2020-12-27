@@ -176,6 +176,7 @@ view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index, in
 void on_select(view_t* view, char* id)
 {
   printf("on_select %s\n", id);
+  // filter db by field id
 }
 
 void on_insert(view_t* view, char* src_id, char* tgt_id)
@@ -186,6 +187,15 @@ void on_insert(view_t* view, char* src_id, char* tgt_id)
 void on_resize(view_t* view, char* id, int width)
 {
   printf("on_resize %s %i\n", id, width);
+  for (int i = 0; i < songlist_fields->length; i++)
+  {
+    sitem_cell_t* cell = songlist_fields->data[i];
+    if (strcmp(cell->id, id) == 0)
+    {
+      cell->size = width;
+      break;
+    }
+  }
 }
 
 void filter(view_t* view, str_t* text)
@@ -227,13 +237,15 @@ void init(int width, int height)
 
   vh_list_add(songlist, songlist_item_generator);
 
-  /* songlist_fields = VNEW(); */
-  /* VADD(songlist_fields, "index"); */
-  /* VADD(songlist_fields, "artist"); */
-  /* VADD(songlist_fields, "title"); */
-  /* VADD(songlist_fields, "date"); */
-  /* VADD(songlist_fields, "track"); */
-  /* VADD(songlist_fields, "disc"); */
+  songlist_fields = VNEW();
+  VADD(songlist_fields, sitem_cell_new("index", 50, 0));
+  VADD(songlist_fields, sitem_cell_new("artist", 300, 1));
+  VADD(songlist_fields, sitem_cell_new("title", 300, 2));
+  VADD(songlist_fields, sitem_cell_new("date", 150, 3));
+  VADD(songlist_fields, sitem_cell_new("track", 150, 4));
+  VADD(songlist_fields, sitem_cell_new("disc", 150, 5));
+  // decrease retain count of cells because of inline allocation
+  vec_dec_retcount(songlist_fields);
 
   timeview = view_get_subview(baseview, "time");
 
