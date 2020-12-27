@@ -55,6 +55,7 @@ vec_t* vec_srt;
 ch_t*  libch;
 
 vec_t* songlist_fields;
+vec_t* songitem_cache;
 
 void songitem_on_select(view_t* view, uint32_t index)
 {
@@ -158,13 +159,22 @@ void close_button_pushed(view_t* view, void* data)
   wm_close();
 }
 
-view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index, int* count)
+void songlist_item_recycler(view_t* listview, view_t* rowview)
+{
+  VADD(songitem_cache, rowview);
+}
+
+view_t* songlist_item_generator(view_t* listview, int index, int* count)
 {
   if (index < 0)
     return NULL; // no items over 0
   if (index >= vec_srt->length)
     return NULL;
-  if (rowview == NULL)
+
+  view_t* rowview = vec_head(songitem_cache);
+  if (rowview)
+    VREM(songitem_cache, rowview);
+  else
     rowview = songitem_new(fontpath, songitem_on_select);
 
   *count = vec_srt->length;
@@ -235,7 +245,9 @@ void init(int width, int height)
 
   songlist = view_get_subview(baseview, "songlist");
 
-  vh_list_add(songlist, songlist_item_generator);
+  vh_list_add(songlist, songlist_item_generator, songlist_item_recycler);
+
+  songitem_cache = VNEW();
 
   songlist_fields = VNEW();
   VADD(songlist_fields, sitem_cell_new("index", 50, 0));
