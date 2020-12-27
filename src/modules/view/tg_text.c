@@ -15,8 +15,8 @@ typedef struct _tg_text_t
   textstyle_t style;
 } tg_text_t;
 
-void tg_text_add(view_t* view, char* text, textstyle_t style);
-void tg_text_set(view_t* view, char* text);
+void tg_text_add(view_t* view);
+void tg_text_set(view_t* view, char* text, textstyle_t style);
 
 #endif
 
@@ -48,28 +48,22 @@ void tg_text_gen(view_t* view)
   }
 }
 
-void tg_text_add(view_t* view, char* text, textstyle_t style)
+void tg_text_add(view_t* view)
 {
-  tg_text_t* gen = mem_alloc(sizeof(tg_text_t), "tg_text_t", NULL, NULL);
+  tg_text_t* gen = mem_calloc(sizeof(tg_text_t), "tg_text_t", NULL, NULL);
 
-  gen->style = style;
-  gen->text  = cstr_fromcstring(text);
-
-  view->texture.state = TS_BLANK;
-  view->tex_gen_data  = gen;
-  view->tex_gen       = tg_text_gen;
+  view->tex_gen_data = gen;
+  view->tex_gen      = tg_text_gen;
 }
 
-void tg_text_set(view_t* view, char* text)
+void tg_text_set(view_t* view, char* text, textstyle_t style)
 {
   tg_text_t* gen = view->tex_gen_data;
 
-  if (strcmp(text, gen->text) != 0)
-  {
-    REL(gen->text);
-    gen->text           = cstr_fromcstring(text);
-    view->texture.state = TS_BLANK;
-  }
+  if (gen->text) REL(gen->text);
+  gen->text           = cstr_fromcstring(text);
+  gen->style          = style;
+  view->texture.state = TS_BLANK;
 }
 
 #endif

@@ -62,7 +62,7 @@ void vh_text_upd(view_t* view)
 
   //text_render_glyphs(glyphs, text->length, style, bitmap);
 
-  tg_text_set(data->para, str_cstring(data->text));
+  tg_text_set(data->para, str_cstring(data->text), data->style);
 }
 
 void vh_text_evt(view_t* view, ev_t ev)
@@ -186,7 +186,8 @@ void vh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t
   para->layout.h_per = 1.0;
   para->needs_touch  = 0;
 
-  tg_text_add(para, "A", ts);
+  tg_text_add(para);
+  tg_text_set(para, "A", ts);
   view_add(view, para);
 
   data->para = para;

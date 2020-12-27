@@ -21,13 +21,9 @@ void cr_text_upd(view_t* view, void* p)
 {
   cr_text_data_t data = *(cr_text_data_t*)p;
 
-  if (view->tex_gen_data == NULL)
-  {
-    // TODO tg_text_add shouldn't have initial text, _set should have textstyle
-    tg_text_add(view, data.text, data.style);
-  }
+  if (view->tex_gen_data == NULL) tg_text_add(view);
 
-  tg_text_set(view, data.text);
+  tg_text_set(view, data.text, data.style);
 }
 
 #endif

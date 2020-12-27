@@ -104,9 +104,16 @@ void prev_button_pushed(view_t* view, void* data)
   lastindex = lastindex - 1;
   if (lastindex < 0) lastindex = 0;
 
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = TA_CENTER;
+  ts.size        = 25.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0;
+
   map_t* songmap = vec_srt->data[lastindex];
-  tg_text_set(song, (char*)MGET(songmap, "title"));
-  tg_text_set(artist, (char*)MGET(songmap, "artist"));
+  tg_text_set(song, (char*)MGET(songmap, "title"), ts);
+  tg_text_set(artist, (char*)MGET(songmap, "artist"), ts);
 
   player_play(MGET(songmap, "path"));
 }
@@ -116,9 +123,16 @@ void next_button_pushed(view_t* view, void* data)
   lastindex = lastindex + 1;
   if (lastindex == vec_srt->length) lastindex = files->length - 1;
 
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = TA_CENTER;
+  ts.size        = 25.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0;
+
   map_t* songmap = vec_srt->data[lastindex];
-  tg_text_set(song, (char*)MGET(songmap, "title"));
-  tg_text_set(artist, (char*)MGET(songmap, "artist"));
+  tg_text_set(song, (char*)MGET(songmap, "title"), ts);
+  tg_text_set(artist, (char*)MGET(songmap, "artist"), ts);
 
   player_play(MGET(songmap, "path"));
 }
@@ -127,9 +141,16 @@ void rand_button_pushed(view_t* view, void* data)
 {
   lastindex = rand() % vec_srt->length;
 
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = TA_CENTER;
+  ts.size        = 25.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0;
+
   map_t* songmap = vec_srt->data[lastindex];
-  tg_text_set(song, (char*)MGET(songmap, "title"));
-  tg_text_set(artist, (char*)MGET(songmap, "artist"));
+  tg_text_set(song, (char*)MGET(songmap, "title"), ts);
+  tg_text_set(artist, (char*)MGET(songmap, "artist"), ts);
 
   player_play(MGET(songmap, "path"));
 }
@@ -173,8 +194,15 @@ void songitem_on_select(view_t* view, uint32_t index)
   // update display
   map_t* songmap = vec_srt->data[index];
 
-  tg_text_set(song, (char*)MGET(songmap, "title"));
-  tg_text_set(artist, (char*)MGET(songmap, "artist"));
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = TA_CENTER;
+  ts.size        = 25.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0;
+
+  tg_text_set(song, (char*)MGET(songmap, "title"), ts);
+  tg_text_set(artist, (char*)MGET(songmap, "artist"), ts);
 
   // LOG started playing xy
 
@@ -325,19 +353,20 @@ void init(int width, int height)
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0;
 
-  tg_text_add(timeview, "00:00", ts);
+  tg_text_add(timeview);
+  tg_text_set(timeview, "00:00", ts);
 
   song = view_get_subview(baseview, "song");
 
   ts.size = 25.0;
 
-  tg_text_add(song, "-", ts);
+  tg_text_add(song);
+  tg_text_set(song, "-", ts);
 
   artist = view_get_subview(baseview, "artist");
 
-  ts.size = 25.0;
-
-  tg_text_add(artist, "-", ts);
+  tg_text_add(artist);
+  tg_text_set(artist, "-", ts);
 
   //info = view_get_subview(baseview, "info");
 
@@ -347,6 +376,7 @@ void init(int width, int height)
 
   view_t* filterbar = view_get_subview(baseview, "filterfield");
   tg_css_add(filterbar);
+
   filterbar->layout.background_color = 0xFFFFFFFF;
   vh_text_add(filterbar, "", fontpath, filter);
   //vh_text_add(filterbar, "Search/Filter (x)", filter);
@@ -402,8 +432,11 @@ void init(int width, int height)
   view_t* genrebtn  = view_get_subview(baseview, "genrebtn");
   view_t* artistbtn = view_get_subview(baseview, "artistbtn");
 
-  tg_text_add(genrebtn, "genre/tags", ts);
-  tg_text_add(artistbtn, "artists", ts);
+  tg_text_add(genrebtn);
+  tg_text_add(artistbtn);
+
+  tg_text_set(genrebtn, "genre/tags", ts);
+  tg_text_set(artistbtn, "artists", ts);
 
   view_t* maxbtn   = view_get_subview(baseview, "maxicon");
   view_t* closebtn = view_get_subview(baseview, "closeicon");
@@ -462,9 +495,16 @@ void update(ev_t ev)
     {
       lasttime = floor(time);
 
+      textstyle_t ts = {0};
+      ts.font        = fontpath;
+      ts.align       = TA_CENTER;
+      ts.size        = 35.0;
+      ts.textcolor   = 0x000000FF;
+      ts.backcolor   = 0;
+
       char timebuff[20];
       snprintf(timebuff, 20, "%.2i:%.2i", (int)floor(lasttime / 60.0), (int)lasttime % 60);
-      tg_text_set(timeview, timebuff);
+      tg_text_set(timeview, timebuff, ts);
 
       double posratio = time / player_duration();
       tg_knob_set_angle(playbtn, posratio * 6.28 - 3.14 / 2.0);
