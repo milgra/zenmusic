@@ -5,7 +5,7 @@
 
 void db_read(map_t* db);
 void db_write(map_t* db);
-void db_sort(map_t* db, vec_t* vec);
+void db_sort(map_t* db, vec_t* vec, char* field);
 void db_filter(map_t* db, char* text, vec_t* vec);
 
 #endif
@@ -86,13 +86,15 @@ void db_write(map_t* db)
   printf("LOG db saved");
 }
 
+char* sort_field = NULL;
+
 int db_comp_artist(void* left, void* right)
 {
   map_t* l = left;
   map_t* r = right;
 
-  char* la = MGET(l, "artist");
-  char* ra = MGET(r, "artist");
+  char* la = MGET(l, sort_field);
+  char* ra = MGET(r, sort_field);
 
   return strcmp(la, ra);
 }
@@ -136,11 +138,15 @@ void db_filter(map_t* db, char* text, vec_t* res)
   vec_sort(res, db_comp_artist);
 }
 
-void db_sort(map_t* db, vec_t* vec)
+void db_sort(map_t* db, vec_t* vec, char* field)
 {
-  vec_reset(vec);
-  map_values(db, vec);
-  vec_sort(vec, db_comp_artist);
+  if (field != NULL)
+  {
+    sort_field = field;
+    vec_reset(vec);
+    map_values(db, vec);
+    vec_sort(vec, db_comp_artist);
+  }
 }
 
 #endif

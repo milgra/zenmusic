@@ -120,6 +120,7 @@ struct _view_t
 
   char*    id;     /* identifier for handling view */
   vec_t*   views;  /* subviews */
+  vec_t*   trash;  /* removed subviews for ui manager cycle */
   view_t*  parent; /* parent view */
   uint32_t index;  /* depth */
 
@@ -181,6 +182,7 @@ view_t* view_new(char* id, r2_t frame)
   view_t* view       = mem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
   view->id           = cstr_fromcstring(id);
   view->views        = VNEW();
+  view->trash        = VNEW();
   view->frame.local  = frame;
   view->frame.global = frame;
   view->texture.page = -1;
@@ -226,7 +228,9 @@ void view_remove(view_t* view, view_t* subview)
 {
   reindex = 1;
 
+  VADD(view->trash, subview);
   VREM(view->views, subview);
+
   subview->parent = NULL;
 }
 

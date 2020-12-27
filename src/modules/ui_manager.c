@@ -131,8 +131,22 @@ void ui_manager_remove(view_t* view)
   view_remove(root, view);
 }
 
+void ui_manager_cleanup(view_t* view)
+{
+  view_t* v;
+  while ((v = VNXT(view->views))) ui_manager_cleanup(v);
+  ui_generator_remove(v);
+}
+
 void ui_manager_reindex(view_t* view, uint32_t* index)
 {
+  /* if (view->trash->length > 0) */
+  /* { */
+  /*   view_t* v; */
+  /*   while ((v = VNXT(view->trash))) ui_manager_cleanup(view); */
+  /*   vec_reset(view->trash); */
+  /* } */
+
   if (!view->hidden)
   {
     if (view->index != *index || *index == 0)

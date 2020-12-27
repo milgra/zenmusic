@@ -13,7 +13,7 @@ typedef struct _sitem_cell_t
 
 sitem_cell_t* sitem_cell_new(char* id, int size, int index);
 
-view_t* songitem_new(char* fontpath, void (*on_select)(view_t* view, uint32_t index));
+view_t* songitem_new(char* fontpath, void (*on_select)(view_t* view, uint32_t index), vec_t* fields);
 void    songitem_update(view_t* rowview, int index, map_t* file, char* fontpath);
 
 #endif
@@ -40,7 +40,7 @@ sitem_cell_t* sitem_cell_new(char* id, int size, int index)
   return cell;
 }
 
-view_t* songitem_new(char* fontpath, void (*on_select)(view_t* view, uint32_t index))
+view_t* songitem_new(char* fontpath, void (*on_select)(view_t* view, uint32_t index), vec_t* fields)
 {
   textstyle_t ts = {0};
   ts.font        = fontpath;
@@ -57,9 +57,11 @@ view_t* songitem_new(char* fontpath, void (*on_select)(view_t* view, uint32_t in
 
   vh_litem_add(rowview, 35, on_select);
 
-  vh_litem_add_cell(rowview, "index", 50, cr_text_upd);
-  vh_litem_add_cell(rowview, "artist", 300, cr_text_upd);
-  vh_litem_add_cell(rowview, "title", 300, cr_text_upd);
+  sitem_cell_t* cell;
+  while ((cell = VNXT(fields)))
+  {
+    vh_litem_add_cell(rowview, cell->id, cell->size, cr_text_upd);
+  }
 
   return rowview;
 }
@@ -83,9 +85,10 @@ void songitem_update(view_t* rowview, int index, map_t* file, char* fontpath)
   ts.backcolor   = color1;
 
   vh_litem_upd(rowview, index);
-  vh_litem_upd_cell(rowview, "index", 30, &((cr_text_data_t){.style = ts, .text = indbuffer}));
-  vh_litem_upd_cell(rowview, "artist", 200, &((cr_text_data_t){.style = ts, .text = MGET(file, "artist")}));
-  vh_litem_upd_cell(rowview, "title", 300, &((cr_text_data_t){.style = ts, .text = MGET(file, "title")}));
+  vh_litem_upd_cell(rowview, "index", &((cr_text_data_t){.style = ts, .text = indbuffer}));
+  vh_litem_upd_cell(rowview, "artist", &((cr_text_data_t){.style = ts, .text = MGET(file, "artist")}));
+  vh_litem_upd_cell(rowview, "title", &((cr_text_data_t){.style = ts, .text = MGET(file, "title")}));
+  //  vh_litem_upd_cell(rowview, "genre", &((cr_text_data_t){.style = ts, .text = MGET(file, "genre")}));
 }
 
 #endif

@@ -25,9 +25,10 @@ typedef struct _vh_litem_t
 void vh_litem_add(view_t* view, int h, void (*on_select)(view_t* view, uint32_t index));
 void vh_litem_upd(view_t* view, int index);
 void vh_litem_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* view, void* data));
-void vh_litem_upd_cell(view_t* view, char* id, int size, void* data);
+void vh_litem_upd_cell(view_t* view, char* id, void* data);
+void vh_litem_upd_cell_size(view_t* view, char* id, int size);
 void vh_litem_rem_cell(char* id);
-void vh_litem_swp_cell(char* ida, char* idb);
+void vh_litem_swp_cell(view_t* view, int src, int tgt);
 
 #endif
 
@@ -92,7 +93,7 @@ void vh_litem_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* vie
   view_set_frame(view, local);
 }
 
-void vh_litem_upd_cell(view_t* view, char* id, int size, void* data)
+void vh_litem_upd_cell(view_t* view, char* id, void* data)
 {
   vh_litem_t* vh = view->handler_data;
 
@@ -105,6 +106,48 @@ void vh_litem_upd_cell(view_t* view, char* id, int size, void* data)
       break;
     }
   }
+}
+
+void vh_litem_rearrange(view_t* view)
+{
+  vh_litem_t* vh  = view->handler_data;
+  float       pos = 0;
+  for (int i = 0; i < vh->cells->length; i++)
+  {
+    cell_t* cell = vh->cells->data[i];
+    r2_t    f    = cell->view->frame.local;
+    f.x          = pos;
+    pos += f.w;
+    view_set_frame(cell->view, f);
+  }
+}
+
+void vh_litem_upd_cell_size(view_t* view, char* id, int size)
+{
+  vh_litem_t* vh = view->handler_data;
+
+  for (int i = 0; i < vh->cells->length; i++)
+  {
+    cell_t* cell = vh->cells->data[i];
+    if (strcmp(cell->id, id) == 0)
+    {
+      r2_t f = cell->view->frame.local;
+      f.w    = size;
+      view_set_frame(cell->view, f);
+      break;
+    }
+  }
+  vh_litem_rearrange(view);
+}
+
+void vh_litem_swp_cell(view_t* view, int src, int tgt)
+{
+  vh_litem_t* vh = view->handler_data;
+
+  cell_t* cell = vh->cells->data[src];
+  VREM(vh->cells, cell);
+  vec_addatindex(vh->cells, cell, tgt);
+  vh_litem_rearrange(view);
 }
 
 #endif

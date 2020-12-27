@@ -29,11 +29,12 @@ typedef struct _vh_list_t
   void (*rec_row)(view_t* listview, view_t* rowview);
 } vh_list_t;
 
-void vh_list_add(view_t* view,
-                 view_t* (*gen_row)(view_t* listview, int index, int* item_count),
-                 void (*rec_row)(view_t* listview, view_t* rowview));
-void vh_list_fill(view_t* view);
-void vh_list_reset(view_t* view);
+void   vh_list_add(view_t* view,
+                   view_t* (*gen_row)(view_t* listview, int index, int* item_count),
+                   void (*rec_row)(view_t* listview, view_t* rowview));
+vec_t* vh_list_items(view_t* view);
+void   vh_list_fill(view_t* view);
+void   vh_list_reset(view_t* view);
 
 #endif
 
@@ -256,6 +257,12 @@ void vh_list_del(void* p)
 {
   vh_list_t* vh = (vh_list_t*)p;
   REL(vh->items);
+}
+
+vec_t* vh_list_items(view_t* view)
+{
+  vh_list_t* vh = view->handler_data;
+  return vh->items;
 }
 
 void vh_list_fill(view_t* view)

@@ -176,7 +176,7 @@ void vh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t
   view->needs_key    = 1;
   view->needs_text   = 1;
   view->handler      = vh_text_evt;
-  view->handler_data = data;
+  view->evt_han_data = data;
 
   // add paragraph
 

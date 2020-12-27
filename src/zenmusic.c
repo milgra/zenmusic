@@ -15,6 +15,7 @@
 #include "vh_knob.c"
 #include "vh_list.c"
 #include "vh_list_head.c"
+#include "vh_list_item.c"
 #include "vh_text.c"
 #include "view.c"
 #include "view_generator.c"
@@ -56,18 +57,6 @@ ch_t*  libch;
 
 vec_t* songlist_fields;
 vec_t* songitem_cache;
-
-void songitem_on_select(view_t* view, uint32_t index)
-{
-  map_t* songmap = vec_srt->data[index];
-
-  tg_text_set(song, (char*)MGET(songmap, "title"));
-  tg_text_set(artist, (char*)MGET(songmap, "artist"));
-
-  // LOG started playing xy
-
-  player_play(MGET(songmap, "path"));
-}
 
 void seek_ratio_changed(view_t* view, float angle)
 {
@@ -159,6 +148,21 @@ void close_button_pushed(view_t* view, void* data)
   wm_close();
 }
 
+void songitem_on_select(view_t* view, uint32_t index)
+{
+  // indicate list item
+
+  // update display
+  map_t* songmap = vec_srt->data[index];
+
+  tg_text_set(song, (char*)MGET(songmap, "title"));
+  tg_text_set(artist, (char*)MGET(songmap, "artist"));
+
+  // LOG started playing xy
+
+  player_play(MGET(songmap, "path"));
+}
+
 void songlist_item_recycler(view_t* listview, view_t* rowview)
 {
   VADD(songitem_cache, rowview);
@@ -175,7 +179,7 @@ view_t* songlist_item_generator(view_t* listview, int index, int* count)
   if (rowview)
     VREM(songitem_cache, rowview);
   else
-    rowview = songitem_new(fontpath, songitem_on_select);
+    rowview = songitem_new(fontpath, songitem_on_select, songlist_fields);
 
   *count = vec_srt->length;
 
@@ -183,28 +187,68 @@ view_t* songlist_item_generator(view_t* listview, int index, int* count)
   return rowview;
 }
 
+void sort(char* field)
+{
+  db_sort(db, vec_srt, field);
+  //vh_list_fill(songlist);
+  // remove cache as subviews
+  /* view_t* row; */
+  /* while ((row = VNXT(songitem_cache))) view_remove(songlist, row); */
+  //vec_reset(songitem_cache);
+  vh_list_reset(songlist);
+}
+
 void on_select(view_t* view, char* id)
 {
   printf("on_select %s\n", id);
   // filter db by field id
+  sort(id);
 }
 
-void on_insert(view_t* view, char* src_id, char* tgt_id)
+void on_insert(view_t* view, int src, int tgt)
 {
-  printf("on_insert %s %s\n", src_id, tgt_id);
+  // update in fields so new items will use updated order
+  sitem_cell_t* cell = songlist_fields->data[src];
+  RET(cell);
+  VREM(songlist_fields, cell);
+  vec_addatindex(songlist_fields, cell, tgt);
+  REL(cell);
+
+  // update all items and cache
+  view_t* item;
+  while ((item = VNXT(songitem_cache)))
+  {
+    vh_litem_swp_cell(item, src, tgt);
+  }
+  vec_t* items = vh_list_items(songlist);
+  while ((item = VNXT(items)))
+  {
+    vh_litem_swp_cell(item, src, tgt);
+  }
 }
 
-void on_resize(view_t* view, char* id, int width)
+void on_resize(view_t* view, char* id, int size)
 {
-  printf("on_resize %s %i\n", id, width);
+  // update in fields so new items will use updated size
   for (int i = 0; i < songlist_fields->length; i++)
   {
     sitem_cell_t* cell = songlist_fields->data[i];
     if (strcmp(cell->id, id) == 0)
     {
-      cell->size = width;
+      cell->size = size;
       break;
     }
+  }
+  // update all items and cache
+  view_t* item;
+  while ((item = VNXT(songitem_cache)))
+  {
+    vh_litem_upd_cell_size(item, id, size);
+  }
+  vec_t* items = vh_list_items(songlist);
+  while ((item = VNXT(items)))
+  {
+    vh_litem_upd_cell_size(item, id, size);
   }
 }
 
@@ -214,12 +258,6 @@ void filter(view_t* view, str_t* text)
   db_filter(db, word, vec_srt);
   REL(word);
   vh_list_reset(songlist);
-}
-
-void sort()
-{
-  db_sort(db, vec_srt);
-  vh_list_fill(songlist);
 }
 
 void init(int width, int height)
@@ -254,8 +292,9 @@ void init(int width, int height)
   VADD(songlist_fields, sitem_cell_new("artist", 300, 1));
   VADD(songlist_fields, sitem_cell_new("title", 300, 2));
   VADD(songlist_fields, sitem_cell_new("date", 150, 3));
-  VADD(songlist_fields, sitem_cell_new("track", 150, 4));
-  VADD(songlist_fields, sitem_cell_new("disc", 150, 5));
+  VADD(songlist_fields, sitem_cell_new("genre", 150, 4));
+  VADD(songlist_fields, sitem_cell_new("track", 150, 5));
+  VADD(songlist_fields, sitem_cell_new("disc", 150, 6));
   // decrease retain count of cells because of inline allocation
   vec_dec_retcount(songlist_fields);
 
@@ -389,7 +428,7 @@ void init(int width, int height)
   // start analyzing new entries
   lib_analyze(libch);
 
-  sort();
+  sort("artist");
 }
 
 void update(ev_t ev)
@@ -444,7 +483,7 @@ void update(ev_t ev)
     if (ev.time > song_recv_time + 3000)
     {
       song_refr_flag = 0;
-      sort();
+      sort("artist");
       db_write(db);
     }
   }

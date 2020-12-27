@@ -93,6 +93,11 @@ void ui_generator_add(view_t* view)
                              view->texture.bitmap);
 }
 
+void ui_generator_remove(view_t* view)
+{
+  ui_compositor_rem(view->id);
+}
+
 void ui_generator_set_index(view_t* view)
 {
   ui_compositor_upd_index(view->id, view->index);
