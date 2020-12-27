@@ -18,13 +18,18 @@ typedef struct _vh_lhead_t
 {
   vec_t*       cells;
   view_t*      view;
-  lheadcell_t* dragged;
+  lheadcell_t* dragged_cell;
+  int          dragged_pos;
+  int          dragged_flag;
+  lheadcell_t* resized_cell;
+  lheadcell_t* resized_flag;
   int          height;
   int          index;
-  void (*on_select)(view_t* view, uint32_t index);
+  void (*on_select)(view_t* view, char* id);
+  void (*on_insert)(view_t* view, char* src_id, char* tgt_id);
 } vh_lhead_t;
 
-void vh_lhead_add(view_t* view, int h, void (*on_select)(view_t* view, uint32_t index));
+void vh_lhead_add(view_t* view, int h, void (*on_select)(view_t* view, char* id), void (*on_insert)(view_t* view, char* src_id, char* tgt_id));
 void vh_lhead_upd(view_t* view, int index);
 void vh_lhead_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* view, void* data));
 void vh_lhead_upd_cell(view_t* view, char* id, int size, void* data);
@@ -43,6 +48,20 @@ void vh_lhead_del(void* p)
   REL(list->cells);
 }
 
+void vh_lhead_rearrange(view_t* view)
+{
+  vh_lhead_t* vh  = view->handler_data;
+  float       pos = 0;
+  for (int i = 0; i < vh->cells->length; i++)
+  {
+    lheadcell_t* cell = vh->cells->data[i];
+    r2_t         f    = cell->view->frame.local;
+    f.x               = pos;
+    pos += f.w;
+    view_set_frame(cell->view, f);
+  }
+}
+
 void vh_lhead_evt(view_t* view, ev_t ev)
 {
   if (ev.type == EV_MDOWN)
@@ -53,10 +72,19 @@ void vh_lhead_evt(view_t* view, ev_t ev)
     {
       lheadcell_t* cell = vh->cells->data[i];
       r2_t         f    = cell->view->frame.local;
-      if (f.x < ev.x && f.x + f.w > ev.x)
+      if (f.x < ev.x && f.x + f.w + 1 > ev.x)
       {
-        printf("ON CELL %s\n", cell->id);
-        vh->dragged = cell;
+        /* if (ev.x > f.x + f.x - 5) */
+        /* { */
+        /*   vh->resized_cell = cell; */
+        /* } */
+        /* else */
+        /* { */
+        vh->dragged_cell = cell;
+        vh->dragged_pos  = ev.x - f.x;
+        /* } */
+        view_remove(view, cell->view);
+        view_add(view, cell->view);
       }
     }
   }
@@ -66,27 +94,85 @@ void vh_lhead_evt(view_t* view, ev_t ev)
     if (ev.drag)
     {
       vh_lhead_t* vh = view->handler_data;
-      r2_t        f  = vh->dragged->view->frame.local;
-      f.x            = ev.x;
-      view_set_frame(vh->dragged->view, f);
+
+      if (vh->resized_cell)
+      {
+        r2_t f = vh->dragged_cell->view->frame.local;
+        f.w    = ev.x - f.x;
+        view_set_frame(vh->dragged_cell->view, f);
+      }
+      else if (vh->dragged_cell)
+      {
+        vh->dragged_flag = 1;
+        r2_t f           = vh->dragged_cell->view->frame.local;
+        f.x              = ev.x - vh->dragged_pos;
+        view_set_frame(vh->dragged_cell->view, f);
+      }
     }
   }
   else if (ev.type == EV_MUP)
   {
-    if (!ev.drag)
+    vh_lhead_t* vh = view->handler_data;
+    if (!vh->dragged_flag)
     {
-      vh_lhead_t* vh = view->handler_data;
-      (*vh->on_select)(view, vh->index);
+      if (vh->resized_cell)
+      {
+      }
+      else
+      {
+        (*vh->on_select)(view, vh->dragged_cell->id);
+      }
+    }
+    else
+    {
+      for (int i = 0; i < vh->cells->length; i++)
+      {
+        lheadcell_t* cell = vh->cells->data[i];
+        r2_t         f    = cell->view->frame.local;
+        if (f.x < ev.x && f.x + f.w > ev.x && cell != vh->dragged_cell)
+        {
+          // repos dragged cell
+          RET(vh->dragged_cell);
+          vec_rem(vh->cells, vh->dragged_cell);
+          for (int j = 0; j < vh->cells->length; j++)
+          {
+            lheadcell_t* jcell = vh->cells->data[j];
+            if (jcell == cell)
+            {
+              // insert dragged cell before selected cell
+              if (i != j)
+                vec_addatindex(vh->cells, vh->dragged_cell, j + 1);
+              else
+                vec_addatindex(vh->cells, vh->dragged_cell, j);
+              break;
+            }
+          }
+
+          // cleanup
+          REL(vh->dragged_cell);
+
+          (*vh->on_insert)(view, vh->dragged_cell->id, cell->id);
+
+          break;
+        }
+      }
+
+      vh->dragged_cell = NULL;
+      vh->resized_cell = NULL;
+
+      vh->dragged_flag = 0;
+      vh_lhead_rearrange(view);
     }
   }
 }
 
-void vh_lhead_add(view_t* view, int h, void (*on_select)(view_t* view, uint32_t index))
+void vh_lhead_add(view_t* view, int h, void (*on_select)(view_t* view, char* id), void (*on_insert)(view_t* view, char* src_id, char* tgt_id))
 {
   vh_lhead_t* vh = mem_calloc(sizeof(vh_lhead_t), "vh_lhead_t", vh_lhead_del, NULL);
   vh->cells      = VNEW();
   vh->height     = h;
   vh->on_select  = on_select;
+  vh->on_insert  = on_insert;
 
   view->handler_data = vh;
   view->handler      = vh_lhead_evt;

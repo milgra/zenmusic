@@ -171,6 +171,16 @@ view_t* songlist_item_generator(view_t* listview, view_t* rowview, int index, in
   return rowview;
 }
 
+void on_select(view_t* view, char* id)
+{
+  printf("on_select %s\n", id);
+}
+
+void on_insert(view_t* view, char* src_id, char* tgt_id)
+{
+  printf("on_insert %s %s\n", src_id, tgt_id);
+}
+
 void filter(view_t* view, str_t* text)
 {
   char* word = str_cstring(text);
@@ -312,7 +322,7 @@ void init(int width, int height)
   ts.textcolor = 0x000000FF;
   ts.backcolor = 0xEFEFEFFF;
 
-  vh_lhead_add(songlistheader, 31, NULL);
+  vh_lhead_add(songlistheader, 30, on_select, on_insert);
 
   vh_lhead_add_cell(songlistheader, "index", 50, cr_text_upd);
   vh_lhead_add_cell(songlistheader, "artist", 300, cr_text_upd);
