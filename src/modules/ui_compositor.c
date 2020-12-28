@@ -18,14 +18,14 @@
 
 void ui_compositor_init(int, int);
 
-void ui_compositor_new_reset(r2_t frame, int page, bm_t* tex);
+void ui_compositor_new_reset();
 void ui_compositor_new_upd(r2_t  frame,
                            float border, // view border
                            int   page,   // texture page
                            int   full,   // needs full texture
                            int   ext,    // external texture
-                           char* texid,  // texture id
-                           bm_t* bm);    // texture bitmap
+                           char* texid); // texture id
+void ui_compositor_new_upd_bmp(char* texid, bm_t* bm);
 
 void ui_compositor_new_render();
 
@@ -122,7 +122,7 @@ void ui_compositor_init(int width, int height)
   gl_get_texture(uic.tex_page++, 4096, 4096);
 }
 
-void ui_compositor_new_reset(r2_t frame, int page, bm_t* tex)
+void ui_compositor_new_reset()
 {
   uic.cache_ind = 0;
 }
@@ -132,8 +132,7 @@ void ui_compositor_new_upd(r2_t  frame,
                            int   page,   // texture page
                            int   full,   // needs full texture
                            int   ext,    // external texture
-                           char* texid,  // texture id
-                           bm_t* bm)     // texture bitmap
+                           char* texid)  // texture id
 {
   // fill up cache if needed
   if (uic.cache_ind + 1 > uic.cache->length)
@@ -157,35 +156,42 @@ void ui_compositor_new_upd(r2_t  frame,
     // view wants full texture to show
     crect_set_texture(rect, 0.0, 0.0, 1.0, 1.0);
   }
-
-  if (ext && frame.w > 0 && frame.h > 0)
+  else if (ext && frame.w > 0 && frame.h > 0)
   {
     // use view dimensions as texture dimensions in case of external texture
     glrect_t tex_dim = gl_get_texture(page, frame.w, frame.h);
     crect_set_texture(rect, 0.0, 0.0, frame.w / (float)tex_dim.w, frame.h / (float)tex_dim.h);
   }
-
-  // store bitmap
-  tm_coords_t tc = tm_get(uic.tm, texid);
-
-  if (bm->w != tc.w || bm->h != tc.h)
+  else
   {
-    // texture doesn't exist or size mismatch
-    int success = tm_put(uic.tm, texid, bm->w, bm->h);
-    // TODO reset main texture, maybe all views?
-    if (success < 0) printf("TEXTURE FULL, NEEDS RESET\n");
 
-    // update tex coords
-    tc = tm_get(uic.tm, texid);
+    // prepare texmap
+    tm_coords_t tc = tm_get(uic.tm, texid);
 
+    if ((int)frame.w != tc.w || (int)frame.h != tc.h)
+    {
+      // texture doesn't exist or size mismatch
+      int success = tm_put(uic.tm, texid, frame.w, frame.h);
+      // TODO reset main texture, maybe all views?
+      if (success < 0) printf("TEXTURE FULL, NEEDS RESET\n");
+
+      // update tex coords
+      tc = tm_get(uic.tm, texid);
+    }
+
+    // set texture coords
     crect_set_texture(rect, tc.ltx, tc.lty, tc.rbx, tc.rby);
   }
 
-  // upload to GPU
-  gl_upload_to_texture(0, tc.x, tc.y, bm->w, bm->h, bm->data);
-
   // increase cache index
   uic.cache_ind++;
+}
+
+void ui_compositor_new_upd_bmp(char* texid, bm_t* bm)
+{
+  tm_coords_t tc = tm_get(uic.tm, texid);
+  // upload to GPU
+  gl_upload_to_texture(0, tc.x, tc.y, bm->w, bm->h, bm->data);
 }
 
 void ui_compositor_new_render()

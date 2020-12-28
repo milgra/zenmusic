@@ -176,6 +176,7 @@ void ui_manager_render()
 {
   if (reindex)
   {
+    ui_generator_cleanup();
     uint32_t index = 0;
     ui_manager_reindex(root, &index);
     reindex = 0;

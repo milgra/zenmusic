@@ -16,6 +16,7 @@
 int      ui_generator_init(int, int);
 void     ui_generator_reset();
 void     ui_generator_render();
+void     ui_generator_cleanup();
 void     ui_generator_add(view_t* view);
 void     ui_generator_remove(view_t* view);
 void     ui_generator_set_index(view_t* view);
@@ -60,6 +61,11 @@ void ui_generator_reset()
   vec_reset(uig.views);
 }
 
+void ui_generator_cleanup()
+{
+  ui_compositor_new_reset();
+}
+
 void ui_generator_add(view_t* view)
 {
   VADD(uig.views, view);
@@ -73,6 +79,13 @@ void ui_generator_add(view_t* view)
     if (view->texture.type == TT_MANAGED) view_set_texture_page(view, ui_compositor_map_texture());
     if (view->texture.type == TT_EXTERNAL) view_set_texture_page(view, ui_compositor_new_texture());
   }
+
+  /* ui_compositor_new_upd(view->frame.global,       // frame */
+  /*                       view->layout.shadow_blur, // view border */
+  /*                       view->texture.page,       // texture page */
+  /*                       view->texture.full,       // needs full texture */
+  /*                       view->texture.page > 0,   // external texture */
+  /*                       view->texture.id);        // texture id */
 
   ui_compositor_add(view->id,
                     view->texture.id,
