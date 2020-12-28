@@ -97,7 +97,10 @@ struct uic_t
 
 void ui_compositor_init(int width, int height)
 {
-  gl_init(width, height);
+  gl_init();
+
+  uic.width  = width;
+  uic.height = height;
 
   uic.fb      = fb_new();
   uic.tm      = tm_new(4096, 4096);

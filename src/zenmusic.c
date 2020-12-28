@@ -19,6 +19,7 @@
 #include "vh_text.c"
 #include "view.c"
 #include "view_generator.c"
+#include "view_layout.c"
 #include "view_util.c"
 #include "wm_connector.c"
 #include "wm_event.c"
@@ -308,8 +309,6 @@ void filter(view_t* view, str_t* text)
 
 void init(int width, int height)
 {
-  printf("zenmusic init %i %i\n", width, height);
-
   srand((unsigned int)time(NULL));
 
   char* respath  = SDL_GetBasePath();
@@ -319,6 +318,10 @@ void init(int width, int height)
 
   vec_t* views = view_gen_load(htmlpath, csspath, respath);
   baseview     = vec_head(views);
+
+  // layout to starter size
+  view_set_frame(baseview, (r2_t){0.0, 0.0, (float)width, (float)height});
+  view_layout(baseview);
 
   common_respath = respath;
 

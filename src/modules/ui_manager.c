@@ -45,12 +45,18 @@ void ui_manager_event(ev_t ev)
   }
   else if (ev.type == EV_RESIZE)
   {
-    view_set_frame(root, (r2_t){0.0, 0.0, (float)ev.w, (float)ev.h});
-    ui_generator_resize(ev.w, ev.h);
-    view_layout(root);
-    /* printf("\nAFTER RESIZE"); */
-    /* view_desc(root, 0); */
-    view_evt(root, ev);
+    r2_t rf = root->frame.local;
+    if (rf.w != (float)ev.w || rf.h != (float)ev.h)
+    {
+      // log
+      printf("ui_manager_resize %i %i\n", ev.w, ev.h);
+      view_set_frame(root, (r2_t){0.0, 0.0, (float)ev.w, (float)ev.h});
+      view_layout(root);
+      ui_generator_resize(ev.w, ev.h);
+      /* printf("\nAFTER RESIZE"); */
+      /* view_desc(root, 0); */
+      view_evt(root, ev);
+    }
   }
   else if (ev.type == EV_MMOVE ||
            ev.type == EV_MDOWN ||
