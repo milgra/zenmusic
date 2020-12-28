@@ -27,13 +27,14 @@ freebsd for os
 
 first version
 
-multiple columns, sorting
 highlight row
+zold/piros listitem background play/pausre, animalt!!!
 messages window, log messages
 move songs to folders
-zold/piros listitem background play/pausre, animalt!!!
 additional columns - genre, last played, added, skipped, play count,
 fix leaks
+genre/tags list, artist list
+id editor window
 elso indulasnal analyzer progresst mutassa valahol amig zenet hallgatsz
 unicode support files, metadata!!!
 tilemap is auto-resize legyen duplazassal

@@ -111,7 +111,14 @@ void ui_generator_render()
   {
     if (view->texture.type == TT_MANAGED && view->texture.state == TS_BLANK)
     {
-      if (ch_send(uig.channel, view)) view->texture.state = TS_PENDING;
+      if (view->texture.rentype == RT_BACKGROUND)
+      {
+        if (ch_send(uig.channel, view)) view->texture.state = TS_PENDING;
+      }
+      else
+      {
+        view_gen_texture(view);
+      }
     }
     if (view->frame.changed)
     {

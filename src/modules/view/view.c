@@ -80,10 +80,17 @@ typedef enum _textype_t
   TT_EXTERNAL
 } textype_t;
 
+typedef enum _rentype_t
+{
+  RT_BACKGROUND,
+  RT_IMMEDIATE
+} rentype_t;
+
 typedef struct _texture_t
 {
-  textype_t type; /* managed or external */
-  uint32_t  page; /* texture page */
+  textype_t type;    /* managed or external */
+  uint32_t  page;    /* texture page */
+  rentype_t rentype; /* background or immediate rendering */
 
   // internal texture
 
