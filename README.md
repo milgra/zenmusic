@@ -28,6 +28,7 @@ freebsd for os
 first version
 
 highlight row
+listitem hidden legyen 
 zold/piros listitem background play/pausre, animalt!!!
 messages window, log messages
 move songs to folders

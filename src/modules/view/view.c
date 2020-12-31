@@ -109,15 +109,16 @@ typedef struct _frame_t
 {
   r2_t local;
   r2_t global;
-  char changed;
+  char pos_changed;
+  char dim_changed;
 } frame_t;
 
 typedef struct _view_t view_t;
 struct _view_t
 {
-  char hidden;    /* exclude from rendering */
-  char overflow;  /* enable content outside frame */
-  char connected; /* view is added to connector */
+  char hidden;   /* exclude from rendering */
+  char overflow; /* enable content outside frame */
+  //  char connected; /* view is added to connector */
 
   char needs_key;    /* accepts key events */
   char needs_text;   /* accepts text events */
@@ -127,7 +128,6 @@ struct _view_t
 
   char*    id;     /* identifier for handling view */
   vec_t*   views;  /* subviews */
-  vec_t*   trash;  /* removed subviews for ui manager cycle */
   view_t*  parent; /* parent view */
   uint32_t index;  /* depth */
 
@@ -161,7 +161,7 @@ void view_desc(void* pointer, int level);
 void view_desc_layout(vlayout_t l);
 void view_calc_global(view_t* view);
 
-extern char reindex;
+extern char resend;
 
 #endif
 
@@ -171,7 +171,7 @@ extern char reindex;
 #include "mtcstring.c"
 #include "mtmemory.c"
 
-char reindex = 1;
+char resend = 1;
 
 void view_del(void* pointer)
 {
@@ -189,7 +189,6 @@ view_t* view_new(char* id, r2_t frame)
   view_t* view       = mem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
   view->id           = cstr_fromcstring(id);
   view->views        = VNEW();
-  view->trash        = VNEW();
   view->frame.local  = frame;
   view->frame.global = frame;
   view->texture.page = -1;
@@ -201,7 +200,7 @@ view_t* view_new(char* id, r2_t frame)
 
 void view_add(view_t* view, view_t* subview)
 {
-  reindex = 1;
+  resend = 1;
 
   for (int i = 0; i < view->views->length; i++)
   {
@@ -217,7 +216,7 @@ void view_add(view_t* view, view_t* subview)
 
 void view_insert(view_t* view, view_t* subview, uint32_t index)
 {
-  reindex = 1;
+  resend = 1;
 
   for (int i = 0; i < view->views->length; i++)
   {
@@ -233,9 +232,8 @@ void view_insert(view_t* view, view_t* subview, uint32_t index)
 
 void view_remove(view_t* view, view_t* subview)
 {
-  reindex = 1;
+  resend = 1;
 
-  VADD(view->trash, subview);
   VREM(view->views, subview);
 
   subview->parent = NULL;
@@ -270,9 +268,29 @@ void view_calc_global(view_t* view)
 {
   r2_t frame_parent = {0};
   if (view->parent != NULL) frame_parent = view->parent->frame.global;
-  view->frame.global.x = roundf(frame_parent.x) + roundf(view->frame.local.x);
-  view->frame.global.y = roundf(frame_parent.y) + roundf(view->frame.local.y);
-  view->frame.changed  = 1;
+
+  r2_t frame_local  = view->frame.local;
+  r2_t frame_global = frame_local;
+
+  frame_global.x = roundf(frame_parent.x) + roundf(view->frame.local.x);
+  frame_global.y = roundf(frame_parent.y) + roundf(view->frame.local.y);
+
+  r2_t old_global = view->frame.global;
+
+  if (frame_global.w != old_global.w ||
+      frame_global.h != old_global.h)
+  {
+    view->frame.dim_changed = 1;
+    if (frame_global.w >= 1.0 &&
+        frame_global.h >= 1.0)
+    {
+      if (view->texture.type == TT_MANAGED) view->texture.state = TS_BLANK;
+    }
+  }
+  else
+    view->frame.pos_changed = 1;
+
+  view->frame.global = frame_global;
 
   view_t* v;
   while ((v = VNXT(view->views))) view_calc_global(v);
@@ -280,22 +298,7 @@ void view_calc_global(view_t* view)
 
 void view_set_frame(view_t* view, r2_t frame)
 {
-  // printf("set frame %s\n", view->id);
-
-  // force rerender
-  // TODO this will cause problems when eh's render textures instead of tg's
-
-  if (view->frame.local.w != frame.w || view->frame.local.h != frame.h)
-  {
-    if (frame.w >= 1.0 && frame.h >= 1.0)
-    {
-      if (view->texture.type == TT_MANAGED) view->texture.state = TS_BLANK;
-    }
-  }
-
-  view->frame.local  = frame;
-  view->frame.global = frame;
-
+  view->frame.local = frame;
   view_calc_global(view);
 }
 

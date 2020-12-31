@@ -46,10 +46,9 @@ void ui_manager_event(ev_t ev)
   else if (ev.type == EV_RESIZE)
   {
     r2_t rf = root->frame.local;
-    if (rf.w != (float)ev.w || rf.h != (float)ev.h)
+    if (rf.w != (float)ev.w ||
+        rf.h != (float)ev.h)
     {
-      // log
-      printf("ui_manager_resize %i %i\n", ev.w, ev.h);
       view_set_frame(root, (r2_t){0.0, 0.0, (float)ev.w, (float)ev.h});
       view_layout(root);
       ui_generator_resize(ev.w, ev.h);
@@ -144,42 +143,20 @@ void ui_manager_cleanup(view_t* view)
   ui_generator_remove(v);
 }
 
-void ui_manager_reindex(view_t* view, uint32_t* index)
+void ui_manager_resend(view_t* view)
 {
-  /* if (view->trash->length > 0) */
-  /* { */
-  /*   view_t* v; */
-  /*   while ((v = VNXT(view->trash))) ui_manager_cleanup(view); */
-  /*   vec_reset(view->trash); */
-  /* } */
-
-  if (!view->hidden)
-  {
-    if (view->index != *index || *index == 0)
-    {
-      view->index = *index;
-      if (view->connected == 0)
-        ui_generator_add(view);
-      else
-        ui_generator_set_index(view);
-    }
-    *index += 1;
-  }
-  view_t* v;
-  while ((v = VNXT(view->views)))
-  {
-    ui_manager_reindex(v, index);
-  }
+  ui_generator_add(view);
+  vec_t* vec = view->views;
+  for (int i = 0; i < vec->length; i++) ui_manager_resend(vec->data[i]);
 }
 
 void ui_manager_render()
 {
-  if (reindex)
+  if (resend)
   {
     ui_generator_cleanup();
-    uint32_t index = 0;
-    ui_manager_reindex(root, &index);
-    reindex = 0;
+    ui_manager_resend(root);
+    resend = 0;
   }
   ui_generator_render();
 }

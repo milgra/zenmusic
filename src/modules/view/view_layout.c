@@ -14,7 +14,6 @@ void view_layout(view_t* view);
 
 void view_layout(view_t* view)
 {
-  //printf("LAYOUT MAIN %s\n", view->id);
   view_t* v;
 
   float act_x = 0;

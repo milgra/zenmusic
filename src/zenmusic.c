@@ -323,6 +323,8 @@ void init(int width, int height)
   view_set_frame(baseview, (r2_t){0.0, 0.0, (float)width, (float)height});
   view_layout(baseview);
 
+  view_desc(baseview, 0);
+
   common_respath = respath;
 
   text_init();
@@ -344,6 +346,7 @@ void init(int width, int height)
   VADD(songlist_fields, sitem_cell_new("genre", 150, 4));
   VADD(songlist_fields, sitem_cell_new("track", 150, 5));
   VADD(songlist_fields, sitem_cell_new("disc", 150, 6));
+
   // decrease retain count of cells because of inline allocation
   vec_dec_retcount(songlist_fields);
 
@@ -464,6 +467,9 @@ void init(int width, int height)
   vh_lhead_upd_cell(songlistheader, "index", 30, &((cr_text_data_t){.style = ts, .text = "index"}));
   vh_lhead_upd_cell(songlistheader, "artist", 200, &((cr_text_data_t){.style = ts, .text = "artist"}));
   vh_lhead_upd_cell(songlistheader, "title", 300, &((cr_text_data_t){.style = ts, .text = "title"}));
+
+  view_t* footer = view_get_subview(baseview, "footer");
+  footer->hidden = 1;
 
   db    = MNEW();
   libch = ch_new(100);

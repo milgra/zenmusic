@@ -55,11 +55,12 @@ void view_gen_apply_style(view_t* view, map_t* style, char* respath)
       }
       else if (strstr(val, "px") != NULL)
       {
-        char* end          = strstr(val, "px");
-        int   len          = end - val;
-        end[len - 1]       = '\0';
-        int pix            = atoi(val);
-        view->layout.width = pix;
+        char* end           = strstr(val, "px");
+        int   len           = end - val;
+        end[len - 1]        = '\0';
+        int pix             = atoi(val);
+        view->layout.width  = pix;
+        view->frame.local.w = pix;
       }
     }
     else if (strcmp(key, "height") == 0)
@@ -79,6 +80,7 @@ void view_gen_apply_style(view_t* view, map_t* style, char* respath)
         end[len - 1]        = '\0';
         int pix             = atoi(val);
         view->layout.height = pix;
+        view->frame.local.h = pix;
       }
     }
     else if (strcmp(key, "display") == 0)

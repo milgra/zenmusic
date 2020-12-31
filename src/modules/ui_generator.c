@@ -57,20 +57,22 @@ int ui_generator_init(int width, int height)
 
 void ui_generator_reset()
 {
-  ui_compositor_reset();
-  vec_reset(uig.views);
+  /* ui_compositor_reset(); */
+  /* vec_reset(uig.views); */
 }
 
 void ui_generator_cleanup()
 {
   ui_compositor_new_reset();
+  vec_reset(uig.views);
 }
 
 void ui_generator_add(view_t* view)
 {
   VADD(uig.views, view);
 
-  view->connected = 1;
+  // TODO connected is not needed any more
+  // view->connected = 1;
 
   // assign pages if view is new
   if (view->texture.page == -1)
@@ -80,48 +82,50 @@ void ui_generator_add(view_t* view)
     if (view->texture.type == TT_EXTERNAL) view_set_texture_page(view, ui_compositor_new_texture());
   }
 
-  /* ui_compositor_new_upd(view->frame.global,       // frame */
-  /*                       view->layout.shadow_blur, // view border */
-  /*                       view->texture.page,       // texture page */
-  /*                       view->texture.full,       // needs full texture */
-  /*                       view->texture.page > 0,   // external texture */
-  /*                       view->texture.id);        // texture id */
+  ui_compositor_new_upd(view->id,
+                        view->hidden,
+                        view->frame.global,       // frame
+                        view->layout.shadow_blur, // view border
+                        view->texture.page,       // texture page
+                        view->texture.full,       // needs full texture
+                        view->texture.page > 0,   // external texture
+                        view->texture.id);        // texture id
 
-  ui_compositor_add(view->id,
-                    view->texture.id,
-                    view->index);
-  ui_compositor_upd_texture(view->id,
-                            view->texture.page,
-                            view->texture.full,
-                            view->texture.page > 0,
-                            view->texture.blur,
-                            view->frame.global.w,
-                            view->frame.global.h);
-  ui_compositor_upd_frame(view->id,
-                          view->frame.global,
-                          view->layout.shadow_blur);
+  /* ui_compositor_add(view->id, */
+  /*                   view->texture.id, */
+  /*                   view->index); */
+  /* ui_compositor_upd_texture(view->id, */
+  /*                           view->texture.page, */
+  /*                           view->texture.full, */
+  /*                           view->texture.page > 0, */
+  /*                           view->texture.blur, */
+  /*                           view->frame.global.w, */
+  /*                           view->frame.global.h); */
+  /* ui_compositor_upd_frame(view->id, */
+  /*                         view->frame.global, */
+  /*                         view->layout.shadow_blur); */
 
-  if (view->texture.state == TS_READY)
-    ui_compositor_upd_bitmap(view->texture.id,
-                             view->texture.bitmap);
+  /* if (view->texture.state == TS_READY) */
+  /*   ui_compositor_upd_bitmap(view->texture.id, */
+  /*                            view->texture.bitmap); */
 }
 
 void ui_generator_remove(view_t* view)
 {
-  ui_compositor_rem(view->id);
+  //  ui_compositor_rem(view->id);
 }
 
 void ui_generator_set_index(view_t* view)
 {
-  ui_compositor_upd_index(view->id, view->index);
+  // ui_compositor_upd_index(view->id, view->index);
 }
 
 void ui_generator_render()
 {
-  view_t* view;
-
-  while ((view = VNXT(uig.views)))
+  for (int i = 0; i < uig.views->length; i++)
   {
+    view_t* view = uig.views->data[i];
+
     if (view->texture.type == TT_MANAGED && view->texture.state == TS_BLANK)
     {
       if (view->texture.rentype == RT_BACKGROUND)
@@ -133,24 +137,24 @@ void ui_generator_render()
         view_gen_texture(view);
       }
     }
-    if (view->frame.changed)
-    {
-      ui_compositor_upd_frame(view->id,
-                              view->frame.global,
-                              view->layout.shadow_blur);
 
-      view->frame.changed = 0;
+    if (view->frame.pos_changed)
+    {
+      ui_compositor_new_upd_frame(i, view->frame.global, view->layout.shadow_blur);
+
+      view->frame.pos_changed = 0;
     }
+
     if (view->texture.changed)
     {
-      ui_compositor_upd_bitmap(view->texture.id,
-                               view->texture.bitmap);
+      ui_compositor_new_upd_bmp(i, view->frame.global, view->layout.shadow_blur, view->texture.id, view->texture.bitmap);
 
-      view->texture.changed = 0;
+      view->frame.dim_changed = 0;
+      view->texture.changed   = 0;
     }
   }
 
-  ui_compositor_render();
+  ui_compositor_new_render();
 }
 
 int ui_generator_workloop()
@@ -169,29 +173,46 @@ int ui_generator_workloop()
 
 void ui_generator_resize(int width, int height)
 {
-  ui_compositor_resize(width, height);
-  ui_compositor_reset();
+  printf("ui generator resize %i %i\n", width, height);
 
-  view_t* view;
-  while ((view = VNXT(uig.views)))
+  ui_compositor_resize(width, height);
+  ui_compositor_new_reset();
+
+  for (int i = 0; i < uig.views->length; i++)
   {
-    ui_compositor_add(view->id,
-                      view->texture.id,
-                      view->index);
-    ui_compositor_upd_texture(view->id,
-                              view->texture.page,
-                              view->texture.full,
-                              view->texture.page > 0,
-                              view->texture.blur,
-                              view->frame.global.w,
-                              view->frame.global.h);
-    ui_compositor_upd_frame(view->id,
-                            view->frame.global,
-                            view->layout.shadow_blur);
-    if (view->texture.state == TS_READY)
-      ui_compositor_upd_bitmap(view->texture.id,
-                               view->texture.bitmap);
+    view_t* view = uig.views->data[i];
+    ui_compositor_new_upd(view->id,
+                          view->hidden,
+                          view->frame.global,       // frame
+                          view->layout.shadow_blur, // view border
+                          view->texture.page,       // texture page
+                          view->texture.full,       // needs full texture
+                          view->texture.page > 0,   // external texture
+                          view->texture.id);        // texture id
   }
+
+  /* ui_compositor_reset(); */
+
+  /* view_t* view; */
+  /* while ((view = VNXT(uig.views))) */
+  /* { */
+  /*   ui_compositor_add(view->id, */
+  /*                     view->texture.id, */
+  /*                     view->index); */
+  /*   ui_compositor_upd_texture(view->id, */
+  /*                             view->texture.page, */
+  /*                             view->texture.full, */
+  /*                             view->texture.page > 0, */
+  /*                             view->texture.blur, */
+  /*                             view->frame.global.w, */
+  /*                             view->frame.global.h); */
+  /*   ui_compositor_upd_frame(view->id, */
+  /*                           view->frame.global, */
+  /*                           view->layout.shadow_blur); */
+  /*   if (view->texture.state == TS_READY) */
+  /*     ui_compositor_upd_bitmap(view->texture.id, */
+  /*                              view->texture.bitmap); */
+  /* } */
 }
 
 #endif
