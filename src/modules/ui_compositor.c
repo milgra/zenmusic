@@ -91,7 +91,7 @@ struct uic_t
   int   height;
   int   tex_page;
 
-  // int upd_geo; // update geometry
+  int upd_geo; // update geometry
   // vec_t* rects_v; // rectangle vector
   // vec_t* final_v; // rectangle vector for quick sort
   // map_t* rects_m; // rectangle map
@@ -115,6 +115,7 @@ void ui_compositor_init(int width, int height)
 
   uic.cache     = VNEW();
   uic.cache_ind = 0;
+  uic.upd_geo   = 1;
 
   /* init texture for ui texture map */
 
@@ -129,8 +130,42 @@ void ui_compositor_init(int width, int height)
 
 void ui_compositor_new_reset()
 {
-  printf("\n\n");
+  printf("COMP NEW RESET\n");
   uic.cache_ind = 0;
+}
+
+void ui_compositor_reset()
+{
+  printf("COMP RESET\n");
+
+  fb_reset(uic.fb);
+  tm_reset(uic.tm);
+
+  uic.cache_ind = 0;
+  uic.upd_geo   = 1;
+
+  /* vec_reset(uic.rects_v); */
+  /* vec_reset(uic.final_v); */
+  /* map_reset(uic.rects_m); */
+}
+
+void ui_compositor_resize(int width, int height)
+{
+  printf("COMP RESIZE\n");
+
+  uic.width   = width;
+  uic.height  = height;
+  uic.upd_geo = 1;
+}
+
+int ui_compositor_new_texture()
+{
+  return uic.tex_page++;
+}
+
+int ui_compositor_map_texture()
+{
+  return 0;
 }
 
 void ui_compositor_new_upd(char* id,
@@ -142,7 +177,7 @@ void ui_compositor_new_upd(char* id,
                            int   ext,    // external texture
                            char* texid)  // texture id
 {
-  //printf("COMP ADD %s %f %f %f %f\n", id, frame.x, frame.y, frame.w, frame.h);
+  // printf("COMP ADD %s %f %f %f %f\n", id, frame.x, frame.y, frame.w, frame.h);
 
   // fill up cache if needed
   if (uic.cache_ind + 1 > uic.cache->length)
@@ -166,6 +201,8 @@ void ui_compositor_new_upd(char* id,
   // set page
   crect_set_page(rect, page);
 
+  // TEXTURE COORDS
+
   // set texture coords
   if (full)
   {
@@ -178,9 +215,8 @@ void ui_compositor_new_upd(char* id,
     glrect_t tex_dim = gl_get_texture(page, frame.w, frame.h);
     crect_set_texture(rect, 0.0, 0.0, frame.w / (float)tex_dim.w, frame.h / (float)tex_dim.h);
   }
-  else
+  else if (!hidden)
   {
-
     // prepare texmap
     tm_coords_t tc = tm_get(uic.tm, texid);
 
@@ -208,6 +244,10 @@ void ui_compositor_new_upd_frame(int index, r2_t frame, float border)
   crect_t* rect = uic.cache->data[index];
   if (border > 0.0) frame = r2_expand(frame, border);
   crect_set_frame(rect, frame);
+
+  // printf("COMP UPD FRAME %s %f %f %f %f\n", rect->id, frame.x, frame.y, frame.w, frame.h);
+
+  uic.upd_geo = 1;
 }
 
 void ui_compositor_new_upd_bmp(int index, r2_t frame, float border, char* texid, bm_t* bm)
@@ -216,11 +256,13 @@ void ui_compositor_new_upd_bmp(int index, r2_t frame, float border, char* texid,
   if (border > 0.0) frame = r2_expand(frame, border);
   crect_set_frame(rect, frame);
 
+  printf("COMP UPD BMP %s %f %f %f %f %i %i\n", rect->id, frame.x, frame.y, frame.w, frame.h, bm->w, bm->h);
+  //crect_desc(rect);
+
   tm_coords_t tc = tm_get(uic.tm, texid);
 
   if (bm->w != tc.w || bm->h != tc.h)
   {
-    printf("size mismatch %s, bm dim %i %i\n", rect->id, bm->w, bm->h);
     // texture doesn't exist or size mismatch
     int success = tm_put(uic.tm, texid, frame.w, frame.h);
     // TODO reset main texture, maybe all views?
@@ -235,52 +277,35 @@ void ui_compositor_new_upd_bmp(int index, r2_t frame, float border, char* texid,
 
   // upload to GPU
   gl_upload_to_texture(0, tc.x, tc.y, bm->w, bm->h, bm->data);
+
+  uic.upd_geo = 1;
 }
 
 void ui_compositor_new_render()
 {
-  fb_reset(uic.fb);
-
-  for (int i = 0; i < uic.cache_ind; i++)
+  if (uic.upd_geo == 1)
   {
-    crect_t* rect = uic.cache->data[i];
-    if (!rect->hidden) fb_add(uic.fb, rect->data, 30);
+    printf("COMP RENDER\n");
+
+    fb_reset(uic.fb);
+    for (int i = 0; i < uic.cache_ind; i++)
+    {
+      crect_t* rect = uic.cache->data[i];
+      if (!rect->hidden) fb_add(uic.fb, rect->data, 30);
+      /* if (strcmp(rect->id, "header") == 0) */
+      /* { */
+      /*   printf("ui_compositor_render %s\n", rect->id); */
+      /*   crect_desc(rect); */
+      /* } */
+    }
+
+    gl_upload_vertexes(uic.fb);
+    uic.upd_geo = 0;
   }
 
-  gl_upload_vertexes(uic.fb);
   gl_clear_framebuffer(TEX_CTX, 0.01, 0.01, 0.01, 1.0);
-
   glrect_t reg_full = {0, 0, uic.width, uic.height};
-
   gl_draw_vertexes_in_framebuffer(TEX_CTX, 0, uic.fb->pos / 5, reg_full, reg_full, SH_TEXTURE);
-}
-
-void ui_compositor_reset()
-{
-  fb_reset(uic.fb);
-  tm_reset(uic.tm);
-
-  uic.cache_ind = 0;
-
-  /* vec_reset(uic.rects_v); */
-  /* vec_reset(uic.final_v); */
-  /* map_reset(uic.rects_m); */
-}
-
-void ui_compositor_resize(int width, int height)
-{
-  uic.width  = width;
-  uic.height = height;
-}
-
-int ui_compositor_new_texture()
-{
-  return uic.tex_page++;
-}
-
-int ui_compositor_map_texture()
-{
-  return 0;
 }
 
 /* void ui_compositor_add(char* rectid, char* texid, uint32_t index) */

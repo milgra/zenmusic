@@ -176,7 +176,7 @@ void ui_generator_resize(int width, int height)
   printf("ui generator resize %i %i\n", width, height);
 
   ui_compositor_resize(width, height);
-  ui_compositor_new_reset();
+  ui_compositor_reset();
 
   for (int i = 0; i < uig.views->length; i++)
   {
@@ -189,6 +189,9 @@ void ui_generator_resize(int width, int height)
                           view->texture.full,       // needs full texture
                           view->texture.page > 0,   // external texture
                           view->texture.id);        // texture id
+
+    if (view->texture.state == TS_READY)
+      ui_compositor_new_upd_bmp(i, view->frame.global, view->layout.shadow_blur, view->texture.id, view->texture.bitmap);
   }
 
   /* ui_compositor_reset(); */

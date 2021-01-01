@@ -35,6 +35,8 @@ void ui_manager_init(int width, int height)
 
   root  = view_new("root", (r2_t){0, 0, width, height});
   queue = VNEW();
+
+  root->hidden = 1;
 }
 
 void ui_manager_event(ev_t ev)

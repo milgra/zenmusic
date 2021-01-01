@@ -44,7 +44,6 @@ void tg_text_gen(view_t* view)
         gen->style,
         fontmap);
 
-    printf("%s changed texture %i %i\n", view->id, fontmap->w, fontmap->h);
     view_set_texture_bmp(view, fontmap);
   }
 }
