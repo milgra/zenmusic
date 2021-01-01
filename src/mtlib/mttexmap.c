@@ -117,7 +117,7 @@ int tm_put(tm_t* tm, char* id, int w, int h)
   int rbx = ncx + w;
   int rby = ncy + h;
 
-  char is_full = nch > tm->height;
+  char is_full = ncy > tm->height;
 
   if (is_full) return -2; // tilemap is full
 

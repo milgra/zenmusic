@@ -130,14 +130,11 @@ void ui_compositor_init(int width, int height)
 
 void ui_compositor_new_reset()
 {
-  printf("COMP NEW RESET\n");
   uic.cache_ind = 0;
 }
 
 void ui_compositor_reset()
 {
-  printf("COMP RESET\n");
-
   fb_reset(uic.fb);
   tm_reset(uic.tm);
 
@@ -256,9 +253,6 @@ void ui_compositor_new_upd_bmp(int index, r2_t frame, float border, char* texid,
   if (border > 0.0) frame = r2_expand(frame, border);
   crect_set_frame(rect, frame);
 
-  printf("COMP UPD BMP %s %f %f %f %f %i %i\n", rect->id, frame.x, frame.y, frame.w, frame.h, bm->w, bm->h);
-  //crect_desc(rect);
-
   tm_coords_t tc = tm_get(uic.tm, texid);
 
   if (bm->w != tc.w || bm->h != tc.h)
@@ -285,8 +279,6 @@ void ui_compositor_new_render()
 {
   if (uic.upd_geo == 1)
   {
-    printf("COMP RENDER\n");
-
     fb_reset(uic.fb);
     for (int i = 0; i < uic.cache_ind; i++)
     {
