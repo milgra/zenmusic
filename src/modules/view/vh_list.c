@@ -169,6 +169,7 @@ void vh_list_evt(view_t* view, ev_t ev)
           (*vh->rec_row)(view, head);
           VREM(vh->items, head);
           vh->head_index += 1;
+          view_remove(view, head);
         }
 
         if (tail->frame.local.y > view->frame.local.h + PRELOAD_DISTANCE && vh->items->length > 1)
@@ -176,6 +177,7 @@ void vh_list_evt(view_t* view, ev_t ev)
           (*vh->rec_row)(view, tail);
           VREM(vh->items, tail);
           vh->tail_index -= 1;
+          view_remove(view, tail);
         }
       }
     }

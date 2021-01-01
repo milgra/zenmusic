@@ -279,7 +279,7 @@ gltex_t gl_create_texture(uint32_t w, uint32_t h)
 
   glBindFramebuffer(GL_FRAMEBUFFER, tex.fb);
   glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex.tx, 0);
-  glClearColor(0.0, 0.0, 0.0, 1.0);
+  glClearColor(1.0, 0.0, 0.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT);
 
   return tex;

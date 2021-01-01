@@ -148,8 +148,6 @@ void ui_compositor_reset()
 
 void ui_compositor_resize(int width, int height)
 {
-  printf("COMP RESIZE\n");
-
   uic.width   = width;
   uic.height  = height;
   uic.upd_geo = 1;
