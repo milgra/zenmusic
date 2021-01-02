@@ -32,13 +32,15 @@ void ui_compositor_upd(char* id,
                        int   full,   // needs full texture
                        int   ext,    // external texture
                        char* texid); // texture id
-void ui_compositor_upd_frame(int index, r2_t frame, float border);
+void ui_compositor_upd_pos(int index, r2_t frame, float border);
 void ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_t* bm);
-void ui_compositor_render();
+void ui_compositor_render(uint32_t time);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
+
+#define UI_STAT_DELAY 10.0
 
 #include "gl_floatbuffer.c"
 #include "mtcstring.c"
@@ -49,11 +51,11 @@ void ui_compositor_render();
 
 typedef struct _crect_t
 {
-  char*    id;
-  char*    tex_id;
-  float    data[30];
-  char     hidden;
-  glrect_t region;
+  char* id;
+  char* tex_id;
+  float data[30];
+  char  hidden;
+  r2_t  frame;
 } crect_t;
 
 crect_t* crect_new();
@@ -76,6 +78,11 @@ struct uic_t
 
   vec_t* cache;
   int    cache_ind;
+
+  uint32_t tex_bytes;
+  uint32_t ver_bytes;
+  uint32_t upd_stamp;
+  uint32_t ren_frame;
 } uic = {0};
 
 void ui_compositor_init(int width, int height)
@@ -205,11 +212,14 @@ void ui_compositor_upd(char* id,
   uic.cache_ind++;
 }
 
-void ui_compositor_upd_frame(int index, r2_t frame, float border)
+void ui_compositor_upd_pos(int index, r2_t frame, float border)
 {
-  crect_t* rect = uic.cache->data[index];
-  if (border > 0.0) frame = r2_expand(frame, border);
-  crect_set_frame(rect, frame);
+  crect_t* rect  = uic.cache->data[index];
+  r2_t     prevf = rect->frame;
+  prevf.x        = frame.x - border;
+  prevf.y        = frame.y - border;
+
+  crect_set_frame(rect, prevf);
 
   uic.upd_geo = 1;
 }
@@ -217,6 +227,10 @@ void ui_compositor_upd_frame(int index, r2_t frame, float border)
 void ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_t* bm)
 {
   crect_t* rect = uic.cache->data[index];
+
+  frame.w = bm->w - 2 * border;
+  frame.h = bm->h - 2 * border;
+
   if (border > 0.0) frame = r2_expand(frame, border);
   crect_set_frame(rect, frame);
 
@@ -239,10 +253,12 @@ void ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_
   // upload to GPU
   gl_upload_to_texture(0, tc.x, tc.y, bm->w, bm->h, bm->data);
 
+  uic.tex_bytes += bm->size;
+
   uic.upd_geo = 1;
 }
 
-void ui_compositor_render()
+void ui_compositor_render(uint32_t time)
 {
   if (uic.upd_geo == 1)
   {
@@ -255,6 +271,21 @@ void ui_compositor_render()
 
     gl_upload_vertexes(uic.fb);
     uic.upd_geo = 0;
+    uic.ver_bytes += uic.fb->pos * sizeof(GLfloat);
+  }
+
+  uic.ren_frame += 1;
+
+  if (time > uic.upd_stamp)
+  {
+    printf("UI TX %.2f Mb/s VX %.2f Mb/s FPS %.2f\n",
+           uic.tex_bytes / UI_STAT_DELAY / (1024.0 * 1024.0),
+           uic.ver_bytes / UI_STAT_DELAY / (1024.0 * 1024.0),
+           uic.ren_frame / UI_STAT_DELAY);
+    uic.upd_stamp = time + UI_STAT_DELAY * 1000.0;
+    uic.tex_bytes = 0;
+    uic.ver_bytes = 0;
+    uic.ren_frame = 0;
   }
 
   gl_clear_framebuffer(TEX_CTX, 0.01, 0.01, 0.01, 1.0);
@@ -351,7 +382,7 @@ void crect_set_hidden(crect_t* r, char hidden)
 
 void crect_set_frame(crect_t* r, r2_t rect)
 {
-  r->region = ((glrect_t){rect.x, rect.y, rect.w, rect.h});
+  r->frame = rect;
 
   r->data[0] = rect.x;
   r->data[1] = rect.y;

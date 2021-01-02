@@ -13,7 +13,7 @@
 void ui_manager_init(int width, int height);
 void ui_manager_event(ev_t event);
 void ui_manager_add(view_t* view);
-void ui_manager_render();
+void ui_manager_render(uint32_t time);
 
 #endif
 
@@ -139,7 +139,7 @@ void ui_manager_resend(view_t* view)
   for (int i = 0; i < vec->length; i++) ui_manager_resend(vec->data[i]);
 }
 
-void ui_manager_render()
+void ui_manager_render(uint32_t time)
 {
   if (resend)
   {
@@ -147,7 +147,7 @@ void ui_manager_render()
     ui_manager_resend(root);
     resend = 0;
   }
-  ui_generator_render();
+  ui_generator_render(time);
 }
 
 #endif

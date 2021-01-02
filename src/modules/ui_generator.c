@@ -14,7 +14,7 @@
 #include "view.c"
 
 int      ui_generator_init(int, int);
-void     ui_generator_render();
+void     ui_generator_render(uint32_t);
 void     ui_generator_cleanup();
 void     ui_generator_add(view_t* view);
 void     ui_generator_remove(view_t* view);
@@ -82,7 +82,7 @@ void ui_generator_add(view_t* view)
                     view->texture.id);        // texture id
 }
 
-void ui_generator_render()
+void ui_generator_render(uint32_t time)
 {
   for (int i = 0; i < uig.views->length; i++)
   {
@@ -102,7 +102,7 @@ void ui_generator_render()
 
     if (view->frame.pos_changed)
     {
-      ui_compositor_upd_frame(i, view->frame.global, view->layout.shadow_blur);
+      ui_compositor_upd_pos(i, view->frame.global, view->layout.shadow_blur);
 
       view->frame.pos_changed = 0;
     }
@@ -116,7 +116,7 @@ void ui_generator_render()
     }
   }
 
-  ui_compositor_render();
+  ui_compositor_render(time);
 }
 
 int ui_generator_workloop()

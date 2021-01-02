@@ -10,7 +10,7 @@
 
 #include "wm_event.c"
 
-void wm_init(void (*init)(int, int), void (*update)(ev_t), void (*render)(), void (*destroy)());
+void wm_init(void (*init)(int, int), void (*update)(ev_t), void (*render)(uint32_t), void (*destroy)());
 void wm_close();
 void wm_toggle_fullscreen();
 
@@ -35,7 +35,7 @@ SDL_Window* wm_window;
 
 void wm_init(void (*init)(int, int),
              void (*update)(ev_t),
-             void (*render)(),
+             void (*render)(uint32_t),
              void (*destroy)())
 {
   SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0");
@@ -226,7 +226,7 @@ void wm_init(void (*init)(int, int),
           ev.type = EV_TIME;
 
           (*update)(ev);
-          (*render)();
+          (*render)(ev.time);
           SDL_GL_SwapWindow(wm_window);
         }
 
