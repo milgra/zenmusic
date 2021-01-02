@@ -56,6 +56,9 @@ map_t* db;
 vec_t* vec_srt;
 ch_t*  libch;
 
+uint32_t selected_index;
+uint32_t selected_color = 0x555555FF;
+
 vec_t* songlist_fields;
 vec_t* songitem_cache;
 
@@ -74,10 +77,23 @@ void seek_ratio_changed(view_t* view, float angle)
   player_set_position(ratio);
 }
 
+void toggle_pause()
+{
+  int state = player_toggle_pause();
+
+  if (state)
+    selected_color = 0xFF5555FF;
+  else
+    selected_color = 0x55FF55FF;
+
+  view_t* item = vh_list_item_for_index(songlist, selected_index);
+
+  if (item) songitem_select(item, selected_index, vec_srt->data[selected_index], fontpath, selected_color);
+}
+
 void play_button_pushed(view_t* view)
 {
-
-  player_toggle_pause();
+  toggle_pause();
 }
 
 void vol_ratio_changed(view_t* view, float angle)
@@ -172,25 +188,22 @@ void close_button_pushed(view_t* view, void* data)
 
 void songitem_on_select(view_t* view, uint32_t index)
 {
-  // indicate list item
-  vec_t*  items = vh_list_items(songlist);
-  view_t* item;
-  while ((item = VNXT(items)))
-  {
-    vh_litem_t* vh = item->handler_data;
-    if (vh->index == index)
-    {
-      printf("FOUND!\n");
-      textstyle_t ts = {0};
-      ts.font        = fontpath;
-      ts.align       = 0;
-      ts.size        = 25.0;
-      ts.textcolor   = 0x000000FF;
-      ts.backcolor   = 0xFF0000FF;
+  // deselect prev item
+  view_t* olditem = vh_list_item_for_index(songlist, selected_index);
 
-      vh_litem_upd_cell(item, "index", &((cr_text_data_t){.style = ts, .text = "e"}));
-    }
+  if (olditem)
+  {
+    songitem_update(olditem, index, vec_srt->data[index], fontpath);
   }
+
+  // indicate list item
+  view_t* newitem = vh_list_item_for_index(songlist, index);
+
+  if (newitem)
+  {
+    songitem_select(newitem, index, vec_srt->data[index], fontpath, selected_color);
+  }
+  selected_index = index;
 
   // update display
   map_t* songmap = vec_srt->data[index];
@@ -230,7 +243,14 @@ view_t* songlist_item_generator(view_t* listview, int index, int* count)
 
   *count = vec_srt->length;
 
-  songitem_update(rowview, index, vec_srt->data[index], fontpath);
+  if (selected_index == index)
+  {
+    songitem_select(rowview, index, vec_srt->data[index], fontpath, selected_color);
+  }
+  else
+  {
+    songitem_update(rowview, index, vec_srt->data[index], fontpath);
+  }
   return rowview;
 }
 
@@ -559,8 +579,7 @@ void update(ev_t ev)
   {
     if (ev.keycode == SDLK_SPACE)
     {
-      // play/pause
-      player_toggle_pause();
+      toggle_pause();
     }
   }
 
@@ -568,9 +587,9 @@ void update(ev_t ev)
   ui_manager_event(ev);
 }
 
-void render()
+void render(uint32_t time)
 {
-  ui_manager_render();
+  ui_manager_render(time);
 }
 
 void destroy()

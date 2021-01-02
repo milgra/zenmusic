@@ -15,6 +15,7 @@ sitem_cell_t* sitem_cell_new(char* id, int size, int index);
 
 view_t* songitem_new(char* fontpath, void (*on_select)(view_t* view, uint32_t index), vec_t* fields);
 void    songitem_update(view_t* rowview, int index, map_t* file, char* fontpath);
+void    songitem_select(view_t* rowview, int index, map_t* file, char* fontpath, uint32_t color);
 
 #endif
 
@@ -89,6 +90,27 @@ void songitem_update(view_t* rowview, int index, map_t* file, char* fontpath)
   vh_litem_upd_cell(rowview, "artist", &((cr_text_data_t){.style = ts, .text = MGET(file, "artist")}));
   vh_litem_upd_cell(rowview, "title", &((cr_text_data_t){.style = ts, .text = MGET(file, "title")}));
   //  vh_litem_upd_cell(rowview, "genre", &((cr_text_data_t){.style = ts, .text = MGET(file, "genre")}));
+}
+
+void songitem_select(view_t* rowview, int index, map_t* file, char* fontpath, uint32_t color)
+{
+  char indbuffer[6];
+  if (index > -1)
+    snprintf(indbuffer, 6, "%i.", index);
+  else
+    snprintf(indbuffer, 6, "No.");
+
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = 0;
+  ts.size        = 25.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = color;
+
+  vh_litem_upd(rowview, index);
+  vh_litem_upd_cell(rowview, "index", &((cr_text_data_t){.style = ts, .text = indbuffer}));
+  vh_litem_upd_cell(rowview, "artist", &((cr_text_data_t){.style = ts, .text = MGET(file, "artist")}));
+  vh_litem_upd_cell(rowview, "title", &((cr_text_data_t){.style = ts, .text = MGET(file, "title")}));
 }
 
 #endif

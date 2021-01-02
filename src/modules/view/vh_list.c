@@ -29,12 +29,13 @@ typedef struct _vh_list_t
   void (*rec_row)(view_t* listview, view_t* rowview);
 } vh_list_t;
 
-void   vh_list_add(view_t* view,
-                   view_t* (*gen_row)(view_t* listview, int index, int* item_count),
-                   void (*rec_row)(view_t* listview, view_t* rowview));
-vec_t* vh_list_items(view_t* view);
-void   vh_list_fill(view_t* view);
-void   vh_list_reset(view_t* view);
+void    vh_list_add(view_t* view,
+                    view_t* (*gen_row)(view_t* listview, int index, int* item_count),
+                    void (*rec_row)(view_t* listview, view_t* rowview));
+vec_t*  vh_list_items(view_t* view);
+void    vh_list_fill(view_t* view);
+void    vh_list_reset(view_t* view);
+view_t* vh_list_item_for_index(view_t* view, int index);
 
 #endif
 
@@ -309,6 +310,19 @@ void vh_list_add(view_t* view,
   view->needs_scroll = 1;
   view->handler_data = vh;
   view->handler      = vh_list_evt;
+}
+
+view_t* vh_list_item_for_index(view_t* view, int index)
+{
+  vh_list_t* vh = view->handler_data;
+
+  if (index > vh->head_index && index < vh->tail_index)
+  {
+    int diff = index - vh->head_index;
+    return vh->items->data[diff];
+  }
+
+  return NULL;
 }
 
 #endif

@@ -27,9 +27,8 @@ freebsd for os
 
 first version
 
-highlight row green/red
 listitem hidden legyen 
-dfdmessages window, log messages
+messages window, log messages
 move songs to folders
 additional columns - genre, last played, added, skipped, play count,
 fix leaks

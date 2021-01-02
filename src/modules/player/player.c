@@ -10,7 +10,7 @@
 
 void player_play(char* path);
 
-void player_toggle_pause();
+int  player_toggle_pause();
 void player_toggle_mute();
 
 void player_set_volume(float ratio);
@@ -57,13 +57,17 @@ void player_play(char* path)
   is = stream_open(path, file_iformat);
 }
 
-void player_toggle_pause()
+int player_toggle_pause()
 {
   if (is)
   {
     stream_toggle_pause(is);
     is->step = 0;
+
+    return is->paused;
   }
+
+  return 0;
 }
 
 void player_toggle_mute()
