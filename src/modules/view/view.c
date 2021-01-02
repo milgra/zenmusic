@@ -118,7 +118,6 @@ struct _view_t
 {
   char hidden;   /* exclude from rendering */
   char overflow; /* enable content outside frame */
-  //  char connected; /* view is added to connector */
 
   char needs_key;    /* accepts key events */
   char needs_text;   /* accepts text events */

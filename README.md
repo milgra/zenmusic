@@ -27,10 +27,9 @@ freebsd for os
 
 first version
 
-highlight row
+highlight row green/red
 listitem hidden legyen 
-zold/piros listitem background play/pausre, animalt!!!
-messages window, log messages
+dfdmessages window, log messages
 move songs to folders
 additional columns - genre, last played, added, skipped, play count,
 fix leaks
