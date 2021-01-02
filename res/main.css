@@ -297,6 +297,15 @@
     box-shadow: 3px;
 }
 
+#messagelist {
+    width: 100%;
+    height: 500px;
+    margin: 10px;
+    border-radius: 15px;
+    background-color: #FFFFFFFF;
+    box-shadow: 3px;
+}
+
 #time {
     width: 59%;
     height: 42px;

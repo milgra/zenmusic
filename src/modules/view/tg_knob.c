@@ -126,6 +126,7 @@ void tg_knob_gen(view_t* view)
 
     gfx_blend_rgba(view->texture.bitmap, 0, 0, tg->fore);
     view->texture.changed = 1;
+    view->texture.state   = TS_READY;
   }
 }
 

@@ -204,7 +204,11 @@ void view_add(view_t* view, view_t* subview)
   for (int i = 0; i < view->views->length; i++)
   {
     view_t* sview = view->views->data[i];
-    if (strcmp(sview->id, subview->id) == 0) printf("DUPLICATE SUBVIEW %s\n", subview->id);
+    if (strcmp(sview->id, subview->id) == 0)
+    {
+      printf("DUPLICATE SUBVIEW %s\n", subview->id);
+      return;
+    }
   }
 
   VADD(view->views, subview);
@@ -220,7 +224,11 @@ void view_insert(view_t* view, view_t* subview, uint32_t index)
   for (int i = 0; i < view->views->length; i++)
   {
     view_t* sview = view->views->data[i];
-    if (strcmp(sview->id, subview->id) == 0) printf("DUPLICATE SUBVIEW %s\n", subview->id);
+    if (strcmp(sview->id, subview->id) == 0)
+    {
+      printf("DUPLICATE SUBVIEW %s\n", subview->id);
+      return;
+    }
   }
 
   vec_addatindex(view->views, subview, index);

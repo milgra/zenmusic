@@ -62,7 +62,7 @@ void ui_manager_event(ev_t ev)
            ev.type == EV_MDOWN ||
            ev.type == EV_MUP)
   {
-    if (ev.type == EV_MMOVE)
+    if (ev.type == EV_MMOVE || queue->length == 0)
     {
       // send mouse move event to previous queue to detect move out
       for (int i = queue->length - 1; i > -1; i--)
@@ -143,6 +143,7 @@ void ui_manager_render(uint32_t time)
 {
   if (resend)
   {
+    vec_reset(queue); // touch queue needs to be emptied to avoid mouse events over removed view
     ui_generator_cleanup();
     ui_manager_resend(root);
     resend = 0;

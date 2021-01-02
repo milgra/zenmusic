@@ -27,8 +27,9 @@ freebsd for os
 
 first version
 
-listitem hidden legyen 
 messages window, log messages
+alapbol minden view hidden legyen, alapbol minden crect full texmap legyen
+listitem hidden legyen 
 move songs to folders
 additional columns - genre, last played, added, skipped, play count,
 fix leaks

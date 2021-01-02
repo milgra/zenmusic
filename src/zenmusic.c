@@ -33,6 +33,7 @@ view_t* songlist;
 view_t* coverview;
 view_t* baseview;
 view_t* timeview;
+view_t* display;
 
 view_t* song;
 view_t* artist;
@@ -47,6 +48,10 @@ view_t* volbtn;
 size_t  lastindex = 0;
 int     loop_all  = 0;
 
+view_t* display;
+view_t* messagelist;
+view_t* header_center;
+
 char     song_refr_flag = 0;
 uint32_t song_recv_time = 0;
 
@@ -56,7 +61,7 @@ map_t* db;
 vec_t* vec_srt;
 ch_t*  libch;
 
-uint32_t selected_index;
+uint32_t selected_index = UINT32_MAX;
 uint32_t selected_color = 0x55FF55FF;
 
 vec_t* songlist_fields;
@@ -186,6 +191,18 @@ void close_button_pushed(view_t* view, void* data)
   wm_close();
 }
 
+void on_display(view_t* view, void* data)
+{
+  view_remove(header_center, display);
+  view_add(header_center, messagelist);
+}
+
+void on_messagelist(view_t* view, void* data)
+{
+  view_remove(header_center, messagelist);
+  view_add(header_center, display);
+}
+
 void songitem_on_select(view_t* view, uint32_t index)
 {
   // deselect prev item
@@ -193,7 +210,7 @@ void songitem_on_select(view_t* view, uint32_t index)
 
   if (olditem)
   {
-    songitem_update(olditem, index, vec_srt->data[index], fontpath);
+    songitem_update(olditem, selected_index, vec_srt->data[selected_index], fontpath);
   }
 
   // indicate list item
@@ -367,10 +384,20 @@ void init(int width, int height)
   VADD(songlist_fields, sitem_cell_new("track", 150, 5));
   VADD(songlist_fields, sitem_cell_new("disc", 150, 6));
 
+  display       = view_get_subview(baseview, "display");
+  messagelist   = view_get_subview(baseview, "messagelist");
+  header_center = view_get_subview(baseview, "header_center");
+
+  vh_button_add(display, NULL, on_display);
+  vh_button_add(messagelist, NULL, on_messagelist);
+
+  view_remove(header_center, messagelist);
+
   // decrease retain count of cells because of inline allocation
   vec_dec_retcount(songlist_fields);
 
-  timeview = view_get_subview(baseview, "time");
+  timeview              = view_get_subview(baseview, "time");
+  timeview->needs_touch = 0;
 
   textstyle_t ts = {0};
   ts.font        = fontpath;
@@ -382,14 +409,16 @@ void init(int width, int height)
   tg_text_add(timeview);
   tg_text_set(timeview, "00:00", ts);
 
-  song = view_get_subview(baseview, "song");
+  song              = view_get_subview(baseview, "song");
+  song->needs_touch = 0;
 
   ts.size = 25.0;
 
   tg_text_add(song);
   tg_text_set(song, "-", ts);
 
-  artist = view_get_subview(baseview, "artist");
+  artist              = view_get_subview(baseview, "artist");
+  artist->needs_touch = 0;
 
   tg_text_add(artist);
   tg_text_set(artist, "-", ts);
