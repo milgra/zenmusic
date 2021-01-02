@@ -57,7 +57,7 @@ vec_t* vec_srt;
 ch_t*  libch;
 
 uint32_t selected_index;
-uint32_t selected_color = 0x555555FF;
+uint32_t selected_color = 0x55FF55FF;
 
 vec_t* songlist_fields;
 vec_t* songitem_cache;
