@@ -97,6 +97,16 @@
     height: 100%;
 }
 
+#filterlist {
+    width: 700px;
+    height: 500px;
+    top: 190px;
+    margin: auto;
+    border-radius: 15px;
+    background-color: #FFFFFFFF;
+    box-shadow: 3px;
+}
+
 #songlistheader {
     background-color: #222222FF;
     top: 185px;

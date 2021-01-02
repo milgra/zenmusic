@@ -82,7 +82,7 @@ void ui_manager_event(ev_t ev)
     for (int i = queue->length - 1; i > -1; i--)
     {
       view_t* v = queue->data[i];
-      if (v->needs_touch)
+      if (v->needs_touch && v->parent)
       {
         if (v->handler) (*v->handler)(v, ev);
         break;
@@ -143,7 +143,6 @@ void ui_manager_render(uint32_t time)
 {
   if (resend)
   {
-    vec_reset(queue); // touch queue needs to be emptied to avoid mouse events over removed view
     ui_generator_cleanup();
     ui_manager_resend(root);
     resend = 0;

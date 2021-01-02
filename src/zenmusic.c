@@ -48,8 +48,10 @@ view_t* volbtn;
 size_t  lastindex = 0;
 int     loop_all  = 0;
 
+view_t* mainview;
 view_t* display;
 view_t* messagelist;
+view_t* filterlist;
 view_t* header_center;
 
 char     song_refr_flag = 0;
@@ -392,6 +394,11 @@ void init(int width, int height)
   vh_button_add(messagelist, NULL, on_messagelist);
 
   view_remove(header_center, messagelist);
+
+  mainview   = view_get_subview(baseview, "main");
+  filterlist = view_get_subview(baseview, "filterlist");
+
+  view_remove(mainview, filterlist);
 
   // decrease retain count of cells because of inline allocation
   vec_dec_retcount(songlist_fields);

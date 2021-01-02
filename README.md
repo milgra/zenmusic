@@ -28,13 +28,13 @@ freebsd for os
 first version
 
 messages window, log messages
+genre/tags/artist window
+tag editor window
 alapbol minden view hidden legyen, alapbol minden crect full texmap legyen
 listitem hidden legyen 
 move songs to folders
 additional columns - genre, last played, added, skipped, play count,
 fix leaks
-genre/tags list, artist list
-id editor window
 elso indulasnal analyzer progresst mutassa valahol amig zenet hallgatsz
 unicode support files, metadata!!!
 tilemap is auto-resize legyen duplazassal
