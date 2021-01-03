@@ -34,6 +34,7 @@ void ui_compositor_upd(char* id,
                        char* texid); // texture id
 void ui_compositor_upd_pos(int index, r2_t frame, float border);
 void ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_t* bm);
+void ui_compositor_upd_vis(int index, char hidden);
 void ui_compositor_render(uint32_t time);
 
 #endif
@@ -210,6 +211,12 @@ void ui_compositor_upd(char* id,
 
   // increase cache index
   uic.cache_ind++;
+}
+
+void ui_compositor_upd_vis(int index, char hidden)
+{
+  crect_t* rect = uic.cache->data[index];
+  rect->hidden  = hidden;
 }
 
 void ui_compositor_upd_pos(int index, r2_t frame, float border)

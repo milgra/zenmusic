@@ -8,6 +8,7 @@
 typedef struct _vh_list_t
 {
   vec_t* items;
+  vec_t* cache;
 
   int head_index;
   int tail_index;
@@ -25,14 +26,15 @@ typedef struct _vh_list_t
   uint32_t vtimeout;
   uint32_t htimeout;
 
-  view_t* (*gen_row)(view_t* listview, int index, int* item_count);
-  void (*rec_row)(view_t* listview, view_t* rowview);
+  view_t* (*create_item)(view_t* listview);
+  int (*update_item)(view_t* listview, view_t* item, int index, int* item_count);
 } vh_list_t;
 
 void    vh_list_add(view_t* view,
-                    view_t* (*gen_row)(view_t* listview, int index, int* item_count),
-                    void (*rec_row)(view_t* listview, view_t* rowview));
+                    view_t* (*create_item)(view_t* listview),
+                    int (*update_item)(view_t* listview, view_t* item, int index, int* item_count));
 vec_t*  vh_list_items(view_t* view);
+vec_t*  vh_list_cache(view_t* view);
 void    vh_list_fill(view_t* view);
 void    vh_list_reset(view_t* view);
 view_t* vh_list_item_for_index(view_t* view, int index);
@@ -91,6 +93,19 @@ void vh_list_move(view_t* view, float dy)
   view_set_frame(vh->hscr, (r2_t){p, view->frame.local.h - 15.0, s, 15.0});
 }
 
+view_t* vh_list_get_item(view_t* view)
+{
+  vh_list_t* vh = view->handler_data;
+  if (vh->cache->length == 0)
+  {
+    view_t* item = (*vh->create_item)(view);
+    VADD(vh->cache, item);
+    view_add(view, item);
+    view_set_hidden(item, 1, 1);
+  }
+  return vec_head(vh->cache);
+}
+
 void vh_list_evt(view_t* view, ev_t ev)
 {
   vh_list_t* vh = view->handler_data;
@@ -101,13 +116,20 @@ void vh_list_evt(view_t* view, ev_t ev)
     {
       if (vh->items->length == 0)
       {
-        view_t* rowitem = (*vh->gen_row)(view, 0, &vh->item_count);
+        view_t* item = vh_list_get_item(view);
+        int     full = (*vh->update_item)(view, item, 0, &vh->item_count);
 
-        if (rowitem)
+        printf("full %i item %i\n", full, item == NULL);
+
+        if (!full)
         {
-          vh->item_wth = rowitem->frame.global.w; // store maximum width
-          VADD(vh->items, rowitem);
-          if (rowitem->parent == NULL) view_insert(view, rowitem, 0);
+          VREM(vh->cache, item);
+          VADD(vh->items, item);
+          view_set_hidden(item, 0, 1);
+
+          vh->item_wth = item->frame.global.w; // store maximum width
+
+          view_set_frame(item, (r2_t){0, 0, item->frame.local.w, item->frame.local.h});
         }
         else
           vh->full = 1;
@@ -121,19 +143,20 @@ void vh_list_evt(view_t* view, ev_t ev)
 
         if (head->frame.local.y > 0.0 - PRELOAD_DISTANCE)
         {
-          view_t* rowitem = (*vh->gen_row)(view, vh->head_index - 1, &vh->item_count);
+          view_t* item = vh_list_get_item(view);
+          int     full = (*vh->update_item)(view, item, vh->head_index - 1, &vh->item_count);
 
-          if (rowitem)
+          if (!full)
           {
-            vh->full     = 0;                       // there is probably more to come
-            vh->item_wth = rowitem->frame.global.w; // store maximum width
+            VREM(vh->cache, item);
+            vec_addatindex(vh->items, item, 0);
+            view_set_hidden(item, 0, 1);
 
-            vec_addatindex(vh->items, rowitem, 0);
+            vh->full     = 0;                    // there is probably more to come
+            vh->item_wth = item->frame.global.w; // store maximum width
+            vh->head_index -= 1;                 // decrease head index
 
-            if (rowitem->parent == NULL) view_insert(view, rowitem, 0);
-            view_set_frame(rowitem, (r2_t){0, head->frame.local.y - rowitem->frame.local.h, rowitem->frame.local.w, rowitem->frame.local.h});
-
-            vh->head_index -= 1;
+            view_set_frame(item, (r2_t){0, head->frame.local.y - item->frame.local.h, item->frame.local.w, item->frame.local.h});
           }
           else
             vh->full = 1;
@@ -143,42 +166,43 @@ void vh_list_evt(view_t* view, ev_t ev)
 
         if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h + PRELOAD_DISTANCE)
         {
-          view_t* rowitem = (*vh->gen_row)(view, vh->tail_index + 1, &vh->item_count);
+          view_t* item = vh_list_get_item(view);
+          int     full = (*vh->update_item)(view, item, vh->tail_index + 1, &vh->item_count);
 
-          if (rowitem)
+          if (!full)
           {
-            vh->full     = 0;                       // there is probably more to come
-            vh->item_wth = rowitem->frame.global.w; // store maximum width
+            VREM(vh->cache, item);
+            VADD(vh->items, item);
+            view_set_hidden(item, 0, 1);
 
-            VADD(vh->items, rowitem);
+            vh->full     = 0;                    // there is probably more to come
+            vh->item_wth = item->frame.global.w; // store maximum width
+            vh->tail_index += 1;                 // increase tail index
 
-            if (rowitem->parent == NULL) view_insert(view, rowitem, view->views->length - 3);
-            view_set_frame(rowitem, (r2_t){0, tail->frame.local.y + tail->frame.local.h, rowitem->frame.local.w, rowitem->frame.local.h});
-
-            vh->tail_index += 1;
+            view_set_frame(item, (r2_t){0, tail->frame.local.y + tail->frame.local.h, item->frame.local.w, item->frame.local.h});
           }
           else
-            vh->full &= 1;
+            vh->full &= 1; // don't set to full if previously item is added
         }
         else
-          vh->full &= 1;
+          vh->full &= 1; // don't set to full if previously item is added
 
         // remove items if needed
 
         if (head->frame.local.y + head->frame.local.h < 0.0 - PRELOAD_DISTANCE && vh->items->length > 1)
         {
-          (*vh->rec_row)(view, head);
+          VADD(vh->cache, head);
           VREM(vh->items, head);
           vh->head_index += 1;
-          view_remove(view, head);
+          view_set_hidden(head, 1, 1);
         }
 
         if (tail->frame.local.y > view->frame.local.h + PRELOAD_DISTANCE && vh->items->length > 1)
         {
-          (*vh->rec_row)(view, tail);
+          VADD(vh->cache, tail);
           VREM(vh->items, tail);
           vh->tail_index -= 1;
-          view_remove(view, tail);
+          view_set_hidden(tail, 1, 1);
         }
       }
     }
@@ -268,6 +292,12 @@ vec_t* vh_list_items(view_t* view)
   return vh->items;
 }
 
+vec_t* vh_list_cache(view_t* view)
+{
+  vh_list_t* vh = view->handler_data;
+  return vh->cache;
+}
+
 void vh_list_fill(view_t* view)
 {
   vh_list_t* vh = view->handler_data;
@@ -287,13 +317,14 @@ void vh_list_reset(view_t* view)
 }
 
 void vh_list_add(view_t* view,
-                 view_t* (*gen_row)(view_t* listview, int index, int* item_count),
-                 void (*rec_row)(view_t* listview, view_t* rowview))
+                 view_t* (*create_item)(view_t* listview),
+                 int (*update_item)(view_t* listview, view_t* item, int index, int* item_count))
 {
-  vh_list_t* vh = mem_calloc(sizeof(vh_list_t), "vh_list", vh_list_del, NULL);
-  vh->items     = VNEW();
-  vh->gen_row   = gen_row;
-  vh->rec_row   = rec_row;
+  vh_list_t* vh   = mem_calloc(sizeof(vh_list_t), "vh_list", vh_list_del, NULL);
+  vh->items       = VNEW();
+  vh->cache       = VNEW();
+  vh->create_item = create_item;
+  vh->update_item = update_item;
 
   view_t* vscr = view_new("vscr", (r2_t){0, 0, 15, 0});
   view_t* hscr = view_new("hscr", (r2_t){0, 10, 0, 10});

@@ -114,6 +114,12 @@ void ui_generator_render(uint32_t time)
       view->frame.dim_changed = 0;
       view->texture.changed   = 0;
     }
+
+    if (view->vis_changed)
+    {
+      ui_compositor_upd_vis(i, view->hidden);
+      view->vis_changed = 0;
+    }
   }
 
   ui_compositor_render(time);

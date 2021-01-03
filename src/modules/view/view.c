@@ -116,7 +116,8 @@ typedef struct _frame_t
 typedef struct _view_t view_t;
 struct _view_t
 {
-  char hidden;   /* exclude from rendering */
+  char hidden; /* exclude from rendering */
+  char vis_changed;
   char overflow; /* enable content outside frame */
 
   char needs_key;    /* accepts key events */
@@ -151,6 +152,7 @@ void view_gen_texture(view_t* view);
 
 void view_set_frame(view_t* view, r2_t frame);
 void view_set_layout(view_t* view, vlayout_t layout);
+void view_set_hidden(view_t* view, char hidden, char recursive);
 void view_set_texture_bmp(view_t* view, bm_t* tex);
 void view_set_texture_id(view_t* view, char* id);
 void view_set_texture_page(view_t* view, uint32_t page);
@@ -307,6 +309,18 @@ void view_set_frame(view_t* view, r2_t frame)
 {
   view->frame.local = frame;
   view_calc_global(view);
+}
+
+void view_set_hidden(view_t* view, char hidden, char recursive)
+{
+  view->hidden      = hidden;
+  view->vis_changed = 1;
+
+  if (recursive)
+  {
+    view_t* v;
+    while ((v = VNXT(view->views))) view_set_hidden(v, hidden, recursive);
+  }
 }
 
 void view_set_texture_bmp(view_t* view, bm_t* bitmap)

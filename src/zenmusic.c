@@ -67,7 +67,6 @@ uint32_t selected_index = UINT32_MAX;
 uint32_t selected_color = 0x55FF55FF;
 
 vec_t* songlist_fields;
-vec_t* songitem_cache;
 
 void seek_ratio_changed(view_t* view, float angle)
 {
@@ -242,35 +241,41 @@ void songitem_on_select(view_t* view, uint32_t index)
   player_play(MGET(songmap, "path"));
 }
 
-void songlist_item_recycler(view_t* listview, view_t* rowview)
+vec_t* messages;
+
+view_t* messagelist_create_item(view_t* listview)
 {
-  VADD(songitem_cache, rowview);
+  return NULL;
 }
 
-view_t* songlist_item_generator(view_t* listview, int index, int* count)
+int messagelist_update_item(view_t* listview, view_t* item, int index, int* item_count)
+{
+  return 1;
+}
+
+view_t* songlist_create_item(view_t* listview)
+{
+  return songitem_new(fontpath, songitem_on_select, songlist_fields);
+}
+
+int songlist_update_item(view_t* listview, view_t* item, int index, int* item_count)
 {
   if (index < 0)
-    return NULL; // no items over 0
+    return 1; // no items before 0
   if (index >= vec_srt->length)
-    return NULL;
+    return 1; // no more items
 
-  view_t* rowview = vec_head(songitem_cache);
-  if (rowview)
-    VREM(songitem_cache, rowview);
-  else
-    rowview = songitem_new(fontpath, songitem_on_select, songlist_fields);
-
-  *count = vec_srt->length;
+  *item_count = vec_srt->length;
 
   if (selected_index == index)
   {
-    songitem_select(rowview, index, vec_srt->data[index], fontpath, songlist_fields, selected_color);
+    songitem_select(item, index, vec_srt->data[index], fontpath, songlist_fields, selected_color);
   }
   else
   {
-    songitem_update(rowview, index, vec_srt->data[index], fontpath, songlist_fields);
+    songitem_update(item, index, vec_srt->data[index], fontpath, songlist_fields);
   }
-  return rowview;
+  return 0;
 }
 
 void sort(char* field)
@@ -302,7 +307,8 @@ void on_header_field_insert(view_t* view, int src, int tgt)
 
   // update all items and cache
   view_t* item;
-  while ((item = VNXT(songitem_cache)))
+  vec_t*  cache = vh_list_cache(songlist);
+  while ((item = VNXT(cache)))
   {
     vh_litem_swp_cell(item, src, tgt);
   }
@@ -327,7 +333,8 @@ void on_header_field_resize(view_t* view, char* id, int size)
   }
   // update all items and cache
   view_t* item;
-  while ((item = VNXT(songitem_cache)))
+  vec_t*  cache = vh_list_cache(songlist);
+  while ((item = VNXT(cache)))
   {
     vh_litem_upd_cell_size(item, id, size);
   }
@@ -371,9 +378,7 @@ void init(int width, int height)
 
   songlist = view_get_subview(baseview, "songlist");
 
-  vh_list_add(songlist, songlist_item_generator, songlist_item_recycler);
-
-  songitem_cache = VNEW();
+  vh_list_add(songlist, songlist_create_item, songlist_update_item);
 
   songlist_fields = VNEW();
   VADD(songlist_fields, sitem_cell_new("index", 50, 0));
@@ -391,6 +396,8 @@ void init(int width, int height)
   display       = view_get_subview(baseview, "display");
   messagelist   = view_get_subview(baseview, "messagelist");
   header_center = view_get_subview(baseview, "header_center");
+
+  vh_list_add(messagelist, messagelist_create_item, messagelist_update_item);
 
   vh_button_add(display, NULL, on_display);
   vh_button_add(messagelist, NULL, on_messagelist);
