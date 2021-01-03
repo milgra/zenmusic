@@ -14,8 +14,8 @@ typedef struct _sitem_cell_t
 sitem_cell_t* sitem_cell_new(char* id, int size, int index);
 
 view_t* songitem_new(char* fontpath, void (*on_select)(view_t* view, uint32_t index), vec_t* fields);
-void    songitem_update(view_t* rowview, int index, map_t* file, char* fontpath);
-void    songitem_select(view_t* rowview, int index, map_t* file, char* fontpath, uint32_t color);
+void    songitem_update(view_t* rowview, int index, map_t* file, char* fontpath, vec_t* fields);
+void    songitem_select(view_t* rowview, int index, map_t* file, char* fontpath, vec_t* fields, uint32_t color);
 
 #endif
 
@@ -67,7 +67,7 @@ view_t* songitem_new(char* fontpath, void (*on_select)(view_t* view, uint32_t in
   return rowview;
 }
 
-void songitem_update(view_t* rowview, int index, map_t* file, char* fontpath)
+void songitem_update(view_t* rowview, int index, map_t* file, char* fontpath, vec_t* fields)
 {
   uint32_t color1 = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
   uint32_t color2 = (index % 2 == 0) ? 0xE5E5E5FF : 0xEFEFEFFF;
@@ -86,13 +86,20 @@ void songitem_update(view_t* rowview, int index, map_t* file, char* fontpath)
   ts.backcolor   = color1;
 
   vh_litem_upd(rowview, index);
+
+  sitem_cell_t* cell;
+  while ((cell = VNXT(fields)))
+  {
+    if (MGET(file, cell->id))
+      vh_litem_upd_cell(rowview, cell->id, &((cr_text_data_t){.style = ts, .text = MGET(file, cell->id)}));
+    else
+      vh_litem_upd_cell(rowview, cell->id, &((cr_text_data_t){.style = ts, .text = "-"}));
+  }
+
   vh_litem_upd_cell(rowview, "index", &((cr_text_data_t){.style = ts, .text = indbuffer}));
-  vh_litem_upd_cell(rowview, "artist", &((cr_text_data_t){.style = ts, .text = MGET(file, "artist")}));
-  vh_litem_upd_cell(rowview, "title", &((cr_text_data_t){.style = ts, .text = MGET(file, "title")}));
-  //  vh_litem_upd_cell(rowview, "genre", &((cr_text_data_t){.style = ts, .text = MGET(file, "genre")}));
 }
 
-void songitem_select(view_t* rowview, int index, map_t* file, char* fontpath, uint32_t color)
+void songitem_select(view_t* rowview, int index, map_t* file, char* fontpath, vec_t* fields, uint32_t color)
 {
   char indbuffer[6];
   if (index > -1)
@@ -108,9 +115,17 @@ void songitem_select(view_t* rowview, int index, map_t* file, char* fontpath, ui
   ts.backcolor   = color;
 
   vh_litem_upd(rowview, index);
+
+  sitem_cell_t* cell;
+  while ((cell = VNXT(fields)))
+  {
+    if (MGET(file, cell->id))
+      vh_litem_upd_cell(rowview, cell->id, &((cr_text_data_t){.style = ts, .text = MGET(file, cell->id)}));
+    else
+      vh_litem_upd_cell(rowview, cell->id, &((cr_text_data_t){.style = ts, .text = "-"}));
+  }
+
   vh_litem_upd_cell(rowview, "index", &((cr_text_data_t){.style = ts, .text = indbuffer}));
-  vh_litem_upd_cell(rowview, "artist", &((cr_text_data_t){.style = ts, .text = MGET(file, "artist")}));
-  vh_litem_upd_cell(rowview, "title", &((cr_text_data_t){.style = ts, .text = MGET(file, "title")}));
 }
 
 #endif

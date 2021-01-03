@@ -95,7 +95,7 @@ void toggle_pause()
 
   view_t* item = vh_list_item_for_index(songlist, selected_index);
 
-  if (item) songitem_select(item, selected_index, vec_srt->data[selected_index], fontpath, selected_color);
+  if (item) songitem_select(item, selected_index, vec_srt->data[selected_index], fontpath, songlist_fields, selected_color);
 }
 
 void play_button_pushed(view_t* view)
@@ -212,7 +212,7 @@ void songitem_on_select(view_t* view, uint32_t index)
 
   if (olditem)
   {
-    songitem_update(olditem, selected_index, vec_srt->data[selected_index], fontpath);
+    songitem_update(olditem, selected_index, vec_srt->data[selected_index], fontpath, songlist_fields);
   }
 
   // indicate list item
@@ -220,7 +220,7 @@ void songitem_on_select(view_t* view, uint32_t index)
 
   if (newitem)
   {
-    songitem_select(newitem, index, vec_srt->data[index], fontpath, selected_color);
+    songitem_select(newitem, index, vec_srt->data[index], fontpath, songlist_fields, selected_color);
   }
   selected_index = index;
 
@@ -264,11 +264,11 @@ view_t* songlist_item_generator(view_t* listview, int index, int* count)
 
   if (selected_index == index)
   {
-    songitem_select(rowview, index, vec_srt->data[index], fontpath, selected_color);
+    songitem_select(rowview, index, vec_srt->data[index], fontpath, songlist_fields, selected_color);
   }
   else
   {
-    songitem_update(rowview, index, vec_srt->data[index], fontpath);
+    songitem_update(rowview, index, vec_srt->data[index], fontpath, songlist_fields);
   }
   return rowview;
 }
@@ -362,8 +362,6 @@ void init(int width, int height)
   view_set_frame(baseview, (r2_t){0.0, 0.0, (float)width, (float)height});
   view_layout(baseview);
 
-  view_desc(baseview, 0);
-
   common_respath = respath;
 
   text_init();
@@ -385,6 +383,10 @@ void init(int width, int height)
   VADD(songlist_fields, sitem_cell_new("genre", 150, 4));
   VADD(songlist_fields, sitem_cell_new("track", 150, 5));
   VADD(songlist_fields, sitem_cell_new("disc", 150, 6));
+  VADD(songlist_fields, sitem_cell_new("plays", 150, 7));
+  VADD(songlist_fields, sitem_cell_new("added", 150, 8));
+  VADD(songlist_fields, sitem_cell_new("last played", 150, 9));
+  VADD(songlist_fields, sitem_cell_new("last skipped", 150, 10));
 
   display       = view_get_subview(baseview, "display");
   messagelist   = view_get_subview(baseview, "messagelist");
@@ -516,13 +518,20 @@ void init(int width, int height)
 
   vh_lhead_add(songlistheader, 30, on_header_field_select, on_header_field_insert, on_header_field_resize);
 
-  vh_lhead_add_cell(songlistheader, "index", 50, cr_text_upd);
-  vh_lhead_add_cell(songlistheader, "artist", 300, cr_text_upd);
-  vh_lhead_add_cell(songlistheader, "title", 300, cr_text_upd);
+  sitem_cell_t* cell;
+  while ((cell = VNXT(songlist_fields)))
+  {
+    vh_lhead_add_cell(songlistheader, cell->id, cell->size, cr_text_upd);
+    vh_lhead_upd_cell(songlistheader, cell->id, cell->size, &((cr_text_data_t){.style = ts, .text = cell->id}));
+  }
 
-  vh_lhead_upd_cell(songlistheader, "index", 30, &((cr_text_data_t){.style = ts, .text = "index"}));
-  vh_lhead_upd_cell(songlistheader, "artist", 200, &((cr_text_data_t){.style = ts, .text = "artist"}));
-  vh_lhead_upd_cell(songlistheader, "title", 300, &((cr_text_data_t){.style = ts, .text = "title"}));
+  /* vh_lhead_add_cell(songlistheader, "index", 50, cr_text_upd); */
+  /* vh_lhead_add_cell(songlistheader, "artist", 300, cr_text_upd); */
+  /* vh_lhead_add_cell(songlistheader, "title", 300, cr_text_upd); */
+
+  /* vh_lhead_upd_cell(songlistheader, "index", 30, &((cr_text_data_t){.style = ts, .text = "index"})); */
+  /* vh_lhead_upd_cell(songlistheader, "artist", 200, &((cr_text_data_t){.style = ts, .text = "artist"})); */
+  /* vh_lhead_upd_cell(songlistheader, "title", 300, &((cr_text_data_t){.style = ts, .text = "title"})); */
 
   view_t* footer = view_get_subview(baseview, "footer");
   footer->hidden = 1;

@@ -28,12 +28,11 @@ freebsd for os
 first version
 
 messages window, log messages
-genre/tags/artist window
-tag editor window
+filter/genre/tags/artist window filter bar klikkre
+tag editor window jobb klikkre
 alapbol minden view hidden legyen, alapbol minden crect full texmap legyen
 listitem hidden legyen 
 move songs to folders
-additional columns - genre, last played, added, skipped, play count,
 fix leaks
 elso indulasnal analyzer progresst mutassa valahol amig zenet hallgatsz
 unicode support files, metadata!!!

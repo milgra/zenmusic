@@ -136,6 +136,8 @@ int ui_generator_workloop()
 void ui_generator_resize(int width, int height)
 {
   ui_compositor_resize(width, height);
+
+  // TODO DO WE NEED TO RESET?!?!
   ui_compositor_reset();
 
   for (int i = 0; i < uig.views->length; i++)
