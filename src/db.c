@@ -7,6 +7,8 @@ void db_read(map_t* db);
 void db_write(map_t* db);
 void db_sort(map_t* db, vec_t* vec, char* field);
 void db_filter(map_t* db, char* text, vec_t* vec);
+void db_genres(map_t* db, vec_t* vec);
+void db_artists(vec_t* vec, vec_t* res);
 
 #endif
 
@@ -147,6 +149,65 @@ void db_sort(map_t* db, vec_t* vec, char* field)
     map_values(db, vec);
     vec_sort(vec, db_comp_artist);
   }
+}
+
+void db_genres(map_t* db, vec_t* res)
+{
+  int ei, gi;
+
+  if (!vec1) vec1 = VNEW();
+
+  vec_reset(res);
+  vec_reset(vec1);
+
+  map_values(db, vec1);
+
+  for (ei = 0;
+       ei < vec1->length;
+       ei++)
+  {
+    map_t* entry = vec1->data[ei];
+    char*  genre = MGET(entry, "genre");
+
+    if (genre)
+    {
+      char found = 0;
+      for (gi = 0; gi < res->length; gi++)
+      {
+        char* act_genre = res->data[gi];
+        if (strcmp(genre, act_genre) == 0)
+        {
+          found = 1;
+          break;
+        }
+      }
+      if (!found) VADD(res, genre);
+    }
+  }
+  printf("db_genres_result $%i\n", res->length);
+}
+
+void db_artists(vec_t* vec, vec_t* res)
+{
+  int ei, gi;
+
+  map_t* artists = MNEW();
+
+  for (ei = 0;
+       ei < vec->length;
+       ei++)
+  {
+    map_t* entry  = vec->data[ei];
+    char*  artist = MGET(entry, "artist");
+
+    if (artist) MPUT(artists, artist, artist);
+  }
+
+  map_values(artists, res);
+
+  REL(artists);
+
+  printf("db_artists_result $%i\n", res->length);
 }
 
 #endif

@@ -60,7 +60,9 @@ uint32_t song_recv_time = 0;
 char*  fontpath;
 vec_t* files;
 map_t* db;
-vec_t* vec_srt;
+vec_t* songs;
+vec_t* genres;
+vec_t* artists;
 ch_t*  libch;
 
 uint32_t selected_index = UINT32_MAX;
@@ -94,7 +96,7 @@ void toggle_pause()
 
   view_t* item = vh_list_item_for_index(songlist, selected_index);
 
-  if (item) songitem_select(item, selected_index, vec_srt->data[selected_index], fontpath, songlist_fields, selected_color);
+  if (item) songitem_select(item, selected_index, songs->data[selected_index], fontpath, songlist_fields, selected_color);
 }
 
 void play_button_pushed(view_t* view)
@@ -134,7 +136,7 @@ void prev_button_pushed(view_t* view, void* data)
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0;
 
-  map_t* songmap = vec_srt->data[lastindex];
+  map_t* songmap = songs->data[lastindex];
   tg_text_set(song, (char*)MGET(songmap, "title"), ts);
   tg_text_set(artist, (char*)MGET(songmap, "artist"), ts);
 
@@ -144,7 +146,7 @@ void prev_button_pushed(view_t* view, void* data)
 void next_button_pushed(view_t* view, void* data)
 {
   lastindex = lastindex + 1;
-  if (lastindex == vec_srt->length) lastindex = files->length - 1;
+  if (lastindex == songs->length) lastindex = files->length - 1;
 
   textstyle_t ts = {0};
   ts.font        = fontpath;
@@ -153,7 +155,7 @@ void next_button_pushed(view_t* view, void* data)
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0;
 
-  map_t* songmap = vec_srt->data[lastindex];
+  map_t* songmap = songs->data[lastindex];
   tg_text_set(song, (char*)MGET(songmap, "title"), ts);
   tg_text_set(artist, (char*)MGET(songmap, "artist"), ts);
 
@@ -162,7 +164,7 @@ void next_button_pushed(view_t* view, void* data)
 
 void rand_button_pushed(view_t* view, void* data)
 {
-  lastindex = rand() % vec_srt->length;
+  lastindex = rand() % songs->length;
 
   textstyle_t ts = {0};
   ts.font        = fontpath;
@@ -171,7 +173,7 @@ void rand_button_pushed(view_t* view, void* data)
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0;
 
-  map_t* songmap = vec_srt->data[lastindex];
+  map_t* songmap = songs->data[lastindex];
   tg_text_set(song, (char*)MGET(songmap, "title"), ts);
   tg_text_set(artist, (char*)MGET(songmap, "artist"), ts);
 
@@ -211,7 +213,7 @@ void songitem_on_select(view_t* view, uint32_t index)
 
   if (olditem)
   {
-    songitem_update(olditem, selected_index, vec_srt->data[selected_index], fontpath, songlist_fields);
+    songitem_update(olditem, selected_index, songs->data[selected_index], fontpath, songlist_fields);
   }
 
   // indicate list item
@@ -219,12 +221,12 @@ void songitem_on_select(view_t* view, uint32_t index)
 
   if (newitem)
   {
-    songitem_select(newitem, index, vec_srt->data[index], fontpath, songlist_fields, selected_color);
+    songitem_select(newitem, index, songs->data[index], fontpath, songlist_fields, selected_color);
   }
   selected_index = index;
 
   // update display
-  map_t* songmap = vec_srt->data[index];
+  map_t* songmap = songs->data[index];
 
   textstyle_t ts = {0};
   ts.font        = fontpath;
@@ -241,16 +243,150 @@ void songitem_on_select(view_t* view, uint32_t index)
   player_play(MGET(songmap, "path"));
 }
 
-vec_t* messages;
+vec_t*   messages;
+uint32_t messageitem_index = 0;
+
+void on_messageitem_select(view_t* view, uint32_t index)
+{
+  printf("on_messageitem_select\n");
+}
+
+void on_artistitem_select(view_t* view, uint32_t index)
+{
+  printf("on_artistitem_select\n");
+}
+
+view_t* artistlist_create_item(view_t* listview)
+{
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = 0;
+  ts.size        = 25.0;
+  ts.textcolor   = 0xFFFFFFFF;
+  ts.backcolor   = 0x00000022;
+
+  char idbuffer[100] = {0};
+  snprintf(idbuffer, 100, "artistlist_item%i", messageitem_index++);
+
+  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
+  rowview->hidden = 1;
+
+  vh_litem_add(rowview, 35, on_artistitem_select);
+  vh_litem_add_cell(rowview, "artist", 150, cr_text_upd);
+
+  return rowview;
+}
+
+int artistlist_update_item(view_t* listview, view_t* item, int index, int* item_count)
+{
+  if (index < 0)
+    return 1; // no items before 0
+  if (index >= artists->length)
+    return 1; // no more items
+
+  *item_count = artists->length;
+
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = 0;
+  ts.size        = 25.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0xFFFFFFFF;
+
+  vh_litem_upd_cell(item, "artist", &((cr_text_data_t){.style = ts, .text = artists->data[index]}));
+
+  return 0;
+}
+
+void on_genreitem_select(view_t* view, uint32_t index)
+{
+  printf("on_genreitem_select\n");
+}
+
+view_t* genrelist_create_item(view_t* listview)
+{
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = 0;
+  ts.size        = 25.0;
+  ts.textcolor   = 0xFFFFFFFF;
+  ts.backcolor   = 0x00000022;
+
+  char idbuffer[100] = {0};
+  snprintf(idbuffer, 100, "genrelist_item%i", messageitem_index++);
+
+  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
+  rowview->hidden = 1;
+
+  vh_litem_add(rowview, 35, on_genreitem_select);
+  vh_litem_add_cell(rowview, "genre", 150, cr_text_upd);
+
+  return rowview;
+}
+
+int genrelist_update_item(view_t* listview, view_t* item, int index, int* item_count)
+{
+  if (index < 0)
+    return 1; // no items before 0
+  if (index >= genres->length)
+    return 1; // no more items
+
+  *item_count = genres->length;
+
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = 0;
+  ts.size        = 25.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0xFFFFFFFF;
+
+  vh_litem_upd_cell(item, "genre", &((cr_text_data_t){.style = ts, .text = genres->data[index]}));
+
+  return 0;
+}
 
 view_t* messagelist_create_item(view_t* listview)
 {
-  return NULL;
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = 0;
+  ts.size        = 25.0;
+  ts.textcolor   = 0xFFFFFFFF;
+  ts.backcolor   = 0x00000022;
+
+  char idbuffer[100] = {0};
+  snprintf(idbuffer, 100, "messagelist_item%i", messageitem_index++);
+
+  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
+  rowview->hidden = 1;
+
+  vh_litem_add(rowview, 35, on_messageitem_select);
+  vh_litem_add_cell(rowview, "message", 150, cr_text_upd);
+
+  printf("messagelist_create_item\n");
+
+  return rowview;
 }
 
 int messagelist_update_item(view_t* listview, view_t* item, int index, int* item_count)
 {
-  return 1;
+  if (index < 0)
+    return 1; // no items before 0
+  if (index >= messages->length)
+    return 1; // no more items
+
+  *item_count = messages->length;
+
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = 0;
+  ts.size        = 25.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0xFFFFFFFF;
+
+  vh_litem_upd_cell(item, "message", &((cr_text_data_t){.style = ts, .text = messages->data[index]}));
+
+  return 0;
 }
 
 view_t* songlist_create_item(view_t* listview)
@@ -262,25 +398,27 @@ int songlist_update_item(view_t* listview, view_t* item, int index, int* item_co
 {
   if (index < 0)
     return 1; // no items before 0
-  if (index >= vec_srt->length)
+  if (index >= songs->length)
     return 1; // no more items
 
-  *item_count = vec_srt->length;
+  *item_count = songs->length;
 
   if (selected_index == index)
   {
-    songitem_select(item, index, vec_srt->data[index], fontpath, songlist_fields, selected_color);
+    songitem_select(item, index, songs->data[index], fontpath, songlist_fields, selected_color);
   }
   else
   {
-    songitem_update(item, index, vec_srt->data[index], fontpath, songlist_fields);
+    songitem_update(item, index, songs->data[index], fontpath, songlist_fields);
   }
   return 0;
 }
 
 void sort(char* field)
 {
-  db_sort(db, vec_srt, field);
+  db_sort(db, songs, field);
+  db_genres(db, genres);
+  db_artists(songs, artists);
   //vh_list_fill(songlist);
   // remove cache as subviews
   /* view_t* row; */
@@ -348,7 +486,7 @@ void on_header_field_resize(view_t* view, char* id, int size)
 void filter(view_t* view, str_t* text)
 {
   char* word = str_cstring(text);
-  db_filter(db, word, vec_srt);
+  db_filter(db, word, songs);
   REL(word);
   vh_list_reset(songlist);
 }
@@ -364,6 +502,12 @@ void init(int width, int height)
 
   vec_t* views = view_gen_load(htmlpath, csspath, respath);
   baseview     = vec_head(views);
+
+  messages = VNEW();
+
+  VADD(messages, cstr_fromcstring("Elso uzenet."));
+  VADD(messages, cstr_fromcstring("Masodik uzenet."));
+  VADD(messages, cstr_fromcstring("Harmadik uzenet."));
 
   // layout to starter size
   view_set_frame(baseview, (r2_t){0.0, 0.0, (float)width, (float)height});
@@ -399,15 +543,22 @@ void init(int width, int height)
 
   vh_list_add(messagelist, messagelist_create_item, messagelist_update_item);
 
+  view_t* genrelist = view_get_subview(baseview, "genrelist");
+  vh_list_add(genrelist, genrelist_create_item, genrelist_update_item);
+
+  view_t* artistlist = view_get_subview(baseview, "artistlist");
+  vh_list_add(artistlist, artistlist_create_item, artistlist_update_item);
+
   vh_button_add(display, NULL, on_display);
-  vh_button_add(messagelist, NULL, on_messagelist);
+  //vh_button_add(messagelist, NULL, on_messagelist);
 
   view_remove(header_center, messagelist);
 
-  mainview   = view_get_subview(baseview, "main");
-  filterlist = view_get_subview(baseview, "filterlist");
+  mainview = view_get_subview(baseview, "main");
 
-  view_remove(mainview, filterlist);
+  /* filterlist = view_get_subview(baseview, "filterlist"); */
+
+  /* view_remove(mainview, filterlist); */
 
   // decrease retain count of cells because of inline allocation
   vec_dec_retcount(songlist_fields);
@@ -546,7 +697,9 @@ void init(int width, int height)
   db    = MNEW();
   libch = ch_new(100);
 
-  vec_srt = VNEW();
+  songs   = VNEW();
+  artists = VNEW();
+  genres  = VNEW();
 
   // read db
   db_read(db);

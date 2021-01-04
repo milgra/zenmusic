@@ -100,8 +100,9 @@ view_t* vh_list_get_item(view_t* view)
   {
     view_t* item = (*vh->create_item)(view);
     VADD(vh->cache, item);
-    view_add(view, item);
-    view_set_hidden(item, 1, 1);
+    view_insert(view, item, 0);
+    //view_set_hidden(item, 1, 1);
+    view_set_frame(item, (r2_t){0, -item->frame.local.h, item->frame.local.w, item->frame.local.h});
   }
   return vec_head(vh->cache);
 }
@@ -119,13 +120,11 @@ void vh_list_evt(view_t* view, ev_t ev)
         view_t* item = vh_list_get_item(view);
         int     full = (*vh->update_item)(view, item, 0, &vh->item_count);
 
-        printf("full %i item %i\n", full, item == NULL);
-
         if (!full)
         {
           VREM(vh->cache, item);
           VADD(vh->items, item);
-          view_set_hidden(item, 0, 1);
+          //view_set_hidden(item, 0, 1);
 
           vh->item_wth = item->frame.global.w; // store maximum width
 
@@ -150,7 +149,7 @@ void vh_list_evt(view_t* view, ev_t ev)
           {
             VREM(vh->cache, item);
             vec_addatindex(vh->items, item, 0);
-            view_set_hidden(item, 0, 1);
+            //view_set_hidden(item, 0, 1);
 
             vh->full     = 0;                    // there is probably more to come
             vh->item_wth = item->frame.global.w; // store maximum width
@@ -173,7 +172,7 @@ void vh_list_evt(view_t* view, ev_t ev)
           {
             VREM(vh->cache, item);
             VADD(vh->items, item);
-            view_set_hidden(item, 0, 1);
+            //view_set_hidden(item, 0, 1);
 
             vh->full     = 0;                    // there is probably more to come
             vh->item_wth = item->frame.global.w; // store maximum width
@@ -194,7 +193,7 @@ void vh_list_evt(view_t* view, ev_t ev)
           VADD(vh->cache, head);
           VREM(vh->items, head);
           vh->head_index += 1;
-          view_set_hidden(head, 1, 1);
+          //view_set_hidden(head, 1, 1);
         }
 
         if (tail->frame.local.y > view->frame.local.h + PRELOAD_DISTANCE && vh->items->length > 1)
@@ -202,7 +201,7 @@ void vh_list_evt(view_t* view, ev_t ev)
           VADD(vh->cache, tail);
           VREM(vh->items, tail);
           vh->tail_index -= 1;
-          view_set_hidden(tail, 1, 1);
+          //view_set_hidden(tail, 1, 1);
         }
       }
     }

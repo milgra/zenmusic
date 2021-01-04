@@ -42,8 +42,8 @@
     background-color: #EEEEEEFF;
     width: 30px;
     height: 30px;
-    left: 5px;
-    top: 5px;
+    right: 185px;
+    top: 60px;
     border-radius: 17px;
     box-shadow: 3px;
 }
@@ -52,8 +52,8 @@
     background-color: #EEEEEEFF;
     width: 30px;
     height: 30px;
-    top:5px;
-    right:5px;
+    top:60px;
+    left: 185px;
     border-radius: 17px;
     box-shadow: 3px;
 }
@@ -98,13 +98,27 @@
 }
 
 #filterlist {
-    width: 700px;
+    width: 500px;
     height: 500px;
     top: 190px;
     margin: auto;
     border-radius: 15px;
     background-color: #FFFFFFFF;
     box-shadow: 3px;
+}
+
+#genrelist {
+    width: 350px;
+    height: 500px;
+    left: 0px;
+    background-color: #FFFFFFFF;
+}
+
+#artistlist {
+    width: 350px;
+    height: 500px;
+    right: 0px;
+    background-color: #FFFFFFFF;
 }
 
 #songlistheader {
@@ -255,7 +269,7 @@
 #playbtn {
     width: 100px;
     height: 100px;
-    margin: auto;
+    right: 65px;
     padding: 15px;
 }
 
@@ -278,7 +292,7 @@
 #volbtn {
     width: 100px;
     height: 100px;
-    margin: auto;
+    left: 65px;
     padding: 15px;
 }
 
