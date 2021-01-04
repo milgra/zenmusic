@@ -12,6 +12,7 @@ typedef enum _sbartype_t
 void vh_sbar_add(view_t* view, sbartype_t type, int steps);
 void vh_sbar_open(view_t* view);
 void vh_sbar_close(view_t* view);
+void vh_sbar_update(view_t* view, float pos, float size);
 
 #endif
 
@@ -26,6 +27,8 @@ typedef struct _vh_sbar_t
   int        step;
   int        steps;
   int        delta;
+  float      pos;
+  float      size;
 } vh_sbar_t;
 
 void vh_sbar_evt(view_t* view, ev_t ev)
@@ -61,12 +64,12 @@ void vh_sbar_evt(view_t* view, ev_t ev)
           if (vh->type == SBAR_V)
           {
             float radius = view->frame.local.w * ratio * 0.5;
-            gfx_circle(bm, bm->w / 2, bm->h / 2, radius, 1, 0x000000FF);
+            gfx_circle(bm, bm->w / 2, vh->pos + vh->size / 2, radius, 1, 0x000000FF);
           }
           else
           {
             float radius = view->frame.local.h * ratio * 0.5;
-            gfx_circle(bm, bm->w / 2, bm->h / 2, radius, 1, 0x000000FF);
+            gfx_circle(bm, vh->pos + vh->size / 2, bm->h / 2, radius, 1, 0x000000FF);
           }
           view->texture.changed = 1;
         }
@@ -78,19 +81,21 @@ void vh_sbar_evt(view_t* view, ev_t ev)
 
           if (vh->type == SBAR_V)
           {
-            float height = (view->frame.local.h - view->frame.local.w) * ratio;
+            float height = vh->size * ratio;
+            float pos    = vh->pos + vh->size / 2 - height / 2;
 
-            gfx_circle(bm, bm->w / 2, bm->h / 2 - height / 2, bm->w / 2, 1, 0x000000FF);
-            gfx_circle(bm, bm->w / 2, bm->h / 2 + height / 2, bm->w / 2, 1, 0x000000FF);
-            gfx_rect(bm, 1, bm->h / 2 - height / 2, bm->w - 2, height, 0x000000FF, 0);
+            gfx_circle(bm, bm->w / 2, pos, bm->w / 2, 1, 0x000000FF);
+            gfx_circle(bm, bm->w / 2, pos + height, bm->w / 2, 1, 0x000000FF);
+            gfx_rect(bm, 1, pos, bm->w - 2, height, 0x000000FF, 0);
           }
           else
           {
-            float width = (view->frame.local.w - view->frame.local.h) * ratio;
+            float width = vh->size * ratio;
+            float pos   = vh->pos + vh->size / 2 - width / 2;
 
-            gfx_circle(bm, bm->w / 2 - width / 2, bm->h / 2, bm->h / 2, 1, 0x000000FF);
-            gfx_circle(bm, bm->w / 2 + width / 2, bm->h / 2, bm->h / 2, 1, 0x000000FF);
-            gfx_rect(bm, bm->w / 2 - width / 2, 1, width, bm->h - 2, 0x000000FF, 0);
+            gfx_circle(bm, pos, bm->h / 2, bm->h / 2, 1, 0x000000FF);
+            gfx_circle(bm, pos + width, bm->h / 2, bm->h / 2, 1, 0x000000FF);
+            gfx_rect(bm, pos, 1, width, bm->h - 2, 0x000000FF, 0);
           }
           view->texture.changed = 1;
         }
@@ -124,6 +129,32 @@ void vh_sbar_close(view_t* view)
   vh_sbar_t* vh = view->handler_data;
   vh->delta     = -1;
   vh->step      = vh->steps - 1;
+}
+
+void vh_sbar_update(view_t* view, float pos, float size)
+{
+  vh_sbar_t* vh = view->handler_data;
+  vh->pos       = pos;
+  vh->size      = size;
+
+  if (vh->step >= vh->steps)
+  {
+    bm_t* bm = view->texture.bitmap;
+    bm_reset(bm);
+    if (vh->type == SBAR_V)
+    {
+      gfx_circle(bm, bm->w / 2, vh->pos, bm->w / 2, 1, 0x000000FF);
+      gfx_circle(bm, bm->w / 2, vh->pos + vh->size, bm->w / 2, 1, 0x000000FF);
+      gfx_rect(bm, 1, vh->pos, bm->w - 2, vh->size, 0x000000FF, 0);
+    }
+    else
+    {
+      gfx_circle(bm, vh->pos, bm->h / 2, bm->h / 2, 1, 0x000000FF);
+      gfx_circle(bm, vh->pos + vh->size, bm->h / 2, bm->h / 2, 1, 0x000000FF);
+      gfx_rect(bm, vh->pos, 1, vh->size, bm->h - 2, 0x000000FF, 0);
+    }
+    view->texture.changed = 1;
+  }
 }
 
 #endif

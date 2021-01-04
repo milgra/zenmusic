@@ -45,6 +45,7 @@ view_t* vh_list_item_for_index(view_t* view, int index);
 
 #include "mtcstring.c"
 #include "mtstring.c"
+#include "tg_css.c"
 #include "tg_text.c"
 #include "vh_anim.c"
 #include "vh_sbar.c"
@@ -72,7 +73,7 @@ void vh_list_move(view_t* view, float dy)
   float s;  // size
   float p;  // position
 
-  // vertical scroller
+  /* // vertical scroller */
   sr = (float)(vh->tail_index - vh->head_index) / (float)vh->item_count;
   pr = (float)(vh->tail_index) / (float)(vh->item_count - (vh->tail_index - vh->head_index));
 
@@ -80,7 +81,7 @@ void vh_list_move(view_t* view, float dy)
   s = view->frame.local.h * sr;
   p = (view->frame.local.h - s) * pr;
 
-  view_set_frame(vh->vscr, (r2_t){view->frame.local.w - 16.0, p, 15.0, s});
+  vh_sbar_update(vh->vscr, p, s);
 
   // horizontal scroller
   sr = view->frame.local.w / vh->item_wth;
@@ -90,7 +91,7 @@ void vh_list_move(view_t* view, float dy)
   s = view->frame.local.w * sr;
   p = (view->frame.local.w - s) * pr;
 
-  view_set_frame(vh->hscr, (r2_t){p, view->frame.local.h - 15.0, s, 15.0});
+  vh_sbar_update(vh->hscr, p, s);
 }
 
 view_t* vh_list_get_item(view_t* view)
@@ -325,8 +326,25 @@ void vh_list_add(view_t* view,
   vh->create_item = create_item;
   vh->update_item = update_item;
 
-  view_t* vscr = view_new("vscr", (r2_t){0, 0, 15, 0});
-  view_t* hscr = view_new("hscr", (r2_t){0, 10, 0, 10});
+  char* vid = cstr_fromformat("%s%s", view->id, "vscr", NULL);
+  char* hid = cstr_fromformat("%s%s", view->id, "hscr", NULL);
+
+  view_t* vscr = view_new(vid, (r2_t){view->frame.local.w - 15, 0, 15, view->frame.local.h});
+  view_t* hscr = view_new(hid, (r2_t){0, view->frame.local.h - 15, view->frame.local.w, 15});
+
+  REL(vid);
+  REL(hid);
+
+  vscr->layout.h_per  = 1.0;
+  vscr->layout.right  = 0;
+  hscr->layout.w_per  = 1.0;
+  hscr->layout.bottom = 0;
+
+  vscr->layout.background_color = 0x00FF00FF;
+  hscr->layout.background_color = 0x00FF00FF;
+
+  tg_css_add(vscr);
+  tg_css_add(hscr);
 
   vh_sbar_add(vscr, SBAR_V, 30);
   vh_sbar_add(hscr, SBAR_H, 30);
