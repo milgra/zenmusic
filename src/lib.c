@@ -114,9 +114,29 @@ int analyzer_thread(void* chptr)
       char* size = MGET(lib_db, path);
       MPUT(curr, "path", path);
       MPUT(curr, "size", size);
-      if (MGET(curr, "title") == NULL) MPUT(curr, "title", path);
-      if (MGET(curr, "artist") == NULL) MPUT(curr, "artist", path);
+
       player_get_metadata(path, curr);
+
+      if (MGET(curr, "artist") == NULL) MPUT(curr, "artist", cstr_fromcstring("-"));
+      if (MGET(curr, "album") == NULL) MPUT(curr, "album", cstr_fromcstring("-"));
+      if (MGET(curr, "title") == NULL)
+      {
+        int index;
+        for (index = strlen(path) - 1; index > -1; --index)
+        {
+          if (path[index] == '/')
+          {
+            index++;
+            break;
+          }
+        }
+
+        int   len   = strlen(path) - index;
+        char* title = mem_calloc(len + 1, "char*", NULL, NULL);
+        memcpy(title, path + index, len);
+
+        MPUT(curr, "title", title);
+      }
       // remove entry from remaining
       vec_rematindex(rem_db, rem_db->length - 1);
       // try to send it to main thread
@@ -156,18 +176,21 @@ void lib_organize(map_t* db)
 
   printf("paths %i\n", paths->length);
 
-  for (int index = 0; index < paths->length; index++)
-  {
-    char*  path  = paths->data[index];
-    map_t* entry = MGET(db, path);
+  /* for (int index = 0; index < paths->length; index++) */
+  /* { */
+  /*   char*  path  = paths->data[index]; */
+  /*   map_t* entry = MGET(db, path); */
 
-    if (entry)
-    {
+  /*   if (entry) */
+  /*   { */
+  /*     char* artist = MGET(entry, "artist"); */
+  /*     char* album  = MGET(entry, "album"); */
 
-      printf("path %s, entry:\n", path);
-      mem_describe(entry, 0);
-    }
-  }
+  /*     char* wanted = cstr_fromformat("%s/%s/%s", "/usr/home/milgra/Music", artist, album); */
+
+  /*     printf("entry path %s, wanted %s\n", path, wanted); */
+  /*   } */
+  /* } */
 }
 
 #endif

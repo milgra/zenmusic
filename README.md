@@ -36,6 +36,7 @@ elso indulasnal analyzer progresst mutassa valahol amig zenet hallgatsz
 unicode support files, metadata!!!
 tilemap is auto-resize legyen duplazassal
 scrollbar drag
+config file - 
 
 ---
 

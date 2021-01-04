@@ -184,7 +184,7 @@ void db_genres(map_t* db, vec_t* res)
       if (!found) VADD(res, genre);
     }
   }
-  printf("db_genres_result $%i\n", res->length);
+  printf("db_genres_result %i\n", res->length);
 }
 
 void db_artists(vec_t* vec, vec_t* res)
@@ -207,7 +207,7 @@ void db_artists(vec_t* vec, vec_t* res)
 
   REL(artists);
 
-  printf("db_artists_result $%i\n", res->length);
+  printf("db_artists_result %i\n", res->length);
 }
 
 #endif

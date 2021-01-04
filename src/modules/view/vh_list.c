@@ -340,8 +340,8 @@ void vh_list_add(view_t* view,
   hscr->layout.w_per  = 1.0;
   hscr->layout.bottom = 0;
 
-  vscr->layout.background_color = 0x00FF00FF;
-  hscr->layout.background_color = 0x00FF00FF;
+  vscr->layout.background_color = 0x00000001;
+  hscr->layout.background_color = 0x00000001;
 
   tg_css_add(vscr);
   tg_css_add(hscr);
