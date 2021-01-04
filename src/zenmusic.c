@@ -683,13 +683,10 @@ void init(int width, int height)
     vh_lhead_upd_cell(songlistheader, cell->id, cell->size, &((cr_text_data_t){.style = ts, .text = cell->id}));
   }
 
-  /* vh_lhead_add_cell(songlistheader, "index", 50, cr_text_upd); */
-  /* vh_lhead_add_cell(songlistheader, "artist", 300, cr_text_upd); */
-  /* vh_lhead_add_cell(songlistheader, "title", 300, cr_text_upd); */
+  view_t* texmap       = view_new("texmap", ((r2_t){0, 0, 100, 100}));
+  texmap->texture.full = 1;
 
-  /* vh_lhead_upd_cell(songlistheader, "index", 30, &((cr_text_data_t){.style = ts, .text = "index"})); */
-  /* vh_lhead_upd_cell(songlistheader, "artist", 200, &((cr_text_data_t){.style = ts, .text = "artist"})); */
-  /* vh_lhead_upd_cell(songlistheader, "title", 300, &((cr_text_data_t){.style = ts, .text = "title"})); */
+  ui_manager_add(texmap);
 
   view_t* footer = view_get_subview(baseview, "footer");
   footer->hidden = 1;
@@ -712,6 +709,8 @@ void init(int width, int height)
 
   // start analyzing new entries
   lib_analyze(libch);
+
+  lib_organize(db);
 
   sort("artist");
 }

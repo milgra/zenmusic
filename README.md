@@ -27,18 +27,15 @@ freebsd for os
 
 first version
 
-messages window, log messages
-filter/genre/tags/artist window filter bar klikkre
-tag editor window jobb klikkre
-alapbol minden view hidden legyen, alapbol minden crect full texmap legyen
-listitem hidden legyen 
 move songs to folders
+tag editor window jobb klikkre
+increase play count
+alapbol minden view hidden legyen, alapbol minden crect full texmap legyen
 fix leaks
 elso indulasnal analyzer progresst mutassa valahol amig zenet hallgatsz
 unicode support files, metadata!!!
 tilemap is auto-resize legyen duplazassal
 scrollbar drag
-jobb halfra vive az egeret song folott id3 editor
 
 ---
 

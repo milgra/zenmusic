@@ -7,6 +7,7 @@
 void lib_read();
 void lib_remove_duplicates(map_t* db);
 void lib_analyze(ch_t* channel);
+void lib_organize(map_t* db);
 
 #endif
 
@@ -92,6 +93,8 @@ void lib_remove_duplicates(map_t* db)
     }
   }
 
+  printf("entries not in db %i\n", lib_db->count);
+
   REL(paths);
 }
 
@@ -142,6 +145,29 @@ void lib_analyze(ch_t* channel)
   map_keys(lib_db, rem_db);
 
   SDL_CreateThread(analyzer_thread, "analyzer", channel);
+}
+
+void lib_organize(map_t* db)
+{
+  // go through all db entries, check path, move if needed
+
+  vec_t* paths = VNEW();
+  map_keys(db, paths);
+
+  printf("paths %i\n", paths->length);
+
+  for (int index = 0; index < paths->length; index++)
+  {
+    char*  path  = paths->data[index];
+    map_t* entry = MGET(db, path);
+
+    if (entry)
+    {
+
+      printf("path %s, entry:\n", path);
+      mem_describe(entry, 0);
+    }
+  }
 }
 
 #endif
