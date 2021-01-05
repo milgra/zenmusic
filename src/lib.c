@@ -171,26 +171,27 @@ void lib_organize(map_t* db)
 {
   // go through all db entries, check path, move if needed
 
-  vec_t* paths = VNEW();
+  fg vec_t* paths = VNEW();
   map_keys(db, paths);
 
   printf("paths %i\n", paths->length);
 
-  /* for (int index = 0; index < paths->length; index++) */
-  /* { */
-  /*   char*  path  = paths->data[index]; */
-  /*   map_t* entry = MGET(db, path); */
+  for (int index = 0; index < paths->length; index++)
+  {
+    char*  path  = paths->data[index];
+    map_t* entry = MGET(db, path);
 
-  /*   if (entry) */
-  /*   { */
-  /*     char* artist = MGET(entry, "artist"); */
-  /*     char* album  = MGET(entry, "album"); */
+    if (entry)
+    {
+      char* artist = MGET(entry, "artist");
+      char* album  = MGET(entry, "album");
+      char* title  = MGET(entry, "title");
 
-  /*     char* wanted = cstr_fromformat("%s/%s/%s", "/usr/home/milgra/Music", artist, album); */
+      char* wanted = cstr_fromformat("%s/%s/%s/%s", "/usr/home/milgra/Music", artist, album, title, NULL);
 
-  /*     printf("entry path %s, wanted %s\n", path, wanted); */
-  /*   } */
-  /* } */
+      printf("entry path %s, wanted %s\n", path, wanted);
+    }
+  }
 }
 
 #endif
