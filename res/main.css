@@ -23,7 +23,7 @@
 
 #songlist {
     height: 100%;
-    background-color: #222222FF;
+    display: none;
     width: 100%;
     overflow: scroll;
 }

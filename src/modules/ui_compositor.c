@@ -303,7 +303,7 @@ void ui_compositor_render(uint32_t time)
     uic.ren_frame = 0;
   }
 
-  gl_clear_framebuffer(TEX_CTX, 0.01, 0.01, 0.01, 1.0);
+  gl_clear_framebuffer(TEX_CTX, 0.8, 0.8, 0.8, 1.0);
   glrect_t reg_full = {0, 0, uic.width, uic.height};
   gl_draw_vertexes_in_framebuffer(TEX_CTX, 0, uic.fb->pos / 5, reg_full, reg_full, SH_TEXTURE);
 }

@@ -683,10 +683,12 @@ void init(int width, int height)
     vh_lhead_upd_cell(songlistheader, cell->id, cell->size, &((cr_text_data_t){.style = ts, .text = cell->id}));
   }
 
-  view_t* texmap       = view_new("texmap", ((r2_t){0, 0, 100, 100}));
-  texmap->needs_touch  = 0;
-  texmap->display      = 1;
-  texmap->texture.full = 1;
+  view_t* texmap        = view_new("texmap", ((r2_t){0, 0, 300, 300}));
+  texmap->needs_touch   = 0;
+  texmap->display       = 1;
+  texmap->texture.full  = 1;
+  texmap->layout.right  = 1;
+  texmap->layout.bottom = 1;
 
   ui_manager_add(texmap);
 
