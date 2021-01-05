@@ -119,6 +119,7 @@ struct _view_t
   char hidden; /* exclude from rendering */
   char vis_changed;
   char overflow; /* enable content outside frame */
+  char display;  /* view should be displayed? */
 
   char needs_key;    /* accepts key events */
   char needs_text;   /* accepts text events */
@@ -195,6 +196,7 @@ view_t* view_new(char* id, r2_t frame)
   view->texture.page = -1;
   view->texture.id   = cstr_fromcstring(id);
   view->needs_touch  = 1;
+  view->display      = 0; // by default no display, tex generators will set this to 1
 
   return view;
 }

@@ -684,6 +684,8 @@ void init(int width, int height)
   }
 
   view_t* texmap       = view_new("texmap", ((r2_t){0, 0, 100, 100}));
+  texmap->needs_touch  = 0;
+  texmap->display      = 1;
   texmap->texture.full = 1;
 
   ui_manager_add(texmap);

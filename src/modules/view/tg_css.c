@@ -94,6 +94,7 @@ void tg_css_gen(view_t* view)
 void tg_css_add(view_t* view)
 {
   view->tex_gen = tg_css_gen;
+  view->display = 1;
 }
 
 #endif

@@ -171,7 +171,7 @@ void lib_organize(map_t* db)
 {
   // go through all db entries, check path, move if needed
 
-  fg vec_t* paths = VNEW();
+  vec_t* paths = VNEW();
   map_keys(db, paths);
 
   printf("paths %i\n", paths->length);

@@ -134,7 +134,7 @@ void ui_manager_add(view_t* view)
 
 void ui_manager_resend(view_t* view)
 {
-  ui_generator_add(view);
+  if (view->display) ui_generator_add(view);
   vec_t* vec = view->views;
   for (int i = 0; i < vec->length; i++) ui_manager_resend(vec->data[i]);
 }
