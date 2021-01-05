@@ -55,7 +55,12 @@ void vh_knob_evt(view_t* view, ev_t ev)
     tg_knob_t* tg = view->tex_gen_data;
 
     float angle = tg->angle - ev.dy / 50.0;
+
     if (angle < 0) angle += 6.28;
+
+    if (tg->angle < 3 * 3.14 / 2 && tg->angle > 3.14 && angle > 3 * 3.14 / 2) angle = tg->angle;
+    if (tg->angle > 3 * 3.14 / 2 && tg->angle < 2 * 3.14 && angle < 3 * 3.14 / 2) angle = tg->angle;
+
     if (angle > 6.28) angle -= 6.28;
     tg_knob_set_angle(view, angle);
     (*vh->ratio_changed)(view, angle);

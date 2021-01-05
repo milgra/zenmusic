@@ -6,6 +6,14 @@ zen media - offline file/media viewer and manager / preview area, file info area
 zen music - offline music player manager and visualizer / video/album area, two spectrum/freq analyzer for stereo channels
 zen image - offline photo/video viewer and library manager / video/image area, location area, info area
 
+
+Zen Music
+
+robust database handling
+zmusdb, text based key-value pairs
+no modification, zmusdb_new created, after succesfull backup it is renamed to zmusdb
+small changes are stored in zmusdb_upd, merged after start
+
 development :
 
 pkg install sdl2 ffmpeg opengl gmake clang-format
@@ -28,7 +36,7 @@ freebsd for os
 first version
 
 message - using library usr/milgra/Music
-tag editor window jobb klikkre
+tag editor window jobb klikkre, album url-t is kezzel kelljen beirni egyelore
 increase play count
 fix leaks
 elso indulasnal analyzer progresst mutassa valahol amig zenet hallgatsz
@@ -39,6 +47,7 @@ text overflow fix
 save small changes to a delta database, add it to the big one at startup
 zenmusic /usr/milgra/Testmusic - select lib folder
 refresh database gomb legyen az egyik, settings, about a masik ketto
+amit releaselni kell, csinalodjon new-val!
 
 ---
 

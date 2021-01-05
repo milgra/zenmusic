@@ -29,6 +29,8 @@
 #include <stdlib.h>
 #include <time.h>
 
+char* libpath = "/home/milgra/Music";
+
 view_t* songlist;
 view_t* coverview;
 view_t* baseview;
@@ -703,10 +705,10 @@ void init(int width, int height)
   genres  = VNEW();
 
   // read db
-  db_read(db);
+  db_read(libpath, db);
 
   // read library
-  lib_read();
+  lib_read(libpath);
 
   // remove existing
   lib_remove_duplicates(db);
@@ -781,14 +783,14 @@ void update(ev_t ev)
       sort("artist");
 
       printf("writing db...\n");
-      db_write(db);
+      db_write(libpath, db);
 
       printf("organizing db...\n");
-      int succ = lib_organize(db);
+      int succ = lib_organize(libpath, db);
       if (succ)
       {
         // save db
-        db_write(db);
+        db_write(libpath, db);
       }
     }
   }

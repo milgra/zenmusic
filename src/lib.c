@@ -4,10 +4,10 @@
 #include "mtchannel.c"
 #include "mtmap.c"
 
-void lib_read();
+void lib_read(char* libpath);
 void lib_remove_duplicates(map_t* db);
 void lib_analyze(ch_t* channel);
-int  lib_organize(map_t* db);
+int  lib_organize(char* libpath, map_t* db);
 
 #endif
 
@@ -36,7 +36,7 @@ static int lib_file_data(const char* fpath, const struct stat* sb, int tflag, st
   /*        ftwbuf->base, */
   /*        fpath + ftwbuf->base); */
 
-  if (tflag != FTW_D)
+  if (tflag == FTW_F)
   {
     // TODO use macro for database name
     if (strstr(fpath, "zmusdb") == NULL)
@@ -53,7 +53,7 @@ static int lib_file_data(const char* fpath, const struct stat* sb, int tflag, st
   return 0; /* To tell nftw() to continue */
 }
 
-void lib_read()
+void lib_read(char* libpath)
 {
   if (lock_db) return;
 
@@ -63,7 +63,7 @@ void lib_read()
   //flags |= FTW_DEPTH;
   flags |= FTW_PHYS;
 
-  nftw("/usr/home/milgra/Testmusic", lib_file_data, 20, flags);
+  nftw(libpath, lib_file_data, 20, flags);
 
   printf("LOG lib read, %i entries found\n", lib_db->count);
 }
@@ -129,21 +129,32 @@ int analyzer_thread(void* chptr)
       if (MGET(curr, "album") == NULL) MPUT(curr, "album", cstr_fromcstring("Unknown"));
       if (MGET(curr, "title") == NULL)
       {
-        int index;
-        for (index = strlen(path) - 1; index > -1; --index)
+        int dotindex;
+        for (dotindex = strlen(path) - 1; dotindex > -1; --dotindex)
         {
-          if (path[index] == '/')
+          if (path[dotindex] == '.') break;
+        }
+
+        int slashindex;
+        for (slashindex = strlen(path) - 1; slashindex > -1; --slashindex)
+        {
+          if (path[slashindex] == '/')
           {
-            index++;
+            slashindex++;
             break;
           }
         }
 
-        int   len   = strlen(path) - index;
-        char* title = mem_calloc(len + 1, "char*", NULL, NULL);
-        memcpy(title, path + index, len);
+        if (dotindex > slashindex)
+        {
+          int   len   = dotindex - slashindex;
+          char* title = mem_calloc(len + 1, "char*", NULL, NULL);
+          memcpy(title, path + slashindex, len);
 
-        MPUT(curr, "title", title);
+          MPUT(curr, "title", title);
+        }
+        else
+          MPUT(curr, "title", path);
       }
       // remove entry from remaining
       vec_rematindex(rem_db, rem_db->length - 1);
@@ -197,7 +208,18 @@ int lib_mkpath(char* file_path, mode_t mode)
   return 0;
 }
 
-int lib_organize(map_t* db)
+char* lib_replace_char(char* str, char find, char replace)
+{
+  char* current_pos = strchr(str, find);
+  while (current_pos)
+  {
+    *current_pos = replace;
+    current_pos  = strchr(current_pos + 1, find);
+  }
+  return str;
+}
+
+int lib_organize(char* libpath, map_t* db)
 {
   // go through all db entries, check path, move if needed
 
@@ -217,6 +239,11 @@ int lib_organize(map_t* db)
       char* album  = MGET(entry, "album");
       char* title  = MGET(entry, "title");
 
+      // remove slashes before directory creation
+
+      lib_replace_char(artist, '/', ' ');
+      lib_replace_char(title, '/', ' ');
+
       int index;
       for (index = strlen(path) - 1; index > -1; --index)
       {
@@ -231,8 +258,8 @@ int lib_organize(map_t* db)
       char* ext = mem_calloc(len + 1, "char*", NULL, NULL);
       memcpy(ext, path + index, len);
 
-      char* new_dirs = cstr_fromformat("%s/%s/%s/", "/usr/home/milgra/Testmusic", artist, album, NULL);
-      char* new_path = cstr_fromformat("%s/%s/%s/%s.%s", "/usr/home/milgra/Testmusic", artist, album, title, ext, NULL);
+      char* new_dirs = cstr_fromformat("%s/%s/%s/", libpath, artist, album, NULL);
+      char* new_path = cstr_fromformat("%s/%s/%s/%s.%s", libpath, artist, album, title, ext, NULL);
 
       if (strcmp(path, new_path) != 0)
       {
@@ -258,8 +285,13 @@ int lib_organize(map_t* db)
         else
           printf("cannot create path %s\n", new_path);
       }
+
+      REL(new_dirs);
+      REL(new_path);
     }
   }
+
+  REL(paths);
 
   return changed;
 }

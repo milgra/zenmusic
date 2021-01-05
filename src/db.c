@@ -3,8 +3,8 @@
 
 #include "mtmap.c"
 
-void db_read(map_t* db);
-void db_write(map_t* db);
+void db_read(char* libpath, map_t* db);
+void db_write(char* libpath, map_t* db);
 void db_sort(map_t* db, vec_t* vec, char* field);
 void db_filter(map_t* db, char* text, vec_t* vec);
 void db_genres(map_t* db, vec_t* vec);
@@ -16,9 +16,12 @@ void db_artists(vec_t* vec, vec_t* res);
 
 #include "mtcstring.c"
 
-void db_read(map_t* db)
+void db_read(char* libpath, map_t* db)
 {
-  char* dbstr = cstr_fromfile("/usr/home/milgra/Testmusic/zmusdb");
+  char* dbpath = cstr_fromformat("%s/zmusdb", libpath, NULL);
+  char* dbstr  = cstr_fromfile(dbpath);
+
+  printf("db_read %s\n", dbpath);
 
   if (dbstr)
   {
@@ -51,21 +54,25 @@ void db_read(map_t* db)
       token = strtok(NULL, "\n");
     }
 
+    REL(dbstr);
+
     printf("LOG db loaded\n");
   }
   else
   {
     printf("LOG No db found.\n");
   }
+
+  REL(dbpath);
 }
 
-void db_write(map_t* db)
+void db_write(char* libpath, map_t* db)
 {
   vec_t* vals = VNEW();
   map_values(db, vals);
 
-  char* new_path = "/usr/home/milgra/Testmusic/zmusdb_new";
-  char* old_path = "/usr/home/milgra/Testmusic/zmusdb";
+  char* new_path = cstr_fromformat("%s/zmusdb_new", libpath, NULL);
+  char* old_path = cstr_fromformat("%s/zmusdb", libpath, NULL);
 
   FILE* f = fopen(new_path, "w");
 
@@ -94,6 +101,12 @@ void db_write(map_t* db)
   int succ = rename(new_path, old_path);
 
   printf("LOG db saved %i\n", succ);
+
+  // cleanup
+
+  REL(vals);
+  REL(new_path);
+  REL(old_path);
 }
 
 char* sort_field = NULL;
@@ -161,6 +174,7 @@ void db_sort(map_t* db, vec_t* vec, char* field)
 
 void db_genres(map_t* db, vec_t* res)
 {
+  // TODO use map like in db_artists
   int ei, gi;
 
   if (!vec1) vec1 = VNEW();
