@@ -712,8 +712,6 @@ void init(int width, int height)
   // start analyzing new entries
   lib_analyze(libch);
 
-  lib_organize(db);
-
   sort("artist");
 }
 
@@ -776,8 +774,20 @@ void update(ev_t ev)
     if (ev.time > song_recv_time + 3000)
     {
       song_refr_flag = 0;
+
+      printf("analyze ready, sorting db...\n");
       sort("artist");
+
+      printf("writing db...\n");
       db_write(db);
+
+      printf("organizing db...\n");
+      int succ = lib_organize(db);
+      if (succ)
+      {
+        // save db
+        db_write(db);
+      }
     }
   }
 

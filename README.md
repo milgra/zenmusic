@@ -27,17 +27,18 @@ freebsd for os
 
 first version
 
-move songs to folders
+message - using library usr/milgra/Music
 tag editor window jobb klikkre
 increase play count
-alapbol minden view hidden legyen, alapbol minden crect full texmap legyen
 fix leaks
 elso indulasnal analyzer progresst mutassa valahol amig zenet hallgatsz
-unicode support files, metadata!!!
 tilemap is auto-resize legyen duplazassal
 scrollbar drag
-config file
+config file - default library
 text overflow fix
+save small changes to a delta database, add it to the big one at startup
+zenmusic /usr/milgra/Testmusic - select lib folder
+refresh database gomb legyen az egyik, settings, about a masik ketto
 
 ---
 

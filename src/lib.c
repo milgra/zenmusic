@@ -7,7 +7,7 @@
 void lib_read();
 void lib_remove_duplicates(map_t* db);
 void lib_analyze(ch_t* channel);
-void lib_organize(map_t* db);
+int  lib_organize(map_t* db);
 
 #endif
 
@@ -15,8 +15,12 @@ void lib_organize(map_t* db);
 
 #include "mtcstring.c"
 #include "player.c"
+#include <errno.h>
 #include <ftw.h>
 #include <limits.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 map_t* lib_db;
 vec_t* rem_db;
@@ -34,12 +38,16 @@ static int lib_file_data(const char* fpath, const struct stat* sb, int tflag, st
 
   if (tflag != FTW_D)
   {
-    char sizestr[20] = {0};
-    snprintf(sizestr, 20, "%li", sb->st_size);
-    char* size = cstr_fromcstring(sizestr);
+    // TODO use macro for database name
+    if (strstr(fpath, "zmusdb") == NULL)
+    {
+      char sizestr[20] = {0};
+      snprintf(sizestr, 20, "%li", sb->st_size);
+      char* size = cstr_fromcstring(sizestr);
 
-    MPUT(lib_db, fpath, size);
-    REL(size);
+      MPUT(lib_db, fpath, size);
+      REL(size);
+    }
   }
 
   return 0; /* To tell nftw() to continue */
@@ -55,7 +63,7 @@ void lib_read()
   //flags |= FTW_DEPTH;
   flags |= FTW_PHYS;
 
-  nftw("/usr/home/milgra/Music", lib_file_data, 20, flags);
+  nftw("/usr/home/milgra/Testmusic", lib_file_data, 20, flags);
 
   printf("LOG lib read, %i entries found\n", lib_db->count);
 }
@@ -117,8 +125,8 @@ int analyzer_thread(void* chptr)
 
       player_get_metadata(path, curr);
 
-      if (MGET(curr, "artist") == NULL) MPUT(curr, "artist", cstr_fromcstring("-"));
-      if (MGET(curr, "album") == NULL) MPUT(curr, "album", cstr_fromcstring("-"));
+      if (MGET(curr, "artist") == NULL) MPUT(curr, "artist", cstr_fromcstring("Unknown"));
+      if (MGET(curr, "album") == NULL) MPUT(curr, "album", cstr_fromcstring("Unknown"));
       if (MGET(curr, "title") == NULL)
       {
         int index;
@@ -167,14 +175,36 @@ void lib_analyze(ch_t* channel)
   SDL_CreateThread(analyzer_thread, "analyzer", channel);
 }
 
-void lib_organize(map_t* db)
+int lib_mkpath(char* file_path, mode_t mode)
+{
+  printf("mkdir %s\n", file_path);
+  assert(file_path && *file_path);
+  for (char* p = strchr(file_path + 1, '/');
+       p;
+       p = strchr(p + 1, '/'))
+  {
+    *p = '\0';
+    if (mkdir(file_path, mode) == -1)
+    {
+      if (errno != EEXIST)
+      {
+        *p = '/';
+        return -1;
+      }
+    }
+    *p = '/';
+  }
+  return 0;
+}
+
+int lib_organize(map_t* db)
 {
   // go through all db entries, check path, move if needed
 
-  vec_t* paths = VNEW();
-  map_keys(db, paths);
+  int    changed = 0;
+  vec_t* paths   = VNEW();
 
-  printf("paths %i\n", paths->length);
+  map_keys(db, paths);
 
   for (int index = 0; index < paths->length; index++)
   {
@@ -187,11 +217,51 @@ void lib_organize(map_t* db)
       char* album  = MGET(entry, "album");
       char* title  = MGET(entry, "title");
 
-      char* wanted = cstr_fromformat("%s/%s/%s/%s", "/usr/home/milgra/Music", artist, album, title, NULL);
+      int index;
+      for (index = strlen(path) - 1; index > -1; --index)
+      {
+        if (path[index] == '.')
+        {
+          index++;
+          break;
+        }
+      }
 
-      printf("entry path %s, wanted %s\n", path, wanted);
+      int   len = strlen(path) - index;
+      char* ext = mem_calloc(len + 1, "char*", NULL, NULL);
+      memcpy(ext, path + index, len);
+
+      char* new_dirs = cstr_fromformat("%s/%s/%s/", "/usr/home/milgra/Testmusic", artist, album, NULL);
+      char* new_path = cstr_fromformat("%s/%s/%s/%s.%s", "/usr/home/milgra/Testmusic", artist, album, title, ext, NULL);
+
+      if (strcmp(path, new_path) != 0)
+      {
+        printf("moving %s to %s\n", path, new_path);
+
+        int error = lib_mkpath(new_dirs, 0777);
+
+        if (error == 0)
+        {
+          error = rename(path, new_path);
+
+          if (error == 0)
+          {
+            printf("updating path in db,\n");
+            MPUT(entry, "path", new_path);
+            MPUT(db, new_path, entry);
+            MDEL(db, path);
+            changed = 1;
+          }
+          else
+            printf("cannot rename file %s %s %s\n", path, new_path, strerror(errno));
+        }
+        else
+          printf("cannot create path %s\n", new_path);
+      }
     }
   }
+
+  return changed;
 }
 
 #endif

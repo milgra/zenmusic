@@ -18,7 +18,7 @@ void db_artists(vec_t* vec, vec_t* res);
 
 void db_read(map_t* db)
 {
-  char* dbstr = cstr_fromfile("zenmusic");
+  char* dbstr = cstr_fromfile("/usr/home/milgra/Testmusic/zmusdb");
 
   if (dbstr)
   {
@@ -64,7 +64,10 @@ void db_write(map_t* db)
   vec_t* vals = VNEW();
   map_values(db, vals);
 
-  FILE* f = fopen("zenmusic", "w");
+  char* new_path = "/usr/home/milgra/Testmusic/zmusdb_new";
+  char* old_path = "/usr/home/milgra/Testmusic/zmusdb";
+
+  FILE* f = fopen(new_path, "w");
 
   for (int index = 0; index < vals->length; index++)
   {
@@ -82,10 +85,15 @@ void db_write(map_t* db)
     REL(keys);
   }
 
+  // TODO check file operations, don't rename db if failed
   fclose(f);
   REL(vals);
 
-  printf("LOG db saved");
+  // after successful write, copy new db to main db
+
+  int succ = rename(new_path, old_path);
+
+  printf("LOG db saved %i\n", succ);
 }
 
 char* sort_field = NULL;
