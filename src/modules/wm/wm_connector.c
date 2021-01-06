@@ -60,9 +60,6 @@ void wm_init(void (*init)(int, int),
     int32_t width  = displaymode.w;
     int32_t height = displaymode.h;
 
-    width  = 953;
-    height = 1042;
-
     wm_window = SDL_CreateWindow("Zen Music",
                                  SDL_WINDOWPOS_UNDEFINED,
                                  SDL_WINDOWPOS_UNDEFINED,

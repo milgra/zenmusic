@@ -53,6 +53,7 @@ get extension from stream for organizing
 relative paths in library
 track number in song name for organizing
 
+test texture resize and reset, texture overflow and reset
 ---
 
 next version

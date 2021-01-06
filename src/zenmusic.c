@@ -262,13 +262,6 @@ void on_artistitem_select(view_t* view, uint32_t index)
 
 view_t* artistlist_create_item(view_t* listview)
 {
-  textstyle_t ts = {0};
-  ts.font        = fontpath;
-  ts.align       = 0;
-  ts.size        = 25.0;
-  ts.textcolor   = 0xFFFFFFFF;
-  ts.backcolor   = 0x00000022;
-
   char idbuffer[100] = {0};
   snprintf(idbuffer, 100, "artistlist_item%i", messageitem_index++);
 
@@ -276,7 +269,7 @@ view_t* artistlist_create_item(view_t* listview)
   //rowview->hidden = 1;
 
   vh_litem_add(rowview, 35, on_artistitem_select);
-  vh_litem_add_cell(rowview, "artist", 500, cr_text_upd);
+  vh_litem_add_cell(rowview, "artist", 250, cr_text_upd);
 
   return rowview;
 }
@@ -292,7 +285,7 @@ int artistlist_update_item(view_t* listview, view_t* item, int index, int* item_
 
   textstyle_t ts = {0};
   ts.font        = fontpath;
-  ts.align       = 0;
+  ts.align       = TA_LEFT;
   ts.size        = 25.0;
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0xFFFFFFFF;
@@ -309,14 +302,6 @@ void on_genreitem_select(view_t* view, uint32_t index)
 
 view_t* genrelist_create_item(view_t* listview)
 {
-  textstyle_t ts = {0};
-  ts.font        = fontpath;
-  ts.align       = 0;
-  ts.margin      = 5;
-  ts.size        = 25.0;
-  ts.textcolor   = 0xFFFFFFFF;
-  ts.backcolor   = 0x00000022;
-
   char idbuffer[100] = {0};
   snprintf(idbuffer, 100, "genrelist_item%i", messageitem_index++);
 
@@ -324,7 +309,7 @@ view_t* genrelist_create_item(view_t* listview)
   rowview->hidden = 1;
 
   vh_litem_add(rowview, 35, on_genreitem_select);
-  vh_litem_add_cell(rowview, "genre", 150, cr_text_upd);
+  vh_litem_add_cell(rowview, "genre", 230, cr_text_upd);
 
   return rowview;
 }
@@ -340,7 +325,8 @@ int genrelist_update_item(view_t* listview, view_t* item, int index, int* item_c
 
   textstyle_t ts = {0};
   ts.font        = fontpath;
-  ts.align       = 0;
+  ts.align       = TA_RIGHT;
+  ts.margin      = 0;
   ts.size        = 25.0;
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0xFFFFFFFF;
@@ -352,13 +338,6 @@ int genrelist_update_item(view_t* listview, view_t* item, int index, int* item_c
 
 view_t* messagelist_create_item(view_t* listview)
 {
-  textstyle_t ts = {0};
-  ts.font        = fontpath;
-  ts.align       = 0;
-  ts.size        = 25.0;
-  ts.textcolor   = 0xFFFFFFFF;
-  ts.backcolor   = 0x00000022;
-
   char idbuffer[100] = {0};
   snprintf(idbuffer, 100, "messagelist_item%i", messageitem_index++);
 
@@ -677,15 +656,6 @@ void init(int width, int height)
 
   ts.size      = 25.0;
   ts.backcolor = 0xEFEFEFFF;
-
-  view_t* genrebtn  = view_get_subview(baseview, "genrebtn");
-  view_t* artistbtn = view_get_subview(baseview, "artistbtn");
-
-  tg_text_add(genrebtn);
-  tg_text_add(artistbtn);
-
-  tg_text_set(genrebtn, "genre/tags", ts);
-  tg_text_set(artistbtn, "artists", ts);
 
   view_t* maxbtn   = view_get_subview(baseview, "maxicon");
   view_t* closebtn = view_get_subview(baseview, "closeicon");

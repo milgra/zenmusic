@@ -34,7 +34,8 @@ typedef struct _glrect_t
 } glrect_t;
 
 void     gl_init();
-glrect_t gl_get_texture(uint32_t i, uint32_t w, uint32_t h);
+void     gl_del_texture(uint32_t i);
+glrect_t gl_new_texture(uint32_t i, int size);
 void     gl_upload_vertexes(fb_t* fb);
 void     gl_upload_to_texture(int page, int x, int y, int w, int h, void* data);
 void     gl_clear_framebuffer(int page, float r, float g, float b, float a);
@@ -338,25 +339,21 @@ void gl_init(width, height)
   gl.vertexes[1] = create_buffer();
 }
 
-glrect_t gl_get_texture(uint32_t page, uint32_t w, uint32_t h)
+glrect_t gl_new_texture(uint32_t page, int size)
 {
   assert(page < TEX_CTX); /* 0 is reserved for context's default framebuffer */
-  assert(w > 0 && h > 0); /* shouldn't create 0x0 texture */
 
-  if (gl.textures[page].w == 0)
-  {
-    int x = 256;
-    int y = 256;
-    while (x < w) x *= 2;
-    while (y < h) y *= 2;
-    gl.textures[page] = gl_create_texture(page, 4096, 4096);
-  }
+  if (gl.textures[page].w == 0) gl.textures[page] = gl_create_texture(page, size, size);
 
   gltex_t tex = gl.textures[page];
 
   printf("gl_get_texture page %i index %i name %i\n", page, tex.index, tex.tx);
 
   return ((glrect_t){.w = tex.w, .h = tex.h});
+}
+
+void gl_del_texture(uint32_t i)
+{
 }
 
 void gl_upload_vertexes(fb_t* fb)

@@ -78,6 +78,7 @@ struct uic_t
   int   width;
   int   height;
   int   tex_page;
+  int   tex_size;
   int   upd_geo; // update geometry
 
   vec_t* cache;
@@ -89,6 +90,28 @@ struct uic_t
   uint32_t ren_frame;
 } uic = {0};
 
+void ui_compositor_reset_textures(size)
+{
+  printf("ui compositor reset textures %i\n", size);
+  if (uic.tex_size > 0)
+  {
+    REL(uic.tm); // del texmap
+
+    gl_del_texture(0); // del texture for texmap
+    gl_del_texture(1); // del texture for mask
+
+    for (int i = 2; i <= uic.tex_page; i++) gl_del_texture(i); // custom textures
+  }
+
+  uic.tm       = tm_new(size, size);
+  uic.tex_size = size;
+
+  gl_new_texture(0, size); // texture for texmap
+  gl_new_texture(1, size); // texture for mask
+
+  for (int i = 2; i <= uic.tex_page; i++) gl_new_texture(i, size); // custom textures
+}
+
 void ui_compositor_init(int width, int height)
 {
   gl_init();
@@ -97,18 +120,18 @@ void ui_compositor_init(int width, int height)
   uic.height = height;
 
   uic.fb = fb_new();
-  uic.tm = tm_new(4096, 4096);
 
   uic.cache     = VNEW();
   uic.cache_ind = 0;
   uic.upd_geo   = 1;
+  uic.tex_page  = 2;
 
-  // TODO texture dimensions should be bigger than screen size
-  gl_get_texture(0, 4096, 4096); // texture for texmap
-  gl_get_texture(1, 4096, 4096); // texture for mask
-  gl_get_texture(2, 4096, 4096); // texture for mask
+  int size = width < height ? height : width;
+  size     = size < 4096 ? 4096 : size;
+  int sqr  = 256;
+  while (sqr < size) sqr *= 2;
 
-  uic.tex_page = 3; // new textures should start from 2
+  ui_compositor_reset_textures(sqr);
 }
 
 void ui_compositor_rewind()
@@ -193,8 +216,9 @@ void ui_compositor_add(char* id,
     if (frame.w > 0 && frame.h > 0)
     {
       // use view dimensions as texture dimensions in case of external texture
-      glrect_t tex_dim = gl_get_texture(page, frame.w, frame.h);
-      crect_set_texture(rect, 0.0, 0.0, frame.w / (float)tex_dim.w, frame.h / (float)tex_dim.h);
+      glrect_t tex_dim = gl_new_texture(page, uic.tex_size);
+      // TODO reset this on texture resize
+      crect_set_texture(rect, 0.0, 0.0, frame.w / (float)uic.tex_size, frame.h / (float)uic.tex_size);
     }
   }
   else
