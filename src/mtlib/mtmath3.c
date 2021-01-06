@@ -1,4 +1,6 @@
-
+/*
+  Milan Toth's 3D math functions
+ */
 
 #ifndef __c36__math3__
 #define __c36__math3__

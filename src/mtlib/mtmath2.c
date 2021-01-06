@@ -1,3 +1,6 @@
+/*
+  Milan Toth's 2D math functions
+ */
 
 #ifndef math2_h
 #define math2_h

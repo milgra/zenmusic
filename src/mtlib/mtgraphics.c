@@ -1,4 +1,6 @@
-//  Created by Milan Toth milgra@milgra.com Public Domain
+/*
+  Milan Toth's graphics functions
+ */
 
 #ifndef mtgraphics_h
 #define mtgraphics_h

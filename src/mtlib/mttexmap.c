@@ -1,5 +1,9 @@
-#ifndef __KineticUI__tm__
-#define __KineticUI__tm__
+/*
+  Milan Toth's texture map functions
+ */
+
+#ifndef _mttexmap_h
+#define _mttexmap_h
 
 #include "mtbitmap.c"
 #include "mtmap.c"

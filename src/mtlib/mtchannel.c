@@ -1,8 +1,8 @@
-/*  
-    Created by Milan Toth milgra@milgra.com
-    One-way non-locking communication channel between threads
-    If mtch_send returns 0, channel is full, send data again later
-    If mtch_recv returns 0, channel is empty
+/*
+  Milan Toth's communication channel
+  One-way non-locking communication channel between threads
+  If mtch_send returns 0, channel is full, send data again later
+  If mtch_recv returns 0, channel is empty
  */
 
 #ifndef mtch_h
@@ -36,6 +36,16 @@ void  ch_test(void);
 
 #if __INCLUDE_LEVEL__ == 0
 
+void ch_del(void* pointer)
+{
+  assert(pointer != NULL);
+
+  ch_t* ch = pointer;
+
+  mem_release(ch->flags);
+  mem_release(ch->boxes);
+}
+
 ch_t* ch_new(uint32_t size)
 {
   ch_t* ch = mem_calloc(sizeof(ch_t), "mtchannel", ch_del, NULL);
@@ -47,16 +57,6 @@ ch_t* ch_new(uint32_t size)
   ch->wpos  = 0;
 
   return ch;
-}
-
-void ch_del(void* pointer)
-{
-  assert(pointer != NULL);
-
-  ch_t* ch = pointer;
-
-  mem_release(ch->flags);
-  mem_release(ch->boxes);
 }
 
 char ch_send(ch_t* ch, void* data)

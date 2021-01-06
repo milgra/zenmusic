@@ -1,4 +1,6 @@
-
+/*
+  Milan Toth's 4D math functions
+ */
 
 #ifndef __c36__math4__
 #define __c36__math4__

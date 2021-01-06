@@ -1,4 +1,6 @@
-//  Created by Milan Toth milgra@milgra.com Public Domain
+/*
+  Milan Toth's c string functions
+*/
 
 #ifndef mtcstr_h
 #define mtcstr_h
@@ -49,6 +51,7 @@ uint32_t cstr_color_from_cstring(char* string)
 
 /* creates string from utf8 bytearray */
 /* PARAMETER LIST MUST END WITH NULL!!! */
+/* TODO do something with this, should be fully fprintf capable without NULL */
 
 char* cstr_fromformat(char* format, ...)
 {

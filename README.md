@@ -50,7 +50,9 @@ save small changes to a delta database, add it to the big one at startup
 zenmusic /usr/milgra/Testmusic - select lib folder
 refresh database gomb legyen az egyik, settings, about a masik ketto
 amit releaselni kell, csinalodjon new-val!
-get extension from stream
+get extension from stream for organizing
+relative paths in library
+track number in song name for organizing
 
 ---
 

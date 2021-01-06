@@ -1,3 +1,7 @@
+/*
+  Milan Toth's bitmap lib
+ */
+
 #ifndef mtbm_h
 #define mtbm_h
 
@@ -42,7 +46,7 @@ bm_t* bm_new(int the_w, int the_h)
   bm->h = the_h;
 
   bm->size = 4 * the_w * the_h;
-  bm->data = mem_calloc(bm->size * sizeof(unsigned char), "uint8_t*", NULL, NULL);
+  bm->data = mem_calloc(bm->size * sizeof(unsigned char), "uint8_t*", bm_del, NULL);
 
   return bm;
 }

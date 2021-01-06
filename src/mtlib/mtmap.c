@@ -1,4 +1,6 @@
-//  Created by Milan Toth milgra@milgra.com Public Domain
+/*
+  Milan Toth's hashmap
+ */
 
 #ifndef mtmap_h
 #define mtmap_h

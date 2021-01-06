@@ -1,4 +1,6 @@
-//  Created by Milan Toth milgra@milgra.com Public Domain
+/*
+  Milan Toth's memory handler functions
+ */
 
 #ifndef mtmem_h
 #define mtmem_h

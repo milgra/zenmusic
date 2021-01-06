@@ -120,6 +120,7 @@ struct _view_t
   char vis_changed;
   char overflow; /* enable content outside frame */
   char display;  /* view should be displayed? */
+  char mask;     /* view should be used as mask for subviews? */
 
   char needs_key;    /* accepts key events */
   char needs_text;   /* accepts text events */

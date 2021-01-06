@@ -1,4 +1,6 @@
-//  Created by Milan Toth milgra@milgra.com Public Domain
+/*
+  Milan Toth's vector functions
+ */
 
 #ifndef mtvec_h
 #define mtvec_h

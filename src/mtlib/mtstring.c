@@ -1,3 +1,7 @@
+/*
+  Milan Toth's UTF8 based string functions
+ */
+
 #ifndef mtstr_h
 #define mtstr_h
 

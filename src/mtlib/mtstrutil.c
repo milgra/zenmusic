@@ -1,3 +1,7 @@
+/*
+  Milan Toth's string utility functions for mtstr
+ */
+
 #ifndef mtstrutil_h
 #define mtstrutil_h
 
