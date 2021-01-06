@@ -106,8 +106,9 @@ void ui_compositor_init(int width, int height)
   // TODO texture dimensions should be bigger than screen size
   gl_get_texture(0, 4096, 4096); // texture for texmap
   gl_get_texture(1, 4096, 4096); // texture for mask
+  gl_get_texture(2, 4096, 4096); // texture for mask
 
-  uic.tex_page = 2; // new textures should start from 2
+  uic.tex_page = 3; // new textures should start from 2
 }
 
 void ui_compositor_rewind()
@@ -295,23 +296,59 @@ void ui_compositor_render(uint32_t time)
 
   uic.ren_frame += 1;
 
-  /* int last  = 0; */
-  /* int index = 0; */
-
-  /* for (int i = 0; i < uic.cache_ind; i++) */
-  /* { */
-  /*   crect_t* rect = uic.cache->data[i]; */
-  /*   if (!rect->hidden) fb_add(uic.fb, rect->data, 30); */
-  /* } */
-
-  // if view is mask, render to mask
-  // glrect_t reg_full = {0, 0, uic.width, uic.height};
-  // gl_draw_vertexes_in_framebuffer(8, 0, uic.fb->pos / 5, reg_full, reg_full, SH_TEXTURE);
-
-  gl_clear_framebuffer(1, 0, 0, 0, 1.0);
-  gl_clear_framebuffer(TEX_CTX, 0.8, 0.8, 0.8, 1.0);
+  // rendering region
   glrect_t reg_full = {0, 0, uic.width, uic.height};
-  gl_draw_vertexes_in_framebuffer(TEX_CTX, 0, uic.fb->pos / 5, reg_full, reg_full, SH_TEXTURE);
+
+  // reset main buffer
+  gl_clear_framebuffer(TEX_CTX, 0.8, 0.8, 0.8, 1.0);
+
+  // reset mask
+  gl_clear_framebuffer(1, 0.0, 0.0, 0.0, 1.0);
+
+  int last    = 0;
+  int index   = 0;
+  int in_mask = 0;
+
+  for (int i = 0; i < uic.cache_ind; i++)
+  {
+    crect_t* rect = uic.cache->data[i];
+    if (rect->masked && !in_mask)
+    {
+      in_mask = 1;
+      // draw buffer so far into main buffer
+      gl_draw_vertexes_in_framebuffer(TEX_CTX, last * 6, index * 6, reg_full, reg_full, SH_TEXTURE, 0);
+
+      // draw into mask texture
+      gl_clear_framebuffer(1, 0.0, 0.0, 0.0, 0.0);
+      // TODO use masked rectangle
+      gl_draw_vertexes_in_framebuffer(1, index * 6, (index + 1) * 6, reg_full, reg_full, SH_TEXTURE, 0);
+
+      // set last index
+      last = index;
+    }
+    if (in_mask && !rect->masked)
+    {
+      // draw buffer so far into main buffer with mask
+      // TODO use mask rectangle
+      gl_draw_vertexes_in_framebuffer(TEX_CTX, last * 6, index * 6, reg_full, reg_full, SH_TEXTURE, 1);
+
+      // reset mask
+      // gl_clear_framebuffer(1, 0.0, 0.0, 0.0, 1.0);
+      in_mask = 0;
+
+      // set last index
+      last = index;
+    }
+
+    if (!rect->hidden) index += 1;
+  }
+
+  // draw remaining buffer
+  if (last < index)
+  {
+    // render remaining
+    gl_draw_vertexes_in_framebuffer(TEX_CTX, last * 6, index * 6, reg_full, reg_full, SH_TEXTURE, 0);
+  }
 
   if (time > uic.upd_stamp)
   {

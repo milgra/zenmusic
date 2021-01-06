@@ -38,7 +38,7 @@ glrect_t gl_get_texture(uint32_t i, uint32_t w, uint32_t h);
 void     gl_upload_vertexes(fb_t* fb);
 void     gl_upload_to_texture(int page, int x, int y, int w, int h, void* data);
 void     gl_clear_framebuffer(int page, float r, float g, float b, float a);
-void     gl_draw_vertexes_in_framebuffer(int page, int start, int end, glrect_t source_region, glrect_t target_region, gl_sha_typ_t shader);
+void     gl_draw_vertexes_in_framebuffer(int page, int start, int end, glrect_t source_region, glrect_t target_region, gl_sha_typ_t shader, int domask);
 void     gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glrect_t source_region, glrect_t target_region, glrect_t window, gl_sha_typ_t shader);
 
 #endif
@@ -100,10 +100,10 @@ glsha_t create_texture_shader()
   char* fsh =
       "#version 120\n"
       "uniform sampler2D sampler[10];"
+      "uniform int domask;"
       "varying vec3 vUv;"
       "void main( )"
       "{"
-      " vec4 msk = texture2D(sampler[1],gl_FragCoord.xy / 4096);"
       " vec4 col = vec4(1.0);"
       " int unit = int(vUv.z);"
       "	if (unit == 0) col = texture2D(sampler[0], vUv.xy);"
@@ -115,7 +115,11 @@ glsha_t create_texture_shader()
       "	else if (unit == 6) col = texture2D(sampler[6], vUv.xy);"
       "	else if (unit == 7) col = texture2D(sampler[7], vUv.xy);"
       "	else if (unit == 8) col = texture2D(sampler[8], vUv.xy);"
-      " if (msk.a == 0.0) col.a = 0.0;"
+      " if (domask == 1)"
+      " {"
+      "  vec4 msk = texture2D(sampler[1],gl_FragCoord.xy / 4096);"
+      "  if (msk.a < col.a) col.a = msk.a;"
+      " }"
       " gl_FragColor = col;"
       "}";
 
@@ -123,10 +127,10 @@ glsha_t create_texture_shader()
                                  fsh,
                                  2,
                                  ((const char*[]){"position", "texcoord"}),
-                                 11,
+                                 12,
                                  ((const char*[]){"projection", "sampler[0]", "sampler[1]", "sampler[2]",
                                                   "sampler[3]", "sampler[4]", "sampler[5]", "sampler[6]",
-                                                  "sampler[7]", "sampler[8]", "sampler[9]"}));
+                                                  "sampler[7]", "sampler[8]", "sampler[9]", "domask"}));
 
   glUseProgram(sha.name);
 
@@ -139,7 +143,6 @@ glsha_t create_texture_shader()
   glUniform1i(sha.uni_loc[7], 6);
   glUniform1i(sha.uni_loc[8], 7);
   glUniform1i(sha.uni_loc[9], 8);
-  glUniform1i(sha.uni_loc[10], 9);
 
   return sha;
 }
@@ -429,7 +432,8 @@ void gl_draw_vertexes_in_framebuffer(int          page,
                                      int          end,
                                      glrect_t     reg_src,
                                      glrect_t     reg_tgt,
-                                     gl_sha_typ_t shader)
+                                     gl_sha_typ_t shader,
+                                     int          domask)
 {
   matrix4array_t projection;
   projection.matrix = m4_defaultortho(0.0, reg_src.w, reg_src.h, 0, 0.0, 1.0);
@@ -440,6 +444,8 @@ void gl_draw_vertexes_in_framebuffer(int          page,
   {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glUniform1i(gl.shaders[shader].uni_loc[11], domask);
 
     glUniformMatrix4fv(gl.shaders[shader].uni_loc[0], 1, 0, projection.array);
     glViewport(0, 0, reg_tgt.w, reg_tgt.h);

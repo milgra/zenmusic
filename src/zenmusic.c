@@ -271,10 +271,10 @@ view_t* artistlist_create_item(view_t* listview)
   snprintf(idbuffer, 100, "artistlist_item%i", messageitem_index++);
 
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
-  rowview->hidden = 1;
+  //rowview->hidden = 1;
 
   vh_litem_add(rowview, 35, on_artistitem_select);
-  vh_litem_add_cell(rowview, "artist", 150, cr_text_upd);
+  vh_litem_add_cell(rowview, "artist", 500, cr_text_upd);
 
   return rowview;
 }
@@ -507,6 +507,21 @@ void init(int width, int height)
 
   messages = VNEW();
 
+  VADD(messages, cstr_fromcstring("Elso uzenet."));
+  VADD(messages, cstr_fromcstring("Masodik uzenet."));
+  VADD(messages, cstr_fromcstring("Harmadik uzenet."));
+  VADD(messages, cstr_fromcstring("Elso uzenet."));
+  VADD(messages, cstr_fromcstring("Masodik uzenet."));
+  VADD(messages, cstr_fromcstring("Harmadik uzenet."));
+  VADD(messages, cstr_fromcstring("Elso uzenet."));
+  VADD(messages, cstr_fromcstring("Masodik uzenet."));
+  VADD(messages, cstr_fromcstring("Harmadik uzenet."));
+  VADD(messages, cstr_fromcstring("Elso uzenet."));
+  VADD(messages, cstr_fromcstring("Masodik uzenet."));
+  VADD(messages, cstr_fromcstring("Harmadik uzenet."));
+  VADD(messages, cstr_fromcstring("Elso uzenet."));
+  VADD(messages, cstr_fromcstring("Masodik uzenet."));
+  VADD(messages, cstr_fromcstring("Harmadik uzenet."));
   VADD(messages, cstr_fromcstring("Elso uzenet."));
   VADD(messages, cstr_fromcstring("Masodik uzenet."));
   VADD(messages, cstr_fromcstring("Harmadik uzenet."));
