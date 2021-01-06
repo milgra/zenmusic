@@ -5,7 +5,11 @@
 #include "view.c"
 #include "wm_event.c"
 
-void vh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t* view, str_t* text));
+void vh_text_add(view_t* view,
+                 char*   text,
+                 char*   fontpath,
+                 void (*ontext)(view_t* view, str_t* text),
+                 void (*onactivate)(view_t* view));
 
 #endif
 
@@ -31,6 +35,7 @@ typedef struct _vh_text_t
 
   view_t* para;
   void (*ontext)(view_t* view, str_t* text);
+  void (*onactivate)(view_t* view);
 } vh_text_t;
 
 void vh_text_upd(view_t* view)
@@ -86,6 +91,8 @@ void vh_text_evt(view_t* view, ev_t ev)
         sf.y    = ef.y + ef.h / 2.0;
 
         vh_anim_set(data->crsr_v, sf, ef, 10, AT_LINEAR);
+
+        (*data->onactivate)(view);
       }
     }
     else
@@ -156,7 +163,11 @@ void vh_text_evt(view_t* view, ev_t ev)
   }
 }
 
-void vh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t* view, str_t* text))
+void vh_text_add(view_t* view,
+                 char*   text,
+                 char*   fontpath,
+                 void (*ontext)(view_t* view, str_t* text),
+                 void (*onactivate)(view_t* view))
 {
   textstyle_t ts = {0};
   ts.font        = fontpath;
@@ -165,11 +176,12 @@ void vh_text_add(view_t* view, char* text, char* fontpath, void (*ontext)(view_t
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0x00000000;
 
-  vh_text_t* data = mem_calloc(sizeof(vh_text_t), "vh_text", NULL, NULL);
-  data->text      = str_new();
-  data->ontext    = ontext;
-  data->style     = ts;
-  data->crsr_i    = 0; // cursor index
+  vh_text_t* data  = mem_calloc(sizeof(vh_text_t), "vh_text", NULL, NULL);
+  data->text       = str_new();
+  data->ontext     = ontext;
+  data->onactivate = onactivate;
+  data->style      = ts;
+  data->crsr_i     = 0; // cursor index
 
   str_addbytearray(data->text, text);
 

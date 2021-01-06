@@ -493,6 +493,11 @@ void filter(view_t* view, str_t* text)
   vh_list_reset(songlist);
 }
 
+void filter_onactivate(view_t* view)
+{
+  view_add(mainview, filterlistback);
+}
+
 void init(int width, int height)
 {
   srand((unsigned int)time(NULL));
@@ -621,7 +626,7 @@ void init(int width, int height)
   tg_css_add(filterbar);
 
   filterbar->layout.background_color = 0xFFFFFFFF;
-  vh_text_add(filterbar, "", fontpath, filter);
+  vh_text_add(filterbar, "", fontpath, filter, filter_onactivate);
   //vh_text_add(filterbar, "Search/Filter (x)", filter);
 
   //view_t* headeritem = songitem_new();
