@@ -35,7 +35,9 @@ freebsd for os
 
 first version
 
+working messages
 message - using library usr/milgra/Music
+masking of popup lists
 tag editor window jobb klikkre, album url-t is kezzel kelljen beirni egyelore
 increase play count
 fix leaks
@@ -48,6 +50,7 @@ save small changes to a delta database, add it to the big one at startup
 zenmusic /usr/milgra/Testmusic - select lib folder
 refresh database gomb legyen az egyik, settings, about a masik ketto
 amit releaselni kell, csinalodjon new-val!
+get extension from stream
 
 ---
 

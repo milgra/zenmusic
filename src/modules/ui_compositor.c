@@ -100,15 +100,11 @@ void ui_compositor_init(int width, int height)
   uic.cache_ind = 0;
   uic.upd_geo   = 1;
 
-  /* init texture for ui texture map */
+  // TODO texture dimensions should be bigger than screen size
+  gl_get_texture(0, 4096, 4096); // texture for texmap
+  gl_get_texture(1, 4096, 4096); // texture for mask
 
-  gl_get_texture(uic.tex_page++, 4096, 4096);
-
-  /* textures for framebuffer composition */
-
-  gl_get_texture(uic.tex_page++, 4096, 4096);
-  gl_get_texture(uic.tex_page++, 4096, 4096);
-  gl_get_texture(uic.tex_page++, 4096, 4096);
+  uic.tex_page = 2; // new textures should start from 2
 }
 
 void ui_compositor_rewind()
@@ -285,11 +281,30 @@ void ui_compositor_render(uint32_t time)
     }
 
     gl_upload_vertexes(uic.fb);
+
     uic.upd_geo = 0;
     uic.ver_bytes += uic.fb->pos * sizeof(GLfloat);
   }
 
   uic.ren_frame += 1;
+
+  /* int last  = 0; */
+  /* int index = 0; */
+
+  /* for (int i = 0; i < uic.cache_ind; i++) */
+  /* { */
+  /*   crect_t* rect = uic.cache->data[i]; */
+  /*   if (!rect->hidden) fb_add(uic.fb, rect->data, 30); */
+  /* } */
+
+  // if view is mask, render to mask
+  // glrect_t reg_full = {0, 0, uic.width, uic.height};
+  // gl_draw_vertexes_in_framebuffer(8, 0, uic.fb->pos / 5, reg_full, reg_full, SH_TEXTURE);
+
+  gl_clear_framebuffer(1, 0, 0, 0, 1.0);
+  gl_clear_framebuffer(TEX_CTX, 0.8, 0.8, 0.8, 1.0);
+  glrect_t reg_full = {0, 0, uic.width, uic.height};
+  gl_draw_vertexes_in_framebuffer(TEX_CTX, 0, uic.fb->pos / 5, reg_full, reg_full, SH_TEXTURE);
 
   if (time > uic.upd_stamp)
   {
@@ -302,10 +317,6 @@ void ui_compositor_render(uint32_t time)
     uic.ver_bytes = 0;
     uic.ren_frame = 0;
   }
-
-  gl_clear_framebuffer(TEX_CTX, 0.8, 0.8, 0.8, 1.0);
-  glrect_t reg_full = {0, 0, uic.width, uic.height};
-  gl_draw_vertexes_in_framebuffer(TEX_CTX, 0, uic.fb->pos / 5, reg_full, reg_full, SH_TEXTURE);
 }
 
 /* void ui_compositor_render() */

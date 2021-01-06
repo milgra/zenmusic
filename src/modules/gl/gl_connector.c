@@ -67,8 +67,6 @@ typedef struct _gltex_t
 
 struct gl_connector_t
 {
-  int tex_index;
-
   glsha_t shaders[4];
   gltex_t textures[10];
   glbuf_t vertexes[10];
@@ -105,17 +103,20 @@ glsha_t create_texture_shader()
       "varying vec3 vUv;"
       "void main( )"
       "{"
+      " vec4 msk = texture2D(sampler[1],gl_FragCoord.xy / 4096);"
+      " vec4 col = vec4(1.0);"
       " int unit = int(vUv.z);"
-      "	if (unit == 0) gl_FragColor = texture2D(sampler[0], vUv.xy);"
-      "	else if (unit == 1) gl_FragColor = texture2D(sampler[1], vUv.xy);"
-      "	else if (unit == 2) gl_FragColor = texture2D(sampler[2], vUv.xy);"
-      "	else if (unit == 3) gl_FragColor = texture2D(sampler[3], vUv.xy);"
-      "	else if (unit == 4) gl_FragColor = texture2D(sampler[4], vUv.xy);"
-      "	else if (unit == 5) gl_FragColor = texture2D(sampler[5], vUv.xy);"
-      "	else if (unit == 6) gl_FragColor = texture2D(sampler[6], vUv.xy);"
-      "	else if (unit == 7) gl_FragColor = texture2D(sampler[7], vUv.xy);"
-      "	else if (unit == 8) gl_FragColor = texture2D(sampler[8], vUv.xy);"
-      "	else if (unit == 9) gl_FragColor = texture2D(sampler[9], vUv.xy);"
+      "	if (unit == 0) col = texture2D(sampler[0], vUv.xy);"
+      "	else if (unit == 1) col = texture2D(sampler[1], vUv.xy);"
+      "	else if (unit == 2) col = texture2D(sampler[2], vUv.xy);"
+      "	else if (unit == 3) col = texture2D(sampler[3], vUv.xy);"
+      "	else if (unit == 4) col = texture2D(sampler[4], vUv.xy);"
+      "	else if (unit == 5) col = texture2D(sampler[5], vUv.xy);"
+      "	else if (unit == 6) col = texture2D(sampler[6], vUv.xy);"
+      "	else if (unit == 7) col = texture2D(sampler[7], vUv.xy);"
+      "	else if (unit == 8) col = texture2D(sampler[8], vUv.xy);"
+      " if (msk.a == 0.0) col.a = 0.0;"
+      " gl_FragColor = col;"
       "}";
 
   glsha_t sha = gl_shader_create(vsh,
@@ -257,11 +258,11 @@ glsha_t create_draw_shader()
                           ((const char*[]){"projection", "samplera"}));
 }
 
-gltex_t gl_create_texture(uint32_t w, uint32_t h)
+gltex_t gl_create_texture(int page, uint32_t w, uint32_t h)
 {
   gltex_t tex = {0};
 
-  tex.index = gl.tex_index++;
+  tex.index = page;
   tex.w     = w;
   tex.h     = h;
 
@@ -343,14 +344,14 @@ glrect_t gl_get_texture(uint32_t page, uint32_t w, uint32_t h)
   {
     int x = 256;
     int y = 256;
-    while (x < w)
-      x *= 2;
-    while (y < h)
-      y *= 2;
-    gl.textures[page] = gl_create_texture(4096, 4096);
+    while (x < w) x *= 2;
+    while (y < h) y *= 2;
+    gl.textures[page] = gl_create_texture(page, 4096, 4096);
   }
 
   gltex_t tex = gl.textures[page];
+
+  printf("gl_get_texture page %i index %i name %i\n", page, tex.index, tex.tx);
 
   return ((glrect_t){.w = tex.w, .h = tex.h});
 }
