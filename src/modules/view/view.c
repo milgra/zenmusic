@@ -120,7 +120,7 @@ struct _view_t
   char vis_changed;
   char overflow; /* enable content outside frame */
   char display;  /* view should be displayed? */
-  char mask;     /* view should be used as mask for subviews? */
+  char masked;   /* view should be used as mask for subviews? */
 
   char needs_key;    /* accepts key events */
   char needs_text;   /* accepts text events */
@@ -202,6 +202,17 @@ view_t* view_new(char* id, r2_t frame)
   return view;
 }
 
+void view_set_masked(view_t* view, char masked)
+{
+  printf("set masked %s %i\n", view->id, masked);
+  view->masked = 1;
+  for (int i = 0; i < view->views->length; i++)
+  {
+    view_t* sview = view->views->data[i];
+    view_set_masked(sview, masked);
+  }
+}
+
 void view_add(view_t* view, view_t* subview)
 {
   resend = 1;
@@ -218,6 +229,8 @@ void view_add(view_t* view, view_t* subview)
 
   VADD(view->views, subview);
   subview->parent = view;
+
+  if (view->masked) view_set_masked(subview, 1);
 
   view_calc_global(view);
 }
@@ -238,6 +251,8 @@ void view_insert(view_t* view, view_t* subview, uint32_t index)
 
   vec_addatindex(view->views, subview, index);
   subview->parent = view;
+
+  if (view->masked) view_set_masked(subview, 1);
 
   view_calc_global(view);
 }

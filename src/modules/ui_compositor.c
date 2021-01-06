@@ -24,7 +24,8 @@ int ui_compositor_new_texture();
 int ui_compositor_map_texture();
 
 void ui_compositor_rewind();
-void ui_compositor_upd(char* id,
+void ui_compositor_add(char* id,
+                       char  masked,
                        char  hidden,
                        r2_t  frame,
                        float border, // view border
@@ -56,6 +57,7 @@ typedef struct _crect_t
   char* tex_id;
   float data[30];
   char  hidden;
+  char  masked;
   r2_t  frame;
 } crect_t;
 
@@ -64,6 +66,7 @@ void     crect_del(void* rect);
 void     crect_desc(crect_t* rect);
 void     crect_set_id(crect_t* rect, char* id);
 void     crect_set_hidden(crect_t* r, char hidden);
+void     crect_set_masked(crect_t* r, char masked);
 void     crect_set_page(crect_t* rect, uint32_t page);
 void     crect_set_frame(crect_t* rect, r2_t uirect);
 void     crect_set_texture(crect_t* rect, float tlx, float tly, float brx, float bry);
@@ -138,7 +141,8 @@ int ui_compositor_map_texture()
   return 0;
 }
 
-void ui_compositor_upd(char* id,
+void ui_compositor_add(char* id,
+                       char  masked,
                        char  hidden,
                        r2_t  frame,
                        float border, // view border
@@ -147,7 +151,7 @@ void ui_compositor_upd(char* id,
                        int   ext,    // external texture
                        char* texid)  // texture id
 {
-  // printf("COMP ADD %s %f %f %f %f\n", id, frame.x, frame.y, frame.w, frame.h);
+  // printf("COMP ADD %s %f %f %f %f masked %i\n", id, frame.x, frame.y, frame.w, frame.h, masked);
 
   // fill up cache if needed
   if (uic.cache_ind + 1 > uic.cache->length)
@@ -163,6 +167,9 @@ void ui_compositor_upd(char* id,
 
   // set hidden
   crect_set_hidden(rect, hidden);
+
+  // set masked
+  crect_set_masked(rect, masked);
 
   // set frame
   if (border > 0.0) frame = r2_expand(frame, border);
@@ -404,6 +411,11 @@ void crect_set_id(crect_t* r, char* id)
 void crect_set_hidden(crect_t* r, char hidden)
 {
   r->hidden = hidden;
+}
+
+void crect_set_masked(crect_t* r, char masked)
+{
+  r->masked = masked;
 }
 
 void crect_set_frame(crect_t* r, r2_t rect)

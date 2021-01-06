@@ -72,7 +72,8 @@ void ui_generator_add(view_t* view)
     if (view->texture.type == TT_EXTERNAL) view_set_texture_page(view, ui_compositor_new_texture());
   }
 
-  ui_compositor_upd(view->id,
+  ui_compositor_add(view->id,
+                    view->masked,
                     view->hidden,
                     view->frame.global,       // frame
                     view->layout.shadow_blur, // view border
@@ -149,7 +150,8 @@ void ui_generator_resize(int width, int height)
   for (int i = 0; i < uig.views->length; i++)
   {
     view_t* view = uig.views->data[i];
-    ui_compositor_upd(view->id,
+    ui_compositor_add(view->id,
+                      view->masked,
                       view->hidden,
                       view->frame.global,       // frame
                       view->layout.shadow_blur, // view border
