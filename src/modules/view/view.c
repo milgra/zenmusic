@@ -204,7 +204,6 @@ view_t* view_new(char* id, r2_t frame)
 
 void view_set_masked(view_t* view, char masked)
 {
-  printf("set masked %s %i\n", view->id, masked);
   view->masked = 1;
   for (int i = 0; i < view->views->length; i++)
   {

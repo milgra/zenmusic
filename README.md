@@ -37,12 +37,11 @@ first version
 
 working messages
 message - using library usr/milgra/Music
-masking of popup lists
 tag editor window jobb klikkre, album url-t is kezzel kelljen beirni egyelore
 increase play count
 fix leaks
 elso indulasnal analyzer progresst mutassa valahol amig zenet hallgatsz
-tilemap is auto-resize legyen duplazassal
+tilemap is auto-resize legyen duplazassal, min screen size legyen alapbol
 scrollbar drag
 config file - default library
 text overflow fix

@@ -53,6 +53,8 @@ int     loop_all  = 0;
 view_t* mainview;
 view_t* display;
 view_t* messagelist;
+view_t* messagelistback;
+view_t* filterlistback;
 view_t* filterlist;
 view_t* header_center;
 
@@ -199,13 +201,11 @@ void close_button_pushed(view_t* view, void* data)
 void on_display(view_t* view, void* data)
 {
   view_remove(header_center, display);
-  view_add(header_center, messagelist);
+  view_add(header_center, messagelistback);
 }
 
 void on_messagelist(view_t* view, void* data)
 {
-  view_remove(header_center, messagelist);
-  view_add(header_center, display);
 }
 
 void songitem_on_select(view_t* view, uint32_t index)
@@ -251,6 +251,8 @@ uint32_t messageitem_index = 0;
 void on_messageitem_select(view_t* view, uint32_t index)
 {
   printf("on_messageitem_select\n");
+  view_remove(header_center, messagelistback);
+  view_add(header_center, display);
 }
 
 void on_artistitem_select(view_t* view, uint32_t index)
@@ -364,8 +366,6 @@ view_t* messagelist_create_item(view_t* listview)
 
   vh_litem_add(rowview, 35, on_messageitem_select);
   vh_litem_add_cell(rowview, "message", 150, cr_text_upd);
-
-  printf("messagelist_create_item\n");
 
   return rowview;
 }
@@ -554,9 +554,10 @@ void init(int width, int height)
   VADD(songlist_fields, sitem_cell_new("last played", 150, 9));
   VADD(songlist_fields, sitem_cell_new("last skipped", 150, 10));
 
-  display       = view_get_subview(baseview, "display");
-  messagelist   = view_get_subview(baseview, "messagelist");
-  header_center = view_get_subview(baseview, "header_center");
+  display         = view_get_subview(baseview, "display");
+  messagelistback = view_get_subview(baseview, "messagelistback");
+  messagelist     = view_get_subview(baseview, "messagelist");
+  header_center   = view_get_subview(baseview, "header_center");
 
   vh_list_add(messagelist, messagelist_create_item, messagelist_update_item);
 
@@ -569,9 +570,12 @@ void init(int width, int height)
   vh_button_add(display, NULL, on_display);
   //vh_button_add(messagelist, NULL, on_messagelist);
 
-  view_remove(header_center, messagelist);
+  view_remove(header_center, messagelistback);
 
   mainview = view_get_subview(baseview, "main");
+
+  filterlistback = view_get_subview(baseview, "filterlistback");
+  view_remove(mainview, filterlistback);
 
   /* filterlist = view_get_subview(baseview, "filterlist"); */
 
