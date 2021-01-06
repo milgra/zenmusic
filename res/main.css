@@ -117,14 +117,14 @@
 }
 
 #genrelist {
-    width: 350px;
+    width: 250px;
     height: 500px;
     left: 0px;
     background-color: #FFFFFFFF;
 }
 
 #artistlist {
-    width: 350px;
+    width: 250px;
     height: 500px;
     right: 0px;
     background-color: #FFFFFFFF;

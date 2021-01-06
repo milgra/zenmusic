@@ -312,6 +312,7 @@ view_t* genrelist_create_item(view_t* listview)
   textstyle_t ts = {0};
   ts.font        = fontpath;
   ts.align       = 0;
+  ts.margin      = 5;
   ts.size        = 25.0;
   ts.textcolor   = 0xFFFFFFFF;
   ts.backcolor   = 0x00000022;
