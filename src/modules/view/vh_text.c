@@ -199,7 +199,7 @@ void vh_text_add(view_t* view,
   para->needs_touch  = 0;
 
   tg_text_add(para);
-  tg_text_set(para, "A", ts);
+  tg_text_set(para, text, ts);
   view_add(view, para);
 
   data->para = para;

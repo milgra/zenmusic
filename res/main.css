@@ -80,10 +80,44 @@
     display: flex;
 }
 
-#genrebtn {
-    width: 150px;
-    height: 100%;
+#clearbtn {
+    top: 8px;
+    width: 30px;
+    height: 20px;
+    right: 125px;
     background-color: #EFEFEFFF;
+    border-radius: 10px;
+    box-shadow: 3px;
+}
+
+#genrebtnbck {
+    top: 20px;
+    right: 20px;
+    width: 120px;
+    height: 30px;
+    background-color: #EFEFEFFF;
+    border-radius: 10px;
+    box-shadow: 3px;
+}
+
+#genrebtn {
+    width: 100%;
+    height: 100%;
+}
+
+#messagesbtnbck {
+    top: 20px;
+    left: 20px;
+    width: 120px;
+    height: 30px;
+    background-color: #EFEFEFFF;
+    border-radius: 10px;
+    box-shadow: 3px;
+}
+
+#messagesbtn {
+    width: 100%;
+    height: 100%;
 }
 
 #artistbtn {
@@ -97,34 +131,15 @@
     height: 100%;
 }
 
-#filterlistback {
-    width: 500px;
-    height: 500px;
-    top: 190px;
-    margin: auto;
-    border-radius: 15px;
-    background-color: #FFFFFFFF;
-    box-shadow: 3px;
-}
-
-#filterlist {
-    display: mask;
-    width: 100%;
-    height: 100%;
-    border-radius: 15px;
-    background-color: #FFFFFFFF;
-    box-shadow: 2px;
-}
-
 #genrelist {
-    width: 250px;
+    width: 230px;
     height: 500px;
     left: 0px;
     background-color: #FFFFFFFF;
 }
 
 #artistlist {
-    width: 250px;
+    width: 230px;
     height: 500px;
     right: 0px;
     background-color: #FFFFFFFF;
@@ -331,15 +346,36 @@
 }
 
 #messagelistback {
-    width: 100%;
+    width: 478px;
     height: 500px;
-    margin: 10px;
+    top: 10px;
+    margin: auto;
     border-radius: 15px;
     background-color: #FFFFFFFF;
     box-shadow: 3px;
 }
 
 #messagelist {
+    display: mask;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    background-color: #FFFFFFFF;
+    box-shadow: 2px;
+}
+
+
+#filterlistback {
+    width: 478px;
+    height: 500px;
+    top: 10px;
+    margin: auto;
+    border-radius: 15px;
+    background-color: #FFFFFFFF;
+    box-shadow: 3px;
+}
+
+#filterlist {
     display: mask;
     width: 100%;
     height: 100%;

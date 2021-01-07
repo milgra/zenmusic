@@ -198,12 +198,6 @@ void close_button_pushed(view_t* view, void* data)
   wm_close();
 }
 
-void on_display(view_t* view, void* data)
-{
-  view_remove(header_center, display);
-  view_add(header_center, messagelistback);
-}
-
 void on_messagelist(view_t* view, void* data)
 {
 }
@@ -269,7 +263,7 @@ view_t* artistlist_create_item(view_t* listview)
   //rowview->hidden = 1;
 
   vh_litem_add(rowview, 35, on_artistitem_select);
-  vh_litem_add_cell(rowview, "artist", 250, cr_text_upd);
+  vh_litem_add_cell(rowview, "artist", 230, cr_text_upd);
 
   return rowview;
 }
@@ -475,7 +469,22 @@ void filter(view_t* view, str_t* text)
 
 void filter_onactivate(view_t* view)
 {
-  view_add(mainview, filterlistback);
+}
+
+void genrebtn_pushed(view_t* view, void* data)
+{
+  if (filterlistback->parent)
+    view_remove(header_center, filterlistback);
+  else
+    view_insert(header_center, filterlistback, 1);
+}
+
+void messagesbtn_pushed(view_t* view, void* data)
+{
+  if (messagelistback->parent)
+    view_remove(header_center, messagelistback);
+  else
+    view_insert(header_center, messagelistback, 1);
 }
 
 void init(int width, int height)
@@ -552,15 +561,12 @@ void init(int width, int height)
   view_t* artistlist = view_get_subview(baseview, "artistlist");
   vh_list_add(artistlist, artistlist_create_item, artistlist_update_item);
 
-  vh_button_add(display, NULL, on_display);
-  //vh_button_add(messagelist, NULL, on_messagelist);
-
   view_remove(header_center, messagelistback);
 
   mainview = view_get_subview(baseview, "main");
 
   filterlistback = view_get_subview(baseview, "filterlistback");
-  view_remove(mainview, filterlistback);
+  view_remove(header_center, filterlistback);
 
   /* filterlist = view_get_subview(baseview, "filterlist"); */
 
@@ -606,8 +612,7 @@ void init(int width, int height)
   tg_css_add(filterbar);
 
   filterbar->layout.background_color = 0xFFFFFFFF;
-  vh_text_add(filterbar, "", fontpath, filter, filter_onactivate);
-  //vh_text_add(filterbar, "Search/Filter (x)", filter);
+  vh_text_add(filterbar, "Search/Query", fontpath, filter, filter_onactivate);
 
   //view_t* headeritem = songitem_new();
   //songitem_update(headeritem, -1, "Artist", NULL);
@@ -655,13 +660,23 @@ void init(int width, int height)
   /* ui_manager_add(texmapview); */
 
   ts.size      = 25.0;
-  ts.backcolor = 0xEFEFEFFF;
+  ts.backcolor = 0x00000000;
 
   view_t* maxbtn   = view_get_subview(baseview, "maxicon");
   view_t* closebtn = view_get_subview(baseview, "closeicon");
 
   vh_button_add(maxbtn, NULL, max_button_pushed);
   vh_button_add(closebtn, NULL, close_button_pushed);
+
+  view_t* genrebtn = view_get_subview(baseview, "genrebtn");
+  vh_button_add(genrebtn, NULL, genrebtn_pushed);
+  tg_text_add(genrebtn);
+  tg_text_set(genrebtn, "genre/artist", ts);
+
+  view_t* messagesbtn = view_get_subview(baseview, "messagesbtn");
+  vh_button_add(messagesbtn, NULL, messagesbtn_pushed);
+  tg_text_add(messagesbtn);
+  tg_text_set(messagesbtn, "messages", ts);
 
   view_t* songlistheader = view_get_subview(baseview, "songlistheader");
 
