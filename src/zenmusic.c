@@ -665,8 +665,12 @@ void init(int width, int height)
 
   LOG("new files detected : %i", lib_entries());
 
-  // start analyzing new entries
-  lib_analyze(libch);
+  if (lib_entries() > 0)
+  {
+    LOG("analyzing entires...");
+    // start analyzing new entries
+    lib_analyze(libch);
+  }
 
   sort("artist");
 }
@@ -731,18 +735,19 @@ void update(ev_t ev)
     {
       song_refr_flag = 0;
 
-      printf("analyze ready, sorting db...\n");
       sort("artist");
 
-      printf("writing db...\n");
       db_write(libpath, db);
 
-      printf("organizing db...\n");
+      LOG("done, saving database");
+      LOG("done, organizing database");
+
       int succ = lib_organize(libpath, db);
-      if (succ)
+      if (succ == 0)
       {
         // save db
         db_write(libpath, db);
+        LOG("done, database saved");
       }
     }
   }
