@@ -228,7 +228,7 @@ void songitem_on_select(view_t* view, uint32_t index)
   ts.font        = fontpath;
   ts.align       = TA_CENTER;
   ts.size        = 25.0;
-  ts.textcolor   = 0x000000FF;
+  ts.textcolor   = 0x555555FF;
   ts.backcolor   = 0;
 
   tg_text_set(song, (char*)MGET(songmap, "title"), ts);
@@ -476,7 +476,7 @@ void genrebtn_pushed(view_t* view, void* data)
   if (filterlistback->parent)
     view_remove(header_center, filterlistback);
   else
-    view_insert(header_center, filterlistback, 1);
+    view_insert(header_center, filterlistback, 2);
 }
 
 void messagesbtn_pushed(view_t* view, void* data)
@@ -484,7 +484,7 @@ void messagesbtn_pushed(view_t* view, void* data)
   if (messagelistback->parent)
     view_remove(header_center, messagelistback);
   else
-    view_insert(header_center, messagelistback, 1);
+    view_insert(header_center, messagelistback, 2);
 }
 
 void init(int width, int height)
@@ -548,7 +548,7 @@ void init(int width, int height)
   VADD(songlist_fields, sitem_cell_new("last played", 150, 9));
   VADD(songlist_fields, sitem_cell_new("last skipped", 150, 10));
 
-  display         = view_get_subview(baseview, "display");
+  //display         = view_get_subview(baseview, "display");
   messagelistback = view_get_subview(baseview, "messagelistback");
   messagelist     = view_get_subview(baseview, "messagelist");
   header_center   = view_get_subview(baseview, "header_center");
@@ -581,9 +581,9 @@ void init(int width, int height)
   textstyle_t ts = {0};
   ts.font        = fontpath;
   ts.align       = TA_CENTER;
-  ts.size        = 35.0;
-  ts.textcolor   = 0x000000FF;
-  ts.backcolor   = 0;
+  ts.size        = 25.0;
+  ts.textcolor   = 0x555555FF;
+  ts.backcolor   = 0x0;
 
   tg_text_add(timeview);
   tg_text_set(timeview, "00:00", ts);
@@ -660,6 +660,7 @@ void init(int width, int height)
   /* ui_manager_add(texmapview); */
 
   ts.size      = 25.0;
+  ts.textcolor = 0x000000FF;
   ts.backcolor = 0x00000000;
 
   view_t* maxbtn   = view_get_subview(baseview, "maxicon");
@@ -671,12 +672,12 @@ void init(int width, int height)
   view_t* genrebtn = view_get_subview(baseview, "genrebtn");
   vh_button_add(genrebtn, NULL, genrebtn_pushed);
   tg_text_add(genrebtn);
-  tg_text_set(genrebtn, "genre/artist", ts);
+  tg_text_set(genrebtn, "filters", ts);
 
   view_t* messagesbtn = view_get_subview(baseview, "messagesbtn");
   vh_button_add(messagesbtn, NULL, messagesbtn_pushed);
   tg_text_add(messagesbtn);
-  tg_text_set(messagesbtn, "messages", ts);
+  tg_text_set(messagesbtn, "activity", ts);
 
   view_t* songlistheader = view_get_subview(baseview, "songlistheader");
 
@@ -745,8 +746,8 @@ void update(ev_t ev)
       textstyle_t ts = {0};
       ts.font        = fontpath;
       ts.align       = TA_CENTER;
-      ts.size        = 35.0;
-      ts.textcolor   = 0x000000FF;
+      ts.size        = 30.0;
+      ts.textcolor   = 0x555555FF;
       ts.backcolor   = 0;
 
       char timebuff[20];

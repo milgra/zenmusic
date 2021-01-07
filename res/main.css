@@ -91,7 +91,7 @@
 }
 
 #genrebtnbck {
-    top: 20px;
+    top: 10px;
     right: 20px;
     width: 120px;
     height: 30px;
@@ -106,7 +106,7 @@
 }
 
 #messagesbtnbck {
-    top: 20px;
+    top: 10px;
     left: 20px;
     width: 120px;
     height: 30px;
@@ -118,6 +118,45 @@
 #messagesbtn {
     width: 100%;
     height: 100%;
+}
+
+#timebck {
+    top: 10px;
+    margin: auto;
+    width: 200px;
+    height: 30px;
+    background-color: #FFFFFFFF;
+    border-radius: 10px;
+    box-shadow: 3px;
+}
+
+#time {
+    width: 100%;
+    height: 100%;
+    margin: auto;
+    top: 1px;
+    background-color: #FF0000FF;
+}
+
+#songbck {
+    top: 50px;
+    margin: auto;
+    width: 460px;
+    height: 90px;
+    background-color: #FFFFFFFF;
+    border-radius: 15px;
+    box-shadow: 3px;
+}
+
+#song {
+    top: 5px;
+    width: 100%;
+    height: 30px;
+}
+#artist {
+    top: 35px;
+    width: 100%;
+    height: 30px;
 }
 
 #artistbtn {
@@ -133,14 +172,14 @@
 
 #genrelist {
     width: 230px;
-    height: 500px;
+    height: 100%;
     left: 0px;
     background-color: #FFFFFFFF;
 }
 
 #artistlist {
     width: 230px;
-    height: 500px;
+    height: 100%;
     right: 0px;
     background-color: #FFFFFFFF;
 }
@@ -341,14 +380,14 @@
     height: 100%;
     margin: 10px;
     border-radius: 15px;
-    background-color: #FFFFFFFF;
+    background-color: #EEEEEEFF;
     box-shadow: 3px;
 }
 
 #messagelistback {
-    width: 478px;
-    height: 500px;
-    top: 10px;
+    width: 460px;
+    height: 800px;
+    top: 50px;
     margin: auto;
     border-radius: 15px;
     background-color: #FFFFFFFF;
@@ -366,9 +405,9 @@
 
 
 #filterlistback {
-    width: 478px;
-    height: 500px;
-    top: 10px;
+    width: 468px;
+    height: 800px;
+    top: 50px;
     margin: auto;
     border-radius: 15px;
     background-color: #FFFFFFFF;
@@ -382,30 +421,6 @@
     border-radius: 15px;
     background-color: #FFFFFFFF;
     box-shadow: 2px;
-}
-
-#time {
-    width: 59%;
-    height: 42px;
-    margin: auto;
-    top: 8px;
-    background-color: #FF0000FF;
-}
-
-#artist {
-    width: 97%;
-    height: 30px;
-    margin: auto;
-    top: 55px;
-    background-color: #00FF00FF;
-}
-
-#song {
-    width: 97%;
-    height: 30px;
-    margin: auto;
-    top: 90px;
-    background-color: #0000FFFF;
 }
 
 #search {

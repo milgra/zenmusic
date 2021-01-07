@@ -54,6 +54,7 @@ relative paths in library
 track number in song name for organizing
 
 test texture resize and reset, texture overflow and reset
+add text/textfield selectors to css
 ---
 
 next version
