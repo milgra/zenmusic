@@ -1,3 +1,4 @@
+#include "activity.c"
 #include "common.c"
 #include "cr_text.c"
 #include "db.c"
@@ -50,9 +51,10 @@ view_t* volbtn;
 size_t  lastindex = 0;
 int     loop_all  = 0;
 
+int messageitem_index = 0;
+
 view_t* mainview;
 view_t* display;
-view_t* messagelist;
 view_t* messagelistback;
 view_t* filterlistback;
 view_t* filterlist;
@@ -198,10 +200,6 @@ void close_button_pushed(view_t* view, void* data)
   wm_close();
 }
 
-void on_messagelist(view_t* view, void* data)
-{
-}
-
 void songitem_on_select(view_t* view, uint32_t index)
 {
   // deselect prev item
@@ -237,16 +235,6 @@ void songitem_on_select(view_t* view, uint32_t index)
   // LOG started playing xy
 
   player_play(MGET(songmap, "path"));
-}
-
-vec_t*   messages;
-uint32_t messageitem_index = 0;
-
-void on_messageitem_select(view_t* view, uint32_t index)
-{
-  printf("on_messageitem_select\n");
-  view_remove(header_center, messagelistback);
-  view_add(header_center, display);
 }
 
 void on_artistitem_select(view_t* view, uint32_t index)
@@ -326,41 +314,6 @@ int genrelist_update_item(view_t* listview, view_t* item, int index, int* item_c
   ts.backcolor   = 0xFFFFFFFF;
 
   vh_litem_upd_cell(item, "genre", &((cr_text_data_t){.style = ts, .text = genres->data[index]}));
-
-  return 0;
-}
-
-view_t* messagelist_create_item(view_t* listview)
-{
-  char idbuffer[100] = {0};
-  snprintf(idbuffer, 100, "messagelist_item%i", messageitem_index++);
-
-  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
-  rowview->hidden = 1;
-
-  vh_litem_add(rowview, 35, on_messageitem_select);
-  vh_litem_add_cell(rowview, "message", 150, cr_text_upd);
-
-  return rowview;
-}
-
-int messagelist_update_item(view_t* listview, view_t* item, int index, int* item_count)
-{
-  if (index < 0)
-    return 1; // no items before 0
-  if (index >= messages->length)
-    return 1; // no more items
-
-  *item_count = messages->length;
-
-  textstyle_t ts = {0};
-  ts.font        = fontpath;
-  ts.align       = 0;
-  ts.size        = 25.0;
-  ts.textcolor   = 0x000000FF;
-  ts.backcolor   = 0xFFFFFFFF;
-
-  vh_litem_upd_cell(item, "message", &((cr_text_data_t){.style = ts, .text = messages->data[index]}));
 
   return 0;
 }
@@ -499,27 +452,6 @@ void init(int width, int height)
   vec_t* views = view_gen_load(htmlpath, csspath, respath);
   baseview     = vec_head(views);
 
-  messages = VNEW();
-
-  VADD(messages, cstr_fromcstring("Elso uzenet."));
-  VADD(messages, cstr_fromcstring("Masodik uzenet."));
-  VADD(messages, cstr_fromcstring("Harmadik uzenet."));
-  VADD(messages, cstr_fromcstring("Elso uzenet."));
-  VADD(messages, cstr_fromcstring("Masodik uzenet."));
-  VADD(messages, cstr_fromcstring("Harmadik uzenet."));
-  VADD(messages, cstr_fromcstring("Elso uzenet."));
-  VADD(messages, cstr_fromcstring("Masodik uzenet."));
-  VADD(messages, cstr_fromcstring("Harmadik uzenet."));
-  VADD(messages, cstr_fromcstring("Elso uzenet."));
-  VADD(messages, cstr_fromcstring("Masodik uzenet."));
-  VADD(messages, cstr_fromcstring("Harmadik uzenet."));
-  VADD(messages, cstr_fromcstring("Elso uzenet."));
-  VADD(messages, cstr_fromcstring("Masodik uzenet."));
-  VADD(messages, cstr_fromcstring("Harmadik uzenet."));
-  VADD(messages, cstr_fromcstring("Elso uzenet."));
-  VADD(messages, cstr_fromcstring("Masodik uzenet."));
-  VADD(messages, cstr_fromcstring("Harmadik uzenet."));
-
   // layout to starter size
   view_set_frame(baseview, (r2_t){0.0, 0.0, (float)width, (float)height});
   view_layout(baseview);
@@ -527,6 +459,8 @@ void init(int width, int height)
   common_respath = respath;
 
   text_init();
+
+  activity_init();
 
   ui_manager_init(width, height);
   ui_manager_add(baseview);
@@ -549,11 +483,12 @@ void init(int width, int height)
   VADD(songlist_fields, sitem_cell_new("last skipped", 150, 10));
 
   //display         = view_get_subview(baseview, "display");
-  messagelistback = view_get_subview(baseview, "messagelistback");
-  messagelist     = view_get_subview(baseview, "messagelist");
-  header_center   = view_get_subview(baseview, "header_center");
+  messagelistback     = view_get_subview(baseview, "messagelistback");
+  view_t* messagelist = view_get_subview(baseview, "messagelist");
 
-  vh_list_add(messagelist, messagelist_create_item, messagelist_update_item);
+  activity_attach(messagelist, fontpath);
+
+  header_center = view_get_subview(baseview, "header_center");
 
   view_t* genrelist = view_get_subview(baseview, "genrelist");
   vh_list_add(genrelist, genrelist_create_item, genrelist_update_item);
@@ -718,11 +653,17 @@ void init(int width, int height)
   // read db
   db_read(libpath, db);
 
+  LOG("database loaded, entries : %i", db->count);
+
   // read library
   lib_read(libpath);
 
+  LOG("library scanned, files : %i", lib_entries());
+
   // remove existing
   lib_remove_duplicates(db);
+
+  LOG("new files detected : %i", lib_entries());
 
   // start analyzing new entries
   lib_analyze(libch);

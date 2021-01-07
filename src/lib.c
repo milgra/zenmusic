@@ -8,6 +8,7 @@ void lib_read(char* libpath);
 void lib_remove_duplicates(map_t* db);
 void lib_analyze(ch_t* channel);
 int  lib_organize(char* libpath, map_t* db);
+int  lib_entries();
 
 #endif
 
@@ -25,6 +26,11 @@ int  lib_organize(char* libpath, map_t* db);
 map_t* lib_db;
 vec_t* rem_db;
 char   lock_db = 0;
+
+int lib_entries()
+{
+  return lib_db->count;
+}
 
 static int lib_file_data(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
 {
