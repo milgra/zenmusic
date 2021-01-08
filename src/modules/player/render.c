@@ -232,6 +232,7 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap, int edge
       i  = i_start + ch;
       y1 = s->ytop + (h / 2); /* position of center line */
 
+      int prevy = 0;
       for (x = 0; x < width; x++)
       {
         y = (s->sample_array[i] * h2) >> 15;
@@ -247,7 +248,13 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap, int edge
           y2 = ys + y;
         }
 
-        gfx_rect(bitmap, s->xleft + x, y2, 1, 2, 0xFFFFFFFF, 1);
+        int sy = prevy < y2 ? prevy : y2;
+        int hy = prevy < y2 ? y2 - prevy : prevy - y2;
+        if (hy == 0) hy = 1;
+
+        gfx_rect(bitmap, s->xleft + x, sy, 1, hy, 0xFFFFFFFF, 1);
+
+        prevy = y2;
 
         i += channels;
         if (i >= SAMPLE_ARRAY_SIZE)
