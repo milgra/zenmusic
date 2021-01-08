@@ -56,6 +56,7 @@ int activity_update_item(view_t* listview, view_t* item, int index, int* item_co
 
   textstyle_t ts = {0};
   ts.font        = act.fontpath;
+  ts.margin      = 10.0;
   ts.align       = TA_LEFT;
   ts.size        = 25.0;
   ts.textcolor   = 0x000000FF;

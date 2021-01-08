@@ -191,7 +191,9 @@ void vh_lhead_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* vie
   lheadcell_t* last = vec_tail(vh->cells);
   float        x    = last == NULL ? 0 : (last->view->frame.local.x + last->view->frame.local.w + 1);
 
-  view_t* cellview = view_new(cstr_fromformat("%s%s", view->id, id, NULL), (r2_t){x, 0, size, vh->height});
+  char*   cellid   = cstr_fromformat("%s%s", view->id, id, NULL);
+  view_t* cellview = view_new(cellid, (r2_t){x, 0, size, vh->height});
+  REL(cellid);
 
   cell->view = cellview;
 

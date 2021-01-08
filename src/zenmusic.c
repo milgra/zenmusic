@@ -621,6 +621,8 @@ void init(int width, int height)
   vh_button_add(maxbtn, NULL, max_button_pushed);
   vh_button_add(closebtn, NULL, close_button_pushed);
 
+  ts.align = TA_CENTER;
+
   view_t* genrebtn = view_get_subview(baseview, "genrebtn");
   vh_button_add(genrebtn, NULL, genrebtn_pushed);
   tg_text_add(genrebtn);
@@ -633,11 +635,12 @@ void init(int width, int height)
 
   view_t* songlistheader = view_get_subview(baseview, "songlistheader");
 
-  ts.font      = fontpath;
-  ts.align     = 0;
-  ts.size      = 25.0;
-  ts.textcolor = 0x000000FF;
-  ts.backcolor = 0xEFEFEFFF;
+  ts.font        = fontpath;
+  ts.align       = 0;
+  ts.margin_left = 10;
+  ts.size        = 25.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0xEFEFEFFF;
 
   vh_lhead_add(songlistheader, 30, on_header_field_select, on_header_field_insert, on_header_field_resize);
 

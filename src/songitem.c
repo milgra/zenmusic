@@ -43,13 +43,6 @@ sitem_cell_t* sitem_cell_new(char* id, int size, int index)
 
 view_t* songitem_new(char* fontpath, void (*on_select)(view_t* view, uint32_t index), vec_t* fields)
 {
-  textstyle_t ts = {0};
-  ts.font        = fontpath;
-  ts.align       = 0;
-  ts.size        = 25.0;
-  ts.textcolor   = 0xFFFFFFFF;
-  ts.backcolor   = 0x00000022;
-
   char idbuffer[100] = {0};
   snprintf(idbuffer, 100, "list_item%i", songitem_index++);
 
@@ -81,6 +74,7 @@ void songitem_update(view_t* rowview, int index, map_t* file, char* fontpath, ve
   textstyle_t ts = {0};
   ts.font        = fontpath;
   ts.align       = 0;
+  ts.margin_left = 10;
   ts.size        = 25.0;
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = color1;

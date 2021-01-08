@@ -37,7 +37,11 @@ typedef struct _textstyle_t
   char        multiline;
 
   float size;
-  float margin;
+  int   margin;
+  int   margin_top;
+  int   margin_right;
+  int   margin_bottom;
+  int   margin_left;
 
   uint32_t textcolor;
   uint32_t backcolor;
@@ -159,7 +163,7 @@ void text_break_glyphs(
 
   int   asc, desc, lgap;   // glyph ascent, descent, linegap
   int   lsb, advx;         // left side bearing, glyph advance
-  int   fonth, lineh;      // baseline position, base height, line height
+  int   fonth, lineh;      // base height, line height
   float scale, xpos, ypos; // font scale, position
 
   stbtt_GetFontVMetrics(font, &asc, &desc, &lgap);
@@ -231,6 +235,7 @@ void text_break_glyphs(
 
     // advance x axis
     xpos += (advx * scale);
+    // in case of space/invisible, set width based on pos
     if (w == 0) glyph.w = xpos - glyph.x;
 
     // advance with kerning
@@ -269,32 +274,43 @@ void text_align_glyphs(glyph_t*    glyphs,
     {
       glyph_t g = glyphs[i];
       float   x = g.x;
+
       // get last glyph in row for row width
+
       float ex = x; // end x
-      float rw = 0; // row width
-      int   ri;     // row index
-      int   sc;     // space count
+
+      int ri; // row index
+      int sc; // space count
+
       for (ri = i; ri < count; ri++)
       {
-        glyph_t rg = glyphs[ri];
-        if (rg.base_y != g.base_y) break;
+        glyph_t rg = glyphs[ri];          // row glyph
+        if (rg.base_y != g.base_y) break; // last glyph in row
         ex = rg.x + rg.w;
         if (rg.cp == ' ') sc += 1; // count spaces
       }
-      rw = ex - x;
+
+      float rw = ex - x; // row width
+
       // calculate horizontal shift
-      float hs = 0; // space
+
+      float hs = 0; // horizontal space before first glyph
+
       if (style.align == TA_RIGHT) hs = (float)w - rw;
       if (style.align == TA_CENTER) hs = ((float)w - rw) / 2.0; // space
       if (style.align == TA_JUSTIFY) hs = ((float)w - rw) / sc; // space
+
       // shift glyphs in both direction
+
       for (int ni = i; ni < ri; ni++)
       {
         glyphs[ni].x += (int)hs;
         glyphs[ni].y += (int)vs;
         glyphs[ni].base_y += (int)vs;
       }
+
       // jump to next row
+
       i = ri - 1;
     }
   }
@@ -306,6 +322,9 @@ void text_render_glyphs(glyph_t*    glyphs,
                         bm_t*       bitmap)
 {
   gfx_rect(bitmap, 0, 0, bitmap->w, bitmap->h, style.backcolor, 0);
+
+  int x = style.margin_left;
+  int y = style.margin_top;
 
   // get or load font
   stbtt_fontinfo* font = MGET(fonts, style.font);
@@ -345,8 +364,8 @@ void text_render_glyphs(glyph_t*    glyphs,
                                         g.cp);
 
       gfx_blend_8(bitmap,
-                  g.x,
-                  g.y,
+                  x + g.x,
+                  y + g.y,
                   style.textcolor,
                   gbytes,
                   g.w,
@@ -369,11 +388,19 @@ void text_render(
     textstyle_t style,
     bm_t*       bitmap)
 {
+  if (style.margin_left == 0 && style.margin > 0) style.margin_left = style.margin;
+  if (style.margin_right == 0 && style.margin > 0) style.margin_right = style.margin;
+  if (style.margin_top == 0 && style.margin > 0) style.margin_top = style.margin;
+  if (style.margin_bottom == 0 && style.margin > 0) style.margin_bottom = style.margin;
+
+  int w = bitmap->w - style.margin_right - style.margin_left;
+  int h = bitmap->h - style.margin_top - style.margin_bottom;
+
   glyph_t* glyphs = malloc(sizeof(glyph_t) * text->length);
   for (int i = 0; i < text->length; i++) glyphs[i].cp = text->codepoints[i];
 
-  text_break_glyphs(glyphs, text->length, style, bitmap->w, bitmap->h);
-  text_align_glyphs(glyphs, text->length, style, bitmap->w, bitmap->h);
+  text_break_glyphs(glyphs, text->length, style, w, h);
+  text_align_glyphs(glyphs, text->length, style, w, h);
   text_render_glyphs(glyphs, text->length, style, bitmap);
 }
 
