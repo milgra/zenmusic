@@ -30,9 +30,9 @@ int tg_text_index = 0;
 
 void tg_text_gen(view_t* view)
 {
-  if (view->frame.local.w > 0 && view->frame.local.h > 0)
+  tg_text_t* gen = view->tex_gen_data;
+  if (view->frame.local.w > 0 && view->frame.local.h > 0 && gen->text)
   {
-    tg_text_t* gen = view->tex_gen_data;
 
     str_t* str = str_new();
     str_addbytearray(str, gen->text);

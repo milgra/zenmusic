@@ -35,7 +35,8 @@ char* libpath = "/home/milgra/Music";
 view_t* songlist;
 view_t* coverview;
 view_t* baseview;
-view_t* timeview;
+view_t* minuteview;
+view_t* secondview;
 view_t* display;
 
 view_t* song;
@@ -231,6 +232,10 @@ void songitem_on_select(view_t* view, uint32_t index)
 
   tg_text_set(song, (char*)MGET(songmap, "title"), ts);
   tg_text_set(artist, (char*)MGET(songmap, "artist"), ts);
+
+  char buff[100];
+  snprintf(buff, 100, "%s/%s/%s", (char*)MGET(songmap, "date"), (char*)MGET(songmap, "genre"), "192Kb/s");
+  tg_text_set(info, buff, ts);
 
   // LOG started playing xy
 
@@ -510,18 +515,28 @@ void init(int width, int height)
   // decrease retain count of cells because of inline allocation
   vec_dec_retcount(songlist_fields);
 
-  timeview              = view_get_subview(baseview, "time");
-  timeview->needs_touch = 0;
+  minuteview              = view_get_subview(baseview, "minute");
+  minuteview->needs_touch = 0;
+
+  secondview              = view_get_subview(baseview, "second");
+  secondview->needs_touch = 0;
+
+  tg_text_add(minuteview);
 
   textstyle_t ts = {0};
   ts.font        = fontpath;
-  ts.align       = TA_CENTER;
+  ts.align       = TA_RIGHT;
   ts.size        = 25.0;
   ts.textcolor   = 0x555555FF;
   ts.backcolor   = 0x0;
 
-  tg_text_add(timeview);
-  tg_text_set(timeview, "00:00", ts);
+  tg_text_set(minuteview, "00:", ts);
+
+  tg_text_add(secondview);
+
+  ts.align = TA_LEFT;
+
+  tg_text_set(secondview, "00", ts);
 
   song              = view_get_subview(baseview, "song");
   song->needs_touch = 0;
@@ -537,7 +552,9 @@ void init(int width, int height)
   tg_text_add(artist);
   tg_text_set(artist, "-", ts);
 
-  //info = view_get_subview(baseview, "info");
+  info = view_get_subview(baseview, "info");
+  tg_text_add(info);
+  tg_text_set(info, "-", ts);
 
   ts.size = 20.0;
 
@@ -690,14 +707,17 @@ void update(ev_t ev)
 
       textstyle_t ts = {0};
       ts.font        = fontpath;
-      ts.align       = TA_CENTER;
-      ts.size        = 30.0;
+      ts.align       = TA_RIGHT;
+      ts.size        = 25.0;
       ts.textcolor   = 0x555555FF;
       ts.backcolor   = 0;
 
       char timebuff[20];
-      snprintf(timebuff, 20, "%.2i:%.2i", (int)floor(lasttime / 60.0), (int)lasttime % 60);
-      tg_text_set(timeview, timebuff, ts);
+      snprintf(timebuff, 20, "%.2i:", (int)floor(lasttime / 60.0));
+      tg_text_set(minuteview, timebuff, ts);
+      snprintf(timebuff, 20, "%.2i", (int)lasttime % 60);
+      ts.align = TA_LEFT;
+      tg_text_set(secondview, timebuff, ts);
 
       double posratio = time / player_duration();
       tg_knob_set_angle(playbtn, posratio * 6.28 - 3.14 / 2.0);
