@@ -70,8 +70,6 @@ void lib_read(char* libpath)
   flags |= FTW_PHYS;
 
   nftw(libpath, lib_file_data, 20, flags);
-
-  printf("LOG lib read, %i entries found\n", lib_db->count);
 }
 
 void lib_remove_duplicates(map_t* db)
@@ -107,16 +105,13 @@ void lib_remove_duplicates(map_t* db)
     }
   }
 
-  printf("entries not in db %i\n", lib_db->count);
-
   REL(paths);
 }
 
 int analyzer_thread(void* chptr)
 {
-  ch_t* channel = chptr;
-  printf("analyzer thread start\n");
-  map_t* curr = NULL;
+  ch_t*  channel = chptr;
+  map_t* curr    = NULL;
 
   while (rem_db->length > 0)
   {
@@ -175,7 +170,6 @@ int analyzer_thread(void* chptr)
     }
   }
 
-  printf("closing analyzer loop\n");
   lock_db = 0;
   return 0;
 }
@@ -194,7 +188,6 @@ void lib_analyze(ch_t* channel)
 
 int lib_mkpath(char* file_path, mode_t mode)
 {
-  printf("mkdir %s\n", file_path);
   assert(file_path && *file_path);
   for (char* p = strchr(file_path + 1, '/');
        p;

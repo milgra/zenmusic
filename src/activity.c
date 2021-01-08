@@ -74,7 +74,6 @@ void activity_init()
 
 void activity_attach(view_t* view, char* fontpath)
 {
-  printf("attach\n");
   vh_list_add(view, activity_create_item, activity_update_item);
 
   act.view     = view;
@@ -92,6 +91,8 @@ void activity_log(char* fmt, ...)
   VADD(act.logs, str);
 
   if (act.view) vh_list_fill(act.view);
+
+  printf("LOG %s\n", str);
 }
 
 #endif

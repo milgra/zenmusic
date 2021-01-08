@@ -35,13 +35,19 @@ freebsd for os
 
 first version
 
-working messages
-message - using library usr/milgra/Music
+fix texture resizing/rect readding
+fix list show/hide
+fix list anxiety
+fix query field
+make genre/artist selection filter songs, fill up query bar
+make tag editor list
+
+tilemap is auto-resize legyen duplazassal, min screen size legyen alapbol
+
 tag editor window jobb klikkre, album url-t is kezzel kelljen beirni egyelore
 increase play count
 fix leaks
 elso indulasnal analyzer progresst mutassa valahol amig zenet hallgatsz
-tilemap is auto-resize legyen duplazassal, min screen size legyen alapbol
 scrollbar drag
 config file - default library
 text overflow fix
@@ -52,30 +58,15 @@ amit releaselni kell, csinalodjon new-val!
 get extension from stream for organizing
 relative paths in library
 track number in song name for organizing
-
 test texture resize and reset, texture overflow and reset
-add text/textfield selectors to css
----
-
-next version
-
+add text/input selectors to css, use text style from css
 search/filter bar - genre is metal, name contains x, year between x and y
 uj event villanjon fel artist helyen, odakattintva event viewer, 
 spectrum, bar analyzer, left/right effect button, unshift bmp?
-config file - library path, visu state,
 speed up font rendering by using glyph indexes instead of codepoints
-
----
-
-future features
-
 ui color shade selector, darknal invertalja a jelenlegi semat
 button on/off alpha change on icon
-search bar csusszon ki header alol ha songlistheaderre megy az eger
-id3 editor
 unit teszter gl_compositorhoz
-ha az egeret a lista item jobb oldalara viszed popupban mutassa id3/song infokat es album artot
-resizable header/songlist border
 grid-based warping of video/album cover based on frequence ( bass in the center )
 andromeda:  monolith-like particle visu
 swithc between multiple glyph views in paragraph/one multiglyph view in paragraph  

@@ -21,8 +21,6 @@ void db_read(char* libpath, map_t* db)
   char* dbpath = cstr_fromformat("%s/zmusdb", libpath, NULL);
   char* dbstr  = cstr_fromfile(dbpath);
 
-  printf("db_read %s\n", dbpath);
-
   if (dbstr)
   {
     char*  token = strtok(dbstr, "\n");
@@ -55,8 +53,6 @@ void db_read(char* libpath, map_t* db)
     }
 
     REL(dbstr);
-
-    printf("LOG db loaded\n");
   }
   else
   {
@@ -99,8 +95,6 @@ void db_write(char* libpath, map_t* db)
   // after successful write, copy new db to main db
 
   int succ = rename(new_path, old_path);
-
-  printf("LOG db saved %i\n", succ);
 
   // cleanup
 
@@ -206,7 +200,6 @@ void db_genres(map_t* db, vec_t* res)
       if (!found) VADD(res, genre);
     }
   }
-  printf("db_genres_result %i\n", res->length);
 }
 
 void db_artists(vec_t* vec, vec_t* res)
@@ -228,8 +221,6 @@ void db_artists(vec_t* vec, vec_t* res)
   map_values(artists, res);
 
   REL(artists);
-
-  printf("db_artists_result %i\n", res->length);
 }
 
 #endif

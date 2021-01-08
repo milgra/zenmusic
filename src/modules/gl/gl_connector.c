@@ -347,8 +347,6 @@ glrect_t gl_new_texture(uint32_t page, int size)
 
   gltex_t tex = gl.textures[page];
 
-  printf("gl_get_texture page %i index %i name %i\n", page, tex.index, tex.tx);
-
   return ((glrect_t){.w = tex.w, .h = tex.h});
 }
 

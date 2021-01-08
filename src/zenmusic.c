@@ -670,6 +670,8 @@ void init(int width, int height)
   artists = VNEW();
   genres  = VNEW();
 
+  LOG("using database : %s", libpath);
+
   // read db
   db_read(libpath, db);
 
