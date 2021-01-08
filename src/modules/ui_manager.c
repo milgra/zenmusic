@@ -45,6 +45,7 @@ void ui_manager_event(ev_t ev)
   else if (ev.type == EV_RESIZE)
   {
     r2_t rf = root->frame.local;
+    printf("resize %i %i\n", ev.w, ev.h);
     if (rf.w != (float)ev.w ||
         rf.h != (float)ev.h)
     {

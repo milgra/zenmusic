@@ -16,12 +16,12 @@
 #include "mtbitmap.c"
 #include "mtmath2.c"
 
-void ui_compositor_init(int, int);
+void ui_compositor_init();
 void ui_compositor_reset();
-void ui_compositor_resize(int width, int height);
 
-int ui_compositor_new_texture();
-int ui_compositor_map_texture();
+void ui_compositor_reset_texmap(int size);
+void ui_compositor_new_texture(int page, int width, int height);
+void ui_compositor_resize_texture(int page, int width, int height);
 
 void ui_compositor_rewind();
 void ui_compositor_add(char* id,
@@ -32,11 +32,13 @@ void ui_compositor_add(char* id,
                        int   page,   // texture page
                        int   full,   // needs full texture
                        int   ext,    // external texture
-                       char* texid); // texture id
+                       char* texid,
+                       int   tex_w,
+                       int   tex_h); // texture id
 void ui_compositor_upd_pos(int index, r2_t frame, float border);
-void ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_t* bm);
+char ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_t* bm);
 void ui_compositor_upd_vis(int index, char hidden);
-void ui_compositor_render(uint32_t time);
+void ui_compositor_render(uint32_t time, int width, int height);
 
 #endif
 
@@ -73,12 +75,8 @@ void     crect_set_texture(crect_t* rect, float tlx, float tly, float brx, float
 
 struct uic_t
 {
-  fb_t* fb; // float buffer
-  tm_t* tm; // texture map
-  int   width;
-  int   height;
-  int   tex_page;
-  int   tex_size;
+  fb_t* fb;      // float buffer
+  tm_t* tm;      // texture map
   int   upd_geo; // update geometry
 
   vec_t* cache;
@@ -90,48 +88,17 @@ struct uic_t
   uint32_t ren_frame;
 } uic = {0};
 
-void ui_compositor_reset_textures(size)
+void ui_compositor_init()
 {
-  printf("ui compositor reset textures %i\n", size);
-  if (uic.tex_size > 0)
-  {
-    REL(uic.tm); // del texmap
+  printf("compositor init\n");
 
-    gl_del_texture(0); // del texture for texmap
-    gl_del_texture(1); // del texture for mask
-
-    for (int i = 2; i <= uic.tex_page; i++) gl_del_texture(i); // custom textures
-  }
-
-  uic.tm       = tm_new(size, size);
-  uic.tex_size = size;
-
-  gl_new_texture(0, size); // texture for texmap
-  gl_new_texture(1, size); // texture for mask
-
-  for (int i = 2; i <= uic.tex_page; i++) gl_new_texture(i, size); // custom textures
-}
-
-void ui_compositor_init(int width, int height)
-{
   gl_init();
-
-  uic.width  = width;
-  uic.height = height;
 
   uic.fb = fb_new();
 
   uic.cache     = VNEW();
   uic.cache_ind = 0;
   uic.upd_geo   = 1;
-  uic.tex_page  = 2;
-
-  int size = width < height ? height : width;
-  size     = size < 4096 ? 4096 : size;
-  int sqr  = 256;
-  while (sqr < size) sqr *= 2;
-
-  ui_compositor_reset_textures(sqr);
 }
 
 void ui_compositor_rewind()
@@ -148,21 +115,24 @@ void ui_compositor_reset()
   uic.upd_geo   = 1;
 }
 
-void ui_compositor_resize(int width, int height)
+void ui_compositor_reset_texmap(int size)
 {
-  uic.width   = width;
-  uic.height  = height;
-  uic.upd_geo = 1;
+  printf("ui_compositor_new_texmap %i\n", size);
+  if (uic.tm) REL(uic.tm);
+  uic.tm = tm_new(size, size);
 }
 
-int ui_compositor_new_texture()
+void ui_compositor_new_texture(int page, int width, int height)
 {
-  return uic.tex_page++;
+  printf("ui_compositor_new_texture %i %i %i\n", page, width, height);
+  gl_new_texture(0, width, height); // texture for texmap
 }
 
-int ui_compositor_map_texture()
+void ui_compositor_resize_texture(int page, int width, int height)
 {
-  return 0;
+  printf("ui_compositor_resize_texture %i %i %i\n", page, width, height);
+  gl_del_texture(page);
+  gl_new_texture(page, width, height);
 }
 
 void ui_compositor_add(char* id,
@@ -173,7 +143,9 @@ void ui_compositor_add(char* id,
                        int   page,   // texture page
                        int   full,   // needs full texture
                        int   ext,    // external texture
-                       char* texid)  // texture id
+                       char* texid,
+                       int   tex_w,
+                       int   tex_h) // texture id
 {
   // printf("COMP ADD %s %f %f %f %f masked %i\n", id, frame.x, frame.y, frame.w, frame.h, masked);
 
@@ -215,10 +187,7 @@ void ui_compositor_add(char* id,
   {
     if (frame.w > 0 && frame.h > 0)
     {
-      // use view dimensions as texture dimensions in case of external texture
-      glrect_t tex_dim = gl_new_texture(page, uic.tex_size);
-      // TODO reset this on texture resize
-      crect_set_texture(rect, 0.0, 0.0, frame.w / (float)uic.tex_size, frame.h / (float)uic.tex_size);
+      crect_set_texture(rect, 0.0, 0.0, frame.w / (float)tex_w, frame.h / (float)tex_h);
     }
   }
   else
@@ -267,7 +236,7 @@ void ui_compositor_upd_pos(int index, r2_t frame, float border)
   uic.upd_geo = 1;
 }
 
-void ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_t* bm)
+char ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_t* bm)
 {
   crect_t* rect = uic.cache->data[index];
 
@@ -284,7 +253,11 @@ void ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_
     // texture doesn't exist or size mismatch
     int success = tm_put(uic.tm, texid, frame.w, frame.h);
     // TODO reset main texture, maybe all views?
-    if (success < 0) printf("TEXTURE FULL, NEEDS RESET\n");
+    if (success < 0)
+    {
+      // printf("TEXTURE FULL, NEEDS RESET\n");
+      return 1;
+    }
 
     // update tex coords
     tc = tm_get(uic.tm, texid);
@@ -299,9 +272,11 @@ void ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_
   uic.tex_bytes += bm->size;
 
   uic.upd_geo = 1;
+
+  return 0;
 }
 
-void ui_compositor_render(uint32_t time)
+void ui_compositor_render(uint32_t time, int width, int height)
 {
   if (uic.upd_geo == 1)
   {
@@ -321,7 +296,7 @@ void ui_compositor_render(uint32_t time)
   uic.ren_frame += 1;
 
   // rendering region
-  glrect_t reg_full = {0, 0, uic.width, uic.height};
+  glrect_t reg_full = {0, 0, width, height};
 
   // reset main buffer
   gl_clear_framebuffer(TEX_CTX, 0.8, 0.8, 0.8, 1.0);

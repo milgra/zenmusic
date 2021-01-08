@@ -33,14 +33,14 @@ typedef struct _glrect_t
   int h;
 } glrect_t;
 
-void     gl_init();
-void     gl_del_texture(uint32_t i);
-glrect_t gl_new_texture(uint32_t i, int size);
-void     gl_upload_vertexes(fb_t* fb);
-void     gl_upload_to_texture(int page, int x, int y, int w, int h, void* data);
-void     gl_clear_framebuffer(int page, float r, float g, float b, float a);
-void     gl_draw_vertexes_in_framebuffer(int page, int start, int end, glrect_t source_region, glrect_t target_region, gl_sha_typ_t shader, int domask);
-void     gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glrect_t source_region, glrect_t target_region, glrect_t window, gl_sha_typ_t shader);
+void gl_init();
+void gl_del_texture(uint32_t i);
+void gl_new_texture(uint32_t i, int width, int height);
+void gl_upload_vertexes(fb_t* fb);
+void gl_upload_to_texture(int page, int x, int y, int w, int h, void* data);
+void gl_clear_framebuffer(int page, float r, float g, float b, float a);
+void gl_draw_vertexes_in_framebuffer(int page, int start, int end, glrect_t source_region, glrect_t target_region, gl_sha_typ_t shader, int domask);
+void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glrect_t source_region, glrect_t target_region, glrect_t window, gl_sha_typ_t shader);
 
 #endif
 
@@ -339,19 +339,16 @@ void gl_init(width, height)
   gl.vertexes[1] = create_buffer();
 }
 
-glrect_t gl_new_texture(uint32_t page, int size)
+void gl_new_texture(uint32_t page, int width, int height)
 {
   assert(page < TEX_CTX); /* 0 is reserved for context's default framebuffer */
 
-  if (gl.textures[page].w == 0) gl.textures[page] = gl_create_texture(page, size, size);
-
-  gltex_t tex = gl.textures[page];
-
-  return ((glrect_t){.w = tex.w, .h = tex.h});
+  gl.textures[page] = gl_create_texture(page, width, height);
 }
 
-void gl_del_texture(uint32_t i)
+void gl_del_texture(uint32_t page)
 {
+  gl_delete_texture(gl.textures[page]);
 }
 
 void gl_upload_vertexes(fb_t* fb)

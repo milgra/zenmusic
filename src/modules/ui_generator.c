@@ -41,15 +41,47 @@ struct _ui_generator_t
   vec_t*      views;
   SDL_Thread* thread;
   ch_t*       channel;
+  int         width;
+  int         height;
+  char        grow;
+  int         texpage;
+  int         texmapsize;
+  int         wpwr;
+  int         hpwr;
 } uig = {0};
+
+int nxt_pwr(int size)
+{
+  int val = 512;
+  while (val < size) val *= 2;
+  return val;
+}
 
 int ui_generator_init(int width, int height)
 {
   ui_compositor_init(width, height);
 
+  uig.width  = width;
+  uig.height = height;
+
   uig.views   = VNEW();
   uig.channel = ch_new(50);
   uig.thread  = SDL_CreateThread(ui_generator_workloop, "generator", NULL);
+
+  // create texmap
+  ui_compositor_reset_texmap(2048);
+  uig.texmapsize = 2048;
+
+  int wp = nxt_pwr(width);
+  int hp = nxt_pwr(height);
+
+  ui_compositor_new_texture(0, 2048, 2048); // texmap texture
+  ui_compositor_new_texture(1, wp, hp);     // mask texture, screen size fixed
+
+  uig.texpage = 2;
+
+  uig.wpwr = wp;
+  uig.hpwr = hp;
 
   return (uig.thread != NULL);
 }
@@ -68,8 +100,13 @@ void ui_generator_add(view_t* view)
   if (view->texture.page == -1)
   {
     // use a texture map texture page
-    if (view->texture.type == TT_MANAGED) view_set_texture_page(view, ui_compositor_map_texture());
-    if (view->texture.type == TT_EXTERNAL) view_set_texture_page(view, ui_compositor_new_texture());
+    if (view->texture.type == TT_MANAGED) view_set_texture_page(view, 0);
+    if (view->texture.type == TT_EXTERNAL)
+    {
+      ui_compositor_new_texture(uig.texpage, uig.wpwr, uig.hpwr);
+      view_set_texture_page(view, uig.texpage);
+      uig.texpage += 1;
+    }
   }
 
   ui_compositor_add(view->id,
@@ -80,11 +117,88 @@ void ui_generator_add(view_t* view)
                     view->texture.page,       // texture page
                     view->texture.full,       // needs full texture
                     view->texture.page > 0,   // external texture
-                    view->texture.id);        // texture id
+                    view->texture.id,         // texture id
+                    uig.wpwr,
+                    uig.hpwr);
+}
+
+void ui_generator_resend_views()
+{
+  printf("ui_generator_resend_views");
+
+  ui_compositor_rewind(); // prepare for view resending
+
+  int resize_texmap = 0;
+
+  for (int index = 0;
+       index < uig.views->length;
+       index++)
+  {
+    view_t* view = uig.views->data[index];
+    ui_compositor_add(view->id,
+                      view->masked,
+                      view->hidden,
+                      view->frame.global,       // frame
+                      view->layout.shadow_blur, // view border
+                      view->texture.page,       // texture page
+                      view->texture.full,       // needs full texture
+                      view->texture.page > 0,   // external texture
+                      view->texture.id,         // texture id
+                      uig.wpwr,
+                      uig.hpwr);
+
+    if (view->texture.state == TS_READY)
+    {
+      resize_texmap |= ui_compositor_upd_bmp(index,
+                                             view->frame.global,
+                                             view->layout.shadow_blur,
+                                             view->texture.id,
+                                             view->texture.bitmap);
+    }
+  }
+
+  if (resize_texmap)
+  {
+    // if texture gets full even after a reset force it's resize in the next render round
+    uig.grow = 1;
+  }
+  else
+  {
+    // reset growing
+    uig.grow = 0;
+  }
+}
+
+void ui_generator_resize_texmap(int size)
+{
+  ui_compositor_reset_texmap(size);
+  ui_compositor_resize_texture(0, size, size);
+}
+
+void ui_generator_resize_framebuffers(int w, int h)
+{
+  for (int index = 1; index < uig.texpage; index++)
+  {
+    ui_compositor_resize_texture(index, w, h);
+  }
+}
+
+void ui_generator_resize(int width, int height)
+{
+  uig.width  = width;
+  uig.height = height;
+
+  int wp = nxt_pwr(width);
+  int hp = nxt_pwr(height);
+
+  // resize framebuffers if screen size changes
+  if (wp != uig.wpwr || hp != uig.hpwr) ui_generator_resize_framebuffers(wp, hp);
 }
 
 void ui_generator_render(uint32_t time)
 {
+  int reset_texmap = 0;
+
   for (int i = 0; i < uig.views->length; i++)
   {
     view_t* view = uig.views->data[i];
@@ -110,7 +224,7 @@ void ui_generator_render(uint32_t time)
 
     if (view->texture.changed)
     {
-      ui_compositor_upd_bmp(i, view->frame.global, view->layout.shadow_blur, view->texture.id, view->texture.bitmap);
+      reset_texmap |= ui_compositor_upd_bmp(i, view->frame.global, view->layout.shadow_blur, view->texture.id, view->texture.bitmap);
 
       view->frame.dim_changed = 0;
       view->texture.changed   = 0;
@@ -123,7 +237,18 @@ void ui_generator_render(uint32_t time)
     }
   }
 
-  ui_compositor_render(time);
+  ui_compositor_render(time, uig.width, uig.height);
+
+  if (reset_texmap || uig.grow)
+  {
+    printf("texture is full in generator render loop, forcing reset, grow : %i\n", uig.grow);
+    if (uig.grow)
+    {
+      uig.texmapsize *= 2;
+      ui_generator_resize_texmap(uig.texmapsize);
+    }
+    ui_generator_resend_views();
+  }
 }
 
 int ui_generator_workloop()
@@ -137,31 +262,6 @@ int ui_generator_workloop()
       view_gen_texture(view);
     }
     SDL_Delay(16);
-  }
-}
-
-void ui_generator_resize(int width, int height)
-{
-  ui_compositor_resize(width, height);
-
-  // TODO DO WE NEED TO RESET?!?!
-  ui_compositor_reset();
-
-  for (int i = 0; i < uig.views->length; i++)
-  {
-    view_t* view = uig.views->data[i];
-    ui_compositor_add(view->id,
-                      view->masked,
-                      view->hidden,
-                      view->frame.global,       // frame
-                      view->layout.shadow_blur, // view border
-                      view->texture.page,       // texture page
-                      view->texture.full,       // needs full texture
-                      view->texture.page > 0,   // external texture
-                      view->texture.id);        // texture id
-
-    if (view->texture.state == TS_READY)
-      ui_compositor_upd_bmp(i, view->frame.global, view->layout.shadow_blur, view->texture.id, view->texture.bitmap);
   }
 }
 
