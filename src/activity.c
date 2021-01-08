@@ -52,6 +52,8 @@ int activity_update_item(view_t* listview, view_t* item, int index, int* item_co
   if (index >= act.logs->length)
     return 1; // no more items
 
+  printf("activity update %i\n", index);
+
   *item_count = act.logs->length;
 
   textstyle_t ts = {0};

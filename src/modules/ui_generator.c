@@ -69,13 +69,13 @@ int ui_generator_init(int width, int height)
   uig.thread  = SDL_CreateThread(ui_generator_workloop, "generator", NULL);
 
   // create texmap
-  ui_compositor_reset_texmap(2048);
-  uig.texmapsize = 2048;
+  ui_compositor_reset_texmap(4096);
+  uig.texmapsize = 4096;
 
   int wp = nxt_pwr(width);
   int hp = nxt_pwr(height);
 
-  ui_compositor_new_texture(0, 2048, 2048); // texmap texture
+  ui_compositor_new_texture(0, 4096, 4096); // texmap texture
   ui_compositor_new_texture(1, wp, hp);     // mask texture, screen size fixed
 
   uig.texpage = 2;
@@ -239,7 +239,7 @@ void ui_generator_render(uint32_t time)
     }
   }
 
-  ui_compositor_render(time, uig.width, uig.height);
+  ui_compositor_render(time, uig.width, uig.height, uig.wpwr, uig.hpwr);
 
   if (reset_texmap || uig.grow)
   {

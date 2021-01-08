@@ -6,7 +6,7 @@
 typedef struct _glsha_t
 {
   GLuint name;
-  GLint  uni_loc[12];
+  GLint  uni_loc[13];
 } glsha_t;
 
 glsha_t gl_shader_create(const char*  vertex_source,

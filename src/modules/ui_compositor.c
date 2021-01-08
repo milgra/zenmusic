@@ -29,7 +29,7 @@ void ui_compositor_add(char* id,
                        char  hidden,
                        r2_t  frame,
                        float border, // view border
-                       int   page,   // texture page
+                       int   page,   // texture pagev
                        int   full,   // needs full texture
                        int   ext,    // external texture
                        char* texid,
@@ -38,7 +38,7 @@ void ui_compositor_add(char* id,
 void ui_compositor_upd_pos(int index, r2_t frame, float border);
 char ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_t* bm);
 void ui_compositor_upd_vis(int index, char hidden);
-void ui_compositor_render(uint32_t time, int width, int height);
+void ui_compositor_render(uint32_t time, int width, int height, int wpwr, int hpwr);
 
 #endif
 
@@ -125,7 +125,7 @@ void ui_compositor_reset_texmap(int size)
 void ui_compositor_new_texture(int page, int width, int height)
 {
   printf("ui_compositor_new_texture %i %i %i\n", page, width, height);
-  gl_new_texture(0, width, height); // texture for texmap
+  gl_new_texture(page, width, height); // texture for texmap
 }
 
 void ui_compositor_resize_texture(int page, int width, int height)
@@ -276,7 +276,7 @@ char ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_
   return 0;
 }
 
-void ui_compositor_render(uint32_t time, int width, int height)
+void ui_compositor_render(uint32_t time, int width, int height, int tex_w, int tex_h)
 {
   if (uic.upd_geo == 1)
   {
@@ -315,12 +315,12 @@ void ui_compositor_render(uint32_t time, int width, int height)
     {
       in_mask = 1;
       // draw buffer so far into main buffer
-      gl_draw_vertexes_in_framebuffer(TEX_CTX, last * 6, index * 6, reg_full, reg_full, SH_TEXTURE, 0);
+      gl_draw_vertexes_in_framebuffer(TEX_CTX, last * 6, index * 6, reg_full, reg_full, SH_TEXTURE, 0, tex_w, tex_h);
 
       // draw into mask texture
       gl_clear_framebuffer(1, 0.0, 0.0, 0.0, 0.0);
       // TODO use masked rectangle
-      gl_draw_vertexes_in_framebuffer(1, index * 6, (index + 1) * 6, reg_full, reg_full, SH_TEXTURE, 0);
+      gl_draw_vertexes_in_framebuffer(1, index * 6, (index + 1) * 6, reg_full, reg_full, SH_TEXTURE, 0, tex_w, tex_h);
 
       // set last index
       last = index;
@@ -329,7 +329,7 @@ void ui_compositor_render(uint32_t time, int width, int height)
     {
       // draw buffer so far into main buffer with mask
       // TODO use mask rectangle
-      gl_draw_vertexes_in_framebuffer(TEX_CTX, last * 6, index * 6, reg_full, reg_full, SH_TEXTURE, 1);
+      gl_draw_vertexes_in_framebuffer(TEX_CTX, last * 6, index * 6, reg_full, reg_full, SH_TEXTURE, 1, tex_w, tex_h);
 
       // reset mask
       // gl_clear_framebuffer(1, 0.0, 0.0, 0.0, 1.0);
@@ -346,7 +346,7 @@ void ui_compositor_render(uint32_t time, int width, int height)
   if (last < index)
   {
     // render remaining
-    gl_draw_vertexes_in_framebuffer(TEX_CTX, last * 6, index * 6, reg_full, reg_full, SH_TEXTURE, 0);
+    gl_draw_vertexes_in_framebuffer(TEX_CTX, last * 6, index * 6, reg_full, reg_full, SH_TEXTURE, 0, tex_w, tex_h);
   }
 
   if (time > uic.upd_stamp)
