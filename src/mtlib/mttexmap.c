@@ -26,18 +26,16 @@ typedef struct _tm_t tm_t;
 struct _tm_t
 {
   map_t* coords;
-  int    cx; // cursor x
-  int    cy; // cursor y
-  int    ch; // cursor height
+  char*  blocks;
   char   is_full;
-  char   did_change;
   int    width;
   int    height;
+  int    cols;
+  int    rows;
 };
 
 tm_t*       tm_new(int w, int h);
 void        tm_del(void* p);
-void        tm_reset(tm_t* tm);
 char        tm_has(tm_t* tm, char* id);
 tm_coords_t tm_get(tm_t* tm, char* id);
 int         tm_put(tm_t* tm, char* id, int w, int h);
@@ -50,10 +48,16 @@ int         tm_put(tm_t* tm, char* id, int w, int h);
 
 tm_t* tm_new(int w, int h)
 {
+  int cols = w / 32;
+  int rows = h / 32;
+
   tm_t* tm   = mem_calloc(sizeof(tm_t), "tm_t", tm_del, NULL);
   tm->coords = map_alloc();
+  tm->blocks = mem_calloc(sizeof(char) * cols * rows, "char*", NULL, NULL);
   tm->width  = w;
   tm->height = h;
+  tm->cols   = cols;
+  tm->rows   = rows;
 
   return tm;
 }
@@ -62,16 +66,7 @@ void tm_del(void* p)
 {
   tm_t* tm = (tm_t*)p;
   REL(tm->coords);
-}
-
-void tm_reset(tm_t* tm)
-{
-  map_reset(tm->coords);
-  tm->cx         = 0;
-  tm->cy         = 0;
-  tm->ch         = 0;
-  tm->is_full    = 0;
-  tm->did_change = 0;
+  REL(tm->blocks);
 }
 
 char tm_has(tm_t* tm, char* id)
@@ -90,56 +85,93 @@ tm_coords_t tm_get(tm_t* tm, char* id)
 
 int tm_put(tm_t* tm, char* id, int w, int h)
 {
-
   if (w > tm->width || h > tm->height) return -1; // too big bitmap
 
-  int nch = tm->ch; // new cursor height
+  // get size of incoming rect
+  int sx = ceil((float)w / 32.0);
+  int sy = ceil((float)h / 32.0);
 
-  if (tm->cx + w > tm->width)
+  int r = 0; // row
+  int c = 0; // col
+  int s = 0; // success
+
+  for (r = 0; r < tm->rows; r++)
   {
-    nch = h;
+    for (c = 0; c < tm->cols; c++)
+    {
+      int i = r * tm->cols + c;
+
+      // if block is free, check if width and height of new rect fits
+
+      if (tm->blocks[i] == 0)
+      {
+        s = 1; // assume success
+        if (c + sx < tm->cols)
+        {
+          for (int tc = c; tc < c + sx; tc++)
+          {
+            int ti = r * tm->cols + tc; // test index
+            if (tm->blocks[ti] == 1)
+            {
+              s = 0; // if block is occupied test is failed
+              break;
+            }
+          }
+        }
+        else
+          s = 0; // doesn't fit
+
+        if (r + sy < tm->rows && s == 1)
+        {
+          for (int tr = r; tr < r + sy; tr++)
+          {
+            int ti = tr * tm->cols + c; // test index
+            if (tm->blocks[ti] == 1)
+            {
+              s = 0; // if block is occupied test is failed
+              break;
+            }
+          }
+        }
+        else
+          s = 0; // doesn't fit
+      }
+      if (s == 1) break;
+    }
+    if (s == 1) break;
   }
-  else if (h > tm->ch)
+
+  if (s == 1)
   {
-    nch = h;
+    // flip blocks to occupied
+    for (int nr = r; nr < r + sy; nr++)
+    {
+      for (int nc = c; nc < c + sx; nc++)
+      {
+        int ni         = nr * tm->cols + nc;
+        tm->blocks[ni] = 1;
+      }
+    }
+
+    int ncx = c * 32;
+    int ncy = r * 32;
+    int rbx = ncx + w;
+    int rby = ncy + h;
+
+    tm_coords_t* coords = HEAP(((tm_coords_t){.ltx = (float)ncx / (float)tm->width,
+                                              .lty = (float)ncy / (float)tm->height,
+                                              .rbx = (float)rbx / (float)tm->width,
+                                              .rby = (float)rby / (float)tm->height,
+                                              .x   = ncx,
+                                              .y   = ncy,
+                                              .w   = w,
+                                              .h   = h}),
+                               "float*");
+
+    map_put(tm->coords, id, coords);
   }
-
-  int ncy = tm->cy; // new cursor y
-
-  if (tm->cx + w > tm->width)
-  {
-    ncy = tm->cy + tm->ch;
-  }
-
-  int ncx = tm->cx; // new cursor x
-
-  if (tm->cx + w > tm->width)
-  {
-    ncx = 0;
-  }
-
-  int rbx = ncx + w;
-  int rby = ncy + h;
-
-  char is_full = ncy > tm->height;
-
-  if (is_full) return -2; // tilemap is full
-
-  tm_coords_t* coords = HEAP(((tm_coords_t){.ltx = (float)ncx / (float)tm->width,
-                                            .lty = (float)ncy / (float)tm->height,
-                                            .rbx = (float)rbx / (float)tm->width,
-                                            .rby = (float)rby / (float)tm->height,
-                                            .x   = ncx,
-                                            .y   = ncy,
-                                            .w   = w,
-                                            .h   = h}),
-                             "float*");
-
-  map_put(tm->coords, id, coords);
-
-  tm->cx = rbx;
-  tm->cy = ncy;
-  tm->ch = nch;
+  else
+    return -2; // texmap is full
 
   return 0; // success
 }

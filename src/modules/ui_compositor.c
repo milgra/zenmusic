@@ -17,7 +17,6 @@
 #include "mtmath2.c"
 
 void ui_compositor_init();
-void ui_compositor_reset();
 
 void ui_compositor_reset_texmap(int size);
 void ui_compositor_new_texture(int page, int width, int height);
@@ -104,15 +103,6 @@ void ui_compositor_init()
 void ui_compositor_rewind()
 {
   uic.cache_ind = 0;
-}
-
-void ui_compositor_reset()
-{
-  fb_reset(uic.fb);
-  tm_reset(uic.tm);
-
-  uic.cache_ind = 0;
-  uic.upd_geo   = 1;
 }
 
 void ui_compositor_reset_texmap(int size)

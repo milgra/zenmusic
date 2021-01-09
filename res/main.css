@@ -451,12 +451,14 @@
 }
     
 .footedge {
+    display: none;
     width: 100%;
     height: 100%;
     background-color: #00FF0001;
 }
 
 .footcenter {
+    display: none;
     width: 150px;
     height: 100%;
     background-color: #0000FF01;

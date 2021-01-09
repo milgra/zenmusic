@@ -35,7 +35,6 @@ freebsd for os
 
 first version
 
-fix texture resizing/rect readding
 fix list show/hide
 fix list anxiety
 fix query field

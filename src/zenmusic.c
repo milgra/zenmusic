@@ -660,8 +660,8 @@ void init(int width, int height)
 
   ui_manager_add(texmap);
 
-  view_t* footer = view_get_subview(baseview, "footer");
-  footer->hidden = 1;
+  view_t* footer  = view_get_subview(baseview, "footer");
+  footer->display = 0;
 
   db    = MNEW();
   libch = ch_new(100);
