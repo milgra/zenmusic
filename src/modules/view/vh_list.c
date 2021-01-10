@@ -231,24 +231,17 @@ void vh_list_evt(view_t* view, ev_t ev)
 
       // vertical bounce
 
-      if (head->frame.local.y > 0.0001)
+      if (head->frame.local.y > 0.001)
       {
         vh_list_move(view, -head->frame.local.y / 5.0);
       }
-      else if (head->frame.local.y < -0.0001)
+      else if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h - 0.001)
       {
-        if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h - 0.001)
+        if (tail->frame.local.y + tail->frame.local.h - head->frame.local.y > view->frame.local.h)
         {
-          if (tail->frame.local.y + tail->frame.local.h - head->frame.local.y > view->frame.local.h)
-          {
-            vh_list_move(view, (view->frame.local.h - (tail->frame.local.y + tail->frame.local.h)) / 5.0);
-          }
-          else
-          {
-            vh_list_move(view, -head->frame.local.y / 5.0);
-          }
+          vh_list_move(view, (view->frame.local.h - (tail->frame.local.y + tail->frame.local.h)) / 5.0);
         }
-        else
+        else if (head->frame.local.y < -0.001)
         {
           vh_list_move(view, -head->frame.local.y / 5.0);
         }
