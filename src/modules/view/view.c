@@ -274,7 +274,6 @@ void view_coll_touched(view_t* view, ev_t ev, vec_t* queue)
       ev.y < view->frame.global.y + view->frame.global.h &&
       ev.y > view->frame.global.y)
   {
-    printf("adding %s\n", view->id);
     VADD(queue, view);
     for (int i = 0; i < view->views->length; i++)
     {
@@ -282,8 +281,6 @@ void view_coll_touched(view_t* view, ev_t ev, vec_t* queue)
       view_coll_touched(v, ev, queue);
     }
   }
-  else
-    printf("skipping %s\n", view->id);
 }
 
 void view_evt(view_t* view, ev_t ev)
