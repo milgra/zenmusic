@@ -89,8 +89,6 @@ struct uic_t
 
 void ui_compositor_init()
 {
-  printf("compositor init\n");
-
   gl_init();
 
   uic.fb = fb_new();
@@ -102,6 +100,7 @@ void ui_compositor_init()
 
 void ui_compositor_rewind()
 {
+  // printf("ui_compositor_rewind\n");
   uic.cache_ind = 0;
 }
 
@@ -137,7 +136,7 @@ void ui_compositor_add(char* id,
                        int   tex_w,
                        int   tex_h) // texture id
 {
-  // printf("COMP ADD %s %f %f %f %f masked %i\n", id, frame.x, frame.y, frame.w, frame.h, masked);
+  // printf("ui_compositor_add %s %f %f %f %f masked %i\n", id, frame.x, frame.y, frame.w, frame.h, masked);
 
   // fill up cache if needed
   if (uic.cache_ind + 1 > uic.cache->length)
@@ -206,6 +205,7 @@ void ui_compositor_add(char* id,
 
   // increase cache index
   uic.cache_ind++;
+  uic.upd_geo = 1;
 }
 
 void ui_compositor_upd_vis(int index, char hidden)
@@ -238,6 +238,7 @@ char ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_
 
   tm_coords_t tc = tm_get(uic.tm, texid);
 
+  // TODO store texture size in texture id so older sizes can be reused on fullscreen switches?
   if (bm->w != tc.w || bm->h != tc.h)
   {
     // texture doesn't exist or size mismatch
@@ -254,14 +255,15 @@ char ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_
 
     // set new texture coords
     crect_set_texture(rect, tc.ltx, tc.lty, tc.rbx, tc.rby);
+
+    // resend is needed since a crect changed
+    uic.upd_geo = 1;
   }
 
   // upload to GPU
   gl_upload_to_texture(0, tc.x, tc.y, bm->w, bm->h, bm->data);
 
   uic.tex_bytes += bm->size;
-
-  uic.upd_geo = 1;
 
   return 0;
 }

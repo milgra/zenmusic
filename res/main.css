@@ -183,6 +183,7 @@
 }
 
 #genrelist {
+    display: none;
     width: 230px;
     height: 100%;
     left: 0px;
@@ -190,6 +191,7 @@
 }
 
 #artistlist {
+    display: none;
     width: 230px;
     height: 100%;
     right: 0px;

@@ -120,6 +120,16 @@ void ui_generator_add(view_t* view)
                     view->texture.id,         // texture id
                     uig.wpwr,
                     uig.hpwr);
+
+  // in case of ui manager resend textures are ready
+  if (view->texture.state == TS_READY)
+  {
+    ui_compositor_upd_bmp(uig.views->length - 1,
+                          view->frame.global,
+                          view->layout.shadow_blur,
+                          view->texture.id,
+                          view->texture.bitmap);
+  }
 }
 
 void ui_generator_resend_views()
@@ -194,7 +204,12 @@ void ui_generator_resize(int width, int height)
   int hp = nxt_pwr(height);
 
   // resize framebuffers if screen size changes
-  if (wp != uig.wpwr || hp != uig.hpwr) ui_generator_resize_framebuffers(wp, hp);
+  if (wp != uig.wpwr || hp != uig.hpwr)
+  {
+    uig.wpwr = wp;
+    uig.hpwr = hp;
+    ui_generator_resize_framebuffers(wp, hp);
+  }
 }
 
 void ui_generator_render(uint32_t time)

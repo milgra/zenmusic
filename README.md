@@ -35,8 +35,7 @@ freebsd for os
 
 first version
 
-fix list show/hide
-fix list anxiety
+fix scrollbars
 fix query field
 make genre/artist selection filter songs, fill up query bar
 make tag editor list
@@ -69,6 +68,7 @@ unit teszter gl_compositorhoz
 grid-based warping of video/album cover based on frequence ( bass in the center )
 andromeda:  monolith-like particle visu
 swithc between multiple glyph views in paragraph/one multiglyph view in paragraph  
+debug button - show texmap in settings
 
 ideas
 

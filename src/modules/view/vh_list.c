@@ -10,24 +10,24 @@ typedef struct _vh_list_t
   vec_t* items;
   vec_t* cache;
 
-  int head_index;
-  int tail_index;
-  int item_count;
-  int full;
+  int head_index; // index of top element
+  int tail_index; // index of bottom element
+  int item_count; // all elements in data source
+  int full;       // list is full, no more elements needed
 
-  float item_wth;
-  float item_pos;
+  float item_wth; // width of all items
+  float item_pos; // horizontal position of all items
 
   // scrollers
 
-  view_t* vscr;
-  view_t* hscr;
+  view_t* vscr; // vertical scroller
+  view_t* hscr; // horizontal scroller
 
-  uint32_t vtimeout;
-  uint32_t htimeout;
+  uint32_t vtimeout; // vertical scroller timeout
+  uint32_t htimeout; // horizontal scroller timeout
 
-  view_t* (*create_item)(view_t* listview);
-  int (*update_item)(view_t* listview, view_t* item, int index, int* item_count);
+  view_t* (*create_item)(view_t* listview);                                       // pointer to item generator function
+  int (*update_item)(view_t* listview, view_t* item, int index, int* item_count); // pointer to item updater function
 } vh_list_t;
 
 void    vh_list_add(view_t* view,
@@ -159,10 +159,14 @@ void vh_list_evt(view_t* view, ev_t ev)
             view_set_frame(item, (r2_t){0, head->frame.local.y - item->frame.local.h, item->frame.local.w, item->frame.local.h});
           }
           else
+          {
             vh->full = 1;
+          }
         }
         else
+        {
           vh->full = 1;
+        }
 
         if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h + PRELOAD_DISTANCE)
         {
@@ -182,27 +186,33 @@ void vh_list_evt(view_t* view, ev_t ev)
             view_set_frame(item, (r2_t){0, tail->frame.local.y + tail->frame.local.h, item->frame.local.w, item->frame.local.h});
           }
           else
+          {
             vh->full &= 1; // don't set to full if previously item is added
+          }
         }
         else
+        {
           vh->full &= 1; // don't set to full if previously item is added
+        }
 
         // remove items if needed
 
-        if (head->frame.local.y + head->frame.local.h < 0.0 - PRELOAD_DISTANCE && vh->items->length > 1)
+        if (tail->frame.local.y + tail->frame.local.h - head->frame.local.y > view->frame.local.h)
         {
-          VADD(vh->cache, head);
-          VREM(vh->items, head);
-          vh->head_index += 1;
-          //view_set_hidden(head, 1, 1);
-        }
-
-        if (tail->frame.local.y > view->frame.local.h + PRELOAD_DISTANCE && vh->items->length > 1)
-        {
-          VADD(vh->cache, tail);
-          VREM(vh->items, tail);
-          vh->tail_index -= 1;
-          //view_set_hidden(tail, 1, 1);
+          if (head->frame.local.y + head->frame.local.h < 0.0 - PRELOAD_DISTANCE && vh->items->length > 1)
+          {
+            VADD(vh->cache, head);
+            VREM(vh->items, head);
+            vh->head_index += 1;
+            //view_set_hidden(head, 1, 1);
+          }
+          if (tail->frame.local.y > view->frame.local.h + PRELOAD_DISTANCE && vh->items->length > 1)
+          {
+            VADD(vh->cache, tail);
+            VREM(vh->items, tail);
+            vh->tail_index -= 1;
+            //view_set_hidden(tail, 1, 1);
+          }
         }
       }
     }
@@ -222,11 +232,24 @@ void vh_list_evt(view_t* view, ev_t ev)
       // vertical bounce
 
       if (head->frame.local.y > 0.0001)
+      {
         vh_list_move(view, -head->frame.local.y / 5.0);
-      else if (head->frame.local.y < -0.0001 && tail->frame.local.y + tail->frame.local.h < view->frame.local.h)
-        vh_list_move(view, (view->frame.local.h - tail->frame.local.h - tail->frame.local.y) / 5.0);
+      }
+      else if (head->frame.local.y < -0.0001)
+      {
+        if (tail->frame.local.y + tail->frame.local.h - head->frame.local.y < view->frame.local.h)
+        {
+          vh_list_move(view, -head->frame.local.y / 5.0);
+        }
+        else if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h - 0.001)
+        {
+          vh_list_move(view, (view->frame.local.h - (tail->frame.local.y + tail->frame.local.h)) / 5.0);
+        }
+      }
       else if (vh->item_pos > 0.0001 || vh->item_pos < -0.0001)
+      {
         vh_list_move(view, 0);
+      }
     }
     // close scrollbars
     if (vh->vtimeout > 0 && vh->vtimeout < ev.time)
