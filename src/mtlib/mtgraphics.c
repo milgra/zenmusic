@@ -318,6 +318,10 @@ void gfx_rect(bm_t*    bm,
   if (ex > bm->w) ex = bm->w;
   int ey = sy + h;
   if (ey > bm->h) ey = bm->h;
+  if (sx < 0) sx = 0;
+  if (sy < 0) sy = 0;
+  if (ex < 0) ex = 0;
+  if (ey < 0) ey = 0;
 
   int r = color >> 24 & 0xFF;
   int g = color >> 16 & 0xFF;
