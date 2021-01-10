@@ -197,7 +197,7 @@ void vh_list_evt(view_t* view, ev_t ev)
 
         // remove items if needed
 
-        if (tail->frame.local.y + tail->frame.local.h - head->frame.local.y > view->frame.local.h)
+        if (tail->frame.local.y - (head->frame.local.y + head->frame.local.h) > view->frame.local.h)
         {
           if (head->frame.local.y + head->frame.local.h < 0.0 - PRELOAD_DISTANCE && vh->items->length > 1)
           {
@@ -237,13 +237,20 @@ void vh_list_evt(view_t* view, ev_t ev)
       }
       else if (head->frame.local.y < -0.0001)
       {
-        if (tail->frame.local.y + tail->frame.local.h - head->frame.local.y < view->frame.local.h)
+        if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h - 0.001)
+        {
+          if (tail->frame.local.y + tail->frame.local.h - head->frame.local.y > view->frame.local.h)
+          {
+            vh_list_move(view, (view->frame.local.h - (tail->frame.local.y + tail->frame.local.h)) / 5.0);
+          }
+          else
+          {
+            vh_list_move(view, -head->frame.local.y / 5.0);
+          }
+        }
+        else
         {
           vh_list_move(view, -head->frame.local.y / 5.0);
-        }
-        else if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h - 0.001)
-        {
-          vh_list_move(view, (view->frame.local.h - (tail->frame.local.y + tail->frame.local.h)) / 5.0);
         }
       }
       else if (vh->item_pos > 0.0001 || vh->item_pos < -0.0001)
