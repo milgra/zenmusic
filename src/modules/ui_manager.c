@@ -59,7 +59,8 @@ void ui_manager_event(ev_t ev)
   }
   else if (ev.type == EV_MMOVE ||
            ev.type == EV_MDOWN ||
-           ev.type == EV_MUP)
+           ev.type == EV_MUP ||
+           ev.type == EV_SCROLL)
   {
     if (ev.type == EV_MMOVE || queue->length == 0)
     {
@@ -84,19 +85,7 @@ void ui_manager_event(ev_t ev)
       if (v->needs_touch && v->parent)
       {
         if (v->handler) (*v->handler)(v, ev);
-        break;
-      }
-    }
-  }
-  else if (ev.type == EV_SCROLL)
-  {
-    for (int i = queue->length - 1; i > -1; i--)
-    {
-      view_t* v = queue->data[i];
-      if (v->needs_scroll)
-      {
-        if (v->handler) (*v->handler)(v, ev);
-        break;
+        if (v->blocks_touch) break;
       }
     }
   }

@@ -59,7 +59,6 @@ view_t* display;
 view_t* messagelistback;
 view_t* filterlistback;
 view_t* filterlist;
-view_t* header_center;
 
 char     song_refr_flag = 0;
 uint32_t song_recv_time = 0;
@@ -432,17 +431,17 @@ void filter_onactivate(view_t* view)
 void genrebtn_pushed(view_t* view, void* data)
 {
   if (filterlistback->parent)
-    view_remove(header_center, filterlistback);
+    view_remove(mainview, filterlistback);
   else
-    view_insert(header_center, filterlistback, 2);
+    view_add(mainview, filterlistback);
 }
 
 void messagesbtn_pushed(view_t* view, void* data)
 {
   if (messagelistback->parent)
-    view_remove(header_center, messagelistback);
+    view_remove(mainview, messagelistback);
   else
-    view_insert(header_center, messagelistback, 2);
+    view_add(mainview, messagelistback);
 }
 
 void init(int width, int height)
@@ -493,20 +492,18 @@ void init(int width, int height)
 
   activity_attach(messagelist, fontpath);
 
-  header_center = view_get_subview(baseview, "header_center");
-
   view_t* genrelist = view_get_subview(baseview, "genrelist");
   vh_list_add(genrelist, genrelist_create_item, genrelist_update_item);
 
   view_t* artistlist = view_get_subview(baseview, "artistlist");
   vh_list_add(artistlist, artistlist_create_item, artistlist_update_item);
 
-  view_remove(header_center, messagelistback);
-
   mainview = view_get_subview(baseview, "main");
 
+  view_remove(mainview, messagelistback);
+
   filterlistback = view_get_subview(baseview, "filterlistback");
-  view_remove(header_center, filterlistback);
+  view_remove(mainview, filterlistback);
 
   /* filterlist = view_get_subview(baseview, "filterlist"); */
 

@@ -100,6 +100,7 @@ view_t* vh_list_get_item(view_t* view)
   if (vh->cache->length == 0)
   {
     view_t* item = (*vh->create_item)(view);
+    view_set_block_touch(item, 0, 1);
     VADD(vh->cache, item);
     view_insert(view, item, 0);
     //view_set_hidden(item, 1, 1);
@@ -378,7 +379,6 @@ void vh_list_add(view_t* view,
   vh->vscr = vscr;
   vh->hscr = hscr;
 
-  view->needs_scroll = 1;
   view->handler_data = vh;
   view->handler      = vh_list_evt;
 }

@@ -76,7 +76,6 @@ void vh_knob_add(view_t* view,
   vh->ratio_changed = ratio_changed;
   vh->button_pushed = button_pushed;
 
-  view->needs_scroll = 1;
   view->handler_data = vh;
   view->handler      = vh_knob_evt;
 }

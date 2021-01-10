@@ -126,7 +126,7 @@ struct _view_t
   char needs_text;   /* accepts text events */
   char needs_time;   /* accepts time events */
   char needs_touch;  /* accepts touch events */
-  char needs_scroll; /* accepts scroll events */
+  char blocks_touch; /* blocks touch events */
 
   char*    id;     /* identifier for handling view */
   vec_t*   views;  /* subviews */
@@ -155,6 +155,7 @@ void view_gen_texture(view_t* view);
 void view_set_frame(view_t* view, r2_t frame);
 void view_set_layout(view_t* view, vlayout_t layout);
 void view_set_hidden(view_t* view, char hidden, char recursive);
+void view_set_block_touch(view_t* view, char block, char recursive);
 void view_set_texture_bmp(view_t* view, bm_t* tex);
 void view_set_texture_id(view_t* view, char* id);
 void view_set_texture_page(view_t* view, uint32_t page);
@@ -197,6 +198,7 @@ view_t* view_new(char* id, r2_t frame)
   view->texture.page = -1;
   view->texture.id   = cstr_fromcstring(id);
   view->needs_touch  = 1;
+  view->blocks_touch = 1;
   view->display      = 0; // by default no display, tex generators will set this to 1
 
   return view;
@@ -272,6 +274,7 @@ void view_coll_touched(view_t* view, ev_t ev, vec_t* queue)
       ev.y < view->frame.global.y + view->frame.global.h &&
       ev.y > view->frame.global.y)
   {
+    printf("adding %s\n", view->id);
     VADD(queue, view);
     for (int i = 0; i < view->views->length; i++)
     {
@@ -279,6 +282,8 @@ void view_coll_touched(view_t* view, ev_t ev, vec_t* queue)
       view_coll_touched(v, ev, queue);
     }
   }
+  else
+    printf("skipping %s\n", view->id);
 }
 
 void view_evt(view_t* view, ev_t ev)
@@ -337,6 +342,17 @@ void view_set_hidden(view_t* view, char hidden, char recursive)
   {
     view_t* v;
     while ((v = VNXT(view->views))) view_set_hidden(v, hidden, recursive);
+  }
+}
+
+void view_set_block_touch(view_t* view, char block, char recursive)
+{
+  view->blocks_touch = block;
+
+  if (recursive)
+  {
+    view_t* v;
+    while ((v = VNXT(view->views))) view_set_block_touch(v, block, recursive);
   }
 }
 
