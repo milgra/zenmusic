@@ -35,7 +35,7 @@ freebsd for os
 
 first version
 
-fix scrollbars
+add id3 editor
 fix query field
 make genre/artist selection filter songs, fill up query bar
 make tag editor list

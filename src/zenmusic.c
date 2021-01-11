@@ -255,7 +255,7 @@ view_t* artistlist_create_item(view_t* listview)
   //rowview->hidden = 1;
 
   vh_litem_add(rowview, 35, on_artistitem_select);
-  vh_litem_add_cell(rowview, "artist", 230, cr_text_upd);
+  vh_litem_add_cell(rowview, "artist", 230, cr_text_add, cr_text_upd);
 
   return rowview;
 }
@@ -295,7 +295,7 @@ view_t* genrelist_create_item(view_t* listview)
   rowview->hidden = 1;
 
   vh_litem_add(rowview, 35, on_genreitem_select);
-  vh_litem_add_cell(rowview, "genre", 230, cr_text_upd);
+  vh_litem_add_cell(rowview, "genre", 230, cr_text_add, cr_text_upd);
 
   return rowview;
 }

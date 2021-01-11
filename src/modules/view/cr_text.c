@@ -11,11 +11,17 @@ typedef struct _cr_text_data_t
   char*       text;
 } cr_text_data_t;
 
+void cr_text_add(view_t* view);
 void cr_text_upd(view_t* view, void* p);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
+
+void cr_text_add(view_t* view)
+{
+  tg_text_add(view);
+}
 
 void cr_text_upd(view_t* view, void* p)
 {

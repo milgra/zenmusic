@@ -24,7 +24,7 @@ typedef struct _vh_litem_t
 
 void vh_litem_add(view_t* view, int h, void (*on_select)(view_t* view, uint32_t index));
 void vh_litem_upd(view_t* view, int index);
-void vh_litem_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* view, void* data));
+void vh_litem_add_cell(view_t* view, char* id, int size, void (*add)(view_t* view), void (*upd)(view_t* view, void* data));
 void vh_litem_upd_cell(view_t* view, char* id, void* data);
 void vh_litem_upd_cell_size(view_t* view, char* id, int size);
 void vh_litem_rem_cell(char* id);
@@ -67,7 +67,8 @@ void vh_litem_upd(view_t* view, int index)
   vh->index      = index;
 }
 
-void vh_litem_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* view, void* data))
+// TODO it would be better to add a generated, initialized view as cell
+void vh_litem_add_cell(view_t* view, char* id, int size, void (*add)(view_t* view), void (*upd)(view_t* view, void* data))
 {
   vh_litem_t* vh = view->handler_data;
 
@@ -79,6 +80,8 @@ void vh_litem_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* vie
   view_t* cellview = view_new(cstr_fromformat("%s%s", view->id, id, NULL), (r2_t){view->frame.local.w, 0, size, view->frame.local.h});
 
   cell->view = cellview;
+
+  (*add)(cellview);
 
   cellview->needs_touch = 0;
 

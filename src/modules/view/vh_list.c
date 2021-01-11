@@ -84,11 +84,7 @@ void vh_list_move(view_t* view, float dy)
     pr = (float)(vh->head_index) / (float)(vh->item_count - (vh->tail_index - vh->head_index + 1));
   }
 
-  if (sr < 0.1) sr = 0.1;
-  s = view->frame.local.h * sr;
-  p = (view->frame.local.h - s) * pr;
-
-  vh_sbar_update(vh->vscr, p, s);
+  vh_sbar_update(vh->vscr, pr, sr);
 
   // horizontal scroller
 
@@ -101,11 +97,7 @@ void vh_list_move(view_t* view, float dy)
     pr = -vh->item_pos / (vh->item_wth - view->frame.global.w);
   }
 
-  if (sr < 0.1) sr = 0.1;
-  s = view->frame.local.w * sr;
-  p = (view->frame.local.w - s) * pr;
-
-  vh_sbar_update(vh->hscr, p, s);
+  vh_sbar_update(vh->hscr, pr, sr);
 }
 
 view_t* vh_list_get_item(view_t* view)

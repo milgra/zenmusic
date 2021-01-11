@@ -54,7 +54,7 @@ view_t* songitem_new(char* fontpath, void (*on_select)(view_t* view, uint32_t in
   sitem_cell_t* cell;
   while ((cell = VNXT(fields)))
   {
-    vh_litem_add_cell(rowview, cell->id, cell->size, cr_text_upd);
+    vh_litem_add_cell(rowview, cell->id, cell->size, cr_text_add, cr_text_upd);
   }
 
   return rowview;

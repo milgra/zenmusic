@@ -29,6 +29,7 @@ typedef struct _vh_sbar_t
   int        delta;
   float      pos;
   float      size;
+  float      fpos; // final pos
 } vh_sbar_t;
 
 void vh_sbar_evt(view_t* view, ev_t ev)
@@ -40,6 +41,7 @@ void vh_sbar_evt(view_t* view, ev_t ev)
     // animation is not ready
     if (vh->step > 0 && vh->step < vh->steps)
     {
+      vh->pos += (vh->fpos - vh->pos) / 5.0;
       // avoid invalid bitmaps
       if (view->frame.local.w >= 1.0 &&
           view->frame.local.h >= 1.0)
@@ -64,12 +66,12 @@ void vh_sbar_evt(view_t* view, ev_t ev)
           if (vh->type == SBAR_V)
           {
             float radius = view->frame.local.w * ratio * 0.5;
-            gfx_circle(bm, bm->w / 2, vh->pos + vh->size / 2, radius, 1, 0x000000FF);
+            gfx_circle(bm, bm->w / 2, vh->pos + vh->size / 2, radius, 1, 0x000000BB);
           }
           else
           {
             float radius = view->frame.local.h * ratio * 0.5;
-            gfx_circle(bm, vh->pos + vh->size / 2, bm->h / 2, radius, 1, 0x000000FF);
+            gfx_circle(bm, vh->pos + vh->size / 2, bm->h / 2, radius, 1, 0x000000BB);
           }
           view->texture.changed = 1;
         }
@@ -79,29 +81,46 @@ void vh_sbar_evt(view_t* view, ev_t ev)
           ratio = (float)(vh->step - vh->steps / 3) / (float)(vh->steps / 3 * 2);
           bm_reset(bm);
 
+          float size = vh->size * ratio;
+          float pos  = vh->pos + vh->size / 2 - size / 2;
+
           if (vh->type == SBAR_V)
           {
-            float height = vh->size * ratio;
-            float pos    = vh->pos + vh->size / 2 - height / 2;
-
-            gfx_circle(bm, bm->w / 2, pos, bm->w / 2, 1, 0x000000FF);
-            gfx_circle(bm, bm->w / 2, pos + height, bm->w / 2, 1, 0x000000FF);
-            gfx_rect(bm, 1, pos, bm->w - 2, height, 0x000000FF, 0);
+            gfx_circle(bm, bm->w / 2, pos, bm->w / 2 + 1, 1, 0x000000BB);
+            gfx_circle(bm, bm->w / 2, pos + size, bm->w / 2 + 1, 1, 0x000000BB);
+            gfx_rect(bm, 0, pos, bm->w, size, 0x000000BB, 0);
           }
           else
           {
-            float width = vh->size * ratio;
-            float pos   = vh->pos + vh->size / 2 - width / 2;
-
-            gfx_circle(bm, pos, bm->h / 2, bm->h / 2, 1, 0x000000FF);
-            gfx_circle(bm, pos + width, bm->h / 2, bm->h / 2, 1, 0x000000FF);
-            gfx_rect(bm, pos, 1, width, bm->h - 2, 0x000000FF, 0);
+            gfx_circle(bm, pos, bm->h / 2, bm->h / 2 + 1, 1, 0x000000BB);
+            gfx_circle(bm, pos + size, bm->h / 2, bm->h / 2 + 1, 1, 0x000000BB);
+            gfx_rect(bm, pos, 0, size, bm->h, 0x000000BB, 0);
           }
           view->texture.changed = 1;
         }
 
         vh->step += vh->delta;
       }
+    }
+    else if (vh->step >= vh->steps)
+    {
+      vh->pos += (vh->fpos - vh->pos) / 5.0;
+
+      bm_t* bm = view->texture.bitmap;
+      bm_reset(bm);
+      if (vh->type == SBAR_V)
+      {
+        gfx_circle(bm, bm->w / 2, vh->pos, bm->w / 2 + 1, 1, 0x000000BB);
+        gfx_circle(bm, bm->w / 2, vh->pos + vh->size, bm->w / 2 + 1, 1, 0x000000BB);
+        gfx_rect(bm, 0, vh->pos, bm->w, vh->size, 0x000000BB, 0);
+      }
+      else
+      {
+        gfx_circle(bm, vh->pos, bm->h / 2, bm->h / 2 + 1, 1, 0x000000BB);
+        gfx_circle(bm, vh->pos + vh->size, bm->h / 2, bm->h / 2 + 1, 1, 0x000000BB);
+        gfx_rect(bm, vh->pos, 0, vh->size, bm->h, 0x000000BB, 0);
+      }
+      view->texture.changed = 1;
     }
   }
 }
@@ -131,29 +150,27 @@ void vh_sbar_close(view_t* view)
   vh->step      = vh->steps - 1;
 }
 
-void vh_sbar_update(view_t* view, float pos, float size)
+void vh_sbar_update(view_t* view, float pr, float sr)
 {
   vh_sbar_t* vh = view->handler_data;
-  vh->pos       = pos;
-  vh->size      = size;
 
-  if (vh->step >= vh->steps)
+  if (vh->type == SBAR_V)
   {
-    bm_t* bm = view->texture.bitmap;
-    bm_reset(bm);
-    if (vh->type == SBAR_V)
-    {
-      gfx_circle(bm, bm->w / 2, vh->pos, bm->w / 2, 1, 0x000000FF);
-      gfx_circle(bm, bm->w / 2, vh->pos + vh->size, bm->w / 2, 1, 0x000000FF);
-      gfx_rect(bm, 1, vh->pos, bm->w - 2, vh->size, 0x000000FF, 0);
-    }
-    else
-    {
-      gfx_circle(bm, vh->pos, bm->h / 2, bm->h / 2, 1, 0x000000FF);
-      gfx_circle(bm, vh->pos + vh->size, bm->h / 2, bm->h / 2, 1, 0x000000FF);
-      gfx_rect(bm, vh->pos, 1, vh->size, bm->h - 2, 0x000000FF, 0);
-    }
-    view->texture.changed = 1;
+    if (sr < 0.1) sr = 0.1;
+
+    float max = view->frame.local.h - view->frame.local.w;
+
+    vh->size = max * sr;
+    vh->fpos = view->frame.local.w / 2 + (max - vh->size) * pr;
+  }
+  else
+  {
+    if (sr < 0.1) sr = 0.1;
+
+    float max = view->frame.local.w - view->frame.local.h;
+
+    vh->size = max * sr;
+    vh->fpos = view->frame.local.h / 2 + (max - vh->size) * pr;
   }
 }
 

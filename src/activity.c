@@ -40,7 +40,7 @@ view_t* activity_create_item(view_t* listview)
   rowview->hidden = 1;
 
   vh_litem_add(rowview, 35, activity_select);
-  vh_litem_add_cell(rowview, "message", 460, cr_text_upd);
+  vh_litem_add_cell(rowview, "message", 460, cr_text_add, cr_text_upd);
 
   return rowview;
 }
