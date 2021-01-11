@@ -367,9 +367,9 @@ void vh_list_add(view_t* view,
   REL(hid);
 
   vscr->layout.h_per  = 1.0;
-  vscr->layout.right  = 0;
+  vscr->layout.right  = 1;
   hscr->layout.w_per  = 1.0;
-  hscr->layout.bottom = 0;
+  hscr->layout.bottom = 1;
 
   vscr->layout.background_color = 0x00000001;
   hscr->layout.background_color = 0x00000001;

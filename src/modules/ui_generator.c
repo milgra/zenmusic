@@ -85,8 +85,6 @@ int ui_generator_init(int width, int height)
 
 void ui_generator_resend_views()
 {
-  printf("ui_generator_resend_views");
-
   ui_compositor_rewind(); // prepare for view resending
 
   int resize_texmap = 0;

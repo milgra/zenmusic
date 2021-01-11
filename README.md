@@ -14,6 +14,8 @@ zmusdb, text based key-value pairs
 no modification, zmusdb_new created, after succesfull backup it is renamed to zmusdb
 small changes are stored in zmusdb_upd, merged after start
 
+zmusdb is a key-value-list kvl file
+
 development :
 
 pkg install sdl2 ffmpeg opengl gmake clang-format
@@ -35,6 +37,7 @@ freebsd for os
 
 first version
 
+scrollbar horizontal anxiety
 add id3 editor
 fix query field
 make genre/artist selection filter songs, fill up query bar

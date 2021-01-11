@@ -437,6 +437,45 @@
     box-shadow: 2px;
 }
 
+#ideditorback {
+    width: 500px;
+    height: 500px;
+    top: 300px;
+    margin: auto;
+    border-radius: 15px;
+    background-color: #FFFFFFFF;
+    box-shadow: 3px;
+}
+
+#ideditor {
+    display: mask;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    background-color: #FFFFFFFF;
+    box-shadow: 2px;
+}
+
+#aboutback {
+    width: 400px;
+    height: 400px;
+    top: 350px;
+    margin: auto;
+    border-radius: 15px;
+    background-color: #FFFFFFFF;
+    box-shadow: 3px;
+}
+
+#about {
+    display: mask;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    background-color: #FFFFFFFF;
+    box-shadow: 2px;
+}
+
+
 #search {
     width: 150px;
     height: 150px;
