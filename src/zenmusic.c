@@ -309,13 +309,13 @@ int genrelist_update_item(view_t* listview, view_t* item, int index, int* item_c
 
   *item_count = genres->length;
 
-  textstyle_t ts = {0};
-  ts.font        = fontpath;
-  ts.align       = TA_RIGHT;
-  ts.margin      = 0;
-  ts.size        = 25.0;
-  ts.textcolor   = 0x000000FF;
-  ts.backcolor   = 0xFFFFFFFF;
+  textstyle_t ts  = {0};
+  ts.font         = fontpath;
+  ts.align        = TA_RIGHT;
+  ts.margin_right = 20;
+  ts.size         = 25.0;
+  ts.textcolor    = 0x000000FF;
+  ts.backcolor    = 0xFFFFFFFF;
 
   vh_litem_upd_cell(item, "genre", &((cr_text_data_t){.style = ts, .text = genres->data[index]}));
 

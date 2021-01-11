@@ -25,36 +25,41 @@ void ui_manager_render(uint32_t time);
 #include "ui_generator.c"
 #include "view_layout.c"
 
-view_t* root;
-vec_t*  queue;
+struct _uim_t
+{
+  view_t* root;
+  vec_t*  queue;
+  vec_t*  views;
+} uim = {0};
 
 void ui_manager_init(int width, int height)
 {
   ui_generator_init(width, height);
 
-  root  = view_new("root", (r2_t){0, 0, width, height});
-  queue = VNEW();
+  uim.root  = view_new("root", (r2_t){0, 0, width, height});
+  uim.views = VNEW();
+  uim.queue = VNEW();
 }
 
 void ui_manager_event(ev_t ev)
 {
   if (ev.type == EV_TIME)
   {
-    view_evt(root, ev);
+    view_evt(uim.root, ev);
   }
   else if (ev.type == EV_RESIZE)
   {
-    r2_t rf = root->frame.local;
+    r2_t rf = uim.root->frame.local;
     printf("resize %i %i\n", ev.w, ev.h);
     if (rf.w != (float)ev.w ||
         rf.h != (float)ev.h)
     {
-      view_set_frame(root, (r2_t){0.0, 0.0, (float)ev.w, (float)ev.h});
-      view_layout(root);
+      view_set_frame(uim.root, (r2_t){0.0, 0.0, (float)ev.w, (float)ev.h});
+      view_layout(uim.root);
       ui_generator_resize(ev.w, ev.h);
       /* printf("\nAFTER RESIZE"); */
-      /* view_desc(root, 0); */
-      view_evt(root, ev);
+      /* view_desc(uim.root, 0); */
+      view_evt(uim.root, ev);
     }
   }
   else if (ev.type == EV_MMOVE ||
@@ -62,12 +67,12 @@ void ui_manager_event(ev_t ev)
            ev.type == EV_MUP ||
            ev.type == EV_SCROLL)
   {
-    if (ev.type == EV_MMOVE || queue->length == 0)
+    if (ev.type == EV_MMOVE || uim.queue->length == 0)
     {
-      // send mouse move event to previous queue to detect move out
-      for (int i = queue->length - 1; i > -1; i--)
+      // send mouse move event to previous uim.queue to detect move out
+      for (int i = uim.queue->length - 1; i > -1; i--)
       {
-        view_t* v = queue->data[i];
+        view_t* v = uim.queue->data[i];
         if (v->needs_touch)
         {
           if (v->handler) (*v->handler)(v, ev);
@@ -75,13 +80,13 @@ void ui_manager_event(ev_t ev)
         }
       }
 
-      vec_reset(queue);
-      view_coll_touched(root, ev, queue);
+      vec_reset(uim.queue);
+      view_coll_touched(uim.root, ev, uim.queue);
     }
 
-    for (int i = queue->length - 1; i > -1; i--)
+    for (int i = uim.queue->length - 1; i > -1; i--)
     {
-      view_t* v = queue->data[i];
+      view_t* v = uim.queue->data[i];
       if (v->needs_touch && v->parent)
       {
         if (v->handler) (*v->handler)(v, ev);
@@ -91,9 +96,9 @@ void ui_manager_event(ev_t ev)
   }
   else if (ev.type == EV_KDOWN || ev.type == EV_KUP)
   {
-    for (int i = queue->length - 1; i > -1; i--)
+    for (int i = uim.queue->length - 1; i > -1; i--)
     {
-      view_t* v = queue->data[i];
+      view_t* v = uim.queue->data[i];
       if (v->needs_key)
       {
         if (v->handler) (*v->handler)(v, ev);
@@ -103,9 +108,9 @@ void ui_manager_event(ev_t ev)
   }
   else if (ev.type == EV_TEXT)
   {
-    for (int i = queue->length - 1; i > -1; i--)
+    for (int i = uim.queue->length - 1; i > -1; i--)
     {
-      view_t* v = queue->data[i];
+      view_t* v = uim.queue->data[i];
       if (v->needs_text)
       {
         if (v->handler) (*v->handler)(v, ev);
@@ -117,22 +122,23 @@ void ui_manager_event(ev_t ev)
 
 void ui_manager_add(view_t* view)
 {
-  view_add(root, view);
+  view_add(uim.root, view);
 }
 
-void ui_manager_resend(view_t* view)
+void ui_manager_collect(view_t* view, vec_t* views)
 {
-  if (view->display) ui_generator_add(view);
+  if (view->display) VADD(views, view);
   vec_t* vec = view->views;
-  for (int i = 0; i < vec->length; i++) ui_manager_resend(vec->data[i]);
+  for (int i = 0; i < vec->length; i++) ui_manager_collect(vec->data[i], views);
 }
 
 void ui_manager_render(uint32_t time)
 {
   if (resend)
   {
-    ui_generator_cleanup();
-    ui_manager_resend(root);
+    vec_reset(uim.views);
+    ui_manager_collect(uim.root, uim.views);
+    ui_generator_use(uim.views);
     resend = 0;
   }
   ui_generator_render(time);

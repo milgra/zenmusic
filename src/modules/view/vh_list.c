@@ -112,6 +112,7 @@ view_t* vh_list_get_item(view_t* view)
     //view_set_hidden(item, 1, 1);
     view_set_frame(item, (r2_t){0, -item->frame.local.h, item->frame.local.w, item->frame.local.h});
   }
+  // TODO check TS_BLANK or TS_READY state!!!
   return vec_head(vh->cache);
 }
 

@@ -15,10 +15,7 @@
 
 int      ui_generator_init(int, int);
 void     ui_generator_render(uint32_t);
-void     ui_generator_cleanup();
-void     ui_generator_add(view_t* view);
-void     ui_generator_remove(view_t* view);
-void     ui_generator_set_index(view_t* view);
+void     ui_generator_use(vec_t* views);
 void     ui_generator_resize(int width, int height);
 uint32_t ui_generate_create_texture();
 
@@ -86,52 +83,6 @@ int ui_generator_init(int width, int height)
   return (uig.thread != NULL);
 }
 
-void ui_generator_cleanup()
-{
-  ui_compositor_rewind();
-  vec_reset(uig.views);
-}
-
-void ui_generator_add(view_t* view)
-{
-  VADD(uig.views, view);
-
-  // assign pages if view is new
-  if (view->texture.page == -1)
-  {
-    // use a texture map texture page
-    if (view->texture.type == TT_MANAGED) view_set_texture_page(view, 0);
-    if (view->texture.type == TT_EXTERNAL)
-    {
-      ui_compositor_new_texture(uig.texpage, uig.wpwr, uig.hpwr);
-      view_set_texture_page(view, uig.texpage);
-      uig.texpage += 1;
-    }
-  }
-
-  ui_compositor_add(view->id,
-                    view->masked,
-                    view->hidden,
-                    view->frame.global,       // frame
-                    view->layout.shadow_blur, // view border
-                    view->texture.page,       // texture page
-                    view->texture.full,       // needs full texture
-                    view->texture.page > 0,   // external texture
-                    view->texture.id,         // texture id
-                    uig.wpwr,
-                    uig.hpwr);
-
-  // in case of ui manager resend textures are ready
-  if (view->texture.state == TS_READY)
-  {
-    ui_compositor_upd_bmp(uig.views->length - 1,
-                          view->frame.global,
-                          view->layout.shadow_blur,
-                          view->texture.id,
-                          view->texture.bitmap);
-  }
-}
-
 void ui_generator_resend_views()
 {
   printf("ui_generator_resend_views");
@@ -145,6 +96,20 @@ void ui_generator_resend_views()
        index++)
   {
     view_t* view = uig.views->data[index];
+
+    // assign pages if view is new
+    if (view->texture.page == -1)
+    {
+      // use a texture map texture page
+      if (view->texture.type == TT_MANAGED) view_set_texture_page(view, 0);
+      if (view->texture.type == TT_EXTERNAL)
+      {
+        ui_compositor_new_texture(uig.texpage, uig.wpwr, uig.hpwr);
+        view_set_texture_page(view, uig.texpage);
+        uig.texpage += 1;
+      }
+    }
+
     ui_compositor_add(view->id,
                       view->masked,
                       view->hidden,
@@ -177,6 +142,14 @@ void ui_generator_resend_views()
     // reset growing
     uig.grow = 0;
   }
+}
+
+void ui_generator_use(vec_t* views)
+{
+  vec_reset(uig.views);
+  vec_addinvector(uig.views, views);
+
+  ui_generator_resend_views();
 }
 
 void ui_generator_resize_texmap(int size)
