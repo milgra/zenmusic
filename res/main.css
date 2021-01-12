@@ -294,7 +294,7 @@
     background-image: url("settings.png");
 }
 
-#donatebtn {
+#aboutbtn {
     width: 30px;
     height: 30px;
     left: 15px;
@@ -304,7 +304,7 @@
     box-shadow: 3px;
 }
 
-#donateicon {
+#abouticon {
     width: 30px;
     height: 30px;
     background-image: url("donate.png");

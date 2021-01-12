@@ -12,6 +12,8 @@ typedef struct _vh_list_t
 
   int head_index; // index of top element
   int tail_index; // index of bottom element
+  int top_index;  // index of upper visible element
+  int bot_index;  // index of bottom visible element
   int item_count; // all elements in data source
   int full;       // list is full, no more elements needed
 
@@ -55,17 +57,20 @@ view_t* vh_list_item_for_index(view_t* view, int index);
 
 void vh_list_move(view_t* view, float dy)
 {
-  view_t* sview;
-
   vh_list_t* vh = view->handler_data;
-  while ((sview = VNXT(vh->items)))
+
+  for (int index = 0; index < vh->items->length; index++)
   {
-    r2_t frame = sview->frame.local;
+    view_t* sview = vh->items->data[index];
+    r2_t    frame = sview->frame.local;
 
     frame.x = vh->item_pos;
     frame.y += dy;
 
     view_set_frame(sview, frame);
+
+    if (frame.y <= 0.0 && view->frame.local.y + view->frame.local.h > 0.0) vh->top_index = vh->head_index + index;
+    if (frame.y < view->frame.local.h && frame.y + frame.h >= view->frame.local.h) vh->bot_index = vh->head_index + index;
   }
 
   float sr; // size ratio
@@ -78,10 +83,10 @@ void vh_list_move(view_t* view, float dy)
   sr = 1.0;
   pr = 0.0;
 
-  if (vh->tail_index - vh->head_index + 1 < vh->item_count)
+  if (vh->bot_index - vh->top_index + 1 < vh->item_count)
   {
-    sr = (float)(vh->tail_index - vh->head_index + 1) / (float)vh->item_count;
-    pr = (float)(vh->head_index) / (float)(vh->item_count - (vh->tail_index - vh->head_index + 1));
+    sr = (float)(vh->bot_index - vh->top_index + 1) / (float)vh->item_count;
+    pr = (float)(vh->top_index) / (float)(vh->item_count - (vh->bot_index - vh->top_index + 1));
   }
 
   vh_sbar_update(vh->vscr, pr, sr);
@@ -233,9 +238,20 @@ void vh_list_evt(view_t* view, ev_t ev)
       // horizontal bounce
 
       if (vh->item_pos > 0.0001)
+      {
         vh->item_pos += -vh->item_pos / 5.0;
-      else if (vh->item_pos < -0.0001 && vh->item_pos + vh->item_wth < view->frame.local.w)
-        vh->item_pos += (view->frame.local.w - vh->item_wth - vh->item_pos) / 5.0;
+      }
+      else if (vh->item_pos + vh->item_wth < view->frame.local.w)
+      {
+        if (vh->item_wth > view->frame.local.w)
+        {
+          vh->item_pos += (view->frame.local.w - vh->item_wth - vh->item_pos) / 5.0;
+        }
+        else if (vh->item_pos < -0.0001)
+        {
+          vh->item_pos += -vh->item_pos / 5.0;
+        }
+      }
 
       // vertical bounce
 

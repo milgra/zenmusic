@@ -30,6 +30,7 @@ typedef struct _vh_sbar_t
   float      pos;
   float      size;
   float      fpos; // final pos
+  float      fsize;
 } vh_sbar_t;
 
 void vh_sbar_evt(view_t* view, ev_t ev)
@@ -42,6 +43,7 @@ void vh_sbar_evt(view_t* view, ev_t ev)
     if (vh->step > 0 && vh->step < vh->steps)
     {
       vh->pos += (vh->fpos - vh->pos) / 5.0;
+      vh->size += (vh->fsize - vh->size) / 5.0;
       // avoid invalid bitmaps
       if (view->frame.local.w >= 1.0 &&
           view->frame.local.h >= 1.0)
@@ -105,6 +107,7 @@ void vh_sbar_evt(view_t* view, ev_t ev)
     else if (vh->step >= vh->steps)
     {
       vh->pos += (vh->fpos - vh->pos) / 5.0;
+      vh->size += (vh->fsize - vh->size) / 5.0;
 
       bm_t* bm = view->texture.bitmap;
       bm_reset(bm);
@@ -154,23 +157,21 @@ void vh_sbar_update(view_t* view, float pr, float sr)
 {
   vh_sbar_t* vh = view->handler_data;
 
+  if (sr < 0.1) sr = 0.1;
+
   if (vh->type == SBAR_V)
   {
-    if (sr < 0.1) sr = 0.1;
-
     float max = view->frame.local.h - view->frame.local.w;
 
-    vh->size = max * sr;
-    vh->fpos = view->frame.local.w / 2 + (max - vh->size) * pr;
+    vh->fsize = max * sr;
+    vh->fpos  = view->frame.local.w / 2 + (max - vh->size) * pr;
   }
   else
   {
-    if (sr < 0.1) sr = 0.1;
-
     float max = view->frame.local.w - view->frame.local.h;
 
-    vh->size = max * sr;
-    vh->fpos = view->frame.local.h / 2 + (max - vh->size) * pr;
+    vh->fsize = max * sr;
+    vh->fpos  = view->frame.local.h / 2 + (max - vh->size) * pr;
   }
 }
 

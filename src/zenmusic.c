@@ -38,6 +38,7 @@ view_t* baseview;
 view_t* minuteview;
 view_t* secondview;
 view_t* display;
+view_t* aboutview;
 
 view_t* song;
 view_t* artist;
@@ -184,6 +185,10 @@ void rand_button_pushed(view_t* view, void* data)
   tg_text_set(artist, (char*)MGET(songmap, "artist"), ts);
 
   player_play(MGET(songmap, "path"));
+}
+
+void about_button_pushed(view_t* view, void* data)
+{
 }
 
 void loop_button_pushed(view_t* view, void* data)
@@ -584,11 +589,16 @@ void init(int width, int height)
   vh_button_add(randbtn, NULL, rand_button_pushed);
 
   view_t* settingsbtn = view_get_subview(baseview, "settingsicon");
-  view_t* donatebtn   = view_get_subview(baseview, "donateicon");
-  view_t* eventsbtn   = view_get_subview(baseview, "eventsicon");
 
   view_t* main      = view_get_subview(baseview, "main");
   main->needs_touch = 0;
+
+  view_t* eventsbtn = view_get_subview(baseview, "eventsicon");
+  view_t* aboutbtn  = view_get_subview(baseview, "abouticon");
+  aboutview         = view_get_subview(baseview, "aboutback");
+
+  vh_button_add(aboutbtn, NULL, about_button_pushed);
+  view_remove(main, aboutview);
 
   view_t* header = view_get_subview(baseview, "header");
   //header->texture.blur = 1;
