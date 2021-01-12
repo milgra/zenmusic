@@ -275,6 +275,9 @@ void songitem_on_select(view_t* view, uint32_t index, ev_t ev)
   }
   else if (ev.button == 3)
   {
+    map_t* songmap = songs->data[index];
+
+    editor_set_song(songmap);
     view_add(mainview, editorview);
   }
 }
