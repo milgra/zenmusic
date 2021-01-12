@@ -37,15 +37,9 @@ freebsd for os
 
 first version
 
-scrollbar horizontal anxiety
-add id3 editor
+id editor, album url, album preview
 fix query field
 make genre/artist selection filter songs, fill up query bar
-make tag editor list
-
-tilemap is auto-resize legyen duplazassal, min screen size legyen alapbol
-
-tag editor window jobb klikkre, album url-t is kezzel kelljen beirni egyelore
 increase play count
 fix leaks
 elso indulasnal analyzer progresst mutassa valahol amig zenet hallgatsz

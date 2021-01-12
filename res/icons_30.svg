@@ -14,7 +14,7 @@
    id="svg8"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
    sodipodi:docname="icons_30.svg"
-   inkscape:export-filename="/home/milgra/Projects/zenmusic/res/close.png"
+   inkscape:export-filename="/home/milgra/Projects/zenmusic/res/editor.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96">
   <defs
@@ -28,9 +28,9 @@
      inkscape:pageshadow="2"
      inkscape:zoom="15.734375"
      inkscape:cx="14.635359"
-     inkscape:cy="18.479541"
+     inkscape:cy="9.2670084"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer5"
+     inkscape:current-layer="layer2"
      inkscape:document-rotation="0"
      showgrid="true"
      units="px"
@@ -142,7 +142,7 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="Donate"
-     style="display:none">
+     style="display:inline">
     <path
        id="path157"
        style="fill:#000000;stroke-width:0.999999"
@@ -154,30 +154,37 @@
      id="layer4"
      inkscape:label="Events"
      style="display:none">
+    <path
+       id="rect108"
+       style="fill:#000000;stroke-width:0.264583"
+       d="M 2.1153275,2.1008074 V 5.8165251 H 5.8607708 V 2.1008074 Z M 2.5224251,2.505005 H 5.4493232 V 5.4677912 H 2.5224251 Z" />
     <rect
-       style="fill:#000000;stroke-width:0.246944"
-       id="rect180"
-       width="0.98777771"
-       height="2.4694443"
-       x="3.5"
-       y="2.0999999"
-       rx="0.49999896"
-       ry="0.49999896" />
+       style="fill:#000000;stroke-width:0.264583"
+       id="rect120"
+       width="2.0426645"
+       height="0.25867513"
+       x="3.0030892"
+       y="3.0556433" />
     <rect
-       style="fill:#000000;stroke-width:0.246944"
-       id="rect182"
-       width="0.98777771"
-       height="0.98777771"
-       x="3.5"
-       y="4.8163891"
-       rx="0.49999896"
-       ry="0.49999896" />
+       style="display:inline;fill:#000000;stroke-width:0.264583"
+       id="rect120-3"
+       width="2.0426645"
+       height="0.25867513"
+       x="2.9961567"
+       y="4.6672535" />
+    <rect
+       style="display:inline;fill:#000000;stroke-width:0.264583"
+       id="rect120-8"
+       width="2.0426645"
+       height="0.25867513"
+       x="3.004302"
+       y="3.8798747" />
   </g>
   <g
      inkscape:groupmode="layer"
      id="layer5"
      inkscape:label="Close"
-     style="display:inline">
+     style="display:none">
     <rect
        style="fill:#000000;stroke-width:0.264583"
        id="rect315"

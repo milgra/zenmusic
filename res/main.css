@@ -323,9 +323,8 @@
 #eventsicon {
     width: 30px;
     height: 30px;
-    background-image: url("events.png");
+    background-image: url("editor.png");
 }
-
 
 #loopbtn {
     width: 40px;
@@ -448,6 +447,25 @@
 }
 
 #ideditor {
+    display: mask;
+    width: 100%;
+    height: 100%;
+    border-radius: 15px;
+    background-color: #FFFFFFFF;
+    box-shadow: 2px;
+}
+
+#settingsback {
+    width: 400px;
+    height: 400px;
+    top: 350px;
+    margin: auto;
+    border-radius: 15px;
+    background-color: #FFFFFFFF;
+    box-shadow: 3px;
+}
+
+#settings {
     display: mask;
     width: 100%;
     height: 100%;

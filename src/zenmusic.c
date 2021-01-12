@@ -41,6 +41,7 @@ view_t* secondview;
 view_t* display;
 view_t* aboutview;
 view_t* editorview;
+view_t* settingsview;
 
 view_t* song;
 view_t* artist;
@@ -133,6 +134,14 @@ void mute_button_pushed(view_t* view)
   player_toggle_mute();
 }
 
+void edit_button_pushed(view_t* view, void* data)
+{
+  if (editorview->parent)
+    view_remove(mainview, editorview);
+  else
+    view_add(mainview, editorview);
+}
+
 void prev_button_pushed(view_t* view, void* data)
 {
   lastindex = lastindex - 1;
@@ -195,6 +204,14 @@ void about_button_pushed(view_t* view, void* data)
     view_remove(mainview, aboutview);
   else
     view_add(mainview, aboutview);
+}
+
+void settings_button_pushed(view_t* view, void* data)
+{
+  if (settingsview->parent)
+    view_remove(mainview, settingsview);
+  else
+    view_add(mainview, settingsview);
 }
 
 void loop_button_pushed(view_t* view, void* data)
@@ -604,14 +621,33 @@ void init(int width, int height)
   vh_button_add(nextbtn, NULL, next_button_pushed);
   vh_button_add(randbtn, NULL, rand_button_pushed);
 
-  view_t* settingsbtn = view_get_subview(baseview, "settingsicon");
-
   view_t* main      = view_get_subview(baseview, "main");
   main->needs_touch = 0;
 
-  view_t* eventsbtn = view_get_subview(baseview, "eventsicon");
-  view_t* aboutbtn  = view_get_subview(baseview, "abouticon");
-  aboutview         = view_get_subview(baseview, "aboutback");
+  view_t* settingsbtn = view_get_subview(baseview, "settingsicon");
+  vh_button_add(settingsbtn, NULL, settings_button_pushed);
+
+  settingsview = view_get_subview(baseview, "settingsback");
+
+  ts.align     = TA_CENTER;
+  ts.textcolor = 0x000000FF;
+  ts.backcolor = 0xFFFFFFFF;
+  ts.size      = 25.0;
+
+  view_t* settings = view_get_subview(baseview, "settings");
+
+  char* settingsinfo = "Library location:\n Change library\n Organize library X\n Change color\n";
+
+  tg_text_add(settings);
+  tg_text_set(settings, settingsinfo, ts);
+
+  view_remove(main, settingsview);
+
+  view_t* editbtn = view_get_subview(baseview, "eventsicon");
+  vh_button_add(editbtn, NULL, edit_button_pushed);
+
+  view_t* aboutbtn = view_get_subview(baseview, "abouticon");
+  aboutview        = view_get_subview(baseview, "aboutback");
 
   vh_button_add(aboutbtn, NULL, about_button_pushed);
 
