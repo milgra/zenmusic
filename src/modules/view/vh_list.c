@@ -59,6 +59,9 @@ void vh_list_move(view_t* view, float dy)
 {
   vh_list_t* vh = view->handler_data;
 
+  char inside  = 0;
+  char outside = 0;
+
   for (int index = 0; index < vh->items->length; index++)
   {
     view_t* sview = vh->items->data[index];
@@ -69,9 +72,21 @@ void vh_list_move(view_t* view, float dy)
 
     view_set_frame(sview, frame);
 
-    if (frame.y <= 0.0 && view->frame.local.y + view->frame.local.h > 0.0) vh->top_index = vh->head_index + index;
-    if (frame.y < view->frame.local.h && frame.y + frame.h >= view->frame.local.h) vh->bot_index = vh->head_index + index;
+    if (frame.y >= 0.0 && !inside)
+    {
+      inside        = 1;
+      vh->top_index = vh->head_index + index;
+    }
+
+    if (frame.y >= view->frame.local.h && !outside)
+    {
+      outside       = 1;
+      vh->bot_index = vh->head_index + index;
+    }
   }
+
+  if (!outside) vh->bot_index = vh->tail_index;
+  if (!inside) vh->top_index = vh->head_index;
 
   float sr; // size ratio
   float pr; // position ratio
