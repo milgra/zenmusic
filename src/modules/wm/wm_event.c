@@ -31,6 +31,7 @@ typedef struct _ev_t
   char        drag;
   uint32_t    time;
   uint32_t    dtime;
+  int         button;
   SDL_KeyCode keycode;
 } ev_t;
 

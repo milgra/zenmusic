@@ -134,13 +134,15 @@ void wm_init(void (*init)(int, int),
 
               if (event.type == SDL_MOUSEBUTTONDOWN)
               {
-                ev.type = EV_MDOWN;
-                ev.drag = 1;
+                ev.type   = EV_MDOWN;
+                ev.button = event.button.button;
+                ev.drag   = 1;
               }
               else if (event.type == SDL_MOUSEBUTTONUP)
               {
-                ev.type = EV_MUP;
-                ev.drag = 0;
+                ev.type   = EV_MUP;
+                ev.button = event.button.button;
+                ev.drag   = 0;
               }
               else if (event.type == SDL_MOUSEMOTION)
               {

@@ -2,6 +2,7 @@
 #include "common.c"
 #include "cr_text.c"
 #include "db.c"
+#include "editor.c"
 #include "lib.c"
 #include "mtchannel.c"
 #include "mtcstring.c"
@@ -39,6 +40,7 @@ view_t* minuteview;
 view_t* secondview;
 view_t* display;
 view_t* aboutview;
+view_t* editorview;
 
 view_t* song;
 view_t* artist;
@@ -189,6 +191,10 @@ void rand_button_pushed(view_t* view, void* data)
 
 void about_button_pushed(view_t* view, void* data)
 {
+  if (aboutview->parent)
+    view_remove(mainview, aboutview);
+  else
+    view_add(mainview, aboutview);
 }
 
 void loop_button_pushed(view_t* view, void* data)
@@ -205,48 +211,58 @@ void close_button_pushed(view_t* view, void* data)
   wm_close();
 }
 
-void songitem_on_select(view_t* view, uint32_t index)
+void songitem_on_select(view_t* view, uint32_t index, ev_t ev)
 {
-  // deselect prev item
-  view_t* olditem = vh_list_item_for_index(songlist, selected_index);
+  printf("select button %i\n", ev.button);
 
-  if (olditem)
+  if (ev.button == 1)
   {
-    songitem_update(olditem, selected_index, songs->data[selected_index], fontpath, songlist_fields);
+
+    // deselect prev item
+    view_t* olditem = vh_list_item_for_index(songlist, selected_index);
+
+    if (olditem)
+    {
+      songitem_update(olditem, selected_index, songs->data[selected_index], fontpath, songlist_fields);
+    }
+
+    // indicate list item
+    view_t* newitem = vh_list_item_for_index(songlist, index);
+
+    if (newitem)
+    {
+      songitem_select(newitem, index, songs->data[index], fontpath, songlist_fields, selected_color);
+    }
+    selected_index = index;
+
+    // update display
+    map_t* songmap = songs->data[index];
+
+    textstyle_t ts = {0};
+    ts.font        = fontpath;
+    ts.align       = TA_CENTER;
+    ts.size        = 25.0;
+    ts.textcolor   = 0x555555FF;
+    ts.backcolor   = 0;
+
+    tg_text_set(song, (char*)MGET(songmap, "title"), ts);
+    tg_text_set(artist, (char*)MGET(songmap, "artist"), ts);
+
+    char buff[100];
+    snprintf(buff, 100, "%s/%s/%s", (char*)MGET(songmap, "date"), (char*)MGET(songmap, "genre"), "192Kb/s");
+    tg_text_set(info, buff, ts);
+
+    // LOG started playing xy
+
+    player_play(MGET(songmap, "path"));
   }
-
-  // indicate list item
-  view_t* newitem = vh_list_item_for_index(songlist, index);
-
-  if (newitem)
+  else if (ev.button == 3)
   {
-    songitem_select(newitem, index, songs->data[index], fontpath, songlist_fields, selected_color);
+    view_add(mainview, editorview);
   }
-  selected_index = index;
-
-  // update display
-  map_t* songmap = songs->data[index];
-
-  textstyle_t ts = {0};
-  ts.font        = fontpath;
-  ts.align       = TA_CENTER;
-  ts.size        = 25.0;
-  ts.textcolor   = 0x555555FF;
-  ts.backcolor   = 0;
-
-  tg_text_set(song, (char*)MGET(songmap, "title"), ts);
-  tg_text_set(artist, (char*)MGET(songmap, "artist"), ts);
-
-  char buff[100];
-  snprintf(buff, 100, "%s/%s/%s", (char*)MGET(songmap, "date"), (char*)MGET(songmap, "genre"), "192Kb/s");
-  tg_text_set(info, buff, ts);
-
-  // LOG started playing xy
-
-  player_play(MGET(songmap, "path"));
 }
 
-void on_artistitem_select(view_t* view, uint32_t index)
+void on_artistitem_select(view_t* view, uint32_t index, ev_t ev)
 {
   printf("on_artistitem_select\n");
 }
@@ -286,7 +302,7 @@ int artistlist_update_item(view_t* listview, view_t* item, int index, int* item_
   return 0;
 }
 
-void on_genreitem_select(view_t* view, uint32_t index)
+void on_genreitem_select(view_t* view, uint32_t index, ev_t ev)
 {
   printf("on_genreitem_select\n");
 }
@@ -365,7 +381,7 @@ void sort(char* field)
   vh_list_reset(songlist);
 }
 
-void on_header_field_select(view_t* view, char* id)
+void on_header_field_select(view_t* view, char* id, ev_t ev)
 {
   printf("on_header_field_select %s\n", id);
   // filter db by field id
@@ -598,7 +614,29 @@ void init(int width, int height)
   aboutview         = view_get_subview(baseview, "aboutback");
 
   vh_button_add(aboutbtn, NULL, about_button_pushed);
+
+  ts.align     = TA_CENTER;
+  ts.textcolor = 0x000000FF;
+  ts.backcolor = 0xFFFFFFFF;
+  ts.size      = 25.0;
+
+  view_t* about = view_get_subview(baseview, "about");
+
+  char* info = "Zen Music by Milan Toth\nFree and Open Source Software.\n"
+               "If you like Zen Music, please consider donating\n www.paypal.me/milgra\n"
+               "Powered by FreeBSD, Emacs and C";
+
+  tg_text_add(about);
+  tg_text_set(about, info, ts);
+
   view_remove(main, aboutview);
+
+  editorview     = view_get_subview(baseview, "ideditorback");
+  view_t* editor = view_get_subview(baseview, "ideditor");
+
+  view_remove(main, editorview);
+
+  editor_attach(editor, fontpath);
 
   view_t* header = view_get_subview(baseview, "header");
   //header->texture.blur = 1;

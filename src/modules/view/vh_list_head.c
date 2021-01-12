@@ -26,12 +26,12 @@ typedef struct _vh_lhead_t
   lheadcell_t* resized_flag;
   int          height;
   int          index;
-  void (*on_select)(view_t* view, char* id);
+  void (*on_select)(view_t* view, char* id, ev_t ev);
   void (*on_insert)(view_t* view, int src, int tgt);
   void (*on_resize)(view_t* view, char* id, int width);
 } vh_lhead_t;
 
-void vh_lhead_add(view_t* view, int h, void (*on_select)(view_t* view, char* id), void (*on_insert)(view_t* view, int src, int tgt), void (*on_resize)(view_t* view, char* id, int width));
+void vh_lhead_add(view_t* view, int h, void (*on_select)(view_t* view, char* id, ev_t ev), void (*on_insert)(view_t* view, int src, int tgt), void (*on_resize)(view_t* view, char* id, int width));
 void vh_lhead_upd(view_t* view, int index);
 void vh_lhead_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* view, void* data));
 void vh_lhead_upd_cell(view_t* view, char* id, int size, void* data);
@@ -126,7 +126,7 @@ void vh_lhead_evt(view_t* view, ev_t ev)
       }
       else if (vh->dragged_cell)
       {
-        (*vh->on_select)(view, vh->dragged_cell->id);
+        (*vh->on_select)(view, vh->dragged_cell->id, ev);
       }
     }
     else
@@ -158,7 +158,7 @@ void vh_lhead_evt(view_t* view, ev_t ev)
 
 void vh_lhead_add(view_t* view,
                   int     h,
-                  void (*on_select)(view_t* view, char* id),
+                  void (*on_select)(view_t* view, char* id, ev_t ev),
                   void (*on_insert)(view_t* view, int src, int tgt),
                   void (*on_resize)(view_t* view, char* id, int width))
 {

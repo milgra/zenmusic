@@ -13,7 +13,7 @@ typedef struct _sitem_cell_t
 
 sitem_cell_t* sitem_cell_new(char* id, int size, int index);
 
-view_t* songitem_new(char* fontpath, void (*on_select)(view_t* view, uint32_t index), vec_t* fields);
+view_t* songitem_new(char* fontpath, void (*on_select)(view_t* view, uint32_t index, ev_t ev), vec_t* fields);
 void    songitem_update(view_t* rowview, int index, map_t* file, char* fontpath, vec_t* fields);
 void    songitem_select(view_t* rowview, int index, map_t* file, char* fontpath, vec_t* fields, uint32_t color);
 
@@ -41,7 +41,7 @@ sitem_cell_t* sitem_cell_new(char* id, int size, int index)
   return cell;
 }
 
-view_t* songitem_new(char* fontpath, void (*on_select)(view_t* view, uint32_t index), vec_t* fields)
+view_t* songitem_new(char* fontpath, void (*on_select)(view_t* view, uint32_t index, ev_t ev), vec_t* fields)
 {
   char idbuffer[100] = {0};
   snprintf(idbuffer, 100, "list_item%i", songitem_index++);

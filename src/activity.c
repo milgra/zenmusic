@@ -26,7 +26,7 @@ struct _activity_t
   view_t* view;
 } act = {0};
 
-void activity_select(view_t* view, uint32_t index)
+void activity_select(view_t* view, uint32_t index, ev_t ev)
 {
   printf("on_activityitem_select\n");
 }
