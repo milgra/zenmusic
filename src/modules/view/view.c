@@ -171,7 +171,6 @@ extern char resend;
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "common.c"
 #include "mtcstring.c"
 #include "mtmemory.c"
 

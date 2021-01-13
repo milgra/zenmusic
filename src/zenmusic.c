@@ -1,5 +1,4 @@
 #include "activity.c"
-#include "common.c"
 #include "cr_text.c"
 #include "db.c"
 #include "editor.c"
@@ -32,48 +31,43 @@
 #include <stdlib.h>
 #include <time.h>
 
-char* libpath = "/home/milgra/Music";
-
-view_t* coverview;
 view_t* baseview;
 view_t* minuteview;
 view_t* secondview;
-view_t* display;
+
 view_t* aboutview;
 view_t* editorview;
 view_t* settingsview;
 
-view_t* song;
-view_t* artist;
-view_t* info;
+view_t* songview;
+view_t* infoview;
+view_t* artistview;
 
 view_t* visuleft;
 view_t* visuright;
 view_t* visuvideo;
-double  lasttime = 0.0;
+
 view_t* playbtn;
 view_t* volbtn;
-size_t  lastindex = 0;
-int     loop_all  = 0;
 
-int messageitem_index = 0;
+double lasttime  = 0.0;
+size_t lastindex = 0;
 
 view_t* mainview;
-view_t* display;
 view_t* messagelistback;
 view_t* filterlistback;
-view_t* filterlist;
 
 char     song_refr_flag = 0;
 uint32_t song_recv_time = 0;
 
-char*  fontpath;
-vec_t* files;
+char* libpath = "/home/milgra/Music";
+char* fontpath;
+
+ch_t*  ch;
 map_t* db;
 vec_t* songs;
 vec_t* genres;
 vec_t* artists;
-ch_t*  libch;
 
 void seek_ratio_changed(view_t* view, float angle)
 {
@@ -142,8 +136,8 @@ void prev_button_pushed(view_t* view, void* data)
   ts.backcolor   = 0;
 
   map_t* songmap = songs->data[lastindex];
-  tg_text_set(song, (char*)MGET(songmap, "title"), ts);
-  tg_text_set(artist, (char*)MGET(songmap, "artist"), ts);
+  tg_text_set(songview, (char*)MGET(songmap, "title"), ts);
+  tg_text_set(artistview, (char*)MGET(songmap, "artist"), ts);
 
   player_play(MGET(songmap, "path"));
 }
@@ -151,7 +145,7 @@ void prev_button_pushed(view_t* view, void* data)
 void next_button_pushed(view_t* view, void* data)
 {
   lastindex = lastindex + 1;
-  if (lastindex == songs->length) lastindex = files->length - 1;
+  // if (lastindex == songs->length) lastindex = files->length - 1;
 
   textstyle_t ts = {0};
   ts.font        = fontpath;
@@ -161,8 +155,8 @@ void next_button_pushed(view_t* view, void* data)
   ts.backcolor   = 0;
 
   map_t* songmap = songs->data[lastindex];
-  tg_text_set(song, (char*)MGET(songmap, "title"), ts);
-  tg_text_set(artist, (char*)MGET(songmap, "artist"), ts);
+  tg_text_set(songview, (char*)MGET(songmap, "title"), ts);
+  tg_text_set(artistview, (char*)MGET(songmap, "artist"), ts);
 
   player_play(MGET(songmap, "path"));
 }
@@ -179,8 +173,8 @@ void rand_button_pushed(view_t* view, void* data)
   ts.backcolor   = 0;
 
   map_t* songmap = songs->data[lastindex];
-  tg_text_set(song, (char*)MGET(songmap, "title"), ts);
-  tg_text_set(artist, (char*)MGET(songmap, "artist"), ts);
+  tg_text_set(songview, (char*)MGET(songmap, "title"), ts);
+  tg_text_set(artistview, (char*)MGET(songmap, "artist"), ts);
 
   player_play(MGET(songmap, "path"));
 }
@@ -199,11 +193,6 @@ void settings_button_pushed(view_t* view, void* data)
     view_remove(mainview, settingsview);
   else
     view_add(mainview, settingsview);
-}
-
-void loop_button_pushed(view_t* view, void* data)
-{
-  loop_all = !loop_all;
 }
 
 void max_button_pushed(view_t* view, void* data)
@@ -263,12 +252,12 @@ void on_song_select(int index)
   ts.textcolor   = 0x555555FF;
   ts.backcolor   = 0;
 
-  tg_text_set(song, (char*)MGET(songmap, "title"), ts);
-  tg_text_set(artist, (char*)MGET(songmap, "artist"), ts);
+  tg_text_set(songview, (char*)MGET(songmap, "title"), ts);
+  tg_text_set(artistview, (char*)MGET(songmap, "artist"), ts);
 
   char buff[100];
   snprintf(buff, 100, "%s/%s/%s", (char*)MGET(songmap, "date"), (char*)MGET(songmap, "genre"), "192Kb/s");
-  tg_text_set(info, buff, ts);
+  tg_text_set(infoview, buff, ts);
 
   // LOG started playing xy
 
@@ -304,8 +293,8 @@ void init(int width, int height)
 {
   srand((unsigned int)time(NULL));
 
-  db    = MNEW();
-  libch = ch_new(100);
+  db = MNEW();
+  ch = ch_new(100);
 
   songs   = VNEW();
   genres  = VNEW();
@@ -314,20 +303,32 @@ void init(int width, int height)
   char* respath  = SDL_GetBasePath();
   char* csspath  = cstr_fromformat("%s/../res/main.css", respath, NULL);
   char* htmlpath = cstr_fromformat("%s/../res/main.html", respath, NULL);
-  fontpath       = cstr_fromformat("%s/../res/Avenir.ttc", respath, NULL);
 
-  vec_t* views = view_gen_load(htmlpath, csspath, respath);
-  baseview     = vec_head(views);
+  fontpath = cstr_fromformat("%s/../res/Avenir.ttc", respath, NULL);
 
-  // layout to starter size
-  view_set_frame(baseview, (r2_t){0.0, 0.0, (float)width, (float)height});
-  view_layout(baseview);
-
-  common_respath = respath;
+  // init text rendering
 
   text_init();
 
+  // init activity logging
+
   activity_init();
+
+  // view setup
+
+  vec_t* views = view_gen_load(htmlpath, csspath, respath);
+
+  baseview = vec_head(views);
+
+  view_set_frame(baseview, (r2_t){0.0, 0.0, (float)width, (float)height});
+  view_layout(baseview);
+
+  ui_manager_init(width, height);
+  ui_manager_add(baseview);
+
+  //
+
+  mainview = view_get_subview(baseview, "main");
 
   songlist_attach(baseview, songs, fontpath, on_song_select, on_song_edit, on_song_header);
 
@@ -345,27 +346,18 @@ void init(int width, int height)
 
   textlist_t* artistlist = textlist_new(view_get_subview(baseview, "artistlist"), artists, ts, on_artist_select);
 
-  ui_manager_init(width, height);
-  ui_manager_add(baseview);
-
-  //display         = view_get_subview(baseview, "display");
   messagelistback     = view_get_subview(baseview, "messagelistback");
   view_t* messagelist = view_get_subview(baseview, "messagelist");
 
   activity_attach(messagelist, fontpath);
-
-  mainview = view_get_subview(baseview, "main");
 
   view_remove(mainview, messagelistback);
 
   filterlistback = view_get_subview(baseview, "filterlistback");
   view_remove(mainview, filterlistback);
 
-  minuteview              = view_get_subview(baseview, "minute");
-  minuteview->needs_touch = 0;
-
-  secondview              = view_get_subview(baseview, "second");
-  secondview->needs_touch = 0;
+  minuteview = view_get_subview(baseview, "minute");
+  secondview = view_get_subview(baseview, "second");
 
   ts.font      = fontpath;
   ts.align     = TA_RIGHT;
@@ -381,23 +373,23 @@ void init(int width, int height)
   tg_text_add(secondview);
   tg_text_set(secondview, "00", ts);
 
-  song              = view_get_subview(baseview, "song");
-  song->needs_touch = 0;
+  songview              = view_get_subview(baseview, "song");
+  songview->needs_touch = 0;
 
   ts.size = 25.0;
 
-  tg_text_add(song);
-  tg_text_set(song, "-", ts);
+  tg_text_add(songview);
+  tg_text_set(songview, "-", ts);
 
-  artist              = view_get_subview(baseview, "artist");
-  artist->needs_touch = 0;
+  artistview              = view_get_subview(baseview, "artist");
+  artistview->needs_touch = 0;
 
-  tg_text_add(artist);
-  tg_text_set(artist, "-", ts);
+  tg_text_add(artistview);
+  tg_text_set(artistview, "-", ts);
 
-  info = view_get_subview(baseview, "info");
-  tg_text_add(info);
-  tg_text_set(info, "-", ts);
+  infoview = view_get_subview(baseview, "info");
+  tg_text_add(infoview);
+  tg_text_set(infoview, "-", ts);
 
   ts.size = 20.0;
 
@@ -549,7 +541,7 @@ void init(int width, int height)
   {
     LOG("analyzing entires...");
     // start analyzing new entries
-    lib_analyze(libch);
+    lib_analyze(ch);
   }
 
   sort("artist");
@@ -576,10 +568,13 @@ void update(ev_t ev)
       ts.backcolor   = 0;
 
       char timebuff[20];
+
       snprintf(timebuff, 20, "%.2i:", (int)floor(lasttime / 60.0));
       tg_text_set(minuteview, timebuff, ts);
-      snprintf(timebuff, 20, "%.2i", (int)lasttime % 60);
+
       ts.align = TA_LEFT;
+
+      snprintf(timebuff, 20, "%.2i", (int)lasttime % 60);
       tg_text_set(secondview, timebuff, ts);
 
       double posratio = time / player_duration();
@@ -594,6 +589,7 @@ void update(ev_t ev)
     // update visualizer
     player_draw_waves(0, visuleft->texture.bitmap, 3);
     player_draw_waves(1, visuright->texture.bitmap, 3);
+
     visuleft->texture.changed  = 1;
     visuright->texture.changed = 1;
 
@@ -603,7 +599,7 @@ void update(ev_t ev)
 
   // get analyzed song entries
   map_t* entry;
-  while ((entry = ch_recv(libch)))
+  while ((entry = ch_recv(ch)))
   {
     char* path = MGET(entry, "path");
     MPUT(db, path, entry);
@@ -611,6 +607,7 @@ void update(ev_t ev)
     song_refr_flag = 1;
     song_recv_time = ev.time;
   }
+
   // reload
   if (song_refr_flag)
   {
@@ -654,6 +651,7 @@ void render(uint32_t time)
 
 void destroy()
 {
+  printf("zenmusic destroy\n");
 }
 
 int main(int argc, char* args[])

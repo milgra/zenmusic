@@ -10,7 +10,6 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "common.c"
 #include "html.c"
 #include "tg_css.c"
 #include <limits.h>
