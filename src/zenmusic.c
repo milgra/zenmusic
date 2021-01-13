@@ -3,13 +3,13 @@
 #include "cr_text.c"
 #include "db.c"
 #include "editor.c"
-#include "genrelist.c"
 #include "lib.c"
 #include "mtchannel.c"
 #include "mtcstring.c"
 #include "mtmap.c"
 #include "player.c"
 #include "songlist.c"
+#include "textlist.c"
 #include "tg_css.c"
 #include "tg_knob.c"
 #include "tg_text.c"
@@ -215,56 +215,11 @@ void close_button_pushed(view_t* view, void* data)
   wm_close();
 }
 
-void on_artistitem_select(view_t* view, void* userdata, int index, ev_t ev)
-{
-  printf("on_artistitem_select\n");
-}
-
-view_t* artistlist_create_item(view_t* listview, void* userdata)
-{
-  char idbuffer[100] = {0};
-  snprintf(idbuffer, 100, "artistlist_item%i", messageitem_index++);
-
-  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
-  //rowview->hidden = 1;
-
-  vh_litem_add(rowview, 35, on_artistitem_select, NULL);
-  vh_litem_add_cell(rowview, "artist", 230, cr_text_add, cr_text_upd);
-
-  return rowview;
-}
-
-int artistlist_update_item(view_t* listview, void* userdata, view_t* item, int index, int* item_count)
-{
-  if (index < 0)
-    return 1; // no items before 0
-  if (index >= artists->length)
-    return 1; // no more items
-
-  *item_count = artists->length;
-
-  textstyle_t ts = {0};
-  ts.font        = fontpath;
-  ts.align       = TA_LEFT;
-  ts.size        = 25.0;
-  ts.textcolor   = 0x000000FF;
-  ts.backcolor   = 0xFFFFFFFF;
-
-  vh_litem_upd_cell(item, "artist", &((cr_text_data_t){.style = ts, .text = artists->data[index]}));
-
-  return 0;
-}
-
 void sort(char* field)
 {
   db_sort(db, songs, field);
   db_genres(db, genres);
   db_artists(songs, artists);
-  //vh_list_fill(songlist);
-  // remove cache as subviews
-  /* view_t* row; */
-  /* while ((row = VNXT(songlist_cache))) view_remove(songlist, row); */
-  //vec_reset(songlist_cache);
   songlist_update();
 }
 
@@ -335,9 +290,14 @@ void on_song_header(char* id)
   sort(id);
 }
 
-void on_genre_select(char* genre)
+void on_genre_select(int index)
 {
-  printf("on genre select %s\n", genre);
+  printf("on genre select %i\n", index);
+}
+
+void on_artist_select(int index)
+{
+  printf("on artist select %i\n", index);
 }
 
 void init(int width, int height)
@@ -348,8 +308,8 @@ void init(int width, int height)
   libch = ch_new(100);
 
   songs   = VNEW();
-  artists = VNEW();
   genres  = VNEW();
+  artists = VNEW();
 
   char* respath  = SDL_GetBasePath();
   char* csspath  = cstr_fromformat("%s/../res/main.css", respath, NULL);
@@ -370,7 +330,20 @@ void init(int width, int height)
   activity_init();
 
   songlist_attach(baseview, songs, fontpath, on_song_select, on_song_edit, on_song_header);
-  genrelist_attach(baseview, genres, fontpath, on_genre_select);
+
+  textstyle_t ts  = {0};
+  ts.font         = fontpath;
+  ts.align        = TA_RIGHT;
+  ts.margin_right = 20;
+  ts.size         = 25.0;
+  ts.textcolor    = 0x000000FF;
+  ts.backcolor    = 0xFFFFFFFF;
+
+  textlist_t* genrelist = textlist_new(view_get_subview(baseview, "genrelist"), genres, ts, on_genre_select);
+
+  ts.align = TA_LEFT;
+
+  textlist_t* artistlist = textlist_new(view_get_subview(baseview, "artistlist"), artists, ts, on_artist_select);
 
   ui_manager_init(width, height);
   ui_manager_add(baseview);
@@ -381,9 +354,6 @@ void init(int width, int height)
 
   activity_attach(messagelist, fontpath);
 
-  view_t* artistlist = view_get_subview(baseview, "artistlist");
-  vh_list_add(artistlist, artistlist_create_item, artistlist_update_item, NULL);
-
   mainview = view_get_subview(baseview, "main");
 
   view_remove(mainview, messagelistback);
@@ -391,22 +361,17 @@ void init(int width, int height)
   filterlistback = view_get_subview(baseview, "filterlistback");
   view_remove(mainview, filterlistback);
 
-  /* filterlist = view_get_subview(baseview, "filterlist"); */
-
-  /* view_remove(mainview, filterlist); */
-
   minuteview              = view_get_subview(baseview, "minute");
   minuteview->needs_touch = 0;
 
   secondview              = view_get_subview(baseview, "second");
   secondview->needs_touch = 0;
 
-  textstyle_t ts = {0};
-  ts.font        = fontpath;
-  ts.align       = TA_RIGHT;
-  ts.size        = 25.0;
-  ts.textcolor   = 0x555555FF;
-  ts.backcolor   = 0x0;
+  ts.font      = fontpath;
+  ts.align     = TA_RIGHT;
+  ts.size      = 25.0;
+  ts.textcolor = 0x555555FF;
+  ts.backcolor = 0x0;
 
   tg_text_add(minuteview);
   tg_text_set(minuteview, "00:", ts);
