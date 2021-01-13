@@ -437,8 +437,6 @@ void init(int width, int height)
   secondview              = view_get_subview(baseview, "second");
   secondview->needs_touch = 0;
 
-  tg_text_add(minuteview);
-
   textstyle_t ts = {0};
   ts.font        = fontpath;
   ts.align       = TA_RIGHT;
@@ -446,12 +444,12 @@ void init(int width, int height)
   ts.textcolor   = 0x555555FF;
   ts.backcolor   = 0x0;
 
+  tg_text_add(minuteview);
   tg_text_set(minuteview, "00:", ts);
-
-  tg_text_add(secondview);
 
   ts.align = TA_LEFT;
 
+  tg_text_add(secondview);
   tg_text_set(secondview, "00", ts);
 
   song              = view_get_subview(baseview, "song");
@@ -474,17 +472,11 @@ void init(int width, int height)
 
   ts.size = 20.0;
 
-  //tg_text_add(info, "-", ts);
-
   view_t* filterbar = view_get_subview(baseview, "filterfield");
   tg_css_add(filterbar);
 
   filterbar->layout.background_color = 0xFFFFFFFF;
   vh_text_add(filterbar, "Search/Query", fontpath, filter, filter_onactivate);
-
-  //view_t* headeritem = songlist_new();
-  //songlist_update(headeritem, -1, "Artist", NULL);
-  //view_add(songlistheader, headeritem);
 
   playbtn = view_get_subview(baseview, "playbtn");
   tg_knob_add(playbtn);
