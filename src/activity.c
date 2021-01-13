@@ -26,12 +26,12 @@ struct _activity_t
   view_t* view;
 } act = {0};
 
-void activity_select(view_t* view, uint32_t index, ev_t ev)
+void activity_select(view_t* view, void* userdata, int index, ev_t ev)
 {
   printf("on_activityitem_select\n");
 }
 
-view_t* activity_create_item(view_t* listview)
+view_t* activity_create_item(view_t* listview, void* userdata)
 {
   char idbuffer[100] = {0};
   snprintf(idbuffer, 100, "activity_item%i", act.ind++);
@@ -39,13 +39,13 @@ view_t* activity_create_item(view_t* listview)
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
   rowview->hidden = 1;
 
-  vh_litem_add(rowview, 35, activity_select);
+  vh_litem_add(rowview, 35, activity_select, NULL);
   vh_litem_add_cell(rowview, "message", 460, cr_text_add, cr_text_upd);
 
   return rowview;
 }
 
-int activity_update_item(view_t* listview, view_t* item, int index, int* item_count)
+int activity_update_item(view_t* listview, void* userdata, view_t* item, int index, int* item_count)
 {
   if (index < 0)
     return 1; // no items before 0
@@ -76,7 +76,7 @@ void activity_init()
 
 void activity_attach(view_t* view, char* fontpath)
 {
-  vh_list_add(view, activity_create_item, activity_update_item);
+  vh_list_add(view, activity_create_item, activity_update_item, NULL);
 
   act.view     = view;
   act.fontpath = fontpath;

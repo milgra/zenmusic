@@ -19,10 +19,11 @@ typedef struct _vh_litem_t
   vec_t*  cells;
   view_t* view;
   int     index;
-  void (*on_select)(view_t* view, uint32_t index, ev_t ev);
+  void (*on_select)(view_t* view, void* userdata, int index, ev_t ev);
+  void* userdata;
 } vh_litem_t;
 
-void vh_litem_add(view_t* view, int h, void (*on_select)(view_t* view, uint32_t index, ev_t ev));
+void vh_litem_add(view_t* view, int h, void (*on_select)(view_t* view, void* userdata, int index, ev_t ev), void* userdata);
 void vh_litem_upd(view_t* view, int index);
 void vh_litem_add_cell(view_t* view, char* id, int size, void (*add)(view_t* view), void (*upd)(view_t* view, void* data));
 void vh_litem_upd_cell(view_t* view, char* id, void* data);
@@ -47,15 +48,16 @@ void vh_litem_evt(view_t* view, ev_t ev)
   if (ev.type == EV_MDOWN)
   {
     vh_litem_t* vh = view->handler_data;
-    (*vh->on_select)(view, vh->index, ev);
+    (*vh->on_select)(view, vh->userdata, vh->index, ev);
   }
 }
 
-void vh_litem_add(view_t* view, int h, void (*on_select)(view_t* view, uint32_t index, ev_t ev))
+void vh_litem_add(view_t* view, int h, void (*on_select)(view_t* view, void* userdata, int index, ev_t ev), void* userdata)
 {
   vh_litem_t* vh = mem_calloc(sizeof(vh_litem_t), "vh_litem_t", vh_litem_del, NULL);
   vh->cells      = VNEW();
   vh->on_select  = on_select;
+  vh->userdata   = userdata;
 
   view->handler_data = vh;
   view->handler      = vh_litem_evt;

@@ -1,97 +1,97 @@
 #ifndef itemlist_h
 #define itemlist_h
 
+#include "cr_text.c"
 #include "view.c"
 
-void itemlist_new(view_t* view, vec_t* items, char* fontpath, void (*on_select)(int));
+typedef struct _itemlist_t
+{
+  vec_t*      items;
+  view_t*     view;
+  textstyle_t textstyle;
+
+  void (*on_select)(char* id);
+} itemlist_t;
+
+itemlist_t* itemlist_new(view_t* view, vec_t* items, char* fontpath, void (*on_select)(int));
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-/* #include "cr_text.c" */
-/* #include "vh_list.c" */
-/* #include "vh_list_item.c" */
-/* #include "view_util.c" */
+#include "vh_list.c"
+#include "vh_list_item.c"
+#include "view_util.c"
 
-/* typedef struct _itemlist_t */
-/* { */
-/*   vec_t*      items; */
-/*   view_t*     view; */
-/*   textstyle_t textstyle; */
+view_t* itemlist_create_item(view_t* listview, void* data);
+int     itemlist_update_item(view_t* listview, void* data, view_t* item, int index, int* item_count);
 
-/*   void (*on_select)(char* id); */
-/* } itemlist_t; */
+void itemlist_del(void* p)
+{
+  itemlist_t* il = p;
+}
 
-/* view_t* itemlist_create_item(view_t* listview); */
-/* int     itemlist_update_item(view_t* listview, view_t* item, int index, int* item_count); */
+itemlist_t* itemlist_new(view_t* view, vec_t* items, char* fontpath, void (*on_select)(int))
+{
+  itemlist_t* il = mem_calloc(sizeof(itemlist_t), "itemlist", itemlist_del, NULL);
 
-/* void itemlist_del(void* p) */
-/* { */
-/*   itemlist_t* il = p; */
-/* } */
+  il->items = items;
 
-/* void itemlist_new(view_t* view, vec_t* items, char* fontpath, void (*on_select)(int)) */
-/* { */
-/*   itemlist_t* il = mem_calloc(sizeof(itemlist_t), "itemlist", itemlist_del, NULL); */
+  vh_list_add(view, itemlist_create_item, itemlist_update_item, il);
 
-/*   il->items = items; */
+  il->view                   = view;
+  il->textstyle.font         = fontpath;
+  il->textstyle.align        = TA_RIGHT;
+  il->textstyle.margin_right = 20;
+  il->textstyle.size         = 25.0;
+  il->textstyle.textcolor    = 0x000000FF;
+  il->textstyle.backcolor    = 0xFFFFFFFF;
 
-/*   vh_list_add(view, itemlist_create_item, itemlist_update_item); */
+  return il;
+}
 
-/*   il->view                   = view; */
-/*   il->textstyle.font         = fontpath; */
-/*   il->textstyle.align        = TA_RIGHT; */
-/*   il->textstyle.margin_right = 20; */
-/*   il->textstyle.size         = 25.0; */
-/*   il->textstyle.textcolor    = 0x000000FF; */
-/*   il->textstyle.backcolor    = 0xFFFFFFFF; */
+void itemlist_update(itemlist_t* il)
+{
+  vh_list_reset(il->view);
+}
 
-/*   return il; */
-/* } */
+void on_itemitem_select(view_t* view, void* data, int index, ev_t ev)
+{
+  itemlist_t* il = data;
+  printf("on_itemitem_select\n");
+  (*il->on_select)(il->items->data[index]);
+}
 
-/* void itemlist_update(itemlist_t* il) */
-/* { */
-/*   vh_list_reset(il->view); */
-/* } */
+view_t* itemlist_create_item(view_t* listview, void* data)
+{
+  itemlist_t* il = data;
 
-/* void on_itemitem_select(view_t* view, void* data, uint32_t index, ev_t ev) */
-/* { */
-/*   itemlist_t* il = data; */
-/*   printf("on_itemitem_select\n"); */
-/*   (*il->on_select)(il->items->data[index]); */
-/* } */
+  static int item_cnt      = 0;
+  char       idbuffer[100] = {0};
+  snprintf(idbuffer, 100, "itemlist_item%i", item_cnt++);
 
-/* view_t* itemlist_create_item(view_t* listview, void* data) */
-/* { */
-/*   itemlist_t* il = data; */
+  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
+  rowview->hidden = 1;
 
-/*   static int item_cnt      = 0; */
-/*   char       idbuffer[100] = {0}; */
-/*   snprintf(idbuffer, 100, "itemlist_item%i", item_cnt++); */
+  vh_litem_add(rowview, 35, on_itemitem_select, il);
+  vh_litem_add_cell(rowview, "item", 230, cr_text_add, cr_text_upd);
 
-/*   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35}); */
-/*   rowview->hidden = 1; */
+  return rowview;
+}
 
-/*   vh_litem_add(rowview, 35, on_itemitem_select, il); */
-/*   vh_litem_add_cell(rowview, "item", 230, cr_text_add, cr_text_upd); */
+int itemlist_update_item(view_t* listview, void* data, view_t* item, int index, int* item_count)
+{
+  itemlist_t* il = data;
+  if (index < 0)
+    return 1; // no items before 0
+  if (index >= il->items->length)
+    return 1; // no more items
 
-/*   return rowview; */
-/* } */
+  *item_count = il->items->length;
 
-/* int itemlist_update_item(view_t* listview, void* data, view_t* item, int index, int* item_count) */
-/* { */
-/*   itemlist_t* il = data; */
-/*   if (index < 0) */
-/*     return 1; // no items before 0 */
-/*   if (index >= il->items->length) */
-/*     return 1; // no more items */
+  vh_litem_upd_cell(item, "item", &((cr_text_data_t){.style = il->textstyle, .text = il->items->data[index]}));
 
-/*   *item_count = il->items->length; */
-
-/*   vh_litem_upd_cell(item, "item", &((cr_text_data_t){.style = il->textstyle, .text = il->items->data[index]})); */
-
-/*   return 0; */
-/* } */
+  return 0;
+}
 
 #endif

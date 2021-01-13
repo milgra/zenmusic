@@ -25,12 +25,12 @@ struct _editor_t
   vec_t*  fields;
 } editor = {0};
 
-void editor_select(view_t* view, uint32_t index, ev_t ev)
+void editor_select(view_t* view, void* userdata, int index, ev_t ev)
 {
   printf("on_editoritem_select\n");
 }
 
-view_t* editor_create_item(view_t* listview)
+view_t* editor_create_item(view_t* listview, void* userdata)
 {
   char idbuffer[100] = {0};
   snprintf(idbuffer, 100, "editor_item%i", editor.ind++);
@@ -38,14 +38,14 @@ view_t* editor_create_item(view_t* listview)
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
   rowview->hidden = 1;
 
-  vh_litem_add(rowview, 35, editor_select);
+  vh_litem_add(rowview, 35, editor_select, NULL);
   vh_litem_add_cell(rowview, "key", 200, cr_text_add, cr_text_upd);
   vh_litem_add_cell(rowview, "value", 200, cr_text_add, cr_text_upd);
 
   return rowview;
 }
 
-int editor_update_item(view_t* listview, view_t* item, int index, int* item_count)
+int editor_update_item(view_t* listview, void* userdata, view_t* item, int index, int* item_count)
 {
   if (index < 0)
     return 1; // no items before 0
@@ -82,7 +82,7 @@ void editor_set_song(map_t* map)
 
 void editor_attach(view_t* view, char* fontpath)
 {
-  vh_list_add(view, editor_create_item, editor_update_item);
+  vh_list_add(view, editor_create_item, editor_update_item, NULL);
 
   editor.view     = view;
   editor.fontpath = fontpath;

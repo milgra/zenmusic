@@ -7,6 +7,8 @@
 
 typedef struct _vh_list_t
 {
+  void* userdata;
+
   vec_t* items;
   vec_t* cache;
 
@@ -28,13 +30,14 @@ typedef struct _vh_list_t
   uint32_t vtimeout; // vertical scroller timeout
   uint32_t htimeout; // horizontal scroller timeout
 
-  view_t* (*create_item)(view_t* listview);                                       // pointer to item generator function
-  int (*update_item)(view_t* listview, view_t* item, int index, int* item_count); // pointer to item updater function
+  view_t* (*create_item)(view_t* listview, void* userdata);                                       // pointer to item generator function
+  int (*update_item)(view_t* listview, void* userdata, view_t* item, int index, int* item_count); // pointer to item updater function
 } vh_list_t;
 
 void    vh_list_add(view_t* view,
-                    view_t* (*create_item)(view_t* listview),
-                    int (*update_item)(view_t* listview, view_t* item, int index, int* item_count));
+                    view_t* (*create_item)(view_t* listview, void* userdata),
+                    int (*update_item)(view_t* listview, void* userdata, view_t* item, int index, int* item_count),
+                    void* userdata);
 vec_t*  vh_list_items(view_t* view);
 vec_t*  vh_list_cache(view_t* view);
 void    vh_list_fill(view_t* view);
@@ -125,7 +128,7 @@ view_t* vh_list_get_item(view_t* view)
   vh_list_t* vh = view->handler_data;
   if (vh->cache->length == 0)
   {
-    view_t* item = (*vh->create_item)(view);
+    view_t* item = (*vh->create_item)(view, vh->userdata);
     view_set_block_touch(item, 0, 1);
     VADD(vh->cache, item);
     view_insert(view, item, 0);
@@ -147,7 +150,7 @@ void vh_list_evt(view_t* view, ev_t ev)
       if (vh->items->length == 0)
       {
         view_t* item = vh_list_get_item(view);
-        int     full = (*vh->update_item)(view, item, 0, &vh->item_count);
+        int     full = (*vh->update_item)(view, vh->userdata, item, 0, &vh->item_count);
 
         if (!full)
         {
@@ -172,7 +175,7 @@ void vh_list_evt(view_t* view, ev_t ev)
         if (head->frame.local.y > 0.0 - PRELOAD_DISTANCE)
         {
           view_t* item = vh_list_get_item(view);
-          int     full = (*vh->update_item)(view, item, vh->head_index - 1, &vh->item_count);
+          int     full = (*vh->update_item)(view, vh->userdata, item, vh->head_index - 1, &vh->item_count);
 
           if (!full)
           {
@@ -199,7 +202,7 @@ void vh_list_evt(view_t* view, ev_t ev)
         if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h + PRELOAD_DISTANCE)
         {
           view_t* item = vh_list_get_item(view);
-          int     full = (*vh->update_item)(view, item, vh->tail_index + 1, &vh->item_count);
+          int     full = (*vh->update_item)(view, vh->userdata, item, vh->tail_index + 1, &vh->item_count);
 
           if (!full)
           {
@@ -379,10 +382,12 @@ void vh_list_reset(view_t* view)
 }
 
 void vh_list_add(view_t* view,
-                 view_t* (*create_item)(view_t* listview),
-                 int (*update_item)(view_t* listview, view_t* item, int index, int* item_count))
+                 view_t* (*create_item)(view_t* listview, void* userdata),
+                 int (*update_item)(view_t* listview, void* userdata, view_t* item, int index, int* item_count),
+                 void* userdata)
 {
   vh_list_t* vh   = mem_calloc(sizeof(vh_list_t), "vh_list", vh_list_del, NULL);
+  vh->userdata    = userdata;
   vh->items       = VNEW();
   vh->cache       = VNEW();
   vh->create_item = create_item;

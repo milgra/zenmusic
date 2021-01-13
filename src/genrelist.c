@@ -27,15 +27,15 @@ struct _genrelist_t
   void (*on_select)(char* id);
 } grel = {0};
 
-view_t* genrelist_create_item(view_t* listview);
-int     genrelist_update_item(view_t* listview, view_t* item, int index, int* item_count);
+view_t* genrelist_create_item(view_t* listview, void* userdata);
+int     genrelist_update_item(view_t* listview, void* userdata, view_t* item, int index, int* item_count);
 
 void genrelist_attach(view_t* base, vec_t* genres, char* fontpath, void (*on_select)(char*))
 {
   grel.genres = genres;
 
   view_t* genrelist = view_get_subview(base, "genrelist");
-  vh_list_add(genrelist, genrelist_create_item, genrelist_update_item);
+  vh_list_add(genrelist, genrelist_create_item, genrelist_update_item, NULL);
 
   grel.view                   = genrelist;
   grel.textstyle.font         = fontpath;
@@ -51,13 +51,13 @@ void genrelist_update()
   vh_list_reset(grel.view);
 }
 
-void on_genreitem_select(view_t* view, uint32_t index, ev_t ev)
+void on_genreitem_select(view_t* view, void* userdata, int index, ev_t ev)
 {
   printf("on_genreitem_select\n");
   (*grel.on_select)(grel.genres->data[index]);
 }
 
-view_t* genrelist_create_item(view_t* listview)
+view_t* genrelist_create_item(view_t* listview, void* userdata)
 {
   static int item_cnt      = 0;
   char       idbuffer[100] = {0};
@@ -66,13 +66,13 @@ view_t* genrelist_create_item(view_t* listview)
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
   rowview->hidden = 1;
 
-  vh_litem_add(rowview, 35, on_genreitem_select);
+  vh_litem_add(rowview, 35, on_genreitem_select, NULL);
   vh_litem_add_cell(rowview, "genre", 230, cr_text_add, cr_text_upd);
 
   return rowview;
 }
 
-int genrelist_update_item(view_t* listview, view_t* item, int index, int* item_count)
+int genrelist_update_item(view_t* listview, void* userdata, view_t* item, int index, int* item_count)
 {
   if (index < 0)
     return 1; // no items before 0

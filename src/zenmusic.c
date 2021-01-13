@@ -215,12 +215,12 @@ void close_button_pushed(view_t* view, void* data)
   wm_close();
 }
 
-void on_artistitem_select(view_t* view, uint32_t index, ev_t ev)
+void on_artistitem_select(view_t* view, void* userdata, int index, ev_t ev)
 {
   printf("on_artistitem_select\n");
 }
 
-view_t* artistlist_create_item(view_t* listview)
+view_t* artistlist_create_item(view_t* listview, void* userdata)
 {
   char idbuffer[100] = {0};
   snprintf(idbuffer, 100, "artistlist_item%i", messageitem_index++);
@@ -228,13 +228,13 @@ view_t* artistlist_create_item(view_t* listview)
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
   //rowview->hidden = 1;
 
-  vh_litem_add(rowview, 35, on_artistitem_select);
+  vh_litem_add(rowview, 35, on_artistitem_select, NULL);
   vh_litem_add_cell(rowview, "artist", 230, cr_text_add, cr_text_upd);
 
   return rowview;
 }
 
-int artistlist_update_item(view_t* listview, view_t* item, int index, int* item_count)
+int artistlist_update_item(view_t* listview, void* userdata, view_t* item, int index, int* item_count)
 {
   if (index < 0)
     return 1; // no items before 0
@@ -382,7 +382,7 @@ void init(int width, int height)
   activity_attach(messagelist, fontpath);
 
   view_t* artistlist = view_get_subview(baseview, "artistlist");
-  vh_list_add(artistlist, artistlist_create_item, artistlist_update_item);
+  vh_list_add(artistlist, artistlist_create_item, artistlist_update_item, NULL);
 
   mainview = view_get_subview(baseview, "main");
 

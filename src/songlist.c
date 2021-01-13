@@ -25,8 +25,8 @@ void songlist_toggle_selected(int state);
 #include "vh_list_item.c"
 #include "view_util.c"
 
-view_t* songlist_create_item(view_t* listview);
-int     songlist_update_item(view_t* listview, view_t* item, int index, int* item_count);
+view_t* songlist_create_item(view_t* listview, void* userdata);
+int     songlist_update_item(view_t* listview, void* userdata, view_t* item, int index, int* item_count);
 void    songlist_update_row(view_t* rowview, int index, map_t* file, uint32_t color);
 
 void on_header_field_select(view_t* view, char* id, ev_t ev);
@@ -93,7 +93,7 @@ void songlist_attach(view_t* base,
 
   // add list handler to view
 
-  vh_list_add(sl.view, songlist_create_item, songlist_update_item);
+  vh_list_add(sl.view, songlist_create_item, songlist_update_item, NULL);
 
   // create fields
 
@@ -202,7 +202,7 @@ void on_header_field_resize(view_t* view, char* id, int size)
 
 // items
 
-void songlist_on_select(view_t* view, uint32_t index, ev_t ev)
+void songlist_on_select(view_t* view, void* userdata, int index, ev_t ev)
 {
 
   if (ev.button == 1)
@@ -234,7 +234,7 @@ void songlist_on_select(view_t* view, uint32_t index, ev_t ev)
   }
 }
 
-view_t* songlist_create_item(view_t* listview)
+view_t* songlist_create_item(view_t* listview, void* data)
 {
   static int item_cnt      = 0;
   char       idbuffer[100] = {0};
@@ -243,7 +243,7 @@ view_t* songlist_create_item(view_t* listview)
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
   rowview->hidden = 1;
 
-  vh_litem_add(rowview, 35, songlist_on_select);
+  vh_litem_add(rowview, 35, songlist_on_select, NULL);
 
   sl_cell_t* cell;
   while ((cell = VNXT(sl.fields)))
@@ -279,7 +279,7 @@ void songlist_update_row(view_t* rowview, int index, map_t* file, uint32_t color
   vh_litem_upd_cell(rowview, "index", &((cr_text_data_t){.style = sl.textstyle, .text = indbuffer}));
 }
 
-int songlist_update_item(view_t* listview, view_t* item, int index, int* item_count)
+int songlist_update_item(view_t* listview, void* userdata, view_t* item, int index, int* item_count)
 {
   if (index < 0)
     return 1; // no items before 0
