@@ -66,6 +66,7 @@ grid-based warping of video/album cover based on frequence ( bass in the center 
 andromeda:  monolith-like particle visu
 swithc between multiple glyph views in paragraph/one multiglyph view in paragraph  
 debug button - show texmap in settings
+kijelzon shadow
 
 ideas
 

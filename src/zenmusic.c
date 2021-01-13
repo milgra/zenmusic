@@ -3,6 +3,7 @@
 #include "cr_text.c"
 #include "db.c"
 #include "editor.c"
+#include "genrelist.c"
 #include "lib.c"
 #include "mtchannel.c"
 #include "mtcstring.c"
@@ -254,47 +255,6 @@ int artistlist_update_item(view_t* listview, view_t* item, int index, int* item_
   return 0;
 }
 
-void on_genreitem_select(view_t* view, uint32_t index, ev_t ev)
-{
-  printf("on_genreitem_select\n");
-}
-
-view_t* genrelist_create_item(view_t* listview)
-{
-  char idbuffer[100] = {0};
-  snprintf(idbuffer, 100, "genrelist_item%i", messageitem_index++);
-
-  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
-  rowview->hidden = 1;
-
-  vh_litem_add(rowview, 35, on_genreitem_select);
-  vh_litem_add_cell(rowview, "genre", 230, cr_text_add, cr_text_upd);
-
-  return rowview;
-}
-
-int genrelist_update_item(view_t* listview, view_t* item, int index, int* item_count)
-{
-  if (index < 0)
-    return 1; // no items before 0
-  if (index >= genres->length)
-    return 1; // no more items
-
-  *item_count = genres->length;
-
-  textstyle_t ts  = {0};
-  ts.font         = fontpath;
-  ts.align        = TA_RIGHT;
-  ts.margin_right = 20;
-  ts.size         = 25.0;
-  ts.textcolor    = 0x000000FF;
-  ts.backcolor    = 0xFFFFFFFF;
-
-  vh_litem_upd_cell(item, "genre", &((cr_text_data_t){.style = ts, .text = genres->data[index]}));
-
-  return 0;
-}
-
 void sort(char* field)
 {
   db_sort(db, songs, field);
@@ -375,6 +335,11 @@ void on_song_header(char* id)
   sort(id);
 }
 
+void on_genre_select(char* genre)
+{
+  printf("on genre select %s\n", genre);
+}
+
 void init(int width, int height)
 {
   srand((unsigned int)time(NULL));
@@ -405,6 +370,7 @@ void init(int width, int height)
   activity_init();
 
   songlist_attach(baseview, songs, fontpath, on_song_select, on_song_edit, on_song_header);
+  genrelist_attach(baseview, genres, fontpath, on_genre_select);
 
   ui_manager_init(width, height);
   ui_manager_add(baseview);
@@ -414,9 +380,6 @@ void init(int width, int height)
   view_t* messagelist = view_get_subview(baseview, "messagelist");
 
   activity_attach(messagelist, fontpath);
-
-  view_t* genrelist = view_get_subview(baseview, "genrelist");
-  vh_list_add(genrelist, genrelist_create_item, genrelist_update_item);
 
   view_t* artistlist = view_get_subview(baseview, "artistlist");
   vh_list_add(artistlist, artistlist_create_item, artistlist_update_item);
