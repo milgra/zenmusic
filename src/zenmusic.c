@@ -370,6 +370,7 @@ void on_song_edit(int index)
 
 void on_song_header(char* id)
 {
+  printf("on song header %s\n", id);
   // filter db by field id
   sort(id);
 }

@@ -91,3 +91,17 @@ optimize :
 only update vertexes when frame change
 only update shadow/blur when frame change
 only update visu bitmaps when needed
+
+---
+
+Functional test
+
+// songlist - songlist header
+
+resize header cells
+rearrange header cells
+sort on header cell select
+
+// songlist - query field
+
+sort on query 
