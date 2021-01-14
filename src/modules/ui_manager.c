@@ -67,7 +67,7 @@ void ui_manager_event(ev_t ev)
            ev.type == EV_MUP ||
            ev.type == EV_SCROLL)
   {
-    if (ev.type == EV_MMOVE || uim.queue->length == 0)
+    if (ev.type == EV_MMOVE || ev.type == EV_MDOWN || uim.queue->length == 0)
     {
       // send mouse move event to previous uim.queue to detect move out
       for (int i = uim.queue->length - 1; i > -1; i--)
