@@ -3,8 +3,6 @@
 
 #include "view.c"
 
-#define LOG(...) activity_log(__VA_ARGS__)
-
 void activity_init();
 void activity_attach(view_t* view, char* fontpath);
 void activity_log(char* msg, ...);

@@ -23,7 +23,6 @@ void songlist_toggle_selected(int state);
 #include "vh_list.c"
 #include "vh_list_head.c"
 #include "vh_list_item.c"
-#include "view_util.c"
 
 view_t* songlist_create_item(view_t* listview, void* userdata);
 int     songlist_update_item(view_t* listview, void* userdata, view_t* item, int index, int* item_count);
@@ -73,6 +72,10 @@ void songlist_attach(view_t* base,
                      void (*on_edit)(int),
                      void (*on_header_select)(char*))
 {
+  assert(base != NULL);
+  assert(songs != NULL);
+  assert(fontpath != NULL);
+
   sl.view   = view_get_subview(base, "songlist");
   sl.songs  = songs;
   sl.fields = VNEW();

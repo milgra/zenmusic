@@ -15,9 +15,12 @@ void db_artists(vec_t* vec, vec_t* res);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "mtcstring.c"
+#include "mtlog.c"
 
 void db_read(char* libpath, map_t* db)
 {
+  LOG("reading db %s", libpath);
+
   char* dbpath = cstr_fromformat("%s/zmusdb", libpath, NULL);
   char* dbstr  = cstr_fromfile(dbpath);
 
@@ -60,10 +63,14 @@ void db_read(char* libpath, map_t* db)
   }
 
   REL(dbpath);
+
+  LOG("database loaded, entries : %i", db->count);
 }
 
 void db_write(char* libpath, map_t* db)
 {
+  LOG("writing db to %s", libpath);
+
   vec_t* vals = VNEW();
   map_values(db, vals);
 

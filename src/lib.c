@@ -15,6 +15,7 @@ int  lib_entries();
 #if __INCLUDE_LEVEL__ == 0
 
 #include "mtcstring.c"
+#include "mtlog.c"
 #include "player.c"
 #include <errno.h>
 #include <ftw.h>
@@ -70,6 +71,8 @@ void lib_read(char* libpath)
   flags |= FTW_PHYS;
 
   nftw(libpath, lib_file_data, 20, flags);
+
+  LOG("library scanned, files : %i", lib_db->count);
 }
 
 void lib_remove_duplicates(map_t* db)
@@ -106,6 +109,8 @@ void lib_remove_duplicates(map_t* db)
   }
 
   REL(paths);
+
+  LOG("new files detected : %i", lib_entries());
 }
 
 int analyzer_thread(void* chptr)
@@ -170,6 +175,10 @@ int analyzer_thread(void* chptr)
     }
   }
 
+  curr = MNEW();
+  MPUT(curr, "path", cstr_fromcstring("//////")); // impossible path
+  ch_send(channel, curr);                         // send finishing entry
+
   lock_db = 0;
   return 0;
 }
@@ -177,6 +186,8 @@ int analyzer_thread(void* chptr)
 void lib_analyze(ch_t* channel)
 {
   if (lock_db) return;
+
+  LOG("analyzing entires...");
 
   lock_db = 1;
 
@@ -220,6 +231,8 @@ char* lib_replace_char(char* str, char find, char replace)
 
 int lib_organize(char* libpath, map_t* db)
 {
+  LOG("organizing database...");
+
   // go through all db entries, check path, move if needed
 
   int    changed = 0;
@@ -262,7 +275,7 @@ int lib_organize(char* libpath, map_t* db)
 
       if (strcmp(path, new_path) != 0)
       {
-        printf("moving %s to %s\n", path, new_path);
+        LOG("moving %s to %s\n", path, new_path);
 
         int error = lib_mkpath(new_dirs, 0777);
 
@@ -272,17 +285,17 @@ int lib_organize(char* libpath, map_t* db)
 
           if (error == 0)
           {
-            printf("updating path in db,\n");
+            LOG("updating path in db,\n");
             MPUT(entry, "path", new_path);
             MPUT(db, new_path, entry);
             MDEL(db, path);
             changed = 1;
           }
           else
-            printf("cannot rename file %s %s %s\n", path, new_path, strerror(errno));
+            LOG("cannot rename file %s %s %s\n", path, new_path, strerror(errno));
         }
         else
-          printf("cannot create path %s\n", new_path);
+          LOG("cannot create path %s\n", new_path);
       }
 
       REL(new_dirs);

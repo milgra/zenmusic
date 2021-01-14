@@ -10,7 +10,7 @@
 
 #include "wm_event.c"
 
-void wm_init(void (*init)(int, int), void (*update)(ev_t), void (*render)(uint32_t), void (*destroy)());
+void wm_init(void (*init)(int, int, char*), void (*update)(ev_t), void (*render)(uint32_t), void (*destroy)());
 void wm_close();
 void wm_toggle_fullscreen();
 
@@ -33,7 +33,7 @@ void wm_toggle_fullscreen();
 char        wm_quit = 0;
 SDL_Window* wm_window;
 
-void wm_init(void (*init)(int, int),
+void wm_init(void (*init)(int, int, char*),
              void (*update)(ev_t),
              void (*render)(uint32_t),
              void (*destroy)())
@@ -103,7 +103,7 @@ void wm_init(void (*init)(int, int),
 
         SDL_StartTextInput();
 
-        (*init)(width, height);
+        (*init)(width, height, SDL_GetBasePath());
 
         ev_t      ev = {0}; // zen event
         SDL_Event event;

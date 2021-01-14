@@ -21,7 +21,6 @@ textlist_t* textlist_new(view_t* view, vec_t* items, textstyle_t textstyle, void
 
 #include "vh_list.c"
 #include "vh_list_item.c"
-#include "view_util.c"
 
 view_t* textlist_create_item(view_t* listview, void* data);
 int     textlist_update_item(view_t* listview, void* data, view_t* item, int index, int* item_count);

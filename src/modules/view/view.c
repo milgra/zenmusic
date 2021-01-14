@@ -148,9 +148,10 @@ void    view_add(view_t* view, view_t* subview);
 void    view_insert(view_t* view, view_t* subview, uint32_t index);
 void    view_remove(view_t* view, view_t* subview);
 
-void view_evt(view_t* view, ev_t ev); /* general event, sending to all views */
-void view_coll_touched(view_t* view, ev_t ev, vec_t* queue);
-void view_gen_texture(view_t* view);
+void    view_evt(view_t* view, ev_t ev); /* general event, sending to all views */
+void    view_coll_touched(view_t* view, ev_t ev, vec_t* queue);
+view_t* view_get_subview(view_t* view, char* id);
+void    view_gen_texture(view_t* view);
 
 void view_set_frame(view_t* view, r2_t frame);
 void view_set_layout(view_t* view, vlayout_t layout);
@@ -280,6 +281,18 @@ void view_coll_touched(view_t* view, ev_t ev, vec_t* queue)
       view_coll_touched(v, ev, queue);
     }
   }
+}
+
+view_t* view_get_subview(view_t* view, char* id)
+{
+  if (strcmp(view->id, id) == 0) return view;
+  for (int i = 0; i < view->views->length; i++)
+  {
+    view_t* sv = view->views->data[i];
+    view_t* re = view_get_subview(sv, id);
+    if (re) return re;
+  }
+  return NULL;
 }
 
 void view_evt(view_t* view, ev_t ev)
