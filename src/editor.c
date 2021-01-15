@@ -30,16 +30,23 @@ void editor_value_changed(view_t* view, str_t* text)
 {
 }
 
-void editor_select(view_t* view)
+void editor_select(view_t* itemview)
 {
-  printf("on_editoritem_select\n");
+  vh_litem2_t* vh = itemview->handler_data;
 
-  // swap text cell to input cell
+  if (vh->sel_cell)
+  {
+    printf("select %s\n", vh->sel_cell->id);
 
-  vh_litem2_t* vh = view->handler_data;
+    view_t* valcell = view_new(cstr_fromformat("%s%s", itemview->id, "edit", NULL), vh->sel_cell->view->frame.local);
+    vh_text_add(valcell, "ehune", editor.fontpath, editor_value_changed, NULL);
 
-  /* view_t* valcell = view_new(cstr_fromformat("%s%s", listview->id, "val", NULL), (r2_t){0, 0, 200, 35}); */
-  /* vh_text_add(valcell, "", editor.fontpath, editor_value_changed, NULL); */
+    // swap text cell to input cell
+
+    printf("replace cell\n");
+
+    vh_litem2_rpl_cell(itemview, vh->sel_cell->id, valcell);
+  }
 }
 
 view_t* editor_create_item(view_t* listview, void* userdata)
@@ -60,10 +67,6 @@ view_t* editor_create_item(view_t* listview, void* userdata)
 
   vh_litem2_add_cell(rowview, "key", 200, keycell);
   vh_litem2_add_cell(rowview, "val", 200, valcell);
-
-  /* vh_litem2_add(rowview, 35, editor_select);   */
-  /* vh_litem2_add_cell(rowview, "key", 200, cr_text_add, cr_text_upd); */
-  /* vh_litem2_add_cell(rowview, "value", 200, cr_text_add, cr_text_upd); */
 
   return rowview;
 }
@@ -88,13 +91,9 @@ int editor_update_item(view_t* listview, void* userdata, view_t* item, int index
   char* key   = editor.fields->data[index];
   char* value = MGET(editor.song, key);
 
-  printf("update item %i %s %s\n", index, key, value);
-
+  vh_litem2_upd_index(item, index);
   tg_text_set(vh_litem2_get_cell(item, "key"), key, ts);
   tg_text_set(vh_litem2_get_cell(item, "val"), value, ts);
-
-  /* vh_litem2_upd_cell(item, "key", &((cr_text_data_t){.style = ts, .text = key})); */
-  /* vh_litem2_upd_cell(item, "value", &((cr_text_data_t){.style = ts, .text = value})); */
 
   return 0;
 }

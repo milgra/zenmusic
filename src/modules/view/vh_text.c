@@ -92,7 +92,7 @@ void vh_text_evt(view_t* view, ev_t ev)
 
         vh_anim_set(data->crsr_v, sf, ef, 10, AT_LINEAR);
 
-        (*data->onactivate)(view);
+        if (data->onactivate) (*data->onactivate)(view);
       }
     }
     else

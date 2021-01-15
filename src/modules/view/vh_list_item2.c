@@ -15,11 +15,11 @@ typedef struct _vh_litem_cell_t
 
 typedef struct _vh_litem2_t
 {
-  int     index;
-  int     sel_cell; // selected cell
-  vec_t*  cells;
-  view_t* view;
-  void*   userdata;
+  int              index;
+  vh_litem_cell_t* sel_cell;
+  vec_t*           cells;
+  view_t*          view;
+  void*            userdata;
   void (*on_select)(view_t* view);
 } vh_litem2_t;
 
@@ -50,6 +50,19 @@ void vh_litem2_evt(view_t* view, ev_t ev)
   if (ev.type == EV_MDOWN)
   {
     vh_litem2_t* vh = view->handler_data;
+    vh->sel_cell    = NULL;
+
+    // get selected cell
+    for (int index = 0; index < vh->cells->length; index++)
+    {
+      vh_litem_cell_t* cell = vh->cells->data[index];
+      if (ev.x > cell->view->frame.global.x && ev.x < cell->view->frame.global.x + cell->view->frame.global.w)
+      {
+        vh->sel_cell = cell;
+        break;
+      }
+    }
+
     (*vh->on_select)(view);
   }
 }
@@ -150,6 +163,10 @@ void vh_litem2_rpl_cell(view_t* view, char* id, view_t* newcell)
     vh_litem_cell_t* cell = vh->cells->data[index];
     if (strcmp(cell->id, id) == 0)
     {
+      printf("replacing cell view for %s\n", cell->id);
+      view_add(view, newcell);
+      view_remove(view, cell->view);
+
       cell->view = newcell;
       break;
     }
