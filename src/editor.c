@@ -19,11 +19,11 @@ void editor_set_song(map_t* map);
 
 struct _editor_t
 {
-  view_t* view;
-  char*   fontpath;
-  int     ind;
-  map_t*  song;
-  vec_t*  fields;
+  view_t*     view;
+  textstyle_t textstyle;
+  int         ind;
+  map_t*      song;
+  vec_t*      fields;
 } editor = {0};
 
 void editor_value_changed(view_t* view, str_t* text)
@@ -45,14 +45,7 @@ void editor_select(view_t* itemview)
 
     printf("valcell id %s sel cell id %s\n", valcell->id, vh->sel_cell->view->id);
 
-    textstyle_t ts = {0};
-    ts.font        = editor.fontpath;
-    ts.align       = TA_LEFT;
-    ts.size        = 25.0;
-    ts.textcolor   = 0x000000FF;
-    ts.backcolor   = 0x00000000;
-
-    vh_text_add(valcell, value, ts, editor_value_changed, NULL);
+    vh_text_add(valcell, value, editor.textstyle, editor_value_changed, NULL);
 
     // swap text cell to input cell
 
@@ -93,27 +86,19 @@ int editor_update_item(view_t* listview, void* userdata, view_t* item, int index
 
   *item_count = editor.fields->length;
 
-  textstyle_t ts = {0};
-  ts.font        = editor.fontpath;
-  ts.margin      = 10.0;
-  ts.align       = TA_LEFT;
-  ts.size        = 25.0;
-  ts.textcolor   = 0x000000FF;
-  ts.backcolor   = 0xFFFFFFFF;
-
   char* key   = editor.fields->data[index];
   char* value = MGET(editor.song, key);
 
-  uint32_t color1 = (index % 2 == 0) ? 0xFEFEFEFF : 0xEFEFEFFF;
-  ts.backcolor    = color1;
+  uint32_t color1            = (index % 2 == 0) ? 0xFEFEFEFF : 0xEFEFEFFF;
+  editor.textstyle.backcolor = color1;
 
   vh_litem_upd_index(item, index);
-  tg_text_set(vh_litem_get_cell(item, "key"), key, ts);
+  tg_text_set(vh_litem_get_cell(item, "key"), key, editor.textstyle);
 
-  uint32_t color2 = (index % 2 == 0) ? 0xF8F8F8FF : 0xE8E8E8FF;
-  ts.backcolor    = color2;
+  uint32_t color2            = (index % 2 == 0) ? 0xF8F8F8FF : 0xE8E8E8FF;
+  editor.textstyle.backcolor = color2;
 
-  tg_text_set(vh_litem_get_cell(item, "val"), value, ts);
+  tg_text_set(vh_litem_get_cell(item, "val"), value, editor.textstyle);
 
   return 0;
 }
@@ -129,9 +114,17 @@ void editor_attach(view_t* view, char* fontpath)
 {
   vh_list_add(view, editor_create_item, editor_update_item, NULL);
 
-  editor.view     = view;
-  editor.fontpath = fontpath;
-  editor.fields   = VNEW();
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.margin      = 10.0;
+  ts.align       = TA_LEFT;
+  ts.size        = 25.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0xFFFFFFFF;
+
+  editor.view      = view;
+  editor.fields    = VNEW();
+  editor.textstyle = ts;
 }
 
 #endif

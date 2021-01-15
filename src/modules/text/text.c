@@ -149,8 +149,8 @@ void text_break_glyphs(
     glyph_t*    glyphs,
     int         count,
     textstyle_t style,
-    int         w,
-    int         h)
+    int         wth,
+    int         hth)
 {
 
   stbtt_fontinfo* font = MGET(fonts, style.font);
@@ -235,6 +235,7 @@ void text_break_glyphs(
 
     // advance x axis
     xpos += (advx * scale);
+
     // in case of space/invisible, set width based on pos
     if (w == 0) glyph.w = xpos - glyph.x;
 
@@ -242,7 +243,7 @@ void text_break_glyphs(
     if (ncp > 0) xpos += scale * stbtt_GetCodepointKernAdvance(font, cp, ncp);
 
     // line break
-    if (cp == '\n' || cp == '\r')
+    if (cp == '\n' || cp == '\r' || (xpos > wth && style.multiline))
     {
       xpos = 0.0;
       ypos += (float)lineh * scale;
