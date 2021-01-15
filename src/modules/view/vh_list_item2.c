@@ -17,6 +17,7 @@ typedef struct _vh_litem2_t
 {
   int              index;
   vh_litem_cell_t* sel_cell;
+  ev_t             sel_ev;
   vec_t*           cells;
   view_t*          view;
   void*            userdata;
@@ -51,6 +52,7 @@ void vh_litem2_evt(view_t* view, ev_t ev)
   {
     vh_litem2_t* vh = view->handler_data;
     vh->sel_cell    = NULL;
+    vh->sel_ev      = ev;
 
     // get selected cell
     for (int index = 0; index < vh->cells->length; index++)

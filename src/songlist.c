@@ -22,7 +22,7 @@ void songlist_toggle_selected(int state);
 #include "vh_button.c"
 #include "vh_list.c"
 #include "vh_list_head.c"
-#include "vh_list_item.c"
+#include "vh_list_item2.c"
 
 view_t* songlist_create_item(view_t* listview, void* userdata);
 int     songlist_update_item(view_t* listview, void* userdata, view_t* item, int index, int* item_count);
@@ -167,12 +167,12 @@ void on_header_field_insert(view_t* view, int src, int tgt)
   vec_t*  cache = vh_list_cache(sl.view);
   while ((item = VNXT(cache)))
   {
-    vh_litem_swp_cell(item, src, tgt);
+    vh_litem2_swp_cell(item, src, tgt);
   }
   vec_t* items = vh_list_items(sl.view);
   while ((item = VNXT(items)))
   {
-    vh_litem_swp_cell(item, src, tgt);
+    vh_litem2_swp_cell(item, src, tgt);
   }
 }
 
@@ -194,49 +194,52 @@ void on_header_field_resize(view_t* view, char* id, int size)
   vec_t*  cache = vh_list_cache(sl.view);
   while ((item = VNXT(cache)))
   {
-    vh_litem_upd_cell_size(item, id, size);
+    vh_litem2_upd_cell_size(item, id, size);
   }
   vec_t* items = vh_list_items(sl.view);
   while ((item = VNXT(items)))
   {
-    vh_litem_upd_cell_size(item, id, size);
+    vh_litem2_upd_cell_size(item, id, size);
   }
 }
 
 // items
 
-void songlist_on_select(view_t* view, void* userdata, int index, ev_t ev)
+void songlist_on_item_select(view_t* itemview)
 {
+  vh_litem2_t* vh = itemview->handler_data;
 
-  if (ev.button == 1)
+  if (vh->sel_ev.button == 1)
   {
     // deselect prev item
     view_t* olditem = vh_list_item_for_index(sl.view, sl.index_s);
 
     if (olditem)
     {
-      uint32_t color1 = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
+      uint32_t color1 = (sl.index_s % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
 
       songlist_update_row(olditem, sl.index_s, sl.songs->data[sl.index_s], color1);
     }
 
     // indicate list item
-    view_t* newitem = vh_list_item_for_index(sl.view, index);
+    view_t* newitem = vh_list_item_for_index(sl.view, vh->index);
+
+    sl.index_s = vh->index;
 
     if (newitem)
     {
       songlist_update_row(newitem, sl.index_s, sl.songs->data[sl.index_s], sl.color_s);
     }
-    sl.index_s = index;
 
-    (*sl.on_select)(index);
+    if (sl.on_select) (*sl.on_select)(vh->index);
   }
-  else if (ev.button == 3)
+  else if (vh->sel_ev.button == 3)
   {
-    (*sl.on_edit)(index);
+    if (sl.on_edit) (*sl.on_edit)(vh->index);
   }
 }
 
+// TODO rename this to songitem namespace
 view_t* songlist_create_item(view_t* listview, void* data)
 {
   static int item_cnt      = 0;
@@ -246,12 +249,15 @@ view_t* songlist_create_item(view_t* listview, void* data)
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
   rowview->hidden = 1;
 
-  vh_litem_add(rowview, 35, songlist_on_select, NULL);
+  vh_litem2_add(rowview, NULL, songlist_on_item_select);
 
   sl_cell_t* cell;
   while ((cell = VNXT(sl.fields)))
   {
-    vh_litem_add_cell(rowview, cell->id, cell->size, cr_text_add, cr_text_upd);
+    view_t* cellview = view_new(cstr_fromformat("%s%s", rowview->id, cell->id, NULL), (r2_t){0, 0, cell->size, 35});
+    tg_text_add(cellview);
+
+    vh_litem2_add_cell(rowview, cell->id, cell->size, cellview);
   }
 
   return rowview;
@@ -268,19 +274,26 @@ void songlist_update_row(view_t* rowview, int index, map_t* file, uint32_t color
   sl.textstyle.textcolor = 0x000000FF;
   sl.textstyle.backcolor = color;
 
-  vh_litem_upd(rowview, index);
+  vh_litem2_upd_index(rowview, index);
 
   sl_cell_t* cell;
   while ((cell = VNXT(sl.fields)))
   {
     if (MGET(file, cell->id))
-      vh_litem_upd_cell(rowview, cell->id, &((cr_text_data_t){.style = sl.textstyle, .text = MGET(file, cell->id)}));
+    {
+      tg_text_set(vh_litem2_get_cell(rowview, cell->id), MGET(file, cell->id), sl.textstyle);
+    }
     else
-      vh_litem_upd_cell(rowview, cell->id, &((cr_text_data_t){.style = sl.textstyle, .text = "-"}));
+    {
+      tg_text_set(vh_litem2_get_cell(rowview, cell->id), "-", sl.textstyle);
+    }
   }
 
-  vh_litem_upd_cell(rowview, "index", &((cr_text_data_t){.style = sl.textstyle, .text = indbuffer}));
+  tg_text_set(vh_litem2_get_cell(rowview, "index"), indbuffer, sl.textstyle);
 }
+
+// remove litem1, cr_text
+// create songitem namespace
 
 int songlist_update_item(view_t* listview, void* userdata, view_t* item, int index, int* item_count)
 {
