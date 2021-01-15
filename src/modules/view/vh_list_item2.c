@@ -85,6 +85,11 @@ void vh_litem2_add_cell(view_t* view, char* id, int size, view_t* cellview)
   // store cell
   VADD(vh->cells, cell);
 
+  // set cell position
+  r2_t frame = cellview->frame.local;
+  frame.x    = view->frame.local.w;
+  view_set_frame(cellview, frame);
+
   // increase item size
   r2_t local = view->frame.local;
   local.w += size;
@@ -121,6 +126,8 @@ void vh_litem2_rearrange(view_t* view)
     f.x    = x;
     x      = x + f.w;
     view_set_frame(cell->view, f);
+
+    printf("rearrange %s %f\n", cell->id, x);
   }
 }
 

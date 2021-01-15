@@ -14,7 +14,8 @@ void editor_set_song(map_t* map);
 #include "cr_text.c"
 #include "text.c"
 #include "vh_list.c"
-#include "vh_list_item.c"
+#include "vh_list_item2.c"
+#include "vh_text.c"
 
 struct _editor_t
 {
@@ -29,11 +30,16 @@ void editor_value_changed(view_t* view, str_t* text)
 {
 }
 
-void editor_select(view_t* view, void* userdata, int index, ev_t ev)
+void editor_select(view_t* view)
 {
   printf("on_editoritem_select\n");
 
   // swap text cell to input cell
+
+  vh_litem2_t* vh = view->handler_data;
+
+  /* view_t* valcell = view_new(cstr_fromformat("%s%s", listview->id, "val", NULL), (r2_t){0, 0, 200, 35}); */
+  /* vh_text_add(valcell, "", editor.fontpath, editor_value_changed, NULL); */
 }
 
 view_t* editor_create_item(view_t* listview, void* userdata)
@@ -41,22 +47,23 @@ view_t* editor_create_item(view_t* listview, void* userdata)
   char idbuffer[100] = {0};
   snprintf(idbuffer, 100, "editor_item%i", editor.ind++);
 
-  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
-  rowview->hidden = 1;
+  view_t* rowview  = view_new(idbuffer, (r2_t){0, 0, 0, 35});
+  rowview->display = 0;
+  vh_litem2_add(rowview, NULL, editor_select);
 
   // first cell is a simple text cell
-  // view_t* keycell = view_new(cstr_fromformat("%s%s", listview->id, "key", NULL), (r2_t){0, 0, 200, 35});
-  // tg_text_add(keycell);
+  view_t* keycell = view_new(cstr_fromformat("%s%s", rowview->id, "key", NULL), (r2_t){0, 0, 200, 35});
+  tg_text_add(keycell);
 
-  // view_t* valcell = view_new(cstr_fromformat("%s%s", listview->id, "val", NULL), (r2_t){0, 0, 200, 35});
-  // vh_text_add(valcell, "", editor.fontpath, editor_value_changed, NULL);
+  view_t* valcell = view_new(cstr_fromformat("%s%s", rowview->id, "val", NULL), (r2_t){0, 0, 200, 35});
+  tg_text_add(valcell);
 
-  // vh_litem_add_cell(rowview, "key", 200, keycell);
-  // vh_litem_add_cell(rowview, "val", 200, valcell);
+  vh_litem2_add_cell(rowview, "key", 200, keycell);
+  vh_litem2_add_cell(rowview, "val", 200, valcell);
 
-  vh_litem_add(rowview, 35, editor_select, NULL);
-  vh_litem_add_cell(rowview, "key", 200, cr_text_add, cr_text_upd);
-  vh_litem_add_cell(rowview, "value", 200, cr_text_add, cr_text_upd);
+  /* vh_litem2_add(rowview, 35, editor_select);   */
+  /* vh_litem2_add_cell(rowview, "key", 200, cr_text_add, cr_text_upd); */
+  /* vh_litem2_add_cell(rowview, "value", 200, cr_text_add, cr_text_upd); */
 
   return rowview;
 }
@@ -81,11 +88,13 @@ int editor_update_item(view_t* listview, void* userdata, view_t* item, int index
   char* key   = editor.fields->data[index];
   char* value = MGET(editor.song, key);
 
-  /* cr_text_set(vh_litem_get_cell(item, "key"), key, ts); */
-  /* cr_text_set(vh_litem_get_cell(item, "val"), value, ts); */
+  printf("update item %i %s %s\n", index, key, value);
 
-  vh_litem_upd_cell(item, "key", &((cr_text_data_t){.style = ts, .text = key}));
-  vh_litem_upd_cell(item, "value", &((cr_text_data_t){.style = ts, .text = value}));
+  tg_text_set(vh_litem2_get_cell(item, "key"), key, ts);
+  tg_text_set(vh_litem2_get_cell(item, "val"), value, ts);
+
+  /* vh_litem2_upd_cell(item, "key", &((cr_text_data_t){.style = ts, .text = key})); */
+  /* vh_litem2_upd_cell(item, "value", &((cr_text_data_t){.style = ts, .text = value})); */
 
   return 0;
 }
