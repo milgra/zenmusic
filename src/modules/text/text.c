@@ -83,6 +83,12 @@ void text_render_glyphs(glyph_t*    glyphs,
                         textstyle_t style,
                         bm_t*       bitmap);
 
+void text_layout(glyph_t*    glyphs,
+                 int         count,
+                 textstyle_t style,
+                 int         wth,
+                 int         hth);
+
 void text_render(
     str_t*      text,
     textstyle_t style,
@@ -317,15 +323,26 @@ void text_align_glyphs(glyph_t*    glyphs,
   }
 }
 
+void text_shift_glyphs(glyph_t*    glyphs,
+                       int         count,
+                       textstyle_t style)
+{
+  int x = style.margin_left;
+  int y = style.margin_top;
+  for (int i = 0; i < count; i++)
+  {
+    glyphs[i].x += x;
+    glyphs[i].y += y;
+    glyphs[i].base_y += y;
+  }
+}
+
 void text_render_glyphs(glyph_t*    glyphs,
                         int         count,
                         textstyle_t style,
                         bm_t*       bitmap)
 {
   gfx_rect(bitmap, 0, 0, bitmap->w, bitmap->h, style.backcolor, 0);
-
-  int x = style.margin_left;
-  int y = style.margin_top;
 
   // get or load font
   stbtt_fontinfo* font = MGET(fonts, style.font);
@@ -365,8 +382,8 @@ void text_render_glyphs(glyph_t*    glyphs,
                                         g.cp);
 
       gfx_blend_8(bitmap,
-                  x + g.x,
-                  y + g.y,
+                  g.x,
+                  g.y,
                   style.textcolor,
                   gbytes,
                   g.w,
@@ -384,25 +401,37 @@ void text_describe_glyphs(glyph_t* glyphs, int count)
   }
 }
 
-void text_render(
-    str_t*      text,
-    textstyle_t style,
-    bm_t*       bitmap)
+void text_layout(glyph_t*    glyphs,
+                 int         count,
+                 textstyle_t style,
+                 int         wth,
+                 int         hth)
 {
   if (style.margin_left == 0 && style.margin > 0) style.margin_left = style.margin;
   if (style.margin_right == 0 && style.margin > 0) style.margin_right = style.margin;
   if (style.margin_top == 0 && style.margin > 0) style.margin_top = style.margin;
   if (style.margin_bottom == 0 && style.margin > 0) style.margin_bottom = style.margin;
 
-  int w = bitmap->w - style.margin_right - style.margin_left;
-  int h = bitmap->h - style.margin_top - style.margin_bottom;
+  int w = wth - style.margin_right - style.margin_left;
+  int h = hth - style.margin_top - style.margin_bottom;
 
+  text_break_glyphs(glyphs, count, style, w, h);
+  text_align_glyphs(glyphs, count, style, w, h);
+  text_shift_glyphs(glyphs, count, style);
+}
+
+void text_render(
+    str_t*      text,
+    textstyle_t style,
+    bm_t*       bitmap)
+{
   glyph_t* glyphs = malloc(sizeof(glyph_t) * text->length);
   for (int i = 0; i < text->length; i++) glyphs[i].cp = text->codepoints[i];
 
-  text_break_glyphs(glyphs, text->length, style, w, h);
-  text_align_glyphs(glyphs, text->length, style, w, h);
+  text_layout(glyphs, text->length, style, bitmap->w, bitmap->h);
   text_render_glyphs(glyphs, text->length, style, bitmap);
+
+  free(glyphs);
 }
 
 #endif

@@ -45,11 +45,9 @@ void vh_text_upd(view_t* view)
   r2_t       frame = view->frame.local;
 
   glyph_t* glyphs = malloc(sizeof(glyph_t) * text->length);
-
   for (int i = 0; i < text->length; i++) glyphs[i].cp = text->codepoints[i];
 
-  text_break_glyphs(glyphs, text->length, data->style, frame.w, frame.h);
-  text_align_glyphs(glyphs, text->length, data->style, frame.w, frame.h);
+  text_layout(glyphs, text->length, data->style, frame.w, frame.h);
 
   // update cursor position
 
