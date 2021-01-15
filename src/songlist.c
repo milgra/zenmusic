@@ -15,13 +15,12 @@ void songlist_toggle_selected(int state);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "cr_text.c"
 #include "tg_css.c"
 #include "tg_text.c"
 #include "vh_button.c"
 #include "vh_list.c"
 #include "vh_list_head.c"
-#include "vh_list_item2.c"
+#include "vh_list_item.c"
 
 view_t* songitem_create(view_t* listview, void* userdata);
 int     songitem_update(view_t* listview, void* userdata, view_t* item, int index, int* item_count);
@@ -122,8 +121,11 @@ void songlist_attach(view_t* base,
   sl_cell_t* cell;
   while ((cell = VNXT(sl.fields)))
   {
-    vh_lhead_add_cell(header, cell->id, cell->size, cr_text_upd);
-    vh_lhead_upd_cell(header, cell->id, cell->size, &((cr_text_data_t){.style = sl.textstyle, .text = cell->id}));
+    view_t* cellview = view_new(cstr_fromformat("%s%s", header->id, cell->id, NULL), (r2_t){0, 0, cell->size, 30});
+    tg_text_add(cellview);
+    tg_text_set(cellview, cell->id, sl.textstyle);
+
+    vh_lhead_add_cell(header, cell->id, cell->size, cellview);
   }
 }
 
@@ -166,12 +168,12 @@ void on_header_field_insert(view_t* view, int src, int tgt)
   vec_t*  cache = vh_list_cache(sl.view);
   while ((item = VNXT(cache)))
   {
-    vh_litem2_swp_cell(item, src, tgt);
+    vh_litem_swp_cell(item, src, tgt);
   }
   vec_t* items = vh_list_items(sl.view);
   while ((item = VNXT(items)))
   {
-    vh_litem2_swp_cell(item, src, tgt);
+    vh_litem_swp_cell(item, src, tgt);
   }
 }
 
@@ -193,12 +195,12 @@ void on_header_field_resize(view_t* view, char* id, int size)
   vec_t*  cache = vh_list_cache(sl.view);
   while ((item = VNXT(cache)))
   {
-    vh_litem2_upd_cell_size(item, id, size);
+    vh_litem_upd_cell_size(item, id, size);
   }
   vec_t* items = vh_list_items(sl.view);
   while ((item = VNXT(items)))
   {
-    vh_litem2_upd_cell_size(item, id, size);
+    vh_litem_upd_cell_size(item, id, size);
   }
 }
 
@@ -206,7 +208,7 @@ void on_header_field_resize(view_t* view, char* id, int size)
 
 void songlist_on_item_select(view_t* itemview)
 {
-  vh_litem2_t* vh = itemview->handler_data;
+  vh_litem_t* vh = itemview->handler_data;
 
   if (vh->sel_ev.button == 1)
   {
@@ -248,7 +250,7 @@ view_t* songitem_create(view_t* listview, void* data)
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
   rowview->hidden = 1;
 
-  vh_litem2_add(rowview, NULL, songlist_on_item_select);
+  vh_litem_add(rowview, NULL, songlist_on_item_select);
 
   sl_cell_t* cell;
   while ((cell = VNXT(sl.fields)))
@@ -256,7 +258,7 @@ view_t* songitem_create(view_t* listview, void* data)
     view_t* cellview = view_new(cstr_fromformat("%s%s", rowview->id, cell->id, NULL), (r2_t){0, 0, cell->size, 35});
     tg_text_add(cellview);
 
-    vh_litem2_add_cell(rowview, cell->id, cell->size, cellview);
+    vh_litem_add_cell(rowview, cell->id, cell->size, cellview);
   }
 
   return rowview;
@@ -273,22 +275,22 @@ void songitem_update_row(view_t* rowview, int index, map_t* file, uint32_t color
   sl.textstyle.textcolor = 0x000000FF;
   sl.textstyle.backcolor = color;
 
-  vh_litem2_upd_index(rowview, index);
+  vh_litem_upd_index(rowview, index);
 
   sl_cell_t* cell;
   while ((cell = VNXT(sl.fields)))
   {
     if (MGET(file, cell->id))
     {
-      tg_text_set(vh_litem2_get_cell(rowview, cell->id), MGET(file, cell->id), sl.textstyle);
+      tg_text_set(vh_litem_get_cell(rowview, cell->id), MGET(file, cell->id), sl.textstyle);
     }
     else
     {
-      tg_text_set(vh_litem2_get_cell(rowview, cell->id), "-", sl.textstyle);
+      tg_text_set(vh_litem_get_cell(rowview, cell->id), "-", sl.textstyle);
     }
   }
 
-  tg_text_set(vh_litem2_get_cell(rowview, "index"), indbuffer, sl.textstyle);
+  tg_text_set(vh_litem_get_cell(rowview, "index"), indbuffer, sl.textstyle);
 }
 
 // remove litem1, cr_text

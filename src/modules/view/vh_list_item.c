@@ -1,35 +1,38 @@
-#ifndef vh_list_item_h
-#define vh_list_item_h
+#ifndef vh_list_item2_h
+#define vh_list_item2_h
 
 #include "mtcstring.c"
 #include "mtmap.c"
 #include "mtvector.c"
 #include "view.c"
 
-typedef struct _cell_t
+typedef struct _vh_litem_cell_t
 {
-  char* id;
-  int   size;
-  void (*upd)(view_t* view, void* data);
+  char*   id;
+  int     size;
   view_t* view;
-} cell_t;
+} vh_litem_cell_t;
 
 typedef struct _vh_litem_t
 {
-  vec_t*  cells;
-  view_t* view;
-  int     index;
-  void (*on_select)(view_t* view, void* userdata, int index, ev_t ev);
-  void* userdata;
+  int              index;
+  vh_litem_cell_t* sel_cell;
+  ev_t             sel_ev;
+  vec_t*           cells;
+  view_t*          view;
+  void*            userdata;
+  void (*on_select)(view_t* view);
 } vh_litem_t;
 
-void vh_litem_add(view_t* view, int h, void (*on_select)(view_t* view, void* userdata, int index, ev_t ev), void* userdata);
-void vh_litem_upd(view_t* view, int index);
-void vh_litem_add_cell(view_t* view, char* id, int size, void (*add)(view_t* view), void (*upd)(view_t* view, void* data));
-void vh_litem_upd_cell(view_t* view, char* id, void* data);
-void vh_litem_upd_cell_size(view_t* view, char* id, int size);
-void vh_litem_rem_cell(char* id);
-void vh_litem_swp_cell(view_t* view, int src, int tgt);
+void vh_litem_add(view_t* view, void* userdata, void (*on_select)(view_t* view));
+void vh_litem_upd_index(view_t* view, int index);
+
+void    vh_litem_add_cell(view_t* view, char* id, int size, view_t* cellview);
+view_t* vh_litem_get_cell(view_t* view, char* id);
+void    vh_litem_rem_cell(char* id);
+void    vh_litem_swp_cell(view_t* view, int src, int tgt);
+void    vh_litem_rpl_cell(view_t* view, char* id, view_t* newcell);
+void    vh_litem_upd_cell_size(view_t* view, char* id, int size);
 
 #endif
 
@@ -48,49 +51,59 @@ void vh_litem_evt(view_t* view, ev_t ev)
   if (ev.type == EV_MDOWN)
   {
     vh_litem_t* vh = view->handler_data;
-    (*vh->on_select)(view, vh->userdata, vh->index, ev);
+    vh->sel_cell   = NULL;
+    vh->sel_ev     = ev;
+
+    // get selected cell
+    for (int index = 0; index < vh->cells->length; index++)
+    {
+      vh_litem_cell_t* cell = vh->cells->data[index];
+      if (ev.x > cell->view->frame.global.x && ev.x < cell->view->frame.global.x + cell->view->frame.global.w)
+      {
+        vh->sel_cell = cell;
+        break;
+      }
+    }
+
+    (*vh->on_select)(view);
   }
 }
 
-void vh_litem_add(view_t* view, int h, void (*on_select)(view_t* view, void* userdata, int index, ev_t ev), void* userdata)
+void vh_litem_add(view_t* view, void* userdata, void (*on_select)(view_t* view))
 {
   vh_litem_t* vh = mem_calloc(sizeof(vh_litem_t), "vh_litem_t", vh_litem_del, NULL);
   vh->cells      = VNEW();
-  vh->on_select  = on_select;
   vh->userdata   = userdata;
+  vh->on_select  = on_select;
 
   view->handler_data = vh;
   view->handler      = vh_litem_evt;
 }
 
-void vh_litem_upd(view_t* view, int index)
+void vh_litem_upd_index(view_t* view, int index)
 {
   vh_litem_t* vh = view->handler_data;
   vh->index      = index;
 }
 
-// TODO it would be better to add a generated, initialized view as cell
-void vh_litem_add_cell(view_t* view, char* id, int size, void (*add)(view_t* view), void (*upd)(view_t* view, void* data))
+void vh_litem_add_cell(view_t* view, char* id, int size, view_t* cellview)
 {
   vh_litem_t* vh = view->handler_data;
 
-  cell_t* cell = mem_alloc(sizeof(cell_t), "cell_t", NULL, NULL);
-  cell->id     = cstr_fromcstring(id);
-  cell->size   = size;
-  cell->upd    = upd;
-
-  view_t* cellview = view_new(cstr_fromformat("%s%s", view->id, id, NULL), (r2_t){view->frame.local.w, 0, size, view->frame.local.h});
-
-  cell->view = cellview;
-
-  (*add)(cellview);
-
-  cellview->needs_touch = 0;
+  vh_litem_cell_t* cell = mem_alloc(sizeof(vh_litem_cell_t), "vh_litem_cell_t", NULL, NULL);
+  cell->id              = cstr_fromcstring(id);
+  cell->size            = size;
+  cell->view            = cellview;
 
   view_add(view, cellview);
 
   // store cell
   VADD(vh->cells, cell);
+
+  // set cell position
+  r2_t frame = cellview->frame.local;
+  frame.x    = view->frame.local.w;
+  view_set_frame(cellview, frame);
 
   // increase item size
   r2_t local = view->frame.local;
@@ -98,42 +111,76 @@ void vh_litem_add_cell(view_t* view, char* id, int size, void (*add)(view_t* vie
   view_set_frame(view, local);
 }
 
-void vh_litem_upd_cell(view_t* view, char* id, void* data)
+view_t* vh_litem_get_cell(view_t* view, char* id)
 {
   vh_litem_t* vh = view->handler_data;
 
-  for (int i = 0; i < vh->cells->length; i++)
+  for (int index = 0; index < vh->cells->length; index++)
   {
-    cell_t* cell = vh->cells->data[i];
+    vh_litem_cell_t* cell = vh->cells->data[index];
     if (strcmp(cell->id, id) == 0)
     {
-      (*cell->upd)(cell->view, data);
-      break;
+      return cell->view;
     }
   }
+  return NULL;
 }
 
 void vh_litem_rearrange(view_t* view)
 {
-  vh_litem_t* vh  = view->handler_data;
-  float       pos = 0;
-  for (int i = 0; i < vh->cells->length; i++)
+  vh_litem_t* vh = view->handler_data;
+  float       x  = 0;
+
+  for (int index = 0;
+       index < vh->cells->length;
+       index++)
   {
-    cell_t* cell = vh->cells->data[i];
-    r2_t    f    = cell->view->frame.local;
-    f.x          = pos;
-    pos += f.w;
+    vh_litem_cell_t* cell = vh->cells->data[index];
+
+    r2_t f = cell->view->frame.local;
+    f.x    = x;
+    x      = x + f.w;
     view_set_frame(cell->view, f);
   }
+}
+
+void vh_litem_swp_cell(view_t* view, int src, int tgt)
+{
+  vh_litem_t* vh = view->handler_data;
+
+  vh_litem_cell_t* cell = vh->cells->data[src];
+  VREM(vh->cells, cell);
+  vec_addatindex(vh->cells, cell, tgt);
+  vh_litem_rearrange(view);
+}
+
+void vh_litem_rpl_cell(view_t* view, char* id, view_t* newcell)
+{
+  vh_litem_t* vh = view->handler_data;
+
+  for (int index = 0; index < vh->cells->length; index++)
+  {
+    vh_litem_cell_t* cell = vh->cells->data[index];
+    if (strcmp(cell->id, id) == 0)
+    {
+      printf("replacing cell view for %s\n", cell->id);
+      view_add(view, newcell);
+      view_remove(view, cell->view);
+
+      cell->view = newcell;
+      break;
+    }
+  }
+  vh_litem_rearrange(view);
 }
 
 void vh_litem_upd_cell_size(view_t* view, char* id, int size)
 {
   vh_litem_t* vh = view->handler_data;
 
-  for (int i = 0; i < vh->cells->length; i++)
+  for (int index = 0; index < vh->cells->length; index++)
   {
-    cell_t* cell = vh->cells->data[i];
+    vh_litem_cell_t* cell = vh->cells->data[index];
     if (strcmp(cell->id, id) == 0)
     {
       r2_t f = cell->view->frame.local;
@@ -142,16 +189,6 @@ void vh_litem_upd_cell_size(view_t* view, char* id, int size)
       break;
     }
   }
-  vh_litem_rearrange(view);
-}
-
-void vh_litem_swp_cell(view_t* view, int src, int tgt)
-{
-  vh_litem_t* vh = view->handler_data;
-
-  cell_t* cell = vh->cells->data[src];
-  VREM(vh->cells, cell);
-  vec_addatindex(vh->cells, cell, tgt);
   vh_litem_rearrange(view);
 }
 

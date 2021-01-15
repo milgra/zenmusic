@@ -1,3 +1,5 @@
+// TODO it should re-use list_item parts
+
 #ifndef vh_list_head_h
 #define vh_list_head_h
 
@@ -8,9 +10,8 @@
 
 typedef struct _lheadcell_t
 {
-  char* id;
-  int   size;
-  void (*upd)(view_t* view, void* data);
+  char*   id;
+  int     size;
   view_t* view;
 } lheadcell_t;
 
@@ -31,12 +32,11 @@ typedef struct _vh_lhead_t
   void (*on_resize)(view_t* view, char* id, int width);
 } vh_lhead_t;
 
-void vh_lhead_add(view_t* view, int h, void (*on_select)(view_t* view, char* id, ev_t ev), void (*on_insert)(view_t* view, int src, int tgt), void (*on_resize)(view_t* view, char* id, int width));
-void vh_lhead_upd(view_t* view, int index);
-void vh_lhead_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* view, void* data));
-void vh_lhead_upd_cell(view_t* view, char* id, int size, void* data);
-void vh_lhead_rem_cell(char* id);
-void vh_lhead_swp_cell(char* ida, char* idb);
+void    vh_lhead_add(view_t* view, int h, void (*on_select)(view_t* view, char* id, ev_t ev), void (*on_insert)(view_t* view, int src, int tgt), void (*on_resize)(view_t* view, char* id, int width));
+view_t* vh_lhead_get_cell(view_t* view, char* id);
+void    vh_lhead_add_cell(view_t* view, char* id, int size, view_t* cellview);
+void    vh_lhead_rem_cell(char* id);
+void    vh_lhead_swp_cell(char* ida, char* idb);
 
 #endif
 
@@ -173,27 +173,36 @@ void vh_lhead_add(view_t* view,
   view->handler      = vh_lhead_evt;
 }
 
-void vh_lhead_upd(view_t* view, int index)
+view_t* vh_lhead_get_cell(view_t* view, char* id)
 {
   vh_lhead_t* vh = view->handler_data;
-  vh->index      = index;
+
+  for (int index = 0; index < vh->cells->length; index++)
+  {
+    lheadcell_t* cell = vh->cells->data[index];
+    if (strcmp(cell->id, id) == 0)
+    {
+      return cell->view;
+    }
+  }
+  return NULL;
 }
 
-void vh_lhead_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* view, void* data))
+void vh_lhead_add_cell(view_t* view, char* id, int size, view_t* cellview)
 {
   vh_lhead_t* vh = view->handler_data;
 
   lheadcell_t* cell = mem_alloc(sizeof(lheadcell_t), "lheadcell_t", NULL, NULL);
   cell->id          = cstr_fromcstring(id);
   cell->size        = size;
-  cell->upd         = upd;
 
   lheadcell_t* last = vec_tail(vh->cells);
   float        x    = last == NULL ? 0 : (last->view->frame.local.x + last->view->frame.local.w + 1);
 
-  char*   cellid   = cstr_fromformat("%s%s", view->id, id, NULL);
-  view_t* cellview = view_new(cellid, (r2_t){x, 0, size, vh->height});
-  REL(cellid);
+  // set cell position
+  r2_t frame = cellview->frame.local;
+  frame.x    = x;
+  view_set_frame(cellview, frame);
 
   cell->view = cellview;
 
@@ -208,21 +217,6 @@ void vh_lhead_add_cell(view_t* view, char* id, int size, void (*upd)(view_t* vie
   r2_t local = view->frame.local;
   local.w    = cellview->frame.local.x + cellview->frame.local.w;
   view_set_frame(view, local);
-}
-
-void vh_lhead_upd_cell(view_t* view, char* id, int size, void* data)
-{
-  vh_lhead_t* vh = view->handler_data;
-
-  for (int i = 0; i < vh->cells->length; i++)
-  {
-    lheadcell_t* cell = vh->cells->data[i];
-    if (strcmp(cell->id, id) == 0)
-    {
-      (*cell->upd)(cell->view, data);
-      break;
-    }
-  }
 }
 
 #endif

@@ -11,10 +11,10 @@ void editor_set_song(map_t* map);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "cr_text.c"
 #include "text.c"
+#include "tg_text.c"
 #include "vh_list.c"
-#include "vh_list_item2.c"
+#include "vh_list_item.c"
 #include "vh_text.c"
 
 struct _editor_t
@@ -32,7 +32,7 @@ void editor_value_changed(view_t* view, str_t* text)
 
 void editor_select(view_t* itemview)
 {
-  vh_litem2_t* vh = itemview->handler_data;
+  vh_litem_t* vh = itemview->handler_data;
 
   if (vh->sel_cell)
   {
@@ -45,7 +45,7 @@ void editor_select(view_t* itemview)
 
     printf("replace cell\n");
 
-    vh_litem2_rpl_cell(itemview, vh->sel_cell->id, valcell);
+    vh_litem_rpl_cell(itemview, vh->sel_cell->id, valcell);
   }
 }
 
@@ -56,7 +56,7 @@ view_t* editor_create_item(view_t* listview, void* userdata)
 
   view_t* rowview  = view_new(idbuffer, (r2_t){0, 0, 0, 35});
   rowview->display = 0;
-  vh_litem2_add(rowview, NULL, editor_select);
+  vh_litem_add(rowview, NULL, editor_select);
 
   // first cell is a simple text cell
   view_t* keycell = view_new(cstr_fromformat("%s%s", rowview->id, "key", NULL), (r2_t){0, 0, 200, 35});
@@ -65,8 +65,8 @@ view_t* editor_create_item(view_t* listview, void* userdata)
   view_t* valcell = view_new(cstr_fromformat("%s%s", rowview->id, "val", NULL), (r2_t){0, 0, 200, 35});
   tg_text_add(valcell);
 
-  vh_litem2_add_cell(rowview, "key", 200, keycell);
-  vh_litem2_add_cell(rowview, "val", 200, valcell);
+  vh_litem_add_cell(rowview, "key", 200, keycell);
+  vh_litem_add_cell(rowview, "val", 200, valcell);
 
   return rowview;
 }
@@ -91,9 +91,9 @@ int editor_update_item(view_t* listview, void* userdata, view_t* item, int index
   char* key   = editor.fields->data[index];
   char* value = MGET(editor.song, key);
 
-  vh_litem2_upd_index(item, index);
-  tg_text_set(vh_litem2_get_cell(item, "key"), key, ts);
-  tg_text_set(vh_litem2_get_cell(item, "val"), value, ts);
+  vh_litem_upd_index(item, index);
+  tg_text_set(vh_litem_get_cell(item, "key"), key, ts);
+  tg_text_set(vh_litem_get_cell(item, "val"), value, ts);
 
   return 0;
 }

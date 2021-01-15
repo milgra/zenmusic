@@ -22,6 +22,7 @@ void ui_toggle_pause(int state);
 #include "songlist.c"
 #include "textlist.c"
 #include "tg_knob.c"
+#include "tg_text.c"
 #include "vh_button.c"
 #include "vh_knob.c"
 #include "vh_text.c"
@@ -399,8 +400,6 @@ void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genr
 
   ts.align               = TA_LEFT;
   textlist_t* artistlist = textlist_new(view_get_subview(baseview, "artistlist"), artists, ts, ui_on_artist_select);
-
-  // TODO use textlist for messages also
 
   messagelistback     = view_get_subview(baseview, "messagelistback");
   view_t* messagelist = view_get_subview(baseview, "messagelist");
