@@ -67,6 +67,7 @@ andromeda:  monolith-like particle visu
 swithc between multiple glyph views in paragraph/one multiglyph view in paragraph  
 debug button - show texmap in settings
 kijelzon shadow
+time onclick = remaining time
 
 ideas
 

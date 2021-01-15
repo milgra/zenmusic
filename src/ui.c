@@ -321,7 +321,7 @@ void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genr
   ts.margin_right = 0;
   ts.size         = 25.0;
   ts.textcolor    = 0x000000FF;
-  ts.backcolor    = 0xFFFFFFFF;
+  ts.backcolor    = 0;
 
   // view setup
 
@@ -356,6 +356,9 @@ void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genr
   view_t* filterbtn   = view_get_subview(baseview, "genrebtn");
   view_t* messagesbtn = view_get_subview(baseview, "messagesbtn");
 
+  view_t* closeeditorbtn  = view_get_subview(baseview, "closeeditoricon");
+  view_t* accepteditorbtn = view_get_subview(baseview, "accepteditoricon");
+
   playbtn = view_get_subview(baseview, "playbtn");
   volbtn  = view_get_subview(baseview, "volbtn");
 
@@ -378,6 +381,8 @@ void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genr
 
   vh_button_add(filterbtn, NULL, ui_on_filterbtn_down);
   vh_button_add(messagesbtn, NULL, ui_on_messagebtn_down);
+
+  vh_button_add(closeeditorbtn, NULL, ui_on_edit_button_down);
 
   tg_text_add(filterbtn);
   tg_text_set(filterbtn, "filters", ts);
@@ -420,6 +425,8 @@ void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genr
   ts.textcolor    = 0x555555FF;
   ts.backcolor    = 0x0;
 
+  ts.align = TA_RIGHT;
+
   tg_text_add(minuteview);
   tg_text_set(minuteview, "00:", ts);
 
@@ -428,10 +435,10 @@ void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genr
   tg_text_add(secondview);
   tg_text_set(secondview, "00", ts);
 
+  ts.align = TA_CENTER;
+
   songview              = view_get_subview(baseview, "song");
   songview->needs_touch = 0;
-
-  ts.size = 25.0;
 
   tg_text_add(songview);
   tg_text_set(songview, "-", ts);
@@ -454,13 +461,14 @@ void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genr
   view_t* filterbar = view_get_subview(baseview, "filterfield");
 
   filterbar->layout.background_color = 0xFFFFFFFF;
-  vh_text_add(filterbar, "Search/Query", fontpath, ui_filter, NULL);
-
-  settingsview = view_get_subview(baseview, "settingsback");
 
   ts.align     = TA_CENTER;
   ts.textcolor = 0x000000FF;
   ts.backcolor = 0xFFFFFFFF;
+
+  vh_text_add(filterbar, "Search/Query", ts, ui_filter, NULL);
+
+  settingsview = view_get_subview(baseview, "settingsback");
 
   view_t* settings = view_get_subview(baseview, "settings");
 

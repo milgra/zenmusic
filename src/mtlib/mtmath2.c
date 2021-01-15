@@ -378,8 +378,6 @@ char v2_box_intersect(v2_t  basisa,
   return 0;
 }
 
-/* !!! TODO CLEANUP, MERGE */
-
 float v2_endpoint_proximity(v2_t transa, v2_t basisa, v2_t transb, v2_t basisb)
 {
   // line intersection point

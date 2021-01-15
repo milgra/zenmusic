@@ -34,12 +34,25 @@ void editor_select(view_t* itemview)
 {
   vh_litem_t* vh = itemview->handler_data;
 
-  if (vh->sel_cell)
+  if (vh->sel_cell && strcmp(vh->sel_cell->id, "val") == 0)
   {
-    printf("select %s\n", vh->sel_cell->id);
+    char* key   = editor.fields->data[vh->index];
+    char* value = MGET(editor.song, key);
 
-    view_t* valcell = view_new(cstr_fromformat("%s%s", itemview->id, "edit", NULL), vh->sel_cell->view->frame.local);
-    vh_text_add(valcell, "ehune", editor.fontpath, editor_value_changed, NULL);
+    printf("select %i %s\n", vh->index, key);
+
+    view_t* valcell = view_new(cstr_fromformat("%s%s%s", itemview->id, key, "edit", NULL), vh->sel_cell->view->frame.local);
+
+    printf("valcell id %s sel cell id %s\n", valcell->id, vh->sel_cell->view->id);
+
+    textstyle_t ts = {0};
+    ts.font        = editor.fontpath;
+    ts.align       = TA_LEFT;
+    ts.size        = 25.0;
+    ts.textcolor   = 0x000000FF;
+    ts.backcolor   = 0x00000000;
+
+    vh_text_add(valcell, value, ts, editor_value_changed, NULL);
 
     // swap text cell to input cell
 
@@ -62,7 +75,7 @@ view_t* editor_create_item(view_t* listview, void* userdata)
   view_t* keycell = view_new(cstr_fromformat("%s%s", rowview->id, "key", NULL), (r2_t){0, 0, 200, 35});
   tg_text_add(keycell);
 
-  view_t* valcell = view_new(cstr_fromformat("%s%s", rowview->id, "val", NULL), (r2_t){0, 0, 200, 35});
+  view_t* valcell = view_new(cstr_fromformat("%s%s", rowview->id, "val", NULL), (r2_t){0, 0, 300, 35});
   tg_text_add(valcell);
 
   vh_litem_add_cell(rowview, "key", 200, keycell);
@@ -91,8 +104,15 @@ int editor_update_item(view_t* listview, void* userdata, view_t* item, int index
   char* key   = editor.fields->data[index];
   char* value = MGET(editor.song, key);
 
+  uint32_t color1 = (index % 2 == 0) ? 0xFEFEFEFF : 0xEFEFEFFF;
+  ts.backcolor    = color1;
+
   vh_litem_upd_index(item, index);
   tg_text_set(vh_litem_get_cell(item, "key"), key, ts);
+
+  uint32_t color2 = (index % 2 == 0) ? 0xF8F8F8FF : 0xE8E8E8FF;
+  ts.backcolor    = color2;
+
   tg_text_set(vh_litem_get_cell(item, "val"), value, ts);
 
   return 0;

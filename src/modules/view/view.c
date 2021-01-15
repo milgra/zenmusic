@@ -174,6 +174,7 @@ extern char resend;
 
 #include "mtcstring.c"
 #include "mtmemory.c"
+#include <limits.h>
 
 char resend = 1;
 
@@ -200,6 +201,17 @@ view_t* view_new(char* id, r2_t frame)
   view->needs_touch  = 1;
   view->blocks_touch = 1;
   view->display      = 0; // by default no display, tex generators will set this to 1
+
+  // reset margins
+
+  view->layout.margin_top    = INT_MAX;
+  view->layout.margin_left   = INT_MAX;
+  view->layout.margin_right  = INT_MAX;
+  view->layout.margin_bottom = INT_MAX;
+  view->layout.top           = INT_MAX;
+  view->layout.left          = INT_MAX;
+  view->layout.right         = INT_MAX;
+  view->layout.bottom        = INT_MAX;
 
   return view;
 }

@@ -259,11 +259,11 @@ void vh_list_evt(view_t* view, ev_t ev)
       {
         vh->item_pos += -vh->item_pos / 5.0;
       }
-      else if (vh->item_pos + vh->item_wth < view->frame.local.w)
+      else if (vh->item_pos + vh->item_wth < view->frame.local.w - vh->vscr->frame.local.w)
       {
-        if (vh->item_wth > view->frame.local.w)
+        if (vh->item_wth > view->frame.local.w - vh->vscr->frame.local.w)
         {
-          vh->item_pos += (view->frame.local.w - vh->item_wth - vh->item_pos) / 5.0;
+          vh->item_pos += (view->frame.local.w - vh->vscr->frame.local.w - vh->item_wth - vh->item_pos) / 5.0;
         }
         else if (vh->item_pos < -0.0001)
         {
@@ -277,11 +277,11 @@ void vh_list_evt(view_t* view, ev_t ev)
       {
         vh_list_move(view, -head->frame.local.y / 5.0);
       }
-      else if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h - 0.001)
+      else if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h - 0.001 - vh->hscr->frame.local.h)
       {
-        if (tail->frame.local.y + tail->frame.local.h - head->frame.local.y > view->frame.local.h)
+        if (tail->frame.local.y + tail->frame.local.h - head->frame.local.y > view->frame.local.h - vh->hscr->frame.local.h)
         {
-          vh_list_move(view, (view->frame.local.h - (tail->frame.local.y + tail->frame.local.h)) / 5.0);
+          vh_list_move(view, (view->frame.local.h - vh->hscr->frame.local.h - (tail->frame.local.y + tail->frame.local.h)) / 5.0);
         }
         else if (head->frame.local.y < -0.001)
         {

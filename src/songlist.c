@@ -293,9 +293,6 @@ void songitem_update_row(view_t* rowview, int index, map_t* file, uint32_t color
   tg_text_set(vh_litem_get_cell(rowview, "index"), indbuffer, sl.textstyle);
 }
 
-// remove litem1, cr_text
-// create songitem namespace
-
 int songitem_update(view_t* listview, void* userdata, view_t* item, int index, int* item_count)
 {
   if (index < 0)

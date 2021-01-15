@@ -137,6 +137,7 @@
     left: 0px;
     background-color: #FF0000FF;
 }
+
 #second {
     width: 50%;
     height: 100%;
@@ -441,7 +442,7 @@
     height: 500px;
     top: 300px;
     margin: auto;
-    border-radius: 15px;
+    border-radius: 19px;
     background-color: #FFFFFFFF;
     box-shadow: 3px;
 }
@@ -450,9 +451,41 @@
     display: mask;
     width: 100%;
     height: 100%;
-    border-radius: 15px;
+    border-radius: 17px;
     background-color: #FFFFFFFF;
     box-shadow: 2px;
+}
+
+#closeeditorbtn {
+    background-color: #EE0000FF;
+    width: 30px;
+    height: 30px;
+    left: 5px;
+    bottom: 5px;
+    border-radius: 17px;
+    box-shadow: 3px;
+}
+
+#closeeditoricon {
+    width: 30px;
+    height: 30px;
+    background-image: url("close.png");
+}
+
+#accepteditorbtn {
+    background-color: #00EE00FF;
+    width: 30px;
+    height: 30px;
+    right: 5px;
+    bottom: 5px;
+    border-radius: 17px;
+    box-shadow: 3px;
+}
+
+#accepteditoricon {
+    width: 30px;
+    height: 30px;
+    background-image: url("donate.png");
 }
 
 #settingsback {

@@ -2,12 +2,13 @@
 #define vh_text_h
 
 #include "mtstring.c"
+#include "text.c"
 #include "view.c"
 #include "wm_event.c"
 
-void vh_text_add(view_t* view,
-                 char*   text,
-                 char*   fontpath,
+void vh_text_add(view_t*     view,
+                 char*       text,
+                 textstyle_t textstyle,
                  void (*ontext)(view_t* view, str_t* text),
                  void (*onactivate)(view_t* view));
 
@@ -18,7 +19,6 @@ void vh_text_add(view_t* view,
 #include "SDL.h"
 #include "mtcstring.c"
 #include "mtvector.c"
-#include "text.c"
 #include "tg_css.c"
 #include "tg_text.c"
 #include "vh_anim.c"
@@ -66,6 +66,8 @@ void vh_text_upd(view_t* view)
   view_set_frame(data->crsr_v, crsr_f);
 
   //text_render_glyphs(glyphs, text->length, style, bitmap);
+  //vh_anim_add(glyphview);
+  //vh_anim_set(glyphview, sf, ef, 10, AT_LINEAR);
 
   tg_text_set(data->para, str_cstring(data->text), data->style);
 }
@@ -73,7 +75,7 @@ void vh_text_upd(view_t* view)
 void vh_text_evt(view_t* view, ev_t ev)
 {
   vh_text_t* data = view->handler_data;
-  if (ev.type == EV_MMOVE)
+  if (ev.type == EV_MDOWN)
   {
     // activate text field, add cursor
     if (ev.x < view->frame.global.x + view->frame.global.w &&
@@ -113,39 +115,6 @@ void vh_text_evt(view_t* view, ev_t ev)
 
     vh_text_upd(view);
 
-    /* // add new glyph view/update paragraph view */
-
-    /* char idbuffer[100] = {0}; */
-    /* snprintf(idbuffer, 100, "glyphview %s", ev.text); */
-
-    /* // TODO get glyph width first */
-    /* view_t* glyphview = view_new(idbuffer, (r2_t){0, 0, 20, 20}); */
-    /* tg_text_add(glyphview, ev.text, data->style); */
-
-    /* view_add(view, glyphview); */
-
-    /* VADD(data->glyphs, glyphview); */
-
-    /* view_t* gview; */
-    /* float   pos = 0; */
-
-    /* while ((gview = VNXT(data->glyphs))) */
-    /* { */
-    /*   r2_t frame = gview->frame.local; */
-    /*   pos += frame.w; */
-    /* } */
-
-    /* r2_t sf = (r2_t){pos, 0, 1, 20}; */
-
-    /* view_set_frame(glyphview, sf); */
-
-    /* r2_t ef = sf; */
-    /* ef.x += 10.0; */
-    /* ef.w = 20.0; */
-
-    /* vh_anim_add(glyphview); */
-    /* vh_anim_set(glyphview, sf, ef, 10, AT_LINEAR); */
-
     (*data->ontext)(view, data->text);
   }
   else if (ev.type == EV_KDOWN)
@@ -163,24 +132,17 @@ void vh_text_evt(view_t* view, ev_t ev)
   }
 }
 
-void vh_text_add(view_t* view,
-                 char*   text,
-                 char*   fontpath,
+void vh_text_add(view_t*     view,
+                 char*       text,
+                 textstyle_t textstyle,
                  void (*ontext)(view_t* view, str_t* text),
                  void (*onactivate)(view_t* view))
 {
-  textstyle_t ts = {0};
-  ts.font        = fontpath;
-  ts.align       = TA_CENTER;
-  ts.size        = 25.0;
-  ts.textcolor   = 0x000000FF;
-  ts.backcolor   = 0x00000000;
-
   vh_text_t* data  = mem_calloc(sizeof(vh_text_t), "vh_text", NULL, NULL);
   data->text       = str_new();
   data->ontext     = ontext;
   data->onactivate = onactivate;
-  data->style      = ts;
+  data->style      = textstyle;
   data->crsr_i     = 0; // cursor index
 
   str_addbytearray(data->text, text);
@@ -190,16 +152,21 @@ void vh_text_add(view_t* view,
   view->handler      = vh_text_evt;
   view->handler_data = data;
 
-  // add paragraph
+  // add default/first paragraph
 
-  view_t* para = view_new("para", (r2_t){0, 0, 40, 20});
+  r2_t frame = view->frame.local;
+  frame.x    = 0;
+  frame.y    = 0;
+
+  view_t* para = view_new("para", frame);
 
   para->layout.w_per = 1.0;
   para->layout.h_per = 1.0;
   para->needs_touch  = 0;
 
   tg_text_add(para);
-  tg_text_set(para, text, ts);
+  tg_text_set(para, text, textstyle);
+
   view_add(view, para);
 
   data->para = para;
@@ -215,43 +182,9 @@ void vh_text_add(view_t* view,
 
   data->crsr_v = crsr_v;
 
-  /* // generate text */
-  /* for (int index = 0; index < data->text->length; index++) */
-  /* { */
-  /*   uint32_t cp = data->text->codepoints[index]; */
+  // udpate
 
-  /*   str_t* str = str_new(); */
-  /*   str_addcodepoint(str, cp); */
-
-  /*   char idbuffer[100] = {0}; */
-  /*   snprintf(idbuffer, 100, "glyphview %s", str_cstring(str)); */
-
-  /*   textstyle_t ts = {0}; */
-  /*   ts.align       = 0; */
-  /*   ts.size        = 15.0; */
-  /*   ts.textcolor   = 0xFFFFFFFF; */
-  /*   ts.backcolor   = 0x00000022; */
-
-  /*   // TODO get glyph width first */
-  /*   view_t* glyphview = view_new(idbuffer, (r2_t){0, 0, 20, 20}); */
-  /*   tg_text_add(glyphview, str_cstring(str), ts); */
-
-  /*   view_add(view, glyphview); */
-
-  /*   VADD(data->glyphs, glyphview); */
-  /* } */
-
-  /* // arrange */
-  /* view_t* gview; */
-  /* float   pos = 0; */
-
-  /* while ((gview = VNXT(data->glyphs))) */
-  /* { */
-  /*   r2_t frame = gview->frame.local; */
-  /*   frame.x    = pos; */
-  /*   pos += frame.w; */
-  /*   view_set_frame(gview, frame); */
-  /* } */
+  vh_text_upd(view);
 }
 
 #endif

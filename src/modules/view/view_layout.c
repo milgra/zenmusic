@@ -105,37 +105,37 @@ void view_layout(view_t* view)
     {
       frame.y = (view->frame.local.h / 2.0) - (frame.h / 2.0);
     }
-    if (v->layout.margin_top > 0)
+    if (v->layout.margin_top < INT_MAX)
     {
       frame.y += v->layout.margin_top;
       frame.h -= v->layout.margin_top;
     }
-    if (v->layout.margin_left > 0)
+    if (v->layout.margin_left < INT_MAX)
     {
       frame.x += v->layout.margin_left;
       frame.w -= v->layout.margin_left;
     }
-    if (v->layout.margin_right > 0)
+    if (v->layout.margin_right < INT_MAX)
     {
       frame.w -= v->layout.margin_right;
     }
-    if (v->layout.margin_bottom > 0)
+    if (v->layout.margin_bottom < INT_MAX)
     {
       frame.h -= v->layout.margin_bottom;
     }
-    if (v->layout.top > 0)
+    if (v->layout.top < INT_MAX)
     {
       frame.y = v->layout.top - 1;
     }
-    if (v->layout.left > 0)
+    if (v->layout.left < INT_MAX)
     {
       frame.x = v->layout.left - 1;
     }
-    if (v->layout.right > 0)
+    if (v->layout.right < INT_MAX)
     {
       frame.x = view->frame.local.w - frame.w - v->layout.right + 1;
     }
-    if (v->layout.bottom > 0)
+    if (v->layout.bottom < INT_MAX)
     {
       frame.y = view->frame.local.h - frame.h - v->layout.bottom + 1;
     }
