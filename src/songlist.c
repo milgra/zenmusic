@@ -1,7 +1,6 @@
 /*
   songlist table and events handler
  */
-
 #ifndef songlist_h
 #define songlist_h
 
@@ -24,9 +23,9 @@ void songlist_toggle_selected(int state);
 #include "vh_list_head.c"
 #include "vh_list_item2.c"
 
-view_t* songlist_create_item(view_t* listview, void* userdata);
-int     songlist_update_item(view_t* listview, void* userdata, view_t* item, int index, int* item_count);
-void    songlist_update_row(view_t* rowview, int index, map_t* file, uint32_t color);
+view_t* songitem_create(view_t* listview, void* userdata);
+int     songitem_update(view_t* listview, void* userdata, view_t* item, int index, int* item_count);
+void    songitem_update_row(view_t* rowview, int index, map_t* file, uint32_t color);
 
 void on_header_field_select(view_t* view, char* id, ev_t ev);
 void on_header_field_insert(view_t* view, int src, int tgt);
@@ -96,7 +95,7 @@ void songlist_attach(view_t* base,
 
   // add list handler to view
 
-  vh_list_add(sl.view, songlist_create_item, songlist_update_item, NULL);
+  vh_list_add(sl.view, songitem_create, songitem_update, NULL);
 
   // create fields
 
@@ -142,7 +141,7 @@ void songlist_toggle_selected(int state)
 
   view_t* item = vh_list_item_for_index(sl.view, sl.index_s);
 
-  if (item) songlist_update_row(item, sl.index_s, sl.songs->data[sl.index_s], sl.color_s);
+  if (item) songitem_update_row(item, sl.index_s, sl.songs->data[sl.index_s], sl.color_s);
 }
 
 // header
@@ -218,7 +217,7 @@ void songlist_on_item_select(view_t* itemview)
     {
       uint32_t color1 = (sl.index_s % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
 
-      songlist_update_row(olditem, sl.index_s, sl.songs->data[sl.index_s], color1);
+      songitem_update_row(olditem, sl.index_s, sl.songs->data[sl.index_s], color1);
     }
 
     // indicate list item
@@ -228,7 +227,7 @@ void songlist_on_item_select(view_t* itemview)
 
     if (newitem)
     {
-      songlist_update_row(newitem, sl.index_s, sl.songs->data[sl.index_s], sl.color_s);
+      songitem_update_row(newitem, sl.index_s, sl.songs->data[sl.index_s], sl.color_s);
     }
 
     if (sl.on_select) (*sl.on_select)(vh->index);
@@ -240,7 +239,7 @@ void songlist_on_item_select(view_t* itemview)
 }
 
 // TODO rename this to songitem namespace
-view_t* songlist_create_item(view_t* listview, void* data)
+view_t* songitem_create(view_t* listview, void* data)
 {
   static int item_cnt      = 0;
   char       idbuffer[100] = {0};
@@ -263,7 +262,7 @@ view_t* songlist_create_item(view_t* listview, void* data)
   return rowview;
 }
 
-void songlist_update_row(view_t* rowview, int index, map_t* file, uint32_t color)
+void songitem_update_row(view_t* rowview, int index, map_t* file, uint32_t color)
 {
   char indbuffer[6];
   if (index > -1)
@@ -295,7 +294,7 @@ void songlist_update_row(view_t* rowview, int index, map_t* file, uint32_t color
 // remove litem1, cr_text
 // create songitem namespace
 
-int songlist_update_item(view_t* listview, void* userdata, view_t* item, int index, int* item_count)
+int songitem_update(view_t* listview, void* userdata, view_t* item, int index, int* item_count)
 {
   if (index < 0)
     return 1; // no items before 0
@@ -306,14 +305,14 @@ int songlist_update_item(view_t* listview, void* userdata, view_t* item, int ind
 
   if (sl.index_s == index)
   {
-    songlist_update_row(item, index, sl.songs->data[index], sl.color_s);
+    songitem_update_row(item, index, sl.songs->data[index], sl.color_s);
   }
   else
   {
     uint32_t color1 = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
     uint32_t color2 = (index % 2 == 0) ? 0xE5E5E5FF : 0xEFEFEFFF;
 
-    songlist_update_row(item, index, sl.songs->data[index], color1);
+    songitem_update_row(item, index, sl.songs->data[index], color1);
   }
   return 0;
 }

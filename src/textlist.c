@@ -20,7 +20,7 @@ textlist_t* textlist_new(view_t* view, vec_t* items, textstyle_t textstyle, void
 #if __INCLUDE_LEVEL__ == 0
 
 #include "vh_list.c"
-#include "vh_list_item.c"
+#include "vh_list_item2.c"
 
 view_t* textlist_create_item(view_t* listview, void* data);
 int     textlist_update_item(view_t* listview, void* data, view_t* item, int index, int* item_count);
@@ -49,10 +49,12 @@ void textlist_update(textlist_t* tl)
   vh_list_reset(tl->view);
 }
 
-void on_textitem_select(view_t* view, void* data, int index, ev_t ev)
+void on_textitem_select(view_t* itemview)
 {
-  textlist_t* tl = data;
-  (*tl->on_select)(index);
+  vh_litem2_t* vh = itemview->handler_data;
+
+  textlist_t* tl = vh->userdata;
+  (*tl->on_select)(vh->index);
 }
 
 view_t* textlist_create_item(view_t* listview, void* data)
@@ -63,11 +65,14 @@ view_t* textlist_create_item(view_t* listview, void* data)
   char       idbuffer[100] = {0};
   snprintf(idbuffer, 100, "textlist_item%i", item_cnt++);
 
-  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
-  rowview->hidden = 1;
+  view_t* rowview  = view_new(idbuffer, (r2_t){0, 0, 0, 35});
+  rowview->display = 0;
+  vh_litem2_add(rowview, NULL, on_textitem_select);
 
-  vh_litem_add(rowview, 35, on_textitem_select, tl);
-  vh_litem_add_cell(rowview, "item", 230, cr_text_add, cr_text_upd);
+  view_t* cell = view_new(cstr_fromformat("%s%s", rowview->id, "cell", NULL), (r2_t){0, 0, 200, 35});
+  tg_text_add(cell);
+
+  vh_litem2_add_cell(rowview, "cell", 200, cell);
 
   return rowview;
 }
@@ -82,7 +87,8 @@ int textlist_update_item(view_t* listview, void* data, view_t* item, int index, 
 
   *item_count = tl->items->length;
 
-  vh_litem_upd_cell(item, "item", &((cr_text_data_t){.style = tl->textstyle, .text = tl->items->data[index]}));
+  vh_litem2_upd_index(item, index);
+  tg_text_set(vh_litem2_get_cell(item, "cell"), tl->items->data[index], tl->textstyle);
 
   return 0;
 }
