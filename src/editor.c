@@ -25,9 +25,15 @@ struct _editor_t
   vec_t*  fields;
 } editor = {0};
 
+void editor_value_changed(view_t* view, str_t* text)
+{
+}
+
 void editor_select(view_t* view, void* userdata, int index, ev_t ev)
 {
   printf("on_editoritem_select\n");
+
+  // swap text cell to input cell
 }
 
 view_t* editor_create_item(view_t* listview, void* userdata)
@@ -37,6 +43,16 @@ view_t* editor_create_item(view_t* listview, void* userdata)
 
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
   rowview->hidden = 1;
+
+  // first cell is a simple text cell
+  // view_t* keycell = view_new(cstr_fromformat("%s%s", listview->id, "key", NULL), (r2_t){0, 0, 200, 35});
+  // tg_text_add(keycell);
+
+  // view_t* valcell = view_new(cstr_fromformat("%s%s", listview->id, "val", NULL), (r2_t){0, 0, 200, 35});
+  // vh_text_add(valcell, "", editor.fontpath, editor_value_changed, NULL);
+
+  // vh_litem_add_cell(rowview, "key", 200, keycell);
+  // vh_litem_add_cell(rowview, "val", 200, valcell);
 
   vh_litem_add(rowview, 35, editor_select, NULL);
   vh_litem_add_cell(rowview, "key", 200, cr_text_add, cr_text_upd);
@@ -52,8 +68,6 @@ int editor_update_item(view_t* listview, void* userdata, view_t* item, int index
   if (index >= editor.fields->length)
     return 1; // no more items
 
-  printf("editor update %i\n", index);
-
   *item_count = editor.fields->length;
 
   textstyle_t ts = {0};
@@ -66,6 +80,9 @@ int editor_update_item(view_t* listview, void* userdata, view_t* item, int index
 
   char* key   = editor.fields->data[index];
   char* value = MGET(editor.song, key);
+
+  /* cr_text_set(vh_litem_get_cell(item, "key"), key, ts); */
+  /* cr_text_set(vh_litem_get_cell(item, "val"), value, ts); */
 
   vh_litem_upd_cell(item, "key", &((cr_text_data_t){.style = ts, .text = key}));
   vh_litem_upd_cell(item, "value", &((cr_text_data_t){.style = ts, .text = value}));
