@@ -28,11 +28,17 @@ struct _editor_t
 
   view_t* sel_item;
   char*   sel_cell;
+  char*   sel_key;
 } editor = {0};
 
 void editor_value_changed(view_t* view)
 {
   printf("editor_value_changed\n");
+
+  vh_text_t* data = view->handler_data;
+
+  char* text = str_cstring(data->text);
+  MPUT(editor.song, editor.sel_key, text);
 }
 
 void editor_edit_finished(view_t* view)
@@ -43,16 +49,32 @@ void editor_edit_finished(view_t* view)
   vh_list_lock_scroll(editor.view, 0);
 
   // remove text view handler
+
+  view_t* valcell = view_new(cstr_fromformat("%s%s", editor.sel_item->id, "val", NULL), view->frame.local);
+  tg_text_add(valcell);
+
+  char* value = MGET(editor.song, editor.sel_key);
+
+  tg_text_set(valcell, value, editor.textstyle);
+
+  valcell->blocks_touch = 0;
+
+  vh_litem_rpl_cell(editor.sel_item, editor.sel_cell, valcell);
 }
 
 void editor_select(view_t* itemview)
 {
+  printf("select\n");
   vh_litem_t* vh = itemview->handler_data;
 
   if (vh->sel_cell && strcmp(vh->sel_cell->id, "val") == 0)
   {
     char* key   = editor.fields->data[vh->index];
     char* value = MGET(editor.song, key);
+
+    editor.sel_item = itemview;
+    editor.sel_cell = vh->sel_cell->id;
+    editor.sel_key  = key;
 
     printf("select %i %s\n", vh->index, key);
 

@@ -111,6 +111,24 @@ void ui_on_edit_button_down(view_t* view, void* data)
     view_add(mainview, editorview);
 }
 
+void ui_on_editor_reject(view_t* view, void* data)
+{
+  ui_on_edit_button_down(view, data);
+}
+
+void ui_on_editor_accept(view_t* view, void* data)
+{
+  ui_on_edit_button_down(view, data);
+
+  // update modified entity in database
+
+  // move song to new place if needed
+
+  // save database
+
+  // reload song list
+}
+
 void ui_on_prev_button_down(view_t* view, void* data)
 {
   lastindex = lastindex - 1;
@@ -382,7 +400,8 @@ void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genr
   vh_button_add(filterbtn, NULL, ui_on_filterbtn_down);
   vh_button_add(messagesbtn, NULL, ui_on_messagebtn_down);
 
-  vh_button_add(closeeditorbtn, NULL, ui_on_edit_button_down);
+  vh_button_add(closeeditorbtn, NULL, ui_on_editor_reject);
+  vh_button_add(accepteditorbtn, NULL, ui_on_editor_accept);
 
   tg_text_add(filterbtn);
   tg_text_set(filterbtn, "filters", ts);

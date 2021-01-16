@@ -6,6 +6,22 @@
 #include "view.c"
 #include "wm_event.c"
 
+typedef struct _vh_text_t
+{
+  str_t*      text;
+  textstyle_t style;
+  char        editing;
+
+  r2_t     crsr_f;
+  view_t*  crsr_v;
+  uint32_t crsr_i;
+
+  view_t* pgraph;
+  void (*on_text)(view_t* view);
+  void (*on_activate)(view_t* view);
+  void (*on_deactivate)(view_t* view);
+} vh_text_t;
+
 void vh_text_add(view_t*     view,
                  char*       text,
                  textstyle_t textstyle);
@@ -23,22 +39,6 @@ void vh_text_set_on_deactivate(view_t* view, void (*event)(view_t*));
 #include "tg_css.c"
 #include "tg_text.c"
 #include "vh_anim.c"
-
-typedef struct _vh_text_t
-{
-  str_t*      text;
-  textstyle_t style;
-  char        editing;
-
-  r2_t     crsr_f;
-  view_t*  crsr_v;
-  uint32_t crsr_i;
-
-  view_t* pgraph;
-  void (*on_text)(view_t* view);
-  void (*on_activate)(view_t* view);
-  void (*on_deactivate)(view_t* view);
-} vh_text_t;
 
 void vh_text_upd(view_t* view)
 {
