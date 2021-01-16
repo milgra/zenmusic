@@ -11,6 +11,7 @@ enum evtype
   EV_RESIZE,
   EV_MMOVE,
   EV_MDOWN,
+  EV_MDOWN_OUTSIDE,
   EV_MUP,
   EV_SCROLL,
   EV_KDOWN,

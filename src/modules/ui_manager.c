@@ -14,6 +14,7 @@ void ui_manager_init(int width, int height);
 void ui_manager_event(ev_t event);
 void ui_manager_add(view_t* view);
 void ui_manager_render(uint32_t time);
+void ui_manager_activate(view_t* view);
 
 #endif
 
@@ -28,17 +29,19 @@ void ui_manager_render(uint32_t time);
 struct _uim_t
 {
   view_t* root;
-  vec_t*  queue;
   vec_t*  views;
+  vec_t*  touchqueue;
+  vec_t*  scrollqueue;
 } uim = {0};
 
 void ui_manager_init(int width, int height)
 {
   ui_generator_init(width, height);
 
-  uim.root  = view_new("root", (r2_t){0, 0, width, height});
-  uim.views = VNEW();
-  uim.queue = VNEW();
+  uim.root        = view_new("root", (r2_t){0, 0, width, height});
+  uim.views       = VNEW();
+  uim.touchqueue  = VNEW();
+  uim.scrollqueue = VNEW();
 }
 
 void ui_manager_event(ev_t ev)
@@ -64,29 +67,46 @@ void ui_manager_event(ev_t ev)
   }
   else if (ev.type == EV_MMOVE ||
            ev.type == EV_MDOWN ||
-           ev.type == EV_MUP ||
-           ev.type == EV_SCROLL)
+           ev.type == EV_MUP)
   {
-    if (ev.type == EV_MMOVE || uim.queue->length == 0)
+    if (ev.type == EV_MDOWN)
     {
-      // send mouse move event to previous uim.queue to detect move out
-      for (int i = uim.queue->length - 1; i > -1; i--)
+      // send mouse move event to previous uim.queue to detect move down outside
+      for (int i = uim.touchqueue->length - 1; i > -1; i--)
       {
-        view_t* v = uim.queue->data[i];
+        ev_t outev = ev;
+        outev.type = EV_MDOWN_OUTSIDE;
+        view_t* v  = uim.touchqueue->data[i];
         if (v->needs_touch)
         {
-          if (v->handler) (*v->handler)(v, ev);
-          break;
+          if (v->handler) (*v->handler)(v, outev);
+          if (v->blocks_touch) break;
         }
       }
 
-      vec_reset(uim.queue);
-      view_coll_touched(uim.root, ev, uim.queue);
+      vec_reset(uim.touchqueue);
+      view_coll_touched(uim.root, ev, uim.touchqueue);
     }
 
-    for (int i = uim.queue->length - 1; i > -1; i--)
+    if (uim.scrollqueue->length > 0) vec_reset(uim.scrollqueue);
+
+    for (int i = uim.touchqueue->length - 1; i > -1; i--)
     {
-      view_t* v = uim.queue->data[i];
+      view_t* v = uim.touchqueue->data[i];
+      if (v->needs_touch && v->parent)
+      {
+        if (v->handler) (*v->handler)(v, ev);
+        if (v->blocks_touch) break;
+      }
+    }
+  }
+  else if (ev.type == EV_SCROLL)
+  {
+    if (uim.scrollqueue->length == 0) view_coll_touched(uim.root, ev, uim.scrollqueue);
+
+    for (int i = uim.scrollqueue->length - 1; i > -1; i--)
+    {
+      view_t* v = uim.scrollqueue->data[i];
       if (v->needs_touch && v->parent)
       {
         if (v->handler) (*v->handler)(v, ev);
@@ -96,9 +116,9 @@ void ui_manager_event(ev_t ev)
   }
   else if (ev.type == EV_KDOWN || ev.type == EV_KUP)
   {
-    for (int i = uim.queue->length - 1; i > -1; i--)
+    for (int i = uim.touchqueue->length - 1; i > -1; i--)
     {
-      view_t* v = uim.queue->data[i];
+      view_t* v = uim.touchqueue->data[i];
       if (v->needs_key)
       {
         if (v->handler) (*v->handler)(v, ev);
@@ -108,9 +128,9 @@ void ui_manager_event(ev_t ev)
   }
   else if (ev.type == EV_TEXT)
   {
-    for (int i = uim.queue->length - 1; i > -1; i--)
+    for (int i = uim.touchqueue->length - 1; i > -1; i--)
     {
-      view_t* v = uim.queue->data[i];
+      view_t* v = uim.touchqueue->data[i];
       if (v->needs_text)
       {
         if (v->handler) (*v->handler)(v, ev);
@@ -123,6 +143,11 @@ void ui_manager_event(ev_t ev)
 void ui_manager_add(view_t* view)
 {
   view_add(uim.root, view);
+}
+
+void ui_manager_activate(view_t* view)
+{
+  VADD(uim.touchqueue, view);
 }
 
 void ui_manager_collect(view_t* view, vec_t* views)

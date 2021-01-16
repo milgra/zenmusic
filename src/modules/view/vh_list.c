@@ -19,6 +19,8 @@ typedef struct _vh_list_t
   int item_count; // all elements in data source
   int full;       // list is full, no more elements needed
 
+  char lock_scroll;
+
   float item_wth; // width of all items
   float item_pos; // horizontal position of all items
 
@@ -43,6 +45,7 @@ vec_t*  vh_list_cache(view_t* view);
 void    vh_list_fill(view_t* view);
 void    vh_list_reset(view_t* view);
 view_t* vh_list_item_for_index(view_t* view, int index);
+void    vh_list_lock_scroll(view_t* view, char state);
 
 #endif
 
@@ -248,7 +251,7 @@ void vh_list_evt(view_t* view, ev_t ev)
       }
     }
     // scroll bounce if needed
-    if (vh->items->length > 0)
+    if (vh->items->length > 0 && !vh->lock_scroll)
     {
       view_t* head = vec_head(vh->items);
       view_t* tail = vec_tail(vh->items);
@@ -307,7 +310,7 @@ void vh_list_evt(view_t* view, ev_t ev)
   }
   else if (ev.type == EV_SCROLL)
   {
-    if (vh->items->length > 0)
+    if (vh->items->length > 0 && !vh->lock_scroll)
     {
       if (ev.dx != 0.0)
       {
@@ -367,6 +370,12 @@ void vh_list_fill(view_t* view)
 {
   vh_list_t* vh = view->handler_data;
   vh->full      = 0;
+}
+
+void vh_list_lock_scroll(view_t* view, char state)
+{
+  vh_list_t* vh   = view->handler_data;
+  vh->lock_scroll = state;
 }
 
 void vh_list_reset(view_t* view)

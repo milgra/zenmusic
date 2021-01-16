@@ -301,7 +301,7 @@ void ui_update_time(double time)
   tg_text_set(secondview, timebuff, ts);
 }
 
-void ui_filter(view_t* view, str_t* text)
+void ui_filter(view_t* view)
 {
 }
 
@@ -466,7 +466,8 @@ void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genr
   ts.textcolor = 0x000000FF;
   ts.backcolor = 0xFFFFFFFF;
 
-  vh_text_add(filterbar, "Search/Query", ts, ui_filter, NULL);
+  vh_text_add(filterbar, "Search/Query", ts);
+  vh_text_set_on_text(filterbar, ui_filter);
 
   settingsview = view_get_subview(baseview, "settingsback");
 

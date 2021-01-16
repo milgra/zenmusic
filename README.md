@@ -37,6 +37,7 @@ freebsd for os
 
 first version
 
+id editor working text on click (ui manager focus problem ), working edit, working save
 id editor, album url, album preview
 fix query field
 make genre/artist selection filter songs, fill up query bar
@@ -45,7 +46,6 @@ fix leaks
 elso indulasnal analyzer progresst mutassa valahol amig zenet hallgatsz
 scrollbar drag
 config file - default library
-text overflow fix
 save small changes to a delta database, add it to the big one at startup
 zenmusic /usr/milgra/Testmusic - select lib folder
 refresh database gomb legyen az egyik, settings, about a masik ketto

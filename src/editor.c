@@ -13,6 +13,7 @@ void editor_set_song(map_t* map);
 
 #include "text.c"
 #include "tg_text.c"
+#include "ui_manager.c"
 #include "vh_list.c"
 #include "vh_list_item.c"
 #include "vh_text.c"
@@ -24,10 +25,24 @@ struct _editor_t
   int         ind;
   map_t*      song;
   vec_t*      fields;
+
+  view_t* sel_item;
+  char*   sel_cell;
 } editor = {0};
 
-void editor_value_changed(view_t* view, str_t* text)
+void editor_value_changed(view_t* view)
 {
+  printf("editor_value_changed\n");
+}
+
+void editor_edit_finished(view_t* view)
+{
+  printf("editor_value_finished\n");
+
+  // lock scrolling
+  vh_list_lock_scroll(editor.view, 0);
+
+  // remove text view handler
 }
 
 void editor_select(view_t* itemview)
@@ -45,7 +60,22 @@ void editor_select(view_t* itemview)
 
     printf("valcell id %s sel cell id %s\n", valcell->id, vh->sel_cell->view->id);
 
-    vh_text_add(valcell, value, editor.textstyle, editor_value_changed, NULL);
+    uint32_t color1            = (vh->index % 2 == 0) ? 0xFEFEFEFF : 0xEFEFEFFF;
+    editor.textstyle.backcolor = color1;
+
+    vh_text_add(valcell, value, editor.textstyle);
+
+    vh_text_set_on_text(valcell, editor_value_changed);
+    vh_text_set_on_deactivate(valcell, editor_edit_finished);
+
+    // activate text input
+    vh_text_activate(valcell, 1);
+
+    // set text input as event receiver
+    ui_manager_activate(valcell);
+
+    // lock scrolling
+    vh_list_lock_scroll(editor.view, 1);
 
     // swap text cell to input cell
 
