@@ -27,6 +27,7 @@ void vh_text_add(view_t*     view,
                  textstyle_t textstyle);
 void vh_text_activate(view_t* view, char state);
 void vh_text_set_on_text(view_t* view, void (*event)(view_t*));
+void vh_text_set_on_activate(view_t* view, void (*event)(view_t*));
 void vh_text_set_on_deactivate(view_t* view, void (*event)(view_t*));
 
 #endif
@@ -209,6 +210,12 @@ void vh_text_set_on_text(view_t* view, void (*event)(view_t*))
 {
   vh_text_t* data = view->handler_data;
   data->on_text   = event;
+}
+
+void vh_text_set_on_activate(view_t* view, void (*event)(view_t*))
+{
+  vh_text_t* data   = view->handler_data;
+  data->on_activate = event;
 }
 
 void vh_text_set_on_deactivate(view_t* view, void (*event)(view_t*))

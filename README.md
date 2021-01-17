@@ -37,8 +37,10 @@ freebsd for os
 
 first version
 
-id editor working text on click (ui manager focus problem ), working edit, working save
+working save, file move, db update, list refresh, meta update in file, album update in file
 id editor, album url, album preview
+filter popup search barra jojjon fol, messages displayre kattinrva, osszes gombot felvinni a helyukre
+title/aritst/info egy textfield legyen, ugy konnyebb shadow is, time bar passed/remaining
 fix query field
 make genre/artist selection filter songs, fill up query bar
 increase play count

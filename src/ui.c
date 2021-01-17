@@ -77,7 +77,7 @@ void ui_on_close_button_down(view_t* view, void* data)
   wm_close();
 }
 
-void ui_on_filterbtn_down(view_t* view, void* data)
+void ui_on_filter_activate(view_t* view)
 {
   if (filterlistback->parent)
     view_remove(mainview, filterlistback);
@@ -87,6 +87,7 @@ void ui_on_filterbtn_down(view_t* view, void* data)
 
 void ui_on_messagebtn_down(view_t* view, void* data)
 {
+  printf("on messagebtn\n");
   if (messagelistback->parent)
     view_remove(mainview, messagelistback);
   else
@@ -371,8 +372,8 @@ void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genr
   view_t* aboutbtn  = view_get_subview(baseview, "abouticon");
   view_t* editbtn   = view_get_subview(baseview, "eventsicon");
 
-  view_t* filterbtn   = view_get_subview(baseview, "genrebtn");
-  view_t* messagesbtn = view_get_subview(baseview, "messagesbtn");
+  view_t* infobtn   = view_get_subview(baseview, "info");
+  view_t* uploadbtn = view_get_subview(baseview, "uploadbtn");
 
   view_t* closeeditorbtn  = view_get_subview(baseview, "closeeditoricon");
   view_t* accepteditorbtn = view_get_subview(baseview, "accepteditoricon");
@@ -397,17 +398,14 @@ void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genr
   vh_button_add(editbtn, NULL, ui_on_edit_button_down);
   vh_button_add(aboutbtn, NULL, ui_on_about_button_down);
 
-  vh_button_add(filterbtn, NULL, ui_on_filterbtn_down);
-  vh_button_add(messagesbtn, NULL, ui_on_messagebtn_down);
+  //  vh_button_add(filterbtn, NULL, ui_on_filterbtn_down);
+  vh_button_add(infobtn, NULL, ui_on_messagebtn_down);
 
   vh_button_add(closeeditorbtn, NULL, ui_on_editor_reject);
   vh_button_add(accepteditorbtn, NULL, ui_on_editor_accept);
 
-  tg_text_add(filterbtn);
-  tg_text_set(filterbtn, "filters", ts);
-
-  tg_text_add(messagesbtn);
-  tg_text_set(messagesbtn, "activity", ts);
+  tg_text_add(uploadbtn);
+  tg_text_set(uploadbtn, "add new image", ts);
 
   // get visualizer views
 
@@ -487,6 +485,7 @@ void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genr
 
   vh_text_add(filterbar, "Search/Query", ts);
   vh_text_set_on_text(filterbar, ui_filter);
+  vh_text_set_on_activate(filterbar, ui_on_filter_activate);
 
   settingsview = view_get_subview(baseview, "settingsback");
 
