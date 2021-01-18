@@ -93,7 +93,7 @@
 #timebck {
     top: 10px;
     margin: auto;
-    width: 240px;
+    width: 235px;
     height: 30px;
     background-color: #FFFFFFFF;
     border-radius: 10px;
@@ -371,8 +371,8 @@
 
 #messagelistback {
     width: 460px;
-    height: 800px;
-    top: 50px;
+    height: 600px;
+    top: 197px;
     margin: auto;
     border-radius: 15px;
     background-color: #FFFFFFFF;
@@ -388,10 +388,9 @@
     box-shadow: 2px;
 }
 
-
 #filterlistback {
     width: 468px;
-    height: 500px;
+    height: 600px;
     top: 197px;
     margin: auto;
     border-radius: 15px;

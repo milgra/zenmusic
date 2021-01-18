@@ -426,6 +426,7 @@ void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genr
   messagelistback     = view_get_subview(baseview, "messagelistback");
   view_t* messagelist = view_get_subview(baseview, "messagelist");
 
+  activity_init();
   activity_attach(messagelist, fontpath);
 
   view_remove(mainview, messagelistback);
