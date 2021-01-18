@@ -36,13 +36,13 @@ void filter(view_t* view, char* text)
 
 void save_db(map_t* entry)
 {
-  db_write(libpath, db);
-
   // update metadata in file
 
   // move song to new place if needed
+  lib_organize_entry(libpath, db, entry);
 
   // save database
+  db_write(libpath, db);
 
   // reload song list
 }

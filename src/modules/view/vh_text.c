@@ -177,7 +177,7 @@ void vh_text_add(view_t*     view,
   frame.x    = 0;
   frame.y    = 0;
 
-  char*   pgraphid = cstr_fromformat("%s%s", view->id, "pgraph");
+  char*   pgraphid = cstr_fromformat("%s%s", view->id, "pgraph", NULL);
   view_t* pgraph   = view_new(pgraphid, frame);
   REL(pgraphid);
 
@@ -194,7 +194,7 @@ void vh_text_add(view_t*     view,
 
   // add cursor
 
-  char*   crsrid = cstr_fromformat("%s%s", view->id, "crsr");
+  char*   crsrid = cstr_fromformat("%s%s", view->id, "crsr", NULL);
   view_t* crsr_v = view_new(crsrid, (r2_t){50, 12, 2, 0});
   REL(crsrid);
 

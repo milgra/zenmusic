@@ -26,7 +26,7 @@ void log_log(char* fmt, ...)
   va_list arglist;
   char*   str = mem_calloc(100, "char*", NULL, NULL);
   va_start(arglist, fmt);
-  vsnprintf(str, 100, fmt, arglist);
+  vsnprintf(str, 150, fmt, arglist);
   va_end(arglist);
 
   printf("LOG %s\n", str);

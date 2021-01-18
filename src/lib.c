@@ -7,6 +7,7 @@
 void lib_read(char* libpath);
 void lib_remove_duplicates(map_t* db);
 void lib_analyze(ch_t* channel);
+int  lib_organize_entry(char* libpath, map_t* db, map_t* entry);
 int  lib_organize(char* libpath, map_t* db);
 int  lib_entries();
 
@@ -229,8 +230,65 @@ char* lib_replace_char(char* str, char find, char replace)
   return str;
 }
 
-int lib_organize_entry(map_t* db, map_t* entry)
+int lib_organize_entry(char* libpath, map_t* db, map_t* entry)
 {
+  int changed = 0;
+
+  char* path   = MGET(entry, "path");
+  char* artist = MGET(entry, "artist");
+  char* album  = MGET(entry, "album");
+  char* title  = MGET(entry, "title");
+
+  // remove slashes before directory creation
+
+  lib_replace_char(artist, '/', ' ');
+  lib_replace_char(title, '/', ' ');
+
+  int index;
+  for (index = strlen(path) - 1; index > -1; --index)
+  {
+    if (path[index] == '.')
+    {
+      index++;
+      break;
+    }
+  }
+
+  int   len = strlen(path) - index;
+  char* ext = mem_calloc(len + 1, "char*", NULL, NULL);
+  memcpy(ext, path + index, len);
+
+  char* new_dirs = cstr_fromformat("%s/%s/%s/", libpath, artist, album, NULL);
+  char* new_path = cstr_fromformat("%s/%s/%s/%s.%s", libpath, artist, album, title, ext, NULL);
+
+  if (strcmp(path, new_path) != 0)
+  {
+    LOG("moving %s to %s\n", path, new_path);
+
+    int error = lib_mkpath(new_dirs, 0777);
+
+    if (error == 0)
+    {
+      error = rename(path, new_path);
+
+      if (error == 0)
+      {
+        LOG("updating path in db,\n");
+        MPUT(entry, "path", new_path);
+        MPUT(db, new_path, entry);
+        MDEL(db, path);
+        changed = 1;
+      }
+      else
+        LOG("cannot rename file %s %s %s\n", path, new_path, strerror(errno));
+    }
+    else
+      LOG("cannot create path %s\n", new_path);
+  }
+
+  REL(new_dirs);
+  REL(new_path);
+
   return 0;
 }
 
@@ -252,59 +310,7 @@ int lib_organize(char* libpath, map_t* db)
 
     if (entry)
     {
-      char* artist = MGET(entry, "artist");
-      char* album  = MGET(entry, "album");
-      char* title  = MGET(entry, "title");
-
-      // remove slashes before directory creation
-
-      lib_replace_char(artist, '/', ' ');
-      lib_replace_char(title, '/', ' ');
-
-      int index;
-      for (index = strlen(path) - 1; index > -1; --index)
-      {
-        if (path[index] == '.')
-        {
-          index++;
-          break;
-        }
-      }
-
-      int   len = strlen(path) - index;
-      char* ext = mem_calloc(len + 1, "char*", NULL, NULL);
-      memcpy(ext, path + index, len);
-
-      char* new_dirs = cstr_fromformat("%s/%s/%s/", libpath, artist, album, NULL);
-      char* new_path = cstr_fromformat("%s/%s/%s/%s.%s", libpath, artist, album, title, ext, NULL);
-
-      if (strcmp(path, new_path) != 0)
-      {
-        LOG("moving %s to %s\n", path, new_path);
-
-        int error = lib_mkpath(new_dirs, 0777);
-
-        if (error == 0)
-        {
-          error = rename(path, new_path);
-
-          if (error == 0)
-          {
-            LOG("updating path in db,\n");
-            MPUT(entry, "path", new_path);
-            MPUT(db, new_path, entry);
-            MDEL(db, path);
-            changed = 1;
-          }
-          else
-            LOG("cannot rename file %s %s %s\n", path, new_path, strerror(errno));
-        }
-        else
-          LOG("cannot create path %s\n", new_path);
-      }
-
-      REL(new_dirs);
-      REL(new_path);
+      changed |= lib_organize_entry(libpath, db, entry);
     }
   }
 
