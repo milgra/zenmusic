@@ -34,6 +34,19 @@ void filter(view_t* view, char* text)
   db_filter(db, text, songs);
 }
 
+void save_db(map_t* entry)
+{
+  db_write(libpath, db);
+
+  // update metadata in file
+
+  // move song to new place if needed
+
+  // save database
+
+  // reload song list
+}
+
 void init(int width, int height, char* respath)
 {
   srand((unsigned int)time(NULL));
@@ -45,8 +58,15 @@ void init(int width, int height, char* respath)
   genres  = VNEW();
   artists = VNEW();
 
-  ui_init(width, height, respath, songs, genres, artists); // init ui
-  config_init();                                           // init config
+  ui_init(width,
+          height,
+          respath,
+          songs,
+          genres,
+          artists,
+          save_db); // init ui
+
+  config_init(); // init config
 
   db_read(libpath, db);                   // read db
   lib_read(libpath);                      // read library

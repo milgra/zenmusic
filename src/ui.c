@@ -1,9 +1,10 @@
 #ifndef ui_h
 #define ui_h
 
+#include "mtmap.c"
 #include "view.c"
 
-void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genres, vec_t* artists);
+void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genres, vec_t* artists, void (*save_entry)(map_t* map));
 void ui_update_position(float ratio);
 void ui_update_volume(float ratio);
 void ui_update_visualizer();
@@ -16,6 +17,7 @@ void ui_toggle_pause(int state);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "activity.c"
+#include "db.c"
 #include "editor.c"
 #include "mtcstring.c"
 #include "player.c"
@@ -63,6 +65,7 @@ void ui_show_song_info(int index);
 struct _ui_t
 {
   vec_t* songs;
+  void (*save_entry)(map_t* map);
 } ui = {0};
 
 // button events
@@ -119,15 +122,30 @@ void ui_on_editor_reject(view_t* view, void* data)
 
 void ui_on_editor_accept(view_t* view, void* data)
 {
+  printf("on_editor_accept\n");
   ui_on_edit_button_down(view, data);
 
+  map_t* old_data = editor_get_old_data();
+  map_t* new_data = editor_get_new_data();
+
   // update modified entity in database
+  vec_t* keys = VNEW();
+  map_keys(new_data, keys);
+  for (int index = 0; index < keys->length; index++)
+  {
+    char* key    = keys->data[index];
+    char* oldval = MGET(old_data, key);
+    char* newval = MGET(new_data, key);
 
-  // move song to new place if needed
+    if (strcmp(oldval, newval) != 0)
+    {
+      printf("%s changed from %s to %s, writing to db\n", key, oldval, newval);
+      MPUT(old_data, key, newval);
+    }
+  }
 
-  // save database
-
-  // reload song list
+  // notify main namespace to organize and save metadata and database
+  (*ui.save_entry)(old_data);
 }
 
 void ui_on_prev_button_down(view_t* view, void* data)
@@ -324,9 +342,10 @@ void ui_filter(view_t* view)
 {
 }
 
-void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genres, vec_t* artists)
+void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genres, vec_t* artists, void (*save_entry)(map_t* map))
 {
-  ui.songs = songs;
+  ui.songs      = songs;
+  ui.save_entry = save_entry;
 
   // init text
 

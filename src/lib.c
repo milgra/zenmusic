@@ -229,6 +229,11 @@ char* lib_replace_char(char* str, char find, char replace)
   return str;
 }
 
+int lib_organize_entry(map_t* db, map_t* entry)
+{
+  return 0;
+}
+
 int lib_organize(char* libpath, map_t* db)
 {
   LOG("organizing database...");

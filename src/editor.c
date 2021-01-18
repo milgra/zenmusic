@@ -4,8 +4,10 @@
 #include "mtmap.c"
 #include "view.c"
 
-void editor_attach(view_t* view, char* fontpath);
-void editor_set_song(map_t* map);
+void   editor_attach(view_t* view, char* fontpath);
+void   editor_set_song(map_t* map);
+map_t* editor_get_old_data();
+map_t* editor_get_new_data();
 
 #endif
 
@@ -21,11 +23,11 @@ void editor_set_song(map_t* map);
 struct _editor_t
 {
   view_t*     view;
-  textstyle_t textstyle;
-  int         ind;
   map_t*      song;
+  map_t*      temp;
   vec_t*      fields;
   view_t*     sel_item;
+  textstyle_t textstyle;
 } editor = {0};
 
 void editor_input_cell_value_changed(view_t* inputview)
@@ -37,7 +39,7 @@ void editor_input_cell_value_changed(view_t* inputview)
 
   printf("editor_input_cell_value_changed key %s text %s\n", key, text);
 
-  MPUT(editor.song, key, text);
+  MPUT(editor.temp, key, text);
 }
 
 void editor_input_cell_edit_finished(view_t* inputview)
@@ -101,8 +103,9 @@ void editor_select_item(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 
 view_t* editor_create_item(view_t* listview, void* userdata)
 {
-  char idbuffer[100] = {0};
-  snprintf(idbuffer, 100, "editor_item%i", editor.ind++);
+  static int itemcnt;
+  char       idbuffer[100] = {0};
+  snprintf(idbuffer, 100, "editor_item%i", itemcnt++);
 
   view_t* rowview  = view_new(idbuffer, (r2_t){0, 0, 0, 35});
   rowview->display = 0;
@@ -150,9 +153,19 @@ int editor_update_item(view_t* listview, void* userdata, view_t* item, int index
 
 void editor_set_song(map_t* map)
 {
+  printf("editor set song\n");
+  mem_describe(map, 0);
+
+  // reset temporary fields containers
+  map_reset(editor.temp);
   vec_reset(editor.fields);
+
+  // store song and extract fields
   editor.song = map;
   map_keys(map, editor.fields);
+
+  // reset list handler
+  vh_list_reset(editor.view);
 }
 
 void editor_attach(view_t* view, char* fontpath)
@@ -168,8 +181,19 @@ void editor_attach(view_t* view, char* fontpath)
   ts.backcolor   = 0xFFFFFFFF;
 
   editor.view      = view;
+  editor.temp      = MNEW();
   editor.fields    = VNEW();
   editor.textstyle = ts;
+}
+
+map_t* editor_get_old_data()
+{
+  return editor.song;
+}
+
+map_t* editor_get_new_data()
+{
+  return editor.temp;
 }
 
 #endif

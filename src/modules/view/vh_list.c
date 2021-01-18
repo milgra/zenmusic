@@ -44,6 +44,7 @@ vec_t*  vh_list_items(view_t* view);
 vec_t*  vh_list_cache(view_t* view);
 void    vh_list_fill(view_t* view);
 void    vh_list_reset(view_t* view);
+void    vh_list_refresh(view_t* view);
 view_t* vh_list_item_for_index(view_t* view, int index);
 void    vh_list_lock_scroll(view_t* view, char state);
 
@@ -378,16 +379,56 @@ void vh_list_lock_scroll(view_t* view, char state)
   vh->lock_scroll = state;
 }
 
+// cleanup all items, prepare for new content
+
 void vh_list_reset(view_t* view)
 {
   vh_list_t* vh = view->handler_data;
 
+  vec_addinvector(vh->cache, vh->items);
+
+  // remove all items from view
+
+  for (int index = 0; index < vh->cache->length; index++)
+  {
+    view_t* sview = vh->cache->data[index];
+    view_remove(view, sview);
+  }
+
   vec_reset(vh->items);
+  vec_reset(vh->cache);
 
   vh->head_index = 0;
   vh->tail_index = 0;
   vh->item_count = 0;
   vh->full       = 0;
+}
+
+// reload visible items
+
+void vh_list_refresh(view_t* view)
+{
+  vh_list_t* vh = view->handler_data;
+
+  vec_addinvector(vh->cache, vh->items);
+
+  // move all cache items outside visible area
+
+  for (int index = 0; index < vh->cache->length; index++)
+  {
+    view_t* sview = vh->cache->data[index];
+    r2_t    frame = sview->frame.local;
+
+    frame.x = 0;
+    frame.y = -frame.h;
+
+    vec_reset(vh->items);
+
+    vh->head_index = 0;
+    vh->tail_index = vh->head_index;
+    vh->item_count = 0;
+    vh->full       = 0;
+  }
 }
 
 void vh_list_add(view_t* view,
