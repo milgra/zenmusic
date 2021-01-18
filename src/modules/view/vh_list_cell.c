@@ -11,15 +11,29 @@ typedef struct _vh_lcell_t
   int     index;
 } vh_lcell_t;
 
-void    vh_lcell_arrange(vec_t* cells);
-view_t* vh_lcell_get(vec_t* cells, char* id);
-void    vh_lcell_ins(vec_t* cells, int si, int ti);
+vh_lcell_t* vh_lcell_new(char* id, int size, view_t* view, int index);
+void        vh_lcell_arrange(vec_t* cells);
+view_t*     vh_lcell_get(vec_t* cells, char* id);
+void        vh_lcell_ins(vec_t* cells, int si, int ti);
+void        vh_lcell_set_size(vec_t* cells, char* id, int size);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "mtcstring.c"
 #include "mtvector.c"
+
+vh_lcell_t* vh_lcell_new(char* id, int size, view_t* view, int index)
+{
+  vh_lcell_t* cell = mem_alloc(sizeof(vh_lcell_t), "vh_lcell_t", NULL, NULL);
+  cell->id         = cstr_fromcstring(id);
+  cell->size       = size;
+  cell->view       = view;
+  cell->index      = index;
+
+  return cell;
+}
 
 void vh_lcell_arrange(vec_t* cells)
 {
@@ -54,6 +68,22 @@ void vh_lcell_ins(vec_t* cells, int si, int ti)
   VREM(cells, cell);
   vec_addatindex(cells, cell, ti);
   REL(cell);
+  vh_lcell_arrange(cells);
+}
+
+void vh_lcell_set_size(vec_t* cells, char* id, int size)
+{
+  for (int index = 0; index < cells->length; index++)
+  {
+    vh_lcell_t* cell = cells->data[index];
+    if (strcmp(cell->id, id) == 0)
+    {
+      r2_t f = cell->view->frame.local;
+      f.w    = size;
+      view_set_frame(cell->view, f);
+      break;
+    }
+  }
   vh_lcell_arrange(cells);
 }
 

@@ -38,18 +38,41 @@ void    vh_lhead_swp_cell(char* ida, char* idb);
 
 #include "tg_css.c"
 
-// cell related functions
+void vh_lhead_evt(view_t* view, ev_t ev);
+void vh_lhead_del(void* p);
 
-view_t* vh_lhead_get_cell(view_t* view, char* id)
+void vh_lhead_add(view_t* view,
+                  int     h,
+                  void (*on_select)(view_t* view, char* id, ev_t ev),
+                  void (*on_insert)(view_t* view, int src, int tgt),
+                  void (*on_resize)(view_t* view, char* id, int width))
 {
-  vh_lhead_t* vh = view->handler_data;
-  return vh_lcell_get(vh->cells, id);
+  vh_lhead_t* vh = mem_calloc(sizeof(vh_lhead_t), "vh_lhead_t", vh_lhead_del, NULL);
+  vh->cells      = VNEW();
+  vh->on_select  = on_select;
+  vh->on_insert  = on_insert;
+  vh->on_resize  = on_resize;
+
+  view->handler_data = vh;
+  view->handler      = vh_lhead_evt;
 }
 
 void vh_lhead_del(void* p)
 {
   vh_lhead_t* list = p;
   REL(list->cells);
+}
+
+void vh_lhead_resize(view_t* view)
+{
+  vh_lhead_t* vh = view->handler_data;
+
+  vh_lcell_t* last   = vec_tail(vh->cells);
+  r2_t        lframe = last->view->frame.local;
+  r2_t        vframe = view->frame.local;
+  vframe.w           = lframe.x + lframe.w;
+
+  view_set_frame(view, vframe);
 }
 
 void vh_lhead_evt(view_t* view, ev_t ev)
@@ -93,6 +116,7 @@ void vh_lhead_evt(view_t* view, ev_t ev)
         f.w    = ev.x - f.x;
         view_set_frame(vh->resized_cell->view, f);
         vh_lcell_arrange(vh->cells);
+        vh_lhead_resize(view);
       }
       else if (vh->dragged_cell)
       {
@@ -135,54 +159,35 @@ void vh_lhead_evt(view_t* view, ev_t ev)
     vh->resized_cell = NULL;
     vh->dragged_flag = 0;
     vh_lcell_arrange(vh->cells);
+    vh_lhead_resize(view);
   }
 }
 
-void vh_lhead_add(view_t* view,
-                  int     h,
-                  void (*on_select)(view_t* view, char* id, ev_t ev),
-                  void (*on_insert)(view_t* view, int src, int tgt),
-                  void (*on_resize)(view_t* view, char* id, int width))
-{
-  vh_lhead_t* vh = mem_calloc(sizeof(vh_lhead_t), "vh_lhead_t", vh_lhead_del, NULL);
-  vh->cells      = VNEW();
-  vh->on_select  = on_select;
-  vh->on_insert  = on_insert;
-  vh->on_resize  = on_resize;
-
-  view->handler_data = vh;
-  view->handler      = vh_lhead_evt;
-}
+// cell handling
 
 void vh_lhead_add_cell(view_t* view, char* id, int size, view_t* cellview)
 {
-  vh_lhead_t* vh = view->handler_data;
+  vh_lhead_t* vh   = view->handler_data;
+  vh_lcell_t* cell = vh_lcell_new(id, size, cellview, vh->cells->length);
 
-  vh_lcell_t* cell = mem_alloc(sizeof(vh_lcell_t), "vh_lcell_t", NULL, NULL);
-  cell->id         = cstr_fromcstring(id);
-  cell->size       = size;
-  cell->view       = cellview;
-  cell->index      = vh->cells->length;
-
-  vh_lcell_t* last = vec_tail(vh->cells);
-  float       x    = last == NULL ? 0 : (last->view->frame.local.x + last->view->frame.local.w + 1);
-
-  // set cell position
-  r2_t frame = cellview->frame.local;
-  frame.x    = x;
-  view_set_frame(cellview, frame);
-
+  // disable touch to enable mouse events
   cellview->needs_touch = 0;
 
+  // add subview
   view_add(view, cellview);
 
   // store cell
   VADD(vh->cells, cell);
 
-  // increase item size
-  r2_t local = view->frame.local;
-  local.w    = cellview->frame.local.x + cellview->frame.local.w;
-  view_set_frame(view, local);
+  // arrange and resize
+  vh_lcell_arrange(vh->cells);
+  vh_lhead_resize(view);
+}
+
+view_t* vh_lhead_get_cell(view_t* view, char* id)
+{
+  vh_lhead_t* vh = view->handler_data;
+  return vh_lcell_get(vh->cells, id);
 }
 
 #endif
