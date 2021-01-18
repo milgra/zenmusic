@@ -421,14 +421,13 @@ void vh_list_refresh(view_t* view)
 
     frame.x = 0;
     frame.y = -frame.h;
-
-    vec_reset(vh->items);
-
-    vh->head_index = 0;
-    vh->tail_index = vh->head_index;
-    vh->item_count = 0;
-    vh->full       = 0;
   }
+
+  vec_reset(vh->items);
+
+  vh->tail_index = vh->head_index;
+  vh->item_count = 0;
+  vh->full       = 0;
 }
 
 void vh_list_add(view_t* view,

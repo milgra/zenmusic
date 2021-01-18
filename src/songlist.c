@@ -9,6 +9,7 @@
 
 void songlist_attach(view_t* base, vec_t* songs, char* fontpath, void (*on_select)(int), void (*on_edit)(int), void (*on_header_select)(char*));
 void songlist_update();
+void songlist_refresh();
 void songlist_toggle_selected(int state);
 
 #endif
@@ -100,15 +101,16 @@ void songlist_attach(view_t* base,
 
   VADD(sl.fields, sl_cell_new("index", 50, 0));
   VADD(sl.fields, sl_cell_new("artist", 300, 1));
-  VADD(sl.fields, sl_cell_new("title", 300, 2));
-  VADD(sl.fields, sl_cell_new("date", 150, 3));
-  VADD(sl.fields, sl_cell_new("genre", 150, 4));
-  VADD(sl.fields, sl_cell_new("track", 150, 5));
-  VADD(sl.fields, sl_cell_new("disc", 150, 6));
-  VADD(sl.fields, sl_cell_new("plays", 150, 7));
-  VADD(sl.fields, sl_cell_new("added", 150, 8));
-  VADD(sl.fields, sl_cell_new("last played", 150, 9));
-  VADD(sl.fields, sl_cell_new("last skipped", 150, 10));
+  VADD(sl.fields, sl_cell_new("album", 200, 2));
+  VADD(sl.fields, sl_cell_new("title", 300, 3));
+  VADD(sl.fields, sl_cell_new("date", 150, 4));
+  VADD(sl.fields, sl_cell_new("genre", 150, 5));
+  VADD(sl.fields, sl_cell_new("track", 150, 6));
+  VADD(sl.fields, sl_cell_new("disc", 150, 7));
+  VADD(sl.fields, sl_cell_new("plays", 150, 8));
+  VADD(sl.fields, sl_cell_new("added", 150, 9));
+  VADD(sl.fields, sl_cell_new("last played", 150, 10));
+  VADD(sl.fields, sl_cell_new("last skipped", 150, 11));
 
   vec_dec_retcount(sl.fields);
 
@@ -135,6 +137,11 @@ void songlist_attach(view_t* base,
 void songlist_update()
 {
   vh_list_reset(sl.view);
+}
+
+void songlist_refresh()
+{
+  vh_list_refresh(sl.view);
 }
 
 void songlist_toggle_selected(int state)

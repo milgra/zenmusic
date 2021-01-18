@@ -45,6 +45,7 @@ void save_db(map_t* entry)
   db_write(libpath, db);
 
   // reload song list
+  songlist_refresh();
 }
 
 void init(int width, int height, char* respath)
