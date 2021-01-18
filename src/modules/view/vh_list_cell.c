@@ -41,7 +41,8 @@ void vh_lcell_arrange(vec_t* cells)
   for (int i = 0; i < cells->length; i++)
   {
     vh_lcell_t* cell = cells->data[i];
-    r2_t        f    = cell->view->frame.local;
+    cell->index      = i;
+    r2_t f           = cell->view->frame.local;
     f.x              = pos;
     pos += f.w + 1;
     view_set_frame(cell->view, f);

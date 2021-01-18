@@ -209,11 +209,9 @@ void on_header_field_resize(view_t* view, char* id, int size)
 
 // items
 
-void songlist_on_item_select(view_t* itemview)
+void songlist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
-  vh_litem_t* vh = itemview->handler_data;
-
-  if (vh->sel_ev.button == 1)
+  if (ev.button == 1)
   {
     // deselect prev item
     view_t* olditem = vh_list_item_for_index(sl.view, sl.index_s);
@@ -226,20 +224,20 @@ void songlist_on_item_select(view_t* itemview)
     }
 
     // indicate list item
-    view_t* newitem = vh_list_item_for_index(sl.view, vh->index);
+    view_t* newitem = vh_list_item_for_index(sl.view, index);
 
-    sl.index_s = vh->index;
+    sl.index_s = index;
 
     if (newitem)
     {
       songitem_update_row(newitem, sl.index_s, sl.songs->data[sl.index_s], sl.color_s);
     }
 
-    if (sl.on_select) (*sl.on_select)(vh->index);
+    if (sl.on_select) (*sl.on_select)(index);
   }
-  else if (vh->sel_ev.button == 3)
+  else if (ev.button == 3)
   {
-    if (sl.on_edit) (*sl.on_edit)(vh->index);
+    if (sl.on_edit) (*sl.on_edit)(index);
   }
 }
 

@@ -11,6 +11,7 @@ typedef struct _vh_text_t
   str_t*      text;
   textstyle_t style;
   char        editing;
+  void*       userdata;
 
   r2_t     crsr_f;
   view_t*  crsr_v;
@@ -24,7 +25,8 @@ typedef struct _vh_text_t
 
 void vh_text_add(view_t*     view,
                  char*       text,
-                 textstyle_t textstyle);
+                 textstyle_t textstyle,
+                 void*       userdata);
 void vh_text_activate(view_t* view, char state);
 void vh_text_set_on_text(view_t* view, void (*event)(view_t*));
 void vh_text_set_on_activate(view_t* view, void (*event)(view_t*));
@@ -151,7 +153,8 @@ void vh_text_evt(view_t* view, ev_t ev)
 
 void vh_text_add(view_t*     view,
                  char*       text,
-                 textstyle_t textstyle)
+                 textstyle_t textstyle,
+                 void*       userdata)
 {
   printf("vh_text_add %s\n", view->id);
 
@@ -159,6 +162,7 @@ void vh_text_add(view_t*     view,
   data->text      = str_new();
   data->style     = textstyle;
   data->crsr_i    = 0; // cursor index
+  data->userdata  = userdata;
 
   str_addbytearray(data->text, text);
 

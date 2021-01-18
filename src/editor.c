@@ -25,85 +25,77 @@ struct _editor_t
   int         ind;
   map_t*      song;
   vec_t*      fields;
-
-  view_t* sel_item;
-  char*   sel_cell;
-  char*   sel_key;
+  view_t*     sel_item;
 } editor = {0};
 
-void editor_value_changed(view_t* view)
+void editor_input_cell_value_changed(view_t* inputview)
 {
-  printf("editor_value_changed\n");
+  vh_text_t* data = inputview->handler_data;
 
-  vh_text_t* data = view->handler_data;
-
+  char* key  = data->userdata;
   char* text = str_cstring(data->text);
-  MPUT(editor.song, editor.sel_key, text);
+
+  printf("editor_input_cell_value_changed key %s text %s\n", key, text);
+
+  MPUT(editor.song, key, text);
 }
 
-void editor_edit_finished(view_t* view)
+void editor_input_cell_edit_finished(view_t* inputview)
 {
-  printf("editor_value_finished\n");
+  vh_text_t* data = inputview->handler_data;
 
-  // lock scrolling
-  vh_list_lock_scroll(editor.view, 0);
+  char* key  = data->userdata;
+  char* text = str_cstring(data->text);
+
+  printf("editor_input_cell_edit_finished key %s text %s\n", key, text);
 
   // remove text view handler
 
-  view_t* valcell = view_new(cstr_fromformat("%s%s", editor.sel_item->id, "val", NULL), view->frame.local);
-  tg_text_add(valcell);
+  view_t* textcell = view_new(cstr_fromformat("%s%s", editor.sel_item->id, "val", NULL), inputview->frame.local);
+  tg_text_add(textcell);
+  tg_text_set(textcell, text, editor.textstyle);
+  textcell->blocks_touch = 0;
 
-  char* value = MGET(editor.song, editor.sel_key);
+  // TODO check if previous cell gets released
+  vh_litem_rpl_cell(editor.sel_item, key, textcell);
 
-  tg_text_set(valcell, value, editor.textstyle);
+  printf("text cell created id %s\n", textcell->id);
+  printf("replacing intpu cell with text cell\n");
 
-  valcell->blocks_touch = 0;
-
-  vh_litem_rpl_cell(editor.sel_item, editor.sel_cell, valcell);
+  // unlock scrolling
+  vh_list_lock_scroll(editor.view, 0);
 }
 
-void editor_select(view_t* itemview)
+void editor_select_item(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
-  printf("select\n");
-  vh_litem_t* vh = itemview->handler_data;
+  printf("editor_select_item %s index %i cell id %s\n", itemview->id, index, cell->id);
 
-  if (vh->sel_cell && strcmp(vh->sel_cell->id, "val") == 0)
+  // only value cells are editable
+  if (strcmp(cell->id, "val") == 0)
   {
-    char* key   = editor.fields->data[vh->index];
+    char* key   = editor.fields->data[index];
     char* value = MGET(editor.song, key);
 
-    editor.sel_item = itemview;
-    editor.sel_cell = vh->sel_cell->id;
-    editor.sel_key  = key;
+    printf("key for item %s value %s\n", key, value);
 
-    printf("select %i %s\n", vh->index, key);
+    uint32_t color1 = (index % 2 == 0) ? 0xFEFEFEFF : 0xEFEFEFFF;
 
-    view_t* valcell = view_new(cstr_fromformat("%s%s%s", itemview->id, key, "edit", NULL), vh->sel_cell->view->frame.local);
-
-    printf("valcell id %s sel cell id %s\n", valcell->id, vh->sel_cell->view->id);
-
-    uint32_t color1            = (vh->index % 2 == 0) ? 0xFEFEFEFF : 0xEFEFEFFF;
     editor.textstyle.backcolor = color1;
+    editor.sel_item            = itemview;
 
-    vh_text_add(valcell, value, editor.textstyle);
+    view_t* inputcell = view_new(cstr_fromformat("%s%s%s", itemview->id, key, "edit", NULL), cell->view->frame.local);
+    vh_text_add(inputcell, value, editor.textstyle, key);                  // add text handler with key as userdata
+    vh_text_set_on_text(inputcell, editor_input_cell_value_changed);       // listen for text change
+    vh_text_set_on_deactivate(inputcell, editor_input_cell_edit_finished); // listen for text editing finish
+    vh_text_activate(inputcell, 1);                                        // activate text input
+    ui_manager_activate(inputcell);                                        // set text input as event receiver
+    vh_list_lock_scroll(editor.view, 1);                                   // lock scrolling of list to avoid going out screen
+    vh_litem_rpl_cell(itemview, cell->id, inputcell);                      // replacing simple text cell with input cell
 
-    vh_text_set_on_text(valcell, editor_value_changed);
-    vh_text_set_on_deactivate(valcell, editor_edit_finished);
+    // TODO check if previous cell gets released
 
-    // activate text input
-    vh_text_activate(valcell, 1);
-
-    // set text input as event receiver
-    ui_manager_activate(valcell);
-
-    // lock scrolling
-    vh_list_lock_scroll(editor.view, 1);
-
-    // swap text cell to input cell
-
-    printf("replace cell\n");
-
-    vh_litem_rpl_cell(itemview, vh->sel_cell->id, valcell);
+    printf("input cell created id %s\n", inputcell->id);
+    printf("replacing text cell with input cell %s\n", cell->id);
   }
 }
 
@@ -115,7 +107,7 @@ view_t* editor_create_item(view_t* listview, void* userdata)
   view_t* rowview  = view_new(idbuffer, (r2_t){0, 0, 0, 35});
   rowview->display = 0;
   vh_litem_add(rowview, NULL);
-  vh_litem_set_on_select(rowview, editor_select);
+  vh_litem_set_on_select(rowview, editor_select_item);
 
   // first cell is a simple text cell
   view_t* keycell = view_new(cstr_fromformat("%s%s", rowview->id, "key", NULL), (r2_t){0, 0, 200, 35});

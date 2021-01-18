@@ -14,14 +14,12 @@ typedef struct _vh_litem_t
   vec_t*  cells;
   void*   userdata;
 
-  vh_lcell_t* sel_cell;
-  ev_t        sel_ev;
-  void (*on_select)(view_t* view);
+  void (*on_select)(view_t* view, int index, vh_lcell_t* cell, ev_t ev);
 } vh_litem_t;
 
 void vh_litem_add(view_t* view, void* userdata);
 void vh_litem_upd_index(view_t* view, int index);
-void vh_litem_set_on_select(view_t* view, void (*on_select)(view_t*));
+void vh_litem_set_on_select(view_t* view, void (*on_select)(view_t*, int index, vh_lcell_t* cell, ev_t ev));
 
 void    vh_litem_add_cell(view_t* view, char* id, int size, view_t* cellview);
 view_t* vh_litem_get_cell(view_t* view, char* id);
@@ -61,7 +59,7 @@ void vh_litem_upd_index(view_t* view, int index)
   vh->index      = index;
 }
 
-void vh_litem_set_on_select(view_t* view, void (*on_select)(view_t*))
+void vh_litem_set_on_select(view_t* view, void (*on_select)(view_t*, int index, vh_lcell_t* cell, ev_t ev))
 {
   vh_litem_t* vh = view->handler_data;
   vh->on_select  = on_select;
@@ -72,8 +70,6 @@ void vh_litem_evt(view_t* view, ev_t ev)
   if (ev.type == EV_MDOWN)
   {
     vh_litem_t* vh = view->handler_data;
-    vh->sel_cell   = NULL;
-    vh->sel_ev     = ev;
 
     // get selected cell
     for (int index = 0; index < vh->cells->length; index++)
@@ -81,12 +77,10 @@ void vh_litem_evt(view_t* view, ev_t ev)
       vh_lcell_t* cell = vh->cells->data[index];
       if (ev.x > cell->view->frame.global.x && ev.x < cell->view->frame.global.x + cell->view->frame.global.w)
       {
-        vh->sel_cell = cell;
+        (*vh->on_select)(view, vh->index, cell, ev);
         break;
       }
     }
-
-    (*vh->on_select)(view);
   }
 }
 
@@ -141,7 +135,6 @@ void vh_litem_rpl_cell(view_t* view, char* id, view_t* newcell)
     vh_lcell_t* cell = vh->cells->data[index];
     if (strcmp(cell->id, id) == 0)
     {
-      printf("replacing cell view for %s\n", cell->id);
       view_add(view, newcell);
       view_remove(view, cell->view);
 
