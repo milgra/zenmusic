@@ -116,7 +116,10 @@ void songlist_attach(view_t* base,
 
   view_t* header = view_get_subview(base, "songlistheader");
 
-  vh_lhead_add(header, 30, on_header_field_select, on_header_field_insert, on_header_field_resize);
+  vh_lhead_add(header);
+  vh_lhead_set_on_select(header, on_header_field_select);
+  vh_lhead_set_on_insert(header, on_header_field_insert);
+  vh_lhead_set_on_resize(header, on_header_field_resize);
 
   sl_cell_t* cell;
   while ((cell = VNXT(sl.fields)))
@@ -250,7 +253,8 @@ view_t* songitem_create(view_t* listview, void* data)
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
   rowview->hidden = 1;
 
-  vh_litem_add(rowview, NULL, songlist_on_item_select);
+  vh_litem_add(rowview, NULL);
+  vh_litem_set_on_select(rowview, songlist_on_item_select);
 
   sl_cell_t* cell;
   while ((cell = VNXT(sl.fields)))

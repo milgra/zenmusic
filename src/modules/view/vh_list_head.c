@@ -26,7 +26,12 @@ typedef struct _vh_lhead_t
   void (*on_resize)(view_t* view, char* id, int width);
 } vh_lhead_t;
 
-void    vh_lhead_add(view_t* view, int h, void (*on_select)(view_t* view, char* id, ev_t ev), void (*on_insert)(view_t* view, int src, int tgt), void (*on_resize)(view_t* view, char* id, int width));
+void vh_lhead_add(view_t* view);
+
+void vh_lhead_set_on_select(view_t* view, void (*on_select)(view_t*, char*, ev_t));
+void vh_lhead_set_on_insert(view_t* view, void (*on_insert)(view_t*, int, int));
+void vh_lhead_set_on_resize(view_t* view, void (*on_resize)(view_t*, char*, int));
+
 view_t* vh_lhead_get_cell(view_t* view, char* id);
 void    vh_lhead_add_cell(view_t* view, char* id, int size, view_t* cellview);
 void    vh_lhead_rem_cell(char* id);
@@ -40,18 +45,12 @@ void    vh_lhead_swp_cell(char* ida, char* idb);
 
 void vh_lhead_evt(view_t* view, ev_t ev);
 void vh_lhead_del(void* p);
+void vh_lhead_resize(view_t* view);
 
-void vh_lhead_add(view_t* view,
-                  int     h,
-                  void (*on_select)(view_t* view, char* id, ev_t ev),
-                  void (*on_insert)(view_t* view, int src, int tgt),
-                  void (*on_resize)(view_t* view, char* id, int width))
+void vh_lhead_add(view_t* view)
 {
   vh_lhead_t* vh = mem_calloc(sizeof(vh_lhead_t), "vh_lhead_t", vh_lhead_del, NULL);
   vh->cells      = VNEW();
-  vh->on_select  = on_select;
-  vh->on_insert  = on_insert;
-  vh->on_resize  = on_resize;
 
   view->handler_data = vh;
   view->handler      = vh_lhead_evt;
@@ -63,16 +62,22 @@ void vh_lhead_del(void* p)
   REL(list->cells);
 }
 
-void vh_lhead_resize(view_t* view)
+void vh_lhead_set_on_select(view_t* view, void (*on_select)(view_t*, char*, ev_t))
 {
   vh_lhead_t* vh = view->handler_data;
+  vh->on_select  = on_select;
+}
 
-  vh_lcell_t* last   = vec_tail(vh->cells);
-  r2_t        lframe = last->view->frame.local;
-  r2_t        vframe = view->frame.local;
-  vframe.w           = lframe.x + lframe.w;
+void vh_lhead_set_on_insert(view_t* view, void (*on_insert)(view_t*, int, int))
+{
+  vh_lhead_t* vh = view->handler_data;
+  vh->on_insert  = on_insert;
+}
 
-  view_set_frame(view, vframe);
+void vh_lhead_set_on_resize(view_t* view, void (*on_resize)(view_t*, char*, int))
+{
+  vh_lhead_t* vh = view->handler_data;
+  vh->on_resize  = on_resize;
 }
 
 void vh_lhead_evt(view_t* view, ev_t ev)
@@ -161,6 +166,18 @@ void vh_lhead_evt(view_t* view, ev_t ev)
     vh_lcell_arrange(vh->cells);
     vh_lhead_resize(view);
   }
+}
+
+void vh_lhead_resize(view_t* view)
+{
+  vh_lhead_t* vh = view->handler_data;
+
+  vh_lcell_t* last   = vec_tail(vh->cells);
+  r2_t        lframe = last->view->frame.local;
+  r2_t        vframe = view->frame.local;
+  vframe.w           = lframe.x + lframe.w;
+
+  view_set_frame(view, vframe);
 }
 
 // cell handling

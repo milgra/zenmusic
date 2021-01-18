@@ -19,8 +19,9 @@ typedef struct _vh_litem_t
   void (*on_select)(view_t* view);
 } vh_litem_t;
 
-void vh_litem_add(view_t* view, void* userdata, void (*on_select)(view_t* view));
+void vh_litem_add(view_t* view, void* userdata);
 void vh_litem_upd_index(view_t* view, int index);
+void vh_litem_set_on_select(view_t* view, void (*on_select)(view_t*));
 
 void    vh_litem_add_cell(view_t* view, char* id, int size, view_t* cellview);
 view_t* vh_litem_get_cell(view_t* view, char* id);
@@ -38,12 +39,11 @@ void    vh_litem_upd_cell_size(view_t* view, char* id, int size);
 void vh_litem_evt(view_t* view, ev_t ev);
 void vh_litem_del(void* p);
 
-void vh_litem_add(view_t* view, void* userdata, void (*on_select)(view_t* view))
+void vh_litem_add(view_t* view, void* userdata)
 {
   vh_litem_t* vh = mem_calloc(sizeof(vh_litem_t), "vh_litem_t", vh_litem_del, NULL);
   vh->cells      = VNEW();
   vh->userdata   = userdata;
-  vh->on_select  = on_select;
 
   view->handler_data = vh;
   view->handler      = vh_litem_evt;
@@ -55,22 +55,16 @@ void vh_litem_del(void* p)
   REL(list->cells);
 }
 
-void vh_litem_resize(view_t* view)
-{
-  vh_litem_t* vh = view->handler_data;
-
-  vh_lcell_t* last   = vec_tail(vh->cells);
-  r2_t        lframe = last->view->frame.local;
-  r2_t        vframe = view->frame.local;
-  vframe.w           = lframe.x + lframe.w;
-
-  view_set_frame(view, vframe);
-}
-
 void vh_litem_upd_index(view_t* view, int index)
 {
   vh_litem_t* vh = view->handler_data;
   vh->index      = index;
+}
+
+void vh_litem_set_on_select(view_t* view, void (*on_select)(view_t*))
+{
+  vh_litem_t* vh = view->handler_data;
+  vh->on_select  = on_select;
 }
 
 void vh_litem_evt(view_t* view, ev_t ev)
@@ -94,6 +88,18 @@ void vh_litem_evt(view_t* view, ev_t ev)
 
     (*vh->on_select)(view);
   }
+}
+
+void vh_litem_resize(view_t* view)
+{
+  vh_litem_t* vh = view->handler_data;
+
+  vh_lcell_t* last   = vec_tail(vh->cells);
+  r2_t        lframe = last->view->frame.local;
+  r2_t        vframe = view->frame.local;
+  vframe.w           = lframe.x + lframe.w;
+
+  view_set_frame(view, vframe);
 }
 
 // cell handling

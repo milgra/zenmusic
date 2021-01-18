@@ -114,7 +114,8 @@ view_t* editor_create_item(view_t* listview, void* userdata)
 
   view_t* rowview  = view_new(idbuffer, (r2_t){0, 0, 0, 35});
   rowview->display = 0;
-  vh_litem_add(rowview, NULL, editor_select);
+  vh_litem_add(rowview, NULL);
+  vh_litem_set_on_select(rowview, editor_select);
 
   // first cell is a simple text cell
   view_t* keycell = view_new(cstr_fromformat("%s%s", rowview->id, "key", NULL), (r2_t){0, 0, 200, 35});
