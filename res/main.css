@@ -408,26 +408,37 @@
 }
 
 #ideditorback {
-    width: 500px;
-    height: 500px;
+    width: 680px;
+    height: 520px;
     top: 300px;
     margin: auto;
     border-radius: 19px;
+    background-color: #EFEFEFFF;
+    box-shadow: 3px;
+}
+
+#editorlistback {
+    width: 500px;
+    height: 502px;
+    top: 10px;
+    left: 10px;
+    border-radius: 15px;
     background-color: #FFFFFFFF;
     box-shadow: 3px;
 }
 
-#ideditor {
+#editorlist {
     display: mask;
     width: 100%;
     height: 100%;
-    border-radius: 17px;
+    border-radius: 15px;
     background-color: #FFFFFFFF;
     box-shadow: 2px;
 }
 
 #coverview {
-    left: -160px;
+    top: 10px;
+    right: 10px;
     width: 150px;
     height: 150px;
     border-radius: 15px;
@@ -436,11 +447,11 @@
 }
 
 #uploadbtnbck {
-    top: 160px;
-    left: -160px;
+    top: 170px;
+    right: 10px;
     width: 150px;
     height: 30px;
-    background-color: #EFEFEFFF;
+    background-color: #FFFFFFFF;
     border-radius: 10px;
     box-shadow: 3px;
 }
@@ -451,11 +462,11 @@
 }
 
 #closeeditorbtn {
-    background-color: #EE0000FF;
+    background-color: #FFFFFFFF;
     width: 30px;
     height: 30px;
-    left: 5px;
-    bottom: 5px;
+    left: -10px;
+    top: -10px;
     border-radius: 17px;
     box-shadow: 3px;
 }
@@ -467,11 +478,11 @@
 }
 
 #accepteditorbtn {
-    background-color: #00EE00FF;
+    background-color: #FFFFFFFF;
     width: 30px;
     height: 30px;
-    right: 5px;
-    bottom: 5px;
+    right: 10px;
+    bottom: 10px;
     border-radius: 17px;
     box-shadow: 3px;
 }
@@ -479,7 +490,7 @@
 #accepteditoricon {
     width: 30px;
     height: 30px;
-    background-image: url("donate.png");
+    background-image: url("accept.png");
 }
 
 #settingsback {

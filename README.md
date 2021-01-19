@@ -37,9 +37,11 @@ freebsd for os
 
 first version
 
-working save, file move, db update, list refresh, meta update in file, album update in file
-id editor, album url, album preview
-filter popup search barra jojjon fol, messages displayre kattinrva, osszes gombot felvinni a helyukre
+config file - default library
+library selector popup
+close icons to all popups
+wire in logs, info sorban 2 secig event mutatodjon
+settings view - select library, organize library, color selector
 title/aritst/info egy textfield legyen, ugy konnyebb shadow is, time bar passed/remaining
 fix query field
 make genre/artist selection filter songs, fill up query bar
@@ -47,18 +49,13 @@ increase play count
 fix leaks
 elso indulasnal analyzer progresst mutassa valahol amig zenet hallgatsz
 scrollbar drag
-config file - default library
 save small changes to a delta database, add it to the big one at startup
-zenmusic /usr/milgra/Testmusic - select lib folder
-refresh database gomb legyen az egyik, settings, about a masik ketto
 amit releaselni kell, csinalodjon new-val!
-get extension from stream for organizing
 relative paths in library
 track number in song name for organizing
 test texture resize and reset, texture overflow and reset
 add text/input selectors to css, use text style from css
 search/filter bar - genre is metal, name contains x, year between x and y
-uj event villanjon fel artist helyen, odakattintva event viewer, 
 spectrum, bar analyzer, left/right effect button, unshift bmp?
 speed up font rendering by using glyph indexes instead of codepoints
 ui color shade selector, darknal invertalja a jelenlegi semat
@@ -67,7 +64,6 @@ unit teszter gl_compositorhoz
 grid-based warping of video/album cover based on frequence ( bass in the center )
 andromeda:  monolith-like particle visu
 swithc between multiple glyph views in paragraph/one multiglyph view in paragraph  
-debug button - show texmap in settings
 kijelzon shadow
 time onclick = remaining time
 

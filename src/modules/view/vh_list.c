@@ -445,16 +445,16 @@ void vh_list_add(view_t* view,
   char* vid = cstr_fromformat("%s%s", view->id, "vscr", NULL);
   char* hid = cstr_fromformat("%s%s", view->id, "hscr", NULL);
 
-  view_t* vscr = view_new(vid, (r2_t){view->frame.local.w - 15, 0, 15, view->frame.local.h});
-  view_t* hscr = view_new(hid, (r2_t){0, view->frame.local.h - 15, view->frame.local.w, 15});
+  view_t* vscr = view_new(vid, (r2_t){view->frame.local.w - 18, 0, 15, view->frame.local.h});
+  view_t* hscr = view_new(hid, (r2_t){0, view->frame.local.h - 18, view->frame.local.w, 15});
 
   REL(vid);
   REL(hid);
 
   vscr->layout.h_per  = 1.0;
-  vscr->layout.right  = 1;
+  vscr->layout.right  = 3;
   hscr->layout.w_per  = 1.0;
-  hscr->layout.bottom = 1;
+  hscr->layout.bottom = 3;
 
   vscr->layout.background_color = 0x00000001;
   hscr->layout.background_color = 0x00000001;

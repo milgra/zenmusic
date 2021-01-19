@@ -533,7 +533,7 @@ void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genr
   view_remove(main, aboutview);
 
   editorview     = view_get_subview(baseview, "ideditorback");
-  view_t* editor = view_get_subview(baseview, "ideditor");
+  view_t* editor = view_get_subview(baseview, "editorlist");
 
   view_remove(main, editorview);
 
