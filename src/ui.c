@@ -90,7 +90,6 @@ void ui_on_filter_activate(view_t* view)
 
 void ui_on_messagebtn_down(view_t* view, void* data)
 {
-  printf("on messagebtn\n");
   if (messagelistback->parent)
     view_remove(mainview, messagelistback);
   else
@@ -146,6 +145,9 @@ void ui_on_editor_accept(view_t* view, void* data)
 
   // notify main namespace to organize and save metadata and database
   (*ui.save_entry)(old_data);
+
+  // reload song list
+  songlist_refresh();
 }
 
 void ui_on_prev_button_down(view_t* view, void* data)

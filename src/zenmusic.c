@@ -37,15 +37,13 @@ void filter(view_t* view, char* text)
 void save_db(map_t* entry)
 {
   // update metadata in file
+  player_set_metadata(entry, "king.jpg");
 
   // move song to new place if needed
   lib_organize_entry(libpath, db, entry);
 
   // save database
   db_write(libpath, db);
-
-  // reload song list
-  songlist_refresh();
 }
 
 void init(int width, int height, char* respath)

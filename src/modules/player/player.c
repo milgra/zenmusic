@@ -28,6 +28,7 @@ void player_refresh();
 
 bm_t* player_get_album(const char* path);
 void  player_get_metadata(const char* path, map_t* map);
+int   player_set_metadata(map_t* data, char* img_path);
 
 #endif
 
@@ -38,6 +39,7 @@ void  player_get_metadata(const char* path, map_t* map);
 #include "libavutil/imgutils.h"
 #include "mtcstring.c"
 #include "mtgraphics.c"
+#include "mtlog.c"
 #include "render.c"
 #include "strcomm.c"
 #include "stream.c"
@@ -205,6 +207,190 @@ void player_get_metadata(const char* path, map_t* map)
     MPUT(map, tag->key, value);
     REL(value);
   }
+}
+
+int player_set_metadata(map_t* data, char* img_path)
+{
+  char* path = MGET(data, "path");
+
+  if (path)
+  {
+    LOG("player_set_metadata for %s\n", path);
+
+    // open cover art first
+
+    int res;
+
+    AVPacket*          img_pkt      = NULL;
+    AVFormatContext*   img_ctx      = NULL;
+    AVCodecParameters* img_codecpar = NULL;
+
+    if (img_path)
+    {
+      LOG("player_set_metadata opening image file %s\n", img_path);
+
+      img_ctx = avformat_alloc_context();
+      res     = avformat_open_input(&img_ctx, img_path, 0, 0);
+
+      if (res >= 0)
+      {
+        res = avformat_find_stream_info(img_ctx, 0);
+
+        if (res >= 0)
+        {
+
+          img_pkt       = av_packet_alloc();
+          img_pkt->data = NULL;
+          img_pkt->size = 0;
+          av_init_packet(img_pkt);
+
+          while (av_read_frame(img_ctx, img_pkt) == 0)
+          {
+            if (img_ctx->streams[img_pkt->stream_index]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
+            {
+              img_codecpar = img_ctx->streams[img_pkt->stream_index]->codecpar;
+              break;
+            }
+          }
+        }
+        else
+          LOG("ERROR player_set_metadata cannot find stream info : %s\n", img_path);
+      }
+      else
+        LOG("ERROR player_set_metadata cannot open image file : %s\n", img_path);
+    }
+
+    // open source file
+
+    AVFormatContext* src_ctx = avformat_alloc_context();
+
+    res = avformat_open_input(&src_ctx, path, 0, 0);
+
+    if (res >= 0)
+    {
+      res = avformat_find_stream_info(src_ctx, 0);
+
+      if (res >= 0)
+      {
+        AVFormatContext* out_ctx;
+        AVOutputFormat*  out_fmt = av_guess_format("mp3", "./result.mp3", NULL);
+
+        res = avformat_alloc_output_context2(&out_ctx, out_fmt, "mp3", "./result.mp3");
+
+        if (res >= 0)
+        {
+          // creating streams present in input file except cover art
+
+          for (unsigned i = 0; i < src_ctx->nb_streams; i++)
+          {
+            if ((src_ctx->streams[i]->disposition & AV_DISPOSITION_ATTACHED_PIC) == 0)
+            {
+              const AVCodec* codec = avcodec_find_encoder(src_ctx->streams[i]->codecpar->codec_id);
+              if (codec)
+              {
+                AVStream* ostream = avformat_new_stream(out_ctx, codec);
+                avcodec_parameters_copy(ostream->codecpar, src_ctx->streams[i]->codecpar);
+                ostream->codecpar->codec_tag = 0;
+              }
+            }
+          }
+
+          // create cover art image stream
+
+          if (img_codecpar)
+          {
+            AVCodec* codec = avcodec_find_encoder(img_codecpar->codec_id);
+            if (codec)
+            {
+              AVStream* ostream = avformat_new_stream(out_ctx, codec);
+              avcodec_parameters_copy(ostream->codecpar, img_codecpar);
+              ostream->codecpar->codec_tag = 0;
+              ostream->disposition |= AV_DISPOSITION_ATTACHED_PIC;
+            }
+          }
+
+          // copy metadata in old file to new file
+
+          av_dict_copy(&out_ctx->metadata, src_ctx->metadata, 0);
+
+          // update with new entries from data map
+
+          av_dict_set(&out_ctx->metadata, "title", "testtest", 0);
+
+          if (!(out_ctx->oformat->flags & AVFMT_NOFILE))
+          {
+            avio_open(&out_ctx->pb, "./result.mp3", AVIO_FLAG_WRITE);
+
+            res = avformat_init_output(out_ctx, NULL);
+
+            if (res >= 0)
+            {
+
+              res = avformat_write_header(out_ctx, NULL);
+
+              if (res >= 0)
+              {
+                AVPacket* src_pkt = av_packet_alloc();
+                av_init_packet(src_pkt);
+                src_pkt->data = NULL;
+                src_pkt->size = 0;
+
+                // copy all packets from old file to new file with the exception of cover art image
+
+                while (av_read_frame(src_ctx, src_pkt) == 0)
+                {
+                  if ((src_ctx->streams[src_pkt->stream_index]->disposition & AV_DISPOSITION_ATTACHED_PIC) == 0)
+                  {
+                    src_pkt->stream_index = 0;
+                    av_write_frame(out_ctx, src_pkt);
+                  }
+                }
+
+                // if no cover art is added during saving, add a new stream
+
+                if (img_codecpar)
+                {
+                  img_pkt->stream_index = 1;
+
+                  res = av_write_frame(out_ctx, img_pkt);
+                  if (res < 0)
+                    LOG("ERROR : player_set_metadata : cannot write cover art image packet\n");
+
+                  // cleanup
+                  av_packet_free(&img_pkt);
+                  avformat_close_input(&img_ctx);
+                  avformat_free_context(img_ctx);
+                }
+
+                av_packet_free(&src_pkt);
+                av_write_trailer(out_ctx);
+
+                avformat_close_input(&src_ctx);
+                avformat_free_context(out_ctx);
+                avformat_free_context(src_ctx);
+              }
+              else
+                LOG("ERROR : player_set_metadata : cannot write header\n");
+            }
+            else
+              LOG("ERROR : player_set_metadata : cannot init output\n");
+          }
+          else
+            LOG("ERROR : player_set_metadata : avformat needs no file\n");
+        }
+        else
+          LOG("ERROR : player_set_metadata : cannot allocate output context\n");
+      }
+      else
+        LOG("ERROR : player_set_metadata : cannot find stream info\n");
+    }
+    else
+      LOG("ERROR : player_set_metadata : cannot open input file\n");
+  }
+  else
+    LOG("ERROR : player_set_metadata : no path present in entry map\n");
+
+  return 0;
 }
 
 bm_t* player_get_album(const char* path)

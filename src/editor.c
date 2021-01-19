@@ -154,7 +154,6 @@ int editor_update_item(view_t* listview, void* userdata, view_t* item, int index
 void editor_set_song(map_t* map)
 {
   printf("editor set song\n");
-  mem_describe(map, 0);
 
   // reset temporary fields containers
   map_reset(editor.temp);
