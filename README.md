@@ -37,7 +37,7 @@ freebsd for os
 
 first version
 
-config file - default library
+kvlist - config file - default library
 library selector popup
 close icons to all popups
 wire in logs, info sorban 2 secig event mutatodjon
@@ -104,4 +104,26 @@ sort on header cell select
 
 // songlist - query field
 
-sort on query 
+sort on query
+
+
+---
+
+intro video
+
+Hi, My name is Milan, I\m proiud to present the first version of Zen Music player and manager.
+So why did I create another music player?
+I wanted the smoothness, beauty and simlicity of macos itunes on unix-like systems and I also wanted always-on freqeuncy and scope analyzers like in tracker module players from the 80's-90's.
+So Zen Media is capable of
+- retro-minimalistic design optimized for touchpad scrolling 
+- 60 fps smooth scrolling of your library
+- knob-based volume and seek bar instead of the outdated slider bars
+- sub-pixel antialiased glyph rendering & glyph animation
+- frequency/scope analyzer
+- auto-organizing your lib if wanted
+- total transparency with the activity window and human readable database format
+
+tech video
+
+two big parts : ui - glyph, text, view handling, rendering and compositing
+media transcoding : media file decoding, playing, metadata and cover art encoding
