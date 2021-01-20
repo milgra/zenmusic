@@ -13,6 +13,7 @@
 void ui_manager_init(int width, int height);
 void ui_manager_event(ev_t event);
 void ui_manager_add(view_t* view);
+void ui_manager_remove(view_t* view);
 void ui_manager_render(uint32_t time);
 void ui_manager_activate(view_t* view);
 
@@ -143,6 +144,11 @@ void ui_manager_event(ev_t ev)
 void ui_manager_add(view_t* view)
 {
   view_add(uim.root, view);
+}
+
+void ui_manager_remove(view_t* view)
+{
+  view_remove(uim.root, view);
 }
 
 void ui_manager_activate(view_t* view)

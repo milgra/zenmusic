@@ -66,6 +66,7 @@ andromeda:  monolith-like particle visu
 swithc between multiple glyph views in paragraph/one multiglyph view in paragraph  
 kijelzon shadow
 time onclick = remaining time
+socketes taviranyitas - 1 byteokkal
 
 ideas
 
@@ -127,3 +128,9 @@ tech video
 
 two big parts : ui - glyph, text, view handling, rendering and compositing
 media transcoding : media file decoding, playing, metadata and cover art encoding
+
+ui -
+gl-connector layer - the higher layers sending triangles to it with texture ids, renders these triangles with textures
+ui_compositor - collects view rectangles, puts view textures into texture maps, sends textures and vertexes to gl_connector layer
+ui_generator - collects views, sets up texture channels, renders view bitmaps in background thread
+ui_manager - it has the root view for the ui, resends views to generator when add/remove happened

@@ -57,6 +57,10 @@ view_t* mainview;
 view_t* messagelistback;
 view_t* filterlistback;
 
+view_t* libpopuppage;
+view_t* libtextfield;
+view_t* libinputfield;
+
 size_t lastindex = 0;
 char*  fontpath;
 
@@ -340,6 +344,18 @@ void ui_update_time(double time)
   tg_text_set(secondview, timebuff, ts);
 }
 
+void ui_show_libpath_popup()
+{
+  ui_manager_remove(baseview);
+  ui_manager_add(libpopuppage);
+}
+
+void ui_on_accept_libpath(view_t* view, void* data)
+{
+  ui_manager_remove(libpopuppage);
+  ui_manager_add(baseview);
+}
+
 void ui_filter(view_t* view)
 {
 }
@@ -538,6 +554,25 @@ void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genr
   view_remove(main, editorview);
 
   editor_attach(editor, fontpath);
+
+  // lib input popup
+
+  libpopuppage  = view_get_subview(baseview, "libpopuppage");
+  libtextfield  = view_get_subview(baseview, "libtextfield");
+  libinputfield = view_get_subview(baseview, "libinputfield");
+
+  ts.backcolor = 0;
+
+  tg_text_add(libtextfield);
+  tg_text_set(libtextfield, "Please enter the location of your music library folder", ts);
+
+  vh_text_add(libinputfield, "~/Music", ts, NULL);
+  //vh_text_set_on_text(filterbar, ui_filter);
+
+  view_t* acceptlibbtn = view_get_subview(baseview, "acceptlibicon");
+  vh_button_add(acceptlibbtn, NULL, ui_on_accept_libpath);
+
+  view_remove(baseview, libpopuppage);
 
   // additional setup
   // TODO control these from CSS

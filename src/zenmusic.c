@@ -13,11 +13,12 @@
 #include <stdlib.h>
 #include <time.h>
 
-char*  libpath  = "/home/milgra/Music";
 double lasttime = 0.0;
+char*  libpath  = NULL;
 
 ch_t*  ch;
 map_t* db;
+map_t* cfg;
 vec_t* songs;
 vec_t* genres;
 vec_t* artists;
@@ -50,8 +51,9 @@ void init(int width, int height, char* respath)
 {
   srand((unsigned int)time(NULL));
 
-  db = MNEW();      // database
-  ch = ch_new(100); // comm channel for library entries
+  db  = MNEW();      // database
+  ch  = ch_new(100); // comm channel for library entries
+  cfg = MNEW();      // config map
 
   songs   = VNEW();
   genres  = VNEW();
@@ -63,16 +65,26 @@ void init(int width, int height, char* respath)
           songs,
           genres,
           artists,
-          save_db); // init ui
+          save_db);
 
-  config_init(); // init config
+  config_read(cfg);
 
-  db_read(libpath, db);                   // read db
-  lib_read(libpath);                      // read library
-  lib_remove_duplicates(db);              // remove existing
-  if (lib_entries() > 0) lib_analyze(ch); // start analyzing new entries
+  libpath = MGET(cfg, "library_path");
 
-  sort("artist");
+  if (!libpath)
+  {
+    // show library input popup
+    ui_show_libpath_popup();
+  }
+  else
+  {
+    db_read(libpath, db);                   // read db
+    lib_read(libpath);                      // read library
+    lib_remove_duplicates(db);              // remove existing
+    if (lib_entries() > 0) lib_analyze(ch); // start analyzing new entries
+
+    sort("artist");
+  }
 }
 
 void update(ev_t ev)

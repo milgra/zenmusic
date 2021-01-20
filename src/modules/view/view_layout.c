@@ -125,19 +125,19 @@ void view_layout(view_t* view)
     }
     if (v->layout.top < INT_MAX)
     {
-      frame.y = v->layout.top - 1;
+      frame.y = v->layout.top;
     }
     if (v->layout.left < INT_MAX)
     {
-      frame.x = v->layout.left - 1;
+      frame.x = v->layout.left;
     }
     if (v->layout.right < INT_MAX)
     {
-      frame.x = view->frame.local.w - frame.w - v->layout.right + 1;
+      frame.x = view->frame.local.w - frame.w - v->layout.right;
     }
     if (v->layout.bottom < INT_MAX)
     {
-      frame.y = view->frame.local.h - frame.h - v->layout.bottom + 1;
+      frame.y = view->frame.local.h - frame.h - v->layout.bottom;
     }
     view_set_frame(v, frame);
   }
