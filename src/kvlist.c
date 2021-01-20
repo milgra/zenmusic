@@ -15,7 +15,7 @@ int kvlist_write(char* libpath, map_t* db);
 
 int kvlist_read(char* libpath, map_t* db, char* keyfield)
 {
-  printf("kvlist read libpath %s keyfield %s", libpath, keyfield);
+  printf("kvlist read libpath %s keyfield %s\n", libpath, keyfield);
 
   int   retv  = -1;
   char* dbstr = cstr_fromfile(libpath);
@@ -64,7 +64,7 @@ int kvlist_read(char* libpath, map_t* db, char* keyfield)
 
 int kvlist_write(char* libpath, map_t* db)
 {
-  printf("kvlist write %s", libpath);
+  printf("kvlist write %s\n", libpath);
 
   int   retv = -1;
   char* path = cstr_fromformat("%snew", libpath, NULL);
@@ -96,14 +96,14 @@ int kvlist_write(char* libpath, map_t* db)
 
       REL(keys);
 
-      if (!retv) break;
+      if (retv < 0) break;
     }
 
     if (fclose(file) == EOF) retv = -1;
 
     REL(vals);
 
-    if (retv)
+    if (retv == 0)
     {
       if (rename(path, libpath) != 0) retv = -1;
     }

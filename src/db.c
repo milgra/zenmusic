@@ -14,6 +14,7 @@ void db_artists(vec_t* vec, vec_t* res);
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "kvlist.c"
 #include "mtcstring.c"
 #include "mtlog.c"
 
@@ -22,46 +23,7 @@ void db_read(char* libpath, map_t* db)
   LOG("reading db %s", libpath);
 
   char* dbpath = cstr_fromformat("%s/zmusdb", libpath, NULL);
-  char* dbstr  = cstr_fromfile(dbpath);
-
-  if (dbstr)
-  {
-    char*  token = strtok(dbstr, "\n");
-    char*  key   = NULL;
-    map_t* map   = MNEW();
-
-    while (token)
-    {
-      if (key)
-      {
-        char* val = cstr_fromcstring(token);
-        MPUT(map, key, val);
-        REL(key);
-        REL(val);
-        key = NULL;
-      }
-      else
-      {
-        if (token[0] == '-')
-        {
-          char* path = MGET(map, "path");
-          MPUT(db, path, map);
-          REL(map);
-          map = MNEW();
-        }
-        else
-          key = cstr_fromcstring(token);
-      }
-      token = strtok(NULL, "\n");
-    }
-
-    REL(dbstr);
-  }
-  else
-  {
-    printf("LOG No db found.\n");
-  }
-
+  kvlist_read(dbpath, db, "path");
   REL(dbpath);
 
   LOG("database loaded, entries : %i", db->count);
@@ -71,43 +33,11 @@ void db_write(char* libpath, map_t* db)
 {
   LOG("writing db to %s", libpath);
 
-  vec_t* vals = VNEW();
-  map_values(db, vals);
+  char* dbpath = cstr_fromformat("%s/zmusdb", libpath, NULL);
+  int   res    = kvlist_write(dbpath, db);
+  REL(dbpath);
 
-  char* new_path = cstr_fromformat("%s/zmusdb_new", libpath, NULL);
-  char* old_path = cstr_fromformat("%s/zmusdb", libpath, NULL);
-
-  FILE* f = fopen(new_path, "w");
-
-  for (int index = 0; index < vals->length; index++)
-  {
-    map_t* entry = vals->data[index];
-    vec_t* keys  = VNEW();
-    map_keys(entry, keys);
-    char* key;
-    while ((key = VNXT(keys)))
-    {
-      char* val = MGET(entry, key);
-      fprintf(f, "%s\n", key);
-      fprintf(f, "%s\n", val);
-    }
-    fprintf(f, "-\n");
-    REL(keys);
-  }
-
-  // TODO check file operations, don't rename db if failed
-  fclose(f);
-  REL(vals);
-
-  // after successful write, copy new db to main db
-
-  int succ = rename(new_path, old_path);
-
-  // cleanup
-
-  REL(vals);
-  REL(new_path);
-  REL(old_path);
+  if (res < 0) LOG("ERROR db_write cannot write database %s\n", dbpath);
 }
 
 char* sort_field = NULL;
