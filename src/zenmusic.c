@@ -139,6 +139,8 @@ void update(ev_t ev)
     if (strcmp(path, "//////") != 0)
     {
       MPUT(db, path, entry); // store entry
+      VADD(songs, entry);
+      if (db->count % 100 == 0) ui_refresh_songlist();
     }
     else
     {
@@ -149,6 +151,8 @@ void update(ev_t ev)
 
       int succ = lib_organize(libpath, db);
       if (succ == 0) db_write(libpath, db);
+
+      ui_refresh_songlist();
     }
     REL(entry);
   }

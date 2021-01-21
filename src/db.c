@@ -38,6 +38,8 @@ void db_write(char* libpath, map_t* db)
   REL(dbpath);
 
   if (res < 0) LOG("ERROR db_write cannot write database %s\n", dbpath);
+
+  LOG("db written");
 }
 
 char* sort_field = NULL;

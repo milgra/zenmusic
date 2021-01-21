@@ -48,7 +48,7 @@ textlist_t* textlist_new(view_t* view, vec_t* items, textstyle_t textstyle, void
 
 void textlist_update(textlist_t* tl)
 {
-  vh_list_reset(tl->view);
+  vh_list_refresh(tl->view);
 }
 
 void on_textitem_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)

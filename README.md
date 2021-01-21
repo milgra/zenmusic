@@ -21,6 +21,10 @@ development :
 pkg install sdl2 ffmpeg opengl gmake clang-format
 hook clang-format and gmake to file save hook
 
+how to delete a song : just delete it from the file system, zen music will clear it up from the lib after restart
+
+how to remote control : send 0 for play/pause, 1 for prev song, 2 for next song to localhost:732
+
 libraries used :
 
 FFMPEG / media parsing
@@ -37,8 +41,8 @@ freebsd for os
 
 first version
 
-close icons to all popups
 settings view - select library, organize library, color selector
+close icons to all popups
 title/aritst/info egy textfield legyen, ugy konnyebb shadow is, time bar passed/remaining
 fix query field
 make genre/artist selection filter songs, fill up query bar

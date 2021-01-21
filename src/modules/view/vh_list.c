@@ -410,24 +410,16 @@ void vh_list_refresh(view_t* view)
 {
   vh_list_t* vh = view->handler_data;
 
-  vec_addinvector(vh->cache, vh->items);
+  int full = 0;
 
-  // move all cache items outside visible area
-
-  for (int index = 0; index < vh->cache->length; index++)
+  for (int index = 0; index < vh->items->length; index++)
   {
-    view_t* sview = vh->cache->data[index];
-    r2_t    frame = sview->frame.local;
-
-    frame.x = 0;
-    frame.y = -frame.h;
+    view_t* item = vh->items->data[index];
+    full         = (*vh->update_item)(view, vh->userdata, item, vh->head_index + index, &vh->item_count);
+    if (full) break;
   }
 
-  vec_reset(vh->items);
-
-  vh->tail_index = vh->head_index;
-  vh->item_count = 0;
-  vh->full       = 0;
+  vh->full = full;
 }
 
 void vh_list_add(view_t* view,

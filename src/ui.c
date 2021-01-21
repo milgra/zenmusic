@@ -20,6 +20,7 @@ void ui_update_time(double time);
 void ui_toggle_pause(int state);
 void ui_show_libpath_popup(char* message);
 void ui_hide_libpath_popup();
+void ui_refresh_songlist();
 
 #endif
 
@@ -395,6 +396,11 @@ void ui_on_accept_libpath(view_t* view, void* data)
 
 void ui_filter(view_t* view)
 {
+}
+
+void ui_refresh_songlist()
+{
+  songlist_refresh();
 }
 
 void ui_init(float  width,
