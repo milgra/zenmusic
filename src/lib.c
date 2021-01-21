@@ -128,8 +128,10 @@ void lib_remove_duplicates(map_t* db)
 
 int analyzer_thread(void* chptr)
 {
-  ch_t*  channel = chptr;
-  map_t* curr    = NULL;
+  ch_t*    channel = chptr;
+  map_t*   curr    = NULL;
+  uint32_t total   = rem_db->length;
+  int      ratio   = -1;
 
   while (rem_db->length > 0)
   {
@@ -185,6 +187,14 @@ int analyzer_thread(void* chptr)
       // wait for main thread to process new entries
       SDL_Delay(5);
       if (ch_send(channel, curr)) curr = NULL;
+    }
+
+    // show progress
+    int ratio_new = (int)((float)(total - rem_db->length) / (float)total * 100.0);
+    if (ratio != ratio_new)
+    {
+      ratio = ratio_new;
+      LOG("anaylzer progress : %i%%", ratio);
     }
   }
 

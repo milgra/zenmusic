@@ -508,9 +508,6 @@ void ui_init(float  width,
   messagelistback     = view_get_subview(baseview, "messagelistback");
   view_t* messagelist = view_get_subview(baseview, "messagelist");
 
-  activity_init();
-  activity_attach(messagelist, fontpath);
-
   view_remove(mainview, messagelistback);
 
   filterlistback = view_get_subview(baseview, "filterlistback");
@@ -552,6 +549,11 @@ void ui_init(float  width,
   infoview = view_get_subview(baseview, "info");
   tg_text_add(infoview);
   tg_text_set(infoview, "-", ts);
+
+  // init activity
+
+  activity_init();
+  activity_attach(messagelist, infoview, fontpath);
 
   // query field
 
