@@ -262,7 +262,7 @@ void view_insert(view_t* view, view_t* subview, uint32_t index)
     }
   }
 
-  vec_addatindex(view->views, subview, index);
+  vec_ins(view->views, subview, index);
   subview->parent = view;
 
   if (view->masked) view_set_masked(subview, 1);

@@ -184,7 +184,7 @@ void vh_list_evt(view_t* view, ev_t ev)
           if (!full)
           {
             VREM(vh->cache, item);
-            vec_addatindex(vh->items, item, 0);
+            vec_ins(vh->items, item, 0);
             //view_set_hidden(item, 0, 1);
 
             vh->full     = 0;                    // there is probably more to come

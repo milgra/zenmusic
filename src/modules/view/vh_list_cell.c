@@ -67,7 +67,7 @@ void vh_lcell_ins(vec_t* cells, int si, int ti)
   vh_lcell_t* cell = cells->data[si];
   RET(cell); // increase retain count for the swap
   VREM(cells, cell);
-  vec_addatindex(cells, cell, ti);
+  vec_ins(cells, cell, ti);
   REL(cell);
   vh_lcell_arrange(cells);
 }

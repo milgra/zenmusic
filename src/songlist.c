@@ -170,7 +170,7 @@ void on_header_field_insert(view_t* view, int src, int tgt)
 
   RET(cell);
   VREM(sl.fields, cell);
-  vec_addatindex(sl.fields, cell, tgt);
+  vec_ins(sl.fields, cell, tgt);
   REL(cell);
 
   // update all items and cache

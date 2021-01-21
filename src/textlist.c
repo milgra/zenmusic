@@ -72,7 +72,7 @@ view_t* textlist_create_item(view_t* listview, void* data)
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, on_textitem_select);
 
-  view_t* cell = view_new(cstr_fromformat("%s%s", rowview->id, "cell", NULL), (r2_t){0, 0, 200, 35});
+  view_t* cell = view_new(cstr_fromformat("%s%s", rowview->id, "cell", NULL), (r2_t){0, 0, listview->frame.local.w, 35});
   tg_text_add(cell);
 
   vh_litem_add_cell(rowview, "cell", 200, cell);

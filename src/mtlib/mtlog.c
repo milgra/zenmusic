@@ -4,6 +4,7 @@
 #define LOG(...) log_log(__VA_ARGS__)
 
 void log_log(char* fmt, ...);
+void log_set_proxy(void (*proxy)(char*));
 
 #endif
 
@@ -32,6 +33,8 @@ void log_log(char* fmt, ...)
   printf("LOG %s\n", str);
 
   if (mtlog.proxy != NULL) (*mtlog.proxy)(str);
+
+  REL(str);
 }
 
 #endif

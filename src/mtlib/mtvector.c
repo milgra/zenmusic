@@ -33,8 +33,8 @@ void     vec_dealloc(void* vector);
 void     vec_reset(vec_t* vector);
 void     vec_dec_retcount(vec_t* vector);
 void     vec_add(vec_t* vector, void* data);
+void     vec_ins(vec_t* vector, void* data, size_t index);
 void*    vec_next(vec_t* vector);
-void     vec_addatindex(vec_t* vector, void* data, size_t index);
 void     vec_addinvector(vec_t* vec_a, vec_t* vec_b);
 void     vec_adduniquedata(vec_t* vector, void* data);
 void     vec_adduniquedataatindex(vec_t* vector, void* data, size_t index);
@@ -133,7 +133,7 @@ void vec_add(vec_t* vector, void* data)
 
 /* adds data at given index */
 
-void vec_addatindex(vec_t* vector, void* data, size_t index)
+void vec_ins(vec_t* vector, void* data, size_t index)
 {
   if (index > vector->length) index = vector->length;
   mem_retain(data);
@@ -166,7 +166,7 @@ void vec_adduniquedata(vec_t* vector, void* data)
 
 void vec_adduniquedataatindex(vec_t* vector, void* data, size_t index)
 {
-  if (vec_indexofdata(vector, data) == UINT32_MAX) vec_addatindex(vector, data, index);
+  if (vec_indexofdata(vector, data) == UINT32_MAX) vec_ins(vector, data, index);
 }
 
 /* replaces data at given index */
