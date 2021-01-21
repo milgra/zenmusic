@@ -1,18 +1,19 @@
 #ifndef activity_h
 #define activity_h
 
+#include "text.c"
 #include "view.c"
 
 void activity_init();
-void activity_attach(view_t* logview, view_t* notifview, char* fontpath);
+void activity_attach(view_t* logview, view_t* notifview, textstyle_t style);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
 #include "mtlog.c"
-#include "text.c"
 #include "textlist.c"
+#include "tg_text.c"
 #include <pthread.h>
 
 struct _activity_t
@@ -20,7 +21,9 @@ struct _activity_t
   vec_t*          logs;
   int             ind;
   textlist_t*     list;
+  view_t*         info;
   pthread_mutex_t lock;
+  textstyle_t     style;
 } act = {0};
 
 void activity_select(int index)
@@ -41,7 +44,12 @@ void activity_log(char* log)
 
   if (act.logs->length > 100) vec_rematindex(act.logs, 100);
 
-  if (act.list) textlist_update(act.list);
+  if (act.list)
+  {
+    textlist_update(act.list);
+
+    tg_text_set(act.info, log, act.style);
+  }
 
   pthread_mutex_unlock(&act.lock);
 }
@@ -52,18 +60,11 @@ void activity_init()
   log_set_proxy(activity_log);
 }
 
-void activity_attach(view_t* logview, view_t* notifview, char* fontpath)
+void activity_attach(view_t* logview, view_t* notifview, textstyle_t style)
 {
-  textstyle_t ts = {0};
-  ts.font        = fontpath;
-  ts.margin      = 10.0;
-  ts.align       = TA_LEFT;
-  ts.size        = 25.0;
-  ts.textcolor   = 0x000000FF;
-  ts.backcolor   = 0xFFFFFFFF;
-
-  ts.align = TA_LEFT;
-  act.list = textlist_new(logview, act.logs, ts, activity_select);
+  act.style = style;
+  act.list  = textlist_new(logview, act.logs, style, activity_select);
+  act.info  = notifview;
 }
 
 #endif

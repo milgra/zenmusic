@@ -553,7 +553,7 @@ void ui_init(float  width,
   // init activity
 
   activity_init();
-  activity_attach(messagelist, infoview, fontpath);
+  activity_attach(messagelist, infoview, ts);
 
   // query field
 

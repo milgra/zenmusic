@@ -38,7 +38,6 @@ freebsd for os
 first version
 
 close icons to all popups
-wire in logs, info sorban 2 secig event mutatodjon
 settings view - select library, organize library, color selector
 title/aritst/info egy textfield legyen, ugy konnyebb shadow is, time bar passed/remaining
 fix query field
