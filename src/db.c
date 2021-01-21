@@ -20,9 +20,10 @@ void db_artists(vec_t* vec, vec_t* res);
 
 void db_read(char* libpath, map_t* db)
 {
-  LOG("reading db %s", libpath);
+  char* dbpath = cstr_fromformat("%s/zenmusic.kvl", libpath, NULL);
 
-  char* dbpath = cstr_fromformat("%s/zmusdb", libpath, NULL);
+  LOG("reading db %s", dbpath);
+
   kvlist_read(dbpath, db, "path");
   REL(dbpath);
 
@@ -31,10 +32,11 @@ void db_read(char* libpath, map_t* db)
 
 void db_write(char* libpath, map_t* db)
 {
-  LOG("writing db to %s", libpath);
+  char* dbpath = cstr_fromformat("%s/zenmusic.kvl", libpath, NULL);
 
-  char* dbpath = cstr_fromformat("%s/zmusdb", libpath, NULL);
-  int   res    = kvlist_write(dbpath, db);
+  LOG("writing db to %s", dbpath);
+
+  int res = kvlist_write(dbpath, db);
   REL(dbpath);
 
   if (res < 0) LOG("ERROR db_write cannot write database %s\n", dbpath);

@@ -41,6 +41,7 @@ freebsd for os
 
 first version
 
+make instead of gmake, debug, release targets -g -O3, install ffmpeg and sdl2 if needed
 settings view - select library, organize library, color selector
 close icons to all popups
 title/aritst/info egy textfield legyen, ugy konnyebb shadow is, time bar passed/remaining
@@ -136,3 +137,10 @@ gl-connector layer - the higher layers sending triangles to it with texture ids,
 ui_compositor - collects view rectangles, puts view textures into texture maps, sends textures and vertexes to gl_connector layer
 ui_generator - collects views, sets up texture channels, renders view bitmaps in background thread
 ui_manager - it has the root view for the ui, resends views to generator when add/remove happened
+
+--
+
+how to be a pro?
+- create a project without an ide - learn how compiling, linking, makefile works
+- never leave a result unexamined, an argument unasserted
+- learn clojure. your algorithmic skills in any language will be 10x better

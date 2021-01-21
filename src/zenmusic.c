@@ -154,6 +154,7 @@ void update(ev_t ev)
 
       ui_refresh_songlist();
     }
+    // cleanup, ownership was passed with the channel from analyzer
     REL(entry);
   }
 

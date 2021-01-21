@@ -27,7 +27,7 @@ void player_draw_rdft(int index, int channel, bm_t* bm);
 void player_refresh();
 
 bm_t* player_get_album(const char* path);
-void  player_get_metadata(const char* path, map_t* map);
+int   player_get_metadata(const char* path, map_t* map);
 int   player_set_metadata(map_t* data, char* img_path);
 
 #endif
@@ -179,34 +179,45 @@ void player_draw_rdft(int index, int channel, bm_t* bm)
 {
 }
 
-void player_get_metadata(const char* path, map_t* map)
+int player_get_metadata(const char* path, map_t* map)
 {
   assert(path != NULL);
+  assert(map != NULL);
 
-  int i, ret = 0;
+  int retv = -1;
 
   AVFormatContext* pFormatCtx  = avformat_alloc_context();
   AVDictionary*    format_opts = NULL;
-  AVInputFormat*   fileformat  = NULL;
 
   av_dict_set(&format_opts, "scan_all_pmts", "1", AV_DICT_DONT_OVERWRITE);
 
   /* // open the specified path */
-  if (avformat_open_input(&pFormatCtx, path, fileformat, &format_opts) != 0)
+  if (avformat_open_input(&pFormatCtx, path, NULL, &format_opts) == 0)
   {
-    printf("avformat_open_input() failed");
+    if (pFormatCtx)
+    {
+      retv = 0;
+
+      av_dict_set(&format_opts, "scan_all_pmts", NULL, AV_DICT_MATCH_CASE);
+
+      AVDictionaryEntry* tag = NULL;
+
+      while ((tag = av_dict_get(pFormatCtx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
+      {
+        char* value = cstr_fromcstring(tag->value);
+        MPUT(map, tag->key, value);
+        REL(value);
+      }
+    }
+    else
+      printf("player_get_metadata no media context for %s\n", path);
+
+    avformat_close_input(&pFormatCtx);
   }
+  else
+    printf("player_get_metadata cannot open input %s\n", path);
 
-  av_dict_set(&format_opts, "scan_all_pmts", NULL, AV_DICT_MATCH_CASE);
-
-  AVDictionaryEntry* tag = NULL;
-
-  while ((tag = av_dict_get(pFormatCtx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
-  {
-    char* value = cstr_fromcstring(tag->value);
-    MPUT(map, tag->key, value);
-    REL(value);
-  }
+  return retv;
 }
 
 int player_set_metadata(map_t* data, char* img_path)

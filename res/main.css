@@ -127,12 +127,12 @@
 }
 
 #song {
-    top: 0px;
+    top: 30px;
     width: 100%;
     height: 30px;
 }
 #artist {
-    top: 30px;
+    top: 0px;
     width: 100%;
     height: 30px;
 }

@@ -144,43 +144,52 @@ int analyzer_thread(void* chptr)
       MPUT(curr, "path", path);
       MPUT(curr, "size", size);
 
-      player_get_metadata(path, curr);
+      int res = player_get_metadata(path, curr);
 
-      if (MGET(curr, "artist") == NULL) MPUT(curr, "artist", cstr_fromcstring("Unknown"));
-      if (MGET(curr, "album") == NULL) MPUT(curr, "album", cstr_fromcstring("Unknown"));
-      if (MGET(curr, "title") == NULL)
+      if (res == 0)
       {
-        int dotindex;
-        for (dotindex = strlen(path) - 1; dotindex > -1; --dotindex)
+        if (MGET(curr, "artist") == NULL) MPUT(curr, "artist", cstr_fromcstring("Unknown"));
+        if (MGET(curr, "album") == NULL) MPUT(curr, "album", cstr_fromcstring("Unknown"));
+        if (MGET(curr, "title") == NULL)
         {
-          if (path[dotindex] == '.') break;
-        }
-
-        int slashindex;
-        for (slashindex = strlen(path) - 1; slashindex > -1; --slashindex)
-        {
-          if (path[slashindex] == '/')
+          int dotindex;
+          for (dotindex = strlen(path) - 1; dotindex > -1; --dotindex)
           {
-            slashindex++;
-            break;
+            if (path[dotindex] == '.') break;
           }
-        }
 
-        if (dotindex > slashindex)
-        {
-          int   len   = dotindex - slashindex;
-          char* title = mem_calloc(len + 1, "char*", NULL, NULL);
-          memcpy(title, path + slashindex, len);
+          int slashindex;
+          for (slashindex = strlen(path) - 1; slashindex > -1; --slashindex)
+          {
+            if (path[slashindex] == '/')
+            {
+              slashindex++;
+              break;
+            }
+          }
 
-          MPUT(curr, "title", title);
+          if (dotindex > slashindex)
+          {
+            int   len   = dotindex - slashindex;
+            char* title = mem_calloc(len + 1, "char*", NULL, NULL);
+            memcpy(title, path + slashindex, len);
+
+            MPUT(curr, "title", title);
+          }
+          else
+            MPUT(curr, "title", path);
         }
-        else
-          MPUT(curr, "title", path);
+        // try to send it to main thread
+        if (ch_send(channel, curr)) curr = NULL;
+      }
+      else
+      {
+        // file is not a media file readable by ffmpeg, we skip it
+        REL(curr);
+        curr = NULL;
       }
       // remove entry from remaining
       vec_rematindex(rem_db, rem_db->length - 1);
-      // try to send it to main thread
-      if (ch_send(channel, curr)) curr = NULL;
     }
     else
     {

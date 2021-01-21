@@ -219,7 +219,7 @@ void ui_on_song_select(int index)
   ts.font        = fontpath;
   ts.align       = TA_CENTER;
   ts.size        = 25.0;
-  ts.textcolor   = 0x555555FF;
+  ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0;
 
   tg_text_set(songview, (char*)MGET(songmap, "title"), ts);
@@ -525,7 +525,7 @@ void ui_init(float  width,
   secondview = view_get_subview(baseview, "second");
 
   ts.margin_right = 0;
-  ts.textcolor    = 0x555555FF;
+  ts.textcolor    = 0x000000FF;
   ts.backcolor    = 0x0;
 
   ts.align = TA_RIGHT;
@@ -555,6 +555,9 @@ void ui_init(float  width,
   infoview = view_get_subview(baseview, "info");
   tg_text_add(infoview);
   tg_text_set(infoview, "-", ts);
+
+  ts.align  = TA_LEFT;
+  ts.margin = 10.0;
 
   // init activity
 

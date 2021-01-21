@@ -65,6 +65,8 @@ void activity_attach(view_t* logview, view_t* notifview, textstyle_t style)
   act.style = style;
   act.list  = textlist_new(logview, act.logs, style, activity_select);
   act.info  = notifview;
+
+  act.style.align = TA_CENTER;
 }
 
 #endif

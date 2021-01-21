@@ -28,8 +28,8 @@ CFLAGS = \
 	-Isrc/modules/html \
 	-Isrc/modules/view \
 	-Isrc/modules/image \
-	-Isrc/modules/player
-
+	-Isrc/modules/player \
+	-g
 
 LDFLAGS = \
 	-L/usr/local/lib \
