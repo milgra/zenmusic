@@ -583,12 +583,12 @@ void ui_init(float  width,
 
   settingsview = view_get_subview(baseview, "settingsback");
 
-  view_t* settings = view_get_subview(baseview, "settings");
+  /* view_t* settings = view_get_subview(baseview, "settings"); */
 
-  char* settingsinfo = "Library location:\n Change library\n Organize library X\n Change color\n";
+  /* char* settingsinfo = "Library location:\n Change library\n Organize library X\n Change color\n"; */
 
-  tg_text_add(settings);
-  tg_text_set(settings, settingsinfo, ts);
+  /* tg_text_add(settings); */
+  /* tg_text_set(settings, settingsinfo, ts); */
 
   view_remove(main, settingsview);
 

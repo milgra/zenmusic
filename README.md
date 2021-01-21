@@ -142,5 +142,8 @@ ui_manager - it has the root view for the ui, resends views to generator when ad
 
 how to be a pro?
 - create a project without an ide - learn how compiling, linking, makefile works
+ - first command line
+  - then with script
+  - then makefile
 - never leave a result unexamined, an argument unasserted
 - learn clojure. your algorithmic skills in any language will be 10x better
