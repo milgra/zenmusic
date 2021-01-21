@@ -37,8 +37,6 @@ freebsd for os
 
 first version
 
-kvlist - config file - default library
-library selector popup
 close icons to all popups
 wire in logs, info sorban 2 secig event mutatodjon
 settings view - select library, organize library, color selector
@@ -67,6 +65,7 @@ swithc between multiple glyph views in paragraph/one multiglyph view in paragrap
 kijelzon shadow
 time onclick = remaining time
 socketes taviranyitas - 1 byteokkal
+accept input on enter
 
 ideas
 

@@ -4,13 +4,22 @@
 #include "mtmap.c"
 #include "view.c"
 
-void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genres, vec_t* artists, void (*save_entry)(map_t* map));
+void ui_init(float  width,
+             float  height,
+             char*  respath,
+             vec_t* songs,
+             vec_t* genres,
+             vec_t* artists,
+             void (*save_entry)(map_t* map),
+             void (*accept_popup)(char* text));
 void ui_update_position(float ratio);
 void ui_update_volume(float ratio);
 void ui_update_visualizer();
 void ui_update_video();
 void ui_update_time(double time);
 void ui_toggle_pause(int state);
+void ui_show_libpath_popup(char* message);
+void ui_hide_libpath_popup();
 
 #endif
 
@@ -70,6 +79,7 @@ struct _ui_t
 {
   vec_t* songs;
   void (*save_entry)(map_t* map);
+  void (*accept_popup)(char* text);
 } ui = {0};
 
 // button events
@@ -344,26 +354,61 @@ void ui_update_time(double time)
   tg_text_set(secondview, timebuff, ts);
 }
 
-void ui_show_libpath_popup()
+void ui_show_libpath_popup(char* text)
 {
-  ui_manager_remove(baseview);
-  ui_manager_add(libpopuppage);
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = TA_CENTER;
+  ts.size        = 25.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0;
+
+  tg_text_set(libtextfield, text, ts);
+
+  if (!libpopuppage->parent)
+  {
+    ui_manager_remove(baseview);
+    ui_manager_add(libpopuppage);
+  }
+
+  vh_text_activate(libinputfield, 1); // activate text input
+  ui_manager_activate(libinputfield); // set text input as event receiver
+}
+
+void ui_hide_libpath_popup()
+{
+  if (libpopuppage->parent)
+  {
+    ui_manager_remove(libpopuppage);
+    ui_manager_add(baseview);
+  }
 }
 
 void ui_on_accept_libpath(view_t* view, void* data)
 {
-  ui_manager_remove(libpopuppage);
-  ui_manager_add(baseview);
+  // get path string
+  str_t* path    = vh_text_get_text(libinputfield);
+  char*  path_ch = str_cstring(path);
+  (*ui.accept_popup)(path_ch);
+  REL(path_ch);
 }
 
 void ui_filter(view_t* view)
 {
 }
 
-void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genres, vec_t* artists, void (*save_entry)(map_t* map))
+void ui_init(float  width,
+             float  height,
+             char*  respath,
+             vec_t* songs,
+             vec_t* genres,
+             vec_t* artists,
+             void (*save_entry)(map_t* map),
+             void (*accept_popup)(char* text))
 {
-  ui.songs      = songs;
-  ui.save_entry = save_entry;
+  ui.songs        = songs;
+  ui.save_entry   = save_entry;
+  ui.accept_popup = accept_popup;
 
   // init text
 
@@ -564,10 +609,7 @@ void ui_init(float width, float height, char* respath, vec_t* songs, vec_t* genr
   ts.backcolor = 0;
 
   tg_text_add(libtextfield);
-  tg_text_set(libtextfield, "Please enter the location of your music library folder", ts);
-
-  vh_text_add(libinputfield, "~/Music", ts, NULL);
-  //vh_text_set_on_text(filterbar, ui_filter);
+  vh_text_add(libinputfield, "/home/youruser/Music", ts, NULL);
 
   view_t* acceptlibbtn = view_get_subview(baseview, "acceptlibicon");
   vh_button_add(acceptlibbtn, NULL, ui_on_accept_libpath);

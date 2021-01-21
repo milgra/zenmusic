@@ -10,6 +10,8 @@ void lib_analyze(ch_t* channel);
 int  lib_organize_entry(char* libpath, map_t* db, map_t* entry);
 int  lib_organize(char* libpath, map_t* db);
 int  lib_entries();
+int  lib_exists(char* path);
+int  lib_mkpath(char* file_path, mode_t mode);
 
 #endif
 
@@ -59,6 +61,16 @@ static int lib_file_data(const char* fpath, const struct stat* sb, int tflag, st
   }
 
   return 0; /* To tell nftw() to continue */
+}
+
+int lib_exists(char* path)
+{
+  struct stat sb;
+
+  if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode))
+    return 1;
+  else
+    return 0;
 }
 
 void lib_read(char* libpath)

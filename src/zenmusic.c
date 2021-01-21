@@ -2,6 +2,7 @@
 #include "db.c"
 #include "lib.c"
 #include "mtchannel.c"
+#include "mtcstring.c"
 #include "mtmap.c"
 #include "player.c"
 #include "ui.c"
@@ -47,6 +48,40 @@ void save_db(map_t* entry)
   db_write(libpath, db);
 }
 
+void load_lib()
+{
+  printf("load_lib %s\n", libpath);
+
+  db_read(libpath, db);                   // read db
+  lib_read(libpath);                      // read library
+  lib_remove_duplicates(db);              // remove existing
+  if (lib_entries() > 0) lib_analyze(ch); // start analyzing new entries
+
+  sort("artist");
+}
+
+void save_lib(char* path)
+{
+  printf("save_lib %s\n", path);
+
+  if (libpath) REL(libpath);
+
+  if (path[0] == '~')
+    libpath = cstr_fromformat("%s%s", getenv("HOME"), path + 1, NULL); // replace tilde's with home
+  else
+    libpath = cstr_fromcstring(path);
+
+  if (lib_exists(libpath))
+  {
+    MPUT(cfg, "library_path", libpath);
+    config_write(cfg);
+    load_lib();
+    ui_hide_libpath_popup();
+  }
+  else
+    ui_show_libpath_popup("Location doesn't exists, please enter valid location.");
+}
+
 void init(int width, int height, char* respath)
 {
   srand((unsigned int)time(NULL));
@@ -65,7 +100,8 @@ void init(int width, int height, char* respath)
           songs,
           genres,
           artists,
-          save_db);
+          save_db,
+          save_lib);
 
   config_read(cfg);
 
@@ -73,18 +109,11 @@ void init(int width, int height, char* respath)
 
   if (!libpath)
   {
-    // show library input popup
-    ui_show_libpath_popup();
+    config_init(cfg);
+    ui_show_libpath_popup("Please enter the location of your music library folder.");
   }
   else
-  {
-    db_read(libpath, db);                   // read db
-    lib_read(libpath);                      // read library
-    lib_remove_duplicates(db);              // remove existing
-    if (lib_entries() > 0) lib_analyze(ch); // start analyzing new entries
-
-    sort("artist");
-  }
+    load_lib();
 }
 
 void update(ev_t ev)

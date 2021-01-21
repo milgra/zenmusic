@@ -23,14 +23,15 @@ typedef struct _vh_text_t
   void (*on_deactivate)(view_t* view);
 } vh_text_t;
 
-void vh_text_add(view_t*     view,
-                 char*       text,
-                 textstyle_t textstyle,
-                 void*       userdata);
-void vh_text_activate(view_t* view, char state);
-void vh_text_set_on_text(view_t* view, void (*event)(view_t*));
-void vh_text_set_on_activate(view_t* view, void (*event)(view_t*));
-void vh_text_set_on_deactivate(view_t* view, void (*event)(view_t*));
+void   vh_text_add(view_t*     view,
+                   char*       text,
+                   textstyle_t textstyle,
+                   void*       userdata);
+str_t* vh_text_get_text(view_t* view);
+void   vh_text_activate(view_t* view, char state);
+void   vh_text_set_on_text(view_t* view, void (*event)(view_t*));
+void   vh_text_set_on_activate(view_t* view, void (*event)(view_t*));
+void   vh_text_set_on_deactivate(view_t* view, void (*event)(view_t*));
 
 #endif
 
@@ -208,6 +209,12 @@ void vh_text_add(view_t*     view,
   // udpate
 
   vh_text_upd(view);
+}
+
+str_t* vh_text_get_text(view_t* view)
+{
+  vh_text_t* data = view->handler_data;
+  return data->text;
 }
 
 void vh_text_set_on_text(view_t* view, void (*event)(view_t*))
