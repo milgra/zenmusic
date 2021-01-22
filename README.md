@@ -1,5 +1,13 @@
 Zen Multimedia Desktop System
 
+inspired by the golden-era itunes and the tracker module players of the early 90's
+
+slick, lag-free 60 fps smooth and momentum scrolling
+retro-minimalistic ui
+always visible frequency and scope analyzers
+status line and activity window for full transparency
+optional library auto-organizing
+
 Main goals : operating transparency - all events are logged in event viewer
 
 zen media - offline file/media viewer and manager / preview area, file info area
@@ -41,6 +49,7 @@ freebsd for os
 
 first version
 
+if track number exists, use that in file name
 make instead of gmake, debug, release targets -g -O3, install ffmpeg and sdl2 if needed
 settings view - select library, organize library, color selector
 close icons to all popups

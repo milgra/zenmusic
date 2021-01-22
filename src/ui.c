@@ -7,6 +7,7 @@
 void ui_init(float  width,
              float  height,
              char*  respath,
+             char*  libpath,
              vec_t* songs,
              vec_t* genres,
              vec_t* artists,
@@ -406,6 +407,7 @@ void ui_refresh_songlist()
 void ui_init(float  width,
              float  height,
              char*  respath,
+             char*  libpath,
              vec_t* songs,
              vec_t* genres,
              vec_t* artists,
@@ -449,8 +451,8 @@ void ui_init(float  width,
 
   // buttons
 
-  view_t* maxbtn   = view_get_subview(baseview, "maxicon");
-  view_t* closebtn = view_get_subview(baseview, "closeicon");
+  view_t* maxbtn        = view_get_subview(baseview, "maxicon");
+  view_t* app_close_btn = view_get_subview(baseview, "app_close_icon");
 
   view_t* prevbtn = view_get_subview(baseview, "previcon");
   view_t* nextbtn = view_get_subview(baseview, "nexticon");
@@ -470,7 +472,7 @@ void ui_init(float  width,
   volbtn  = view_get_subview(baseview, "volbtn");
 
   vh_button_add(maxbtn, NULL, ui_on_max_button_down);
-  vh_button_add(closebtn, NULL, ui_on_close_button_down);
+  vh_button_add(app_close_btn, NULL, ui_on_close_button_down);
 
   tg_knob_add(playbtn);
   vh_knob_add(playbtn, ui_on_position_change, ui_on_play_button_down);
@@ -581,17 +583,6 @@ void ui_init(float  width,
   vh_text_set_on_text(filterbar, ui_filter);
   vh_text_set_on_activate(filterbar, ui_on_filter_activate);
 
-  settingsview = view_get_subview(baseview, "settingsback");
-
-  /* view_t* settings = view_get_subview(baseview, "settings"); */
-
-  /* char* settingsinfo = "Library location:\n Change library\n Organize library X\n Change color\n"; */
-
-  /* tg_text_add(settings); */
-  /* tg_text_set(settings, settingsinfo, ts); */
-
-  view_remove(main, settingsview);
-
   aboutview = view_get_subview(baseview, "aboutback");
 
   char* info = "Zen Music by Milan Toth\nFree and Open Source Software.\n"
@@ -626,6 +617,34 @@ void ui_init(float  width,
   vh_button_add(acceptlibbtn, NULL, ui_on_accept_libpath);
 
   view_remove(baseview, libpopuppage);
+
+  // settings
+
+  view_t* set_lib_text = view_get_subview(baseview, "set_lib_txt");
+  view_t* set_lib_path = view_get_subview(baseview, "set_lib_pth");
+  view_t* set_lib_btn  = view_get_subview(baseview, "set_lib_btn_txt");
+  view_t* set_org_text = view_get_subview(baseview, "set_org_text");
+  view_t* set_org_btn  = view_get_subview(baseview, "set_org_btn");
+  view_t* set_col_text = view_get_subview(baseview, "set_col_text");
+  view_t* set_col_sel  = view_get_subview(baseview, "set_col_sel");
+
+  tg_text_add(set_lib_text);
+  tg_text_set(set_lib_text, "Music Library Location :", ts);
+
+  tg_text_add(set_lib_path);
+  tg_text_set(set_lib_path, libpath, ts);
+
+  tg_text_add(set_lib_btn);
+  tg_text_set(set_lib_btn, "Use Other Library", ts);
+
+  tg_text_add(set_org_text);
+  tg_text_set(set_org_text, "Keep Music Library Organized", ts);
+
+  tg_text_add(set_col_text);
+  tg_text_set(set_col_text, "User Interface Base Color", ts);
+
+  settingsview = view_get_subview(baseview, "settingsback");
+  view_remove(main, settingsview);
 
   // additional setup
   // TODO control these from CSS

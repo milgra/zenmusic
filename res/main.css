@@ -38,7 +38,7 @@
     box-shadow: 3px;
 }
 
-#closebtn {
+.closebtn {
     background-color: #EEEEEEFF;
     width: 30px;
     height: 30px;
@@ -46,6 +46,12 @@
     top: 60px;
     border-radius: 17px;
     box-shadow: 3px;
+}
+
+.closeicon {
+    width: 30px;
+    height: 30px;
+    background-image: url("close.png");
 }
 
 #maxbtn {
@@ -56,12 +62,6 @@
     left: 155px;
     border-radius: 17px;
     box-shadow: 3px;
-}
-
-#closeicon {
-    width: 30px;
-    height: 30px;
-    background-image: url("close.png");
 }
 
 #maxicon {
@@ -461,7 +461,7 @@
     height: 100%;
 }
 
-#closeeditorbtn {
+.closepopupbtn {
     background-color: #FFFFFFFF;
     width: 30px;
     height: 30px;
@@ -471,7 +471,7 @@
     box-shadow: 3px;
 }
 
-#closeeditoricon {
+.closepopupicon {
     width: 30px;
     height: 30px;
     background-image: url("close.png");
@@ -501,6 +501,8 @@
     border-radius: 15px;
     background-color: #FFFFFFFF;
     box-shadow: 3px;
+    display: flex;
+    flex-direction: column;
 }
 
 #settings {
@@ -510,6 +512,64 @@
     border-radius: 15px;
     background-color: #FFFFFFFF;
     box-shadow: 2px;
+}
+
+#set_lib_txt {
+    width: 400px;
+    height: 50px;
+    margin: auto;
+}
+
+#set_lib_pth {
+    width: 400px;
+    height: 50px;
+    margin: auto;
+}
+
+#set_lib_btn {
+    background-color: #FFFFFFFF;
+    width: 200px;
+    height: 30px;
+    margin: auto;
+    border-radius: 17px;
+    box-shadow: 3px;
+}
+
+#set_lib_btn_txt {
+    width: 100%;
+    height: 100%;
+}
+
+#set_org_text {
+    width: 400px;
+    height: 50px;
+    margin: auto;
+    background-color: #EFEFEFFF;
+}
+
+#set_org_btn {
+    background-color: #FFFFFFFF;
+    width: 200px;
+    height: 30px;
+    margin: auto;
+    border-radius: 17px;
+    box-shadow: 3px;
+}
+
+#set_col_text {
+    width: 400px;
+    height: 50px;
+    margin: auto;
+    background-color: #EFEFEFFF;
+}
+
+#set_col_sel {
+    background-color: #FFFFFFFF;
+    width: 200px;
+    height: 100px;
+    margin: auto;
+    border-radius: 17px;
+    box-shadow: 3px;
 }
 
 #aboutback {

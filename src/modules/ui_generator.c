@@ -195,6 +195,7 @@ void ui_generator_render(uint32_t time)
     {
       if (view->texture.rentype == RT_BACKGROUND)
       {
+        // printf("SENDING TEXTURE %s %f %f\n", view->layout.background_image, view->frame.local.w, view->frame.local.h);
         if (ch_send(uig.channel, view)) view->texture.state = TS_PENDING;
       }
       else

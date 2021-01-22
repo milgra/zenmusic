@@ -54,15 +54,14 @@ void ui_manager_event(ev_t ev)
   else if (ev.type == EV_RESIZE)
   {
     r2_t rf = uim.root->frame.local;
-    printf("resize %i %i\n", ev.w, ev.h);
     if (rf.w != (float)ev.w ||
         rf.h != (float)ev.h)
     {
       view_set_frame(uim.root, (r2_t){0.0, 0.0, (float)ev.w, (float)ev.h});
       view_layout(uim.root);
       ui_generator_resize(ev.w, ev.h);
-      /* printf("\nAFTER RESIZE"); */
-      /* view_desc(uim.root, 0); */
+      // printf("\nAFTER RESIZE");
+      // view_desc(uim.root, 0);
       view_evt(uim.root, ev);
     }
   }

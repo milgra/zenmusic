@@ -94,18 +94,19 @@ void init(int width, int height, char* respath)
   genres  = VNEW();
   artists = VNEW();
 
+  config_read(cfg);
+
+  libpath = MGET(cfg, "library_path");
+
   ui_init(width,
           height,
           respath,
+          libpath,
           songs,
           genres,
           artists,
           save_db,
           save_lib);
-
-  config_read(cfg);
-
-  libpath = MGET(cfg, "library_path");
 
   if (!libpath)
   {
