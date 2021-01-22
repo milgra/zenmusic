@@ -14,7 +14,7 @@
    id="svg8"
    inkscape:version="1.0.1 (3bc2e813f5, 2020-09-07)"
    sodipodi:docname="icons_30.svg"
-   inkscape:export-filename="/home/milgra/Projects/zenmusic/res/home.png"
+   inkscape:export-filename="/home/milgra/Projects/zenmusic/res/shuffle.png"
    inkscape:export-xdpi="96"
    inkscape:export-ydpi="96">
   <defs
@@ -38,7 +38,7 @@
      inkscape:cx="12.68361"
      inkscape:cy="13.601785"
      inkscape:document-units="mm"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer9"
      inkscape:document-rotation="0"
      showgrid="true"
      units="px"
@@ -118,6 +118,47 @@
   </g>
   <g
      inkscape:groupmode="layer"
+     id="layer9"
+     inkscape:label="Shuffle 1">
+    <circle
+       style="display:inline;fill:#000000;stroke-width:0.264583"
+       id="path170-2"
+       cx="3.1730356"
+       cy="-3.9996438"
+       r="0.80481106"
+       transform="scale(1,-1)" />
+    <circle
+       style="display:inline;fill:#000000;stroke-width:0.264583"
+       id="path170-4-3"
+       cx="4.7392526"
+       cy="-3.9848499"
+       r="0.80481106"
+       transform="scale(1,-1)" />
+    <rect
+       style="fill:#000000;stroke-width:0.264583"
+       id="rect211"
+       width="0.54696035"
+       height="2.9269993"
+       x="3.6939793"
+       y="2.6411176" />
+    <ellipse
+       style="display:inline;fill:#000000;stroke-width:0.264583"
+       id="path170-2-4"
+       cx="3.9539897"
+       cy="-2.5348008"
+       transform="scale(1,-1)"
+       rx="0.80481106"
+       ry="0.94405931" />
+    <rect
+       style="fill:#000000;stroke-width:0.264583"
+       id="rect211-8"
+       width="2.1337304"
+       height="0.55285925"
+       x="2.8898418"
+       y="5.294405" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
      id="layer7"
      inkscape:label="Next"
      style="display:none">
@@ -174,13 +215,24 @@
      inkscape:groupmode="layer"
      id="layer2"
      inkscape:label="About"
-     style="display:inline">
+     style="display:none">
     <path
-       id="path1247-8-3"
-       style="display:inline;fill:#000000;fill-opacity:1;stroke-width:0.107635"
-       inkscape:transform-center-x="-0.00072743079"
-       inkscape:transform-center-y="0.41273457"
-       d="M 5.2540801,3.1347861 A 0.3123456,0.36518673 0.22658146 0 0 4.9431811,2.7683672 0.3123456,0.36518673 0.22658146 0 0 4.801086,2.8077485 c 0.015979,-0.013643 0.03144,-0.028254 0.049771,-0.03832 l -1.7451416,-0.00548 c 0.016064,0.00722 0.029294,0.019232 0.043807,0.02918 A 0.3123456,0.36518673 0.22658146 0 0 3.0483341,2.7727569 0.3123456,0.36518673 0.22658146 0 0 2.7345468,3.1367055 0.3123456,0.36518673 0.22658146 0 0 2.8586546,3.4291579 c -0.015548,-0.00879 -0.032045,-0.015019 -0.046259,-0.026811 L 3.6971251,4.8043166 C 3.6781245,4.7561401 3.6683388,4.7036896 3.6684497,4.6506142 3.6690833,4.4904009 3.7583378,4.3559077 3.8812934,4.307189 A 0.3123456,0.36518673 0.22658146 0 0 3.6761852,4.6487429 0.3123456,0.36518673 0.22658146 0 0 3.9870842,5.0151621 0.3123456,0.36518673 0.22658146 0 0 4.2833202,4.7700206 L 5.1598953,3.4002222 c -0.00354,0.00285 -0.00779,0.00395 -0.011413,0.0066 a 0.3123456,0.36518673 0.22658146 0 0 0.105598,-0.272041 z" />
+       style="fill:#000000;stroke-width:0.264583"
+       d="M 5.4008473,3.0512799 C 4.8727807,2.3827795 4.1065003,3.1597126 3.9666338,3.1554301 3.8543321,3.1519884 2.9355154,2.3549403 2.4513033,3.0412541 2.2269969,3.3591822 2.3166426,3.9919021 2.6048354,4.2403859 2.9400259,4.5293918 3.5597925,4.8609496 3.9587113,5.3320964 4.2850798,4.8733271 4.956982,4.4821699 5.2322002,4.2301653 5.4496995,4.0310113 5.6453893,3.3608555 5.4008473,3.0512799 Z"
+       id="path139"
+       sodipodi:nodetypes="scsscss" />
+    <circle
+       style="fill:#000000;stroke-width:0.264583"
+       id="path170"
+       cx="3.1724954"
+       cy="3.3352456"
+       r="0.80481106" />
+    <circle
+       style="display:inline;fill:#000000;stroke-width:0.264583"
+       id="path170-4"
+       cx="4.718276"
+       cy="3.3267694"
+       r="0.80481106" />
   </g>
   <g
      inkscape:groupmode="layer"
@@ -242,42 +294,34 @@
      style="display:none">
     <rect
        style="fill:#000000;stroke-width:0.264583"
-       id="rect334"
-       width="2.6158147"
-       height="0.49014917"
-       x="2.6862302"
-       y="2.6748664"
-       rx="0.30000046"
-       ry="0.49014917" />
+       id="rect146"
+       width="2.4119015"
+       height="0.51421511"
+       x="3.1696851"
+       y="2.4000578" />
+    <rect
+       style="fill:#000000;stroke-width:0.264583"
+       id="rect148"
+       width="0.52931041"
+       height="1.899684"
+       x="5.0431266"
+       y="2.8654573" />
     <rect
        style="display:inline;fill:#000000;stroke-width:0.264583"
-       id="rect334-8"
-       width="2.6158149"
-       height="0.49014917"
-       x="2.6613681"
-       y="4.8042765"
-       rx="0.30000046"
-       ry="0.49014917" />
+       id="rect146-8"
+       width="2.3911862"
+       height="0.51421511"
+       x="-4.7822795"
+       y="-5.5484004"
+       transform="scale(-1)" />
     <rect
        style="display:inline;fill:#000000;stroke-width:0.264583"
-       id="rect334-0"
-       width="2.6158149"
-       height="0.49014917"
-       x="-5.2844954"
-       y="2.6692824"
-       rx="0.30000046"
-       ry="0.49014917"
-       transform="rotate(-89.956491)" />
-    <rect
-       style="display:inline;fill:#000000;stroke-width:0.264583"
-       id="rect334-0-0"
-       width="2.6158149"
-       height="0.49014917"
-       x="-5.2824674"
-       y="4.8206959"
-       rx="0.30000046"
-       ry="0.49014917"
-       transform="rotate(-89.956491)" />
+       id="rect148-6"
+       width="0.52931041"
+       height="2.1125042"
+       x="-2.910464"
+       y="-5.3019991"
+       transform="scale(-1)" />
   </g>
   <g
      inkscape:groupmode="layer"
