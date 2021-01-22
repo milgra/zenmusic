@@ -380,7 +380,7 @@
 }
 
 #messagelist {
-    display: mask;
+    overflow: hidden;
     width: 100%;
     height: 100%;
     border-radius: 15px;
@@ -399,7 +399,7 @@
 }
 
 #filterlist {
-    display: mask;
+    overflow: hidden;
     width: 100%;
     height: 100%;
     border-radius: 15px;
@@ -428,7 +428,7 @@
 }
 
 #editorlist {
-    display: mask;
+    overflow: hidden;
     width: 100%;
     height: 100%;
     border-radius: 15px;
@@ -504,7 +504,7 @@
 }
 
 #settings {
-    display: mask;
+    overflow: hidden;
     width: 100%;
     height: 100%;
     border-radius: 15px;
@@ -523,7 +523,7 @@
 }
 
 #about {
-    display: mask;
+    overflow: hidden;
     width: 100%;
     height: 100%;
     border-radius: 15px;
