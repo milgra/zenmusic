@@ -495,14 +495,37 @@
 
 #settingsback {
     width: 400px;
-    height: 600px;
-    top: 250px;
+    height: 590px;
+    top: 220px;
     margin: auto;
     border-radius: 15px;
     background-color: #EDEDEDFF;
     box-shadow: 3px;
     display: flex;
     flex-direction: column;
+}
+
+.set_block {
+    width: 380px;
+    height: 150px;
+    margin: auto;
+    border-radius: 15px;
+    background-color: #FFFFFFFF;
+    box-shadow: 3px;
+}
+
+.set_block_big {
+    width: 380px;
+    height: 250px;
+    margin: auto;
+    border-radius: 15px;
+    background-color: #FFFFFFFF;
+    box-shadow: 3px;
+}
+
+.set_gap {
+    display: none;
+    height: 10px;
 }
 
 #settings {
@@ -515,18 +538,21 @@
 }
 
 #set_lib_txt {
+    top: 10px;
     width: 400px;
     height: 50px;
     margin: auto;
 }
 
 #set_lib_pth {
+    top: 40px;
     width: 400px;
     height: 50px;
     margin: auto;
 }
 
 #set_lib_btn {
+    top: 90px;
     background-color: #FFFFFFFF;
     width: 200px;
     height: 30px;
@@ -541,6 +567,7 @@
 }
 
 #set_org_text {
+    top: 10px;
     width: 400px;
     height: 50px;
     margin: auto;
@@ -548,6 +575,7 @@
 }
 
 #set_org_val {
+    top: 40px;
     width: 400px;
     height: 50px;
     margin: auto;
@@ -555,6 +583,7 @@
 }
 
 #set_org_btn {
+    top: 90px;
     background-color: #FFFFFFFF;
     width: 200px;
     height: 30px;
@@ -569,6 +598,15 @@
 }
 
 #set_col_text {
+    top: 10px;
+    width: 400px;
+    height: 50px;
+    margin: auto;
+    background-color: #EFEFEFFF;
+}
+
+#set_col_val {
+    top: 40px;
     width: 400px;
     height: 50px;
     margin: auto;
@@ -576,9 +614,10 @@
 }
 
 #set_col_sel_bck {
+    top: 90px;
     background-color: #FFFFFFFF;
     width: 300px;
-    height: 200px;
+    height: 130px;
     margin: auto;
     border-radius: 17px;
     box-shadow: 3px;
@@ -586,7 +625,7 @@
 
 #set_col_sel_msk {
     width: 300px;
-    height: 200px;
+    height: 130px;
     overflow: hidden;
     border-radius: 17px;
     background-color: #000000FF;
@@ -600,12 +639,52 @@
 
 #aboutback {
     width: 400px;
-    height: 400px;
-    top: 350px;
+    height: 590px;
+    top: 220px;
     margin: auto;
     border-radius: 15px;
-    background-color: #FFFFFFFF;
+    background-color: #EDEDEDFF;
     box-shadow: 3px;
+    display: flex;
+    flex-direction: column;
+}
+
+
+#home_lib_txt {
+    top: 10px;
+    width: 400px;
+    height: 160px;
+    margin: auto;
+}
+
+#home_lib_btn {
+    top: 170px;
+    background-color: #FFFFFFFF;
+    width: 200px;
+    height: 30px;
+    margin: auto;
+    border-radius: 17px;
+    box-shadow: 3px;
+}
+
+#home_lib_btn_txt {
+    width: 100%;
+    height: 100%;
+}
+
+#home_org_btn {
+    top: 210px;
+    background-color: #FFFFFFFF;
+    width: 200px;
+    height: 30px;
+    margin: auto;
+    border-radius: 17px;
+    box-shadow: 3px;
+}
+
+#home_org_btn_txt {
+    width: 100%;
+    height: 100%;
 }
 
 #about {
@@ -616,7 +695,6 @@
     background-color: #FFFFFFFF;
     box-shadow: 2px;
 }
-
 
 #search {
     width: 150px;

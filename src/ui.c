@@ -291,6 +291,22 @@ void ui_on_volume_change(view_t* view, float angle)
   player_set_volume(ratio);
 }
 
+void ui_on_home_close(view_t* view, void* data)
+{
+  if (aboutview->parent)
+    view_remove(mainview, aboutview);
+  else
+    view_add(mainview, aboutview);
+}
+
+void ui_on_settings_close(view_t* view, void* data)
+{
+  if (settingsview->parent)
+    view_remove(mainview, settingsview);
+  else
+    view_add(mainview, settingsview);
+}
+
 // api functions
 
 void ui_show_song_info(int index)
@@ -466,8 +482,10 @@ void ui_init(float  width,
   view_t* infobtn   = view_get_subview(baseview, "info");
   view_t* uploadbtn = view_get_subview(baseview, "uploadbtn");
 
-  view_t* closeeditorbtn  = view_get_subview(baseview, "closeeditoricon");
-  view_t* accepteditorbtn = view_get_subview(baseview, "accepteditoricon");
+  view_t* closeeditorbtn   = view_get_subview(baseview, "closeeditoricon");
+  view_t* closehomebtn     = view_get_subview(baseview, "closehomeicon");
+  view_t* closesettingsbtn = view_get_subview(baseview, "closesettingsicon");
+  view_t* accepteditorbtn  = view_get_subview(baseview, "accepteditoricon");
 
   playbtn = view_get_subview(baseview, "playbtn");
   volbtn  = view_get_subview(baseview, "volbtn");
@@ -494,6 +512,9 @@ void ui_init(float  width,
 
   vh_button_add(closeeditorbtn, NULL, ui_on_editor_reject);
   vh_button_add(accepteditorbtn, NULL, ui_on_editor_accept);
+
+  vh_button_add(closehomebtn, NULL, ui_on_home_close);
+  vh_button_add(closesettingsbtn, NULL, ui_on_settings_close);
 
   tg_text_add(uploadbtn);
   tg_text_set(uploadbtn, "add new image", ts);
@@ -584,18 +605,6 @@ void ui_init(float  width,
   vh_text_set_on_text(filterbar, ui_filter);
   vh_text_set_on_activate(filterbar, ui_on_filter_activate);
 
-  aboutview = view_get_subview(baseview, "aboutback");
-
-  char* info = "Zen Music by Milan Toth\nFree and Open Source Software.\n"
-               "If you like Zen Music, please consider donating\n www.paypal.me/milgra\n"
-               "Powered by FreeBSD, Emacs and C";
-
-  view_t* about = view_get_subview(baseview, "about");
-  tg_text_add(about);
-  tg_text_set(about, info, ts);
-
-  view_remove(main, aboutview);
-
   editorview     = view_get_subview(baseview, "ideditorback");
   view_t* editor = view_get_subview(baseview, "editorlist");
 
@@ -628,10 +637,11 @@ void ui_init(float  width,
   view_t* set_org_val     = view_get_subview(baseview, "set_org_val");
   view_t* set_org_btn_txt = view_get_subview(baseview, "set_org_btn_txt");
   view_t* set_col_text    = view_get_subview(baseview, "set_col_text");
+  view_t* set_col_val     = view_get_subview(baseview, "set_col_val");
   view_t* set_col_sel     = view_get_subview(baseview, "set_col_sel");
 
   tg_text_add(set_lib_text);
-  tg_text_set(set_lib_text, "Music Library Location :", ts);
+  tg_text_set(set_lib_text, "Music Library Location", ts);
 
   tg_text_add(set_lib_path);
   tg_text_set(set_lib_path, libpath, ts);
@@ -640,7 +650,7 @@ void ui_init(float  width,
   tg_text_set(set_lib_btn_txt, "Use Other Library", ts);
 
   tg_text_add(set_org_text);
-  tg_text_set(set_org_text, "Keep Library Organized :", ts);
+  tg_text_set(set_org_text, "Keep Library Organized", ts);
 
   tg_text_add(set_org_val);
   tg_text_set(set_org_val, "Disabled", ts);
@@ -649,12 +659,34 @@ void ui_init(float  width,
   tg_text_set(set_org_btn_txt, "Enable", ts);
 
   tg_text_add(set_col_text);
-  tg_text_set(set_col_text, "User Interface Base Color", ts);
+  tg_text_set(set_col_text, "User Interface Color", ts);
+
+  tg_text_add(set_col_val);
+  tg_text_set(set_col_val, "EFEFEF", ts);
 
   tg_picker_add(set_col_sel);
 
   settingsview = view_get_subview(baseview, "settingsback");
   view_remove(main, settingsview);
+
+  aboutview = view_get_subview(baseview, "aboutback");
+
+  view_t* home_lib_text    = view_get_subview(baseview, "home_lib_txt");
+  view_t* home_lib_btn_txt = view_get_subview(baseview, "home_lib_btn_txt");
+
+  view_t* home_org_text    = view_get_subview(baseview, "home_org_txt");
+  view_t* home_org_btn_txt = view_get_subview(baseview, "home_org_btn_txt");
+
+  tg_text_add(home_lib_text);
+  tg_text_set(home_lib_text, "Zen Music v0.8\n by Milan Toth\nFree and Open Source Software.\nIf you like it, please support the development.", ts);
+
+  tg_text_add(home_lib_btn_txt);
+  tg_text_set(home_lib_btn_txt, "Donate on Paypal", ts);
+
+  tg_text_add(home_org_btn_txt);
+  tg_text_set(home_org_btn_txt, "Support on Patreon", ts);
+
+  view_remove(main, aboutview);
 
   // additional setup
   // TODO control these from CSS

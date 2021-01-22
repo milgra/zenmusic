@@ -51,8 +51,6 @@ first version
 
 if track number exists, use that in file name
 make instead of gmake, debug, release targets -g -O3, install ffmpeg and sdl2 if needed
-settings view - select library, organize library, color selector
-close icons to all popups
 title/aritst/info egy textfield legyen, ugy konnyebb shadow is, time bar passed/remaining
 fix query field
 make genre/artist selection filter songs, fill up query bar
@@ -82,6 +80,8 @@ accept input on enter
 sanitize css - textfields came class, etc
 html button onclick - map-ba lehessen rakni function wrappert, main-be legyen az osszes callback function ami kell, csak atadni view generatornak
 generic input popup, choice popup view-k
+popup-ok center align
+go to source/ go to youtube channel button home-ba
 
 ideas
 
