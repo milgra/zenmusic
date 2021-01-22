@@ -43,6 +43,7 @@ void ui_refresh_songlist();
 #include "view_layout.c"
 #include "wm_connector.c"
 // TODO remove fromm zenmusic.c
+#include "tg_picker.c"
 #include "ui_manager.c"
 
 view_t* baseview;
@@ -620,13 +621,14 @@ void ui_init(float  width,
 
   // settings
 
-  view_t* set_lib_text = view_get_subview(baseview, "set_lib_txt");
-  view_t* set_lib_path = view_get_subview(baseview, "set_lib_pth");
-  view_t* set_lib_btn  = view_get_subview(baseview, "set_lib_btn_txt");
-  view_t* set_org_text = view_get_subview(baseview, "set_org_text");
-  view_t* set_org_btn  = view_get_subview(baseview, "set_org_btn");
-  view_t* set_col_text = view_get_subview(baseview, "set_col_text");
-  view_t* set_col_sel  = view_get_subview(baseview, "set_col_sel");
+  view_t* set_lib_text    = view_get_subview(baseview, "set_lib_txt");
+  view_t* set_lib_path    = view_get_subview(baseview, "set_lib_pth");
+  view_t* set_lib_btn_txt = view_get_subview(baseview, "set_lib_btn_txt");
+  view_t* set_org_text    = view_get_subview(baseview, "set_org_text");
+  view_t* set_org_val     = view_get_subview(baseview, "set_org_val");
+  view_t* set_org_btn_txt = view_get_subview(baseview, "set_org_btn_txt");
+  view_t* set_col_text    = view_get_subview(baseview, "set_col_text");
+  view_t* set_col_sel     = view_get_subview(baseview, "set_col_sel");
 
   tg_text_add(set_lib_text);
   tg_text_set(set_lib_text, "Music Library Location :", ts);
@@ -634,14 +636,22 @@ void ui_init(float  width,
   tg_text_add(set_lib_path);
   tg_text_set(set_lib_path, libpath, ts);
 
-  tg_text_add(set_lib_btn);
-  tg_text_set(set_lib_btn, "Use Other Library", ts);
+  tg_text_add(set_lib_btn_txt);
+  tg_text_set(set_lib_btn_txt, "Use Other Library", ts);
 
   tg_text_add(set_org_text);
-  tg_text_set(set_org_text, "Keep Music Library Organized", ts);
+  tg_text_set(set_org_text, "Keep Library Organized :", ts);
+
+  tg_text_add(set_org_val);
+  tg_text_set(set_org_val, "Disabled", ts);
+
+  tg_text_add(set_org_btn_txt);
+  tg_text_set(set_org_btn_txt, "Enable", ts);
 
   tg_text_add(set_col_text);
   tg_text_set(set_col_text, "User Interface Base Color", ts);
+
+  tg_picker_add(set_col_sel);
 
   settingsview = view_get_subview(baseview, "settingsback");
   view_remove(main, settingsview);

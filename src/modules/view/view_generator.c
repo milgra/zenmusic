@@ -22,7 +22,6 @@ void view_gen_apply_style(view_t* view, map_t* style, char* respath)
   {
     char* key = keys->data[index];
     char* val = MGET(style, key);
-    // printf("\nkey %s val %s", key, val);
 
     if (strcmp(key, "background-color") == 0)
     {
@@ -201,9 +200,9 @@ void view_gen_apply_style(view_t* view, map_t* style, char* respath)
       }
     }
   }
-  printf("layout for %s: ", view->id);
-  view_desc_layout(view->layout);
-  printf("\n");
+  /* printf("layout for %s: ", view->id); */
+  /* view_desc_layout(view->layout); */
+  /* printf("\n"); */
 }
 
 vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath)

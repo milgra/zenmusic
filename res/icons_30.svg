@@ -21,10 +21,10 @@
      id="defs2">
     <inkscape:perspective
        sodipodi:type="inkscape:persp3d"
-       inkscape:vp_x="0 : 3.9687502 : 1"
-       inkscape:vp_y="0 : 1000 : 0"
-       inkscape:vp_z="7.9374997 : 3.9687502 : 1"
-       inkscape:persp3d-origin="3.9687499 : 2.6458335 : 1"
+       inkscape:vp_x="-3.490039 : 7.0492872 : 1"
+       inkscape:vp_y="0 : 2135.7657 : 0"
+       inkscape:vp_z="13.958012 : 7.0492872 : 1"
+       inkscape:persp3d-origin="5.2339865 : 4.223847 : 1"
        id="perspective96" />
   </defs>
   <sodipodi:namedview
@@ -121,41 +121,41 @@
      id="layer9"
      inkscape:label="Shuffle 1">
     <circle
-       style="display:inline;fill:#000000;stroke-width:0.264583"
-       id="path170-2"
-       cx="3.1730356"
-       cy="-3.9996438"
-       r="0.80481106"
-       transform="scale(1,-1)" />
+       style="fill:#000000;stroke-width:0.264583"
+       id="path364-3"
+       cx="3.0416799"
+       cy="2.7761359"
+       r="0.48411247" />
     <circle
-       style="display:inline;fill:#000000;stroke-width:0.264583"
-       id="path170-4-3"
-       cx="4.7392526"
-       cy="-3.9848499"
-       r="0.80481106"
-       transform="scale(1,-1)" />
-    <rect
        style="fill:#000000;stroke-width:0.264583"
-       id="rect211"
-       width="0.54696035"
-       height="2.9269993"
-       x="3.6939793"
-       y="2.6411176" />
-    <ellipse
-       style="display:inline;fill:#000000;stroke-width:0.264583"
-       id="path170-2-4"
-       cx="3.9539897"
-       cy="-2.5348008"
-       transform="scale(1,-1)"
-       rx="0.80481106"
-       ry="0.94405931" />
-    <rect
+       id="path364-3-4"
+       cx="3.0097165"
+       cy="3.9629741"
+       r="0.48411247" />
+    <circle
        style="fill:#000000;stroke-width:0.264583"
-       id="rect211-8"
-       width="2.1337304"
-       height="0.55285925"
-       x="2.8898418"
-       y="5.294405" />
+       id="path364-3-5"
+       cx="3.0173898"
+       cy="5.1714325"
+       r="0.48411247" />
+    <circle
+       style="fill:#000000;stroke-width:0.264583"
+       id="path364-3-0"
+       cx="4.9569759"
+       cy="2.7733383"
+       r="0.48411247" />
+    <circle
+       style="fill:#000000;stroke-width:0.264583"
+       id="path364-3-4-0"
+       cx="4.9250131"
+       cy="3.9601769"
+       r="0.48411247" />
+    <circle
+       style="fill:#000000;stroke-width:0.264583"
+       id="path364-3-5-8"
+       cx="4.9326859"
+       cy="5.1686349"
+       r="0.48411247" />
   </g>
   <g
      inkscape:groupmode="layer"

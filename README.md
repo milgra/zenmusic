@@ -79,6 +79,9 @@ kijelzon shadow
 time onclick = remaining time
 socketes taviranyitas - 1 byteokkal
 accept input on enter
+sanitize css - textfields came class, etc
+html button onclick - map-ba lehessen rakni function wrappert, main-be legyen az osszes callback function ami kell, csak atadni view generatornak
+generic input popup, choice popup view-k
 
 ideas
 

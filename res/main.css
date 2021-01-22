@@ -495,11 +495,11 @@
 
 #settingsback {
     width: 400px;
-    height: 400px;
-    top: 350px;
+    height: 600px;
+    top: 250px;
     margin: auto;
     border-radius: 15px;
-    background-color: #FFFFFFFF;
+    background-color: #EDEDEDFF;
     box-shadow: 3px;
     display: flex;
     flex-direction: column;
@@ -547,6 +547,13 @@
     background-color: #EFEFEFFF;
 }
 
+#set_org_val {
+    width: 400px;
+    height: 50px;
+    margin: auto;
+    background-color: #EFEFEFFF;
+}
+
 #set_org_btn {
     background-color: #FFFFFFFF;
     width: 200px;
@@ -556,6 +563,11 @@
     box-shadow: 3px;
 }
 
+#set_org_btn_txt {
+    width: 100%;
+    height: 100%;
+}
+
 #set_col_text {
     width: 400px;
     height: 50px;
@@ -563,13 +575,27 @@
     background-color: #EFEFEFFF;
 }
 
-#set_col_sel {
+#set_col_sel_bck {
     background-color: #FFFFFFFF;
-    width: 200px;
-    height: 100px;
+    width: 300px;
+    height: 200px;
     margin: auto;
     border-radius: 17px;
     box-shadow: 3px;
+}
+
+#set_col_sel_msk {
+    width: 300px;
+    height: 200px;
+    overflow: hidden;
+    border-radius: 17px;
+    background-color: #000000FF;
+    box-shadow: 1px;
+}
+    
+#set_col_sel {
+    width: 100%;
+    height: 100%;
 }
 
 #aboutback {
