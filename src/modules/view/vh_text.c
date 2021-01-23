@@ -12,6 +12,8 @@ typedef struct _vh_text_t
   textstyle_t style;
   char        editing;
   void*       userdata;
+  uint32_t    time;
+  char        open;
 
   r2_t     crsr_f;
   view_t*  crsr_v;
@@ -82,6 +84,30 @@ void vh_text_upd(view_t* view)
   REL(cstr);
 }
 
+void vh_text_open_cursor(view_t* view)
+{
+  vh_text_t* data = view->handler_data;
+
+  r2_t sf = data->crsr_f;
+  r2_t ef = sf;
+  sf.h    = 0;
+  sf.y    = ef.y + ef.h / 2.0;
+
+  vh_anim_set(data->crsr_v, sf, ef, 10, AT_LINEAR);
+}
+
+void vh_text_close_cursor(view_t* view)
+{
+  vh_text_t* data = view->handler_data;
+
+  r2_t sf = data->crsr_f;
+  r2_t ef = sf;
+  ef.h    = 0;
+  ef.y    = sf.y + sf.h / 2.0;
+
+  vh_anim_set(data->crsr_v, sf, ef, 10, AT_LINEAR);
+}
+
 void vh_text_activate(view_t* view, char state)
 {
   vh_text_t* data = view->handler_data;
@@ -91,13 +117,7 @@ void vh_text_activate(view_t* view, char state)
     if (!data->editing)
     {
       data->editing = 1;
-
-      r2_t sf = data->crsr_f;
-      r2_t ef = sf;
-      sf.h    = 0;
-      sf.y    = ef.y + ef.h / 2.0;
-
-      vh_anim_set(data->crsr_v, sf, ef, 10, AT_LINEAR);
+      vh_text_open_cursor(view);
     }
   }
   else
@@ -105,13 +125,7 @@ void vh_text_activate(view_t* view, char state)
     if (data->editing)
     {
       data->editing = 0;
-
-      r2_t sf = data->crsr_f;
-      r2_t ef = sf;
-      ef.h    = 0;
-      ef.y    = sf.y + sf.h / 2.0;
-
-      vh_anim_set(data->crsr_v, sf, ef, 10, AT_LINEAR);
+      vh_text_close_cursor(view);
     }
   }
 }
@@ -119,7 +133,23 @@ void vh_text_activate(view_t* view, char state)
 void vh_text_evt(view_t* view, ev_t ev)
 {
   vh_text_t* data = view->handler_data;
-  if (ev.type == EV_MDOWN)
+  if (ev.type == EV_TIME)
+  {
+    if (data->editing)
+    {
+      if (ev.time > data->time + 1000)
+      {
+        if (data->open)
+          vh_text_close_cursor(view);
+        else
+          vh_text_open_cursor(view);
+
+        data->open = 1 - data->open;
+        data->time = ev.time;
+      }
+    }
+  }
+  else if (ev.type == EV_MDOWN)
   {
     vh_text_activate(view, 1);
     if (data->on_activate) (*data->on_activate)(view);
