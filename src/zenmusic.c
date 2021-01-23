@@ -18,23 +18,7 @@ double lasttime = 0.0;
 char*  libpath  = NULL;
 
 ch_t*  ch;
-map_t* db;
 map_t* cfg;
-vec_t* songs;
-vec_t* genres;
-vec_t* artists;
-
-void sort(char* field)
-{
-  db_sort(db, songs, field);
-  db_genres(db, genres);
-  db_artists(songs, artists);
-}
-
-void filter(view_t* view, char* text)
-{
-  db_filter(db, text, songs);
-}
 
 void save_db(map_t* entry)
 {
@@ -42,22 +26,22 @@ void save_db(map_t* entry)
   player_set_metadata(entry, "king.jpg");
 
   // move song to new place if needed
-  lib_organize_entry(libpath, db, entry);
+  lib_organize_entry(libpath, db_get_db(), entry);
 
   // save database
-  db_write(libpath, db);
+  db_write(libpath);
 }
 
 void load_lib()
 {
   printf("load_lib %s\n", libpath);
 
-  db_read(libpath, db);                   // read db
+  db_read(libpath);                       // read db
   lib_read(libpath);                      // read library
-  lib_remove_duplicates(db);              // remove existing
+  lib_remove_duplicates(db_get_db());     // remove existing
   if (lib_entries() > 0) lib_analyze(ch); // start analyzing new entries
 
-  sort("artist");
+  db_sort("artist");
 }
 
 void save_lib(char* path)
@@ -86,14 +70,10 @@ void init(int width, int height, char* respath)
 {
   srand((unsigned int)time(NULL));
 
-  db  = MNEW();      // database
   ch  = ch_new(100); // comm channel for library entries
   cfg = MNEW();      // config map
 
-  songs   = VNEW();
-  genres  = VNEW();
-  artists = VNEW();
-
+  db_init();
   config_read(cfg);
 
   libpath = MGET(cfg, "library_path");
@@ -102,9 +82,6 @@ void init(int width, int height, char* respath)
           height,
           respath,
           libpath,
-          songs,
-          genres,
-          artists,
           save_db,
           save_lib);
 
@@ -139,19 +116,20 @@ void update(ev_t ev)
 
     if (strcmp(path, "//////") != 0)
     {
-      MPUT(db, path, entry); // store entry
-      VADD(songs, entry);
-      if (db->count % 100 == 0) ui_refresh_songlist();
+      db_add_entry(path, entry);
+      //MPUT(db, path, entry); // store entry
+      //VADD(songs, entry);
+      if (db_count() % 100 == 0) ui_refresh_songlist();
     }
     else
     {
       // analyzing is finished, sort and store database
 
-      sort("artist");
-      db_write(libpath, db);
+      db_sort("artist");
+      db_write(libpath);
 
-      int succ = lib_organize(libpath, db);
-      if (succ == 0) db_write(libpath, db);
+      int succ = lib_organize(libpath, db_get_db());
+      if (succ == 0) db_write(libpath);
 
       ui_refresh_songlist();
     }

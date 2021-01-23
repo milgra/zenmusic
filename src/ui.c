@@ -4,13 +4,10 @@
 #include "mtmap.c"
 #include "view.c"
 
-void ui_init(float  width,
-             float  height,
-             char*  respath,
-             char*  libpath,
-             vec_t* songs,
-             vec_t* genres,
-             vec_t* artists,
+void ui_init(float width,
+             float height,
+             char* respath,
+             char* libpath,
              void (*save_entry)(map_t* map),
              void (*accept_popup)(char* text));
 void ui_update_position(float ratio);
@@ -429,17 +426,14 @@ void ui_refresh_songlist()
   songlist_refresh();
 }
 
-void ui_init(float  width,
-             float  height,
-             char*  respath,
-             char*  libpath,
-             vec_t* songs,
-             vec_t* genres,
-             vec_t* artists,
+void ui_init(float width,
+             float height,
+             char* respath,
+             char* libpath,
              void (*save_entry)(map_t* map),
              void (*accept_popup)(char* text))
 {
-  ui.songs        = songs;
+  ui.songs        = db_get_songs();
   ui.save_entry   = save_entry;
   ui.accept_popup = accept_popup;
 
@@ -537,13 +531,13 @@ void ui_init(float  width,
 
   // list setup
 
-  songlist_attach(baseview, ui.songs, fontpath, ui_on_song_select, ui_on_song_edit, ui_on_song_header);
+  songlist_attach(baseview, fontpath, ui_on_song_select, ui_on_song_edit, ui_on_song_header);
 
   ts.align              = TA_RIGHT;
-  textlist_t* genrelist = textlist_new(view_get_subview(baseview, "genrelist"), genres, ts, ui_on_genre_select);
+  textlist_t* genrelist = textlist_new(view_get_subview(baseview, "genrelist"), db_get_genres(), ts, ui_on_genre_select);
 
   ts.align               = TA_LEFT;
-  textlist_t* artistlist = textlist_new(view_get_subview(baseview, "artistlist"), artists, ts, ui_on_artist_select);
+  textlist_t* artistlist = textlist_new(view_get_subview(baseview, "artistlist"), db_get_artists(), ts, ui_on_artist_select);
 
   messagelistback     = view_get_subview(baseview, "messagelistback");
   view_t* messagelist = view_get_subview(baseview, "messagelist");

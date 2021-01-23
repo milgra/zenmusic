@@ -7,7 +7,7 @@
 #include "mtmap.c"
 #include "view.c"
 
-void songlist_attach(view_t* base, vec_t* songs, char* fontpath, void (*on_select)(int), void (*on_edit)(int), void (*on_header_select)(char*));
+void songlist_attach(view_t* base, char* fontpath, void (*on_select)(int), void (*on_edit)(int), void (*on_header_select)(char*));
 void songlist_update();
 void songlist_refresh();
 void songlist_toggle_selected(int state);
@@ -16,6 +16,7 @@ void songlist_toggle_selected(int state);
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "db.c"
 #include "tg_css.c"
 #include "tg_text.c"
 #include "vh_button.c"
@@ -65,18 +66,16 @@ sl_cell_t* sl_cell_new(char* id, int size, int index)
 }
 
 void songlist_attach(view_t* base,
-                     vec_t*  songs,
                      char*   fontpath,
                      void (*on_select)(int),
                      void (*on_edit)(int),
                      void (*on_header_select)(char*))
 {
   assert(base != NULL);
-  assert(songs != NULL);
   assert(fontpath != NULL);
 
   sl.view   = view_get_subview(base, "songlist");
-  sl.songs  = songs;
+  sl.songs  = db_get_songs();
   sl.fields = VNEW();
 
   sl.index_s = 0;
