@@ -302,7 +302,7 @@ void vh_list_evt(view_t* view, ev_t ev)
           vh_list_move(view, -head->frame.local.y / 5.0);
         }
       }
-      else if (vh->item_pos > vh->header_size + 0.001 || vh->item_pos < -0.0001)
+      else if (vh->item_pos > 0.001 || vh->item_pos < -0.0001)
       {
         vh_list_move(view, 0);
       }
