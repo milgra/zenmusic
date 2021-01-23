@@ -299,6 +299,14 @@ void ui_on_home_close(view_t* view, void* data)
     view_add(mainview, aboutview);
 }
 
+void ui_on_filter_close(view_t* view, void* data)
+{
+  if (filterlistback->parent)
+    view_remove(mainview, filterlistback);
+  else
+    view_add(mainview, filterlistback);
+}
+
 void ui_on_settings_close(view_t* view, void* data)
 {
   if (settingsview->parent)
@@ -483,6 +491,7 @@ void ui_init(float  width,
   view_t* uploadbtn = view_get_subview(baseview, "uploadbtn");
 
   view_t* closeeditorbtn   = view_get_subview(baseview, "closeeditoricon");
+  view_t* closefilterbtn   = view_get_subview(baseview, "closefiltericon");
   view_t* closehomebtn     = view_get_subview(baseview, "closehomeicon");
   view_t* closesettingsbtn = view_get_subview(baseview, "closesettingsicon");
   view_t* accepteditorbtn  = view_get_subview(baseview, "accepteditoricon");
@@ -515,6 +524,7 @@ void ui_init(float  width,
 
   vh_button_add(closehomebtn, NULL, ui_on_home_close);
   vh_button_add(closesettingsbtn, NULL, ui_on_settings_close);
+  vh_button_add(closefilterbtn, NULL, ui_on_filter_close);
 
   tg_text_add(uploadbtn);
   tg_text_set(uploadbtn, "add new image", ts);

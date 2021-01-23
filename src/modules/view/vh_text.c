@@ -117,6 +117,7 @@ void vh_text_activate(view_t* view, char state)
     if (!data->editing)
     {
       data->editing = 1;
+      view_add(view, data->crsr_v);
       vh_text_open_cursor(view);
     }
   }
@@ -125,6 +126,7 @@ void vh_text_activate(view_t* view, char state)
     if (data->editing)
     {
       data->editing = 0;
+      view_remove(view, data->crsr_v);
       vh_text_close_cursor(view);
     }
   }
@@ -232,7 +234,6 @@ void vh_text_add(view_t*     view,
   crsr_v->layout.background_color = 0x666666FF;
   tg_css_add(crsr_v);
   vh_anim_add(crsr_v);
-  view_add(view, crsr_v);
 
   data->crsr_v = crsr_v;
 
