@@ -69,7 +69,6 @@ spectrum, bar analyzer, left/right effect button, unshift bmp?
 speed up font rendering by using glyph indexes instead of codepoints
 ui color shade selector, darknal invertalja a jelenlegi semat
 button on/off alpha change on icon
-unit teszter gl_compositorhoz
 grid-based warping of video/album cover based on frequence ( bass in the center )
 andromeda:  monolith-like particle visu
 swithc between multiple glyph views in paragraph/one multiglyph view in paragraph  
@@ -85,6 +84,7 @@ go to source/ go to youtube channel button home-ba
 
 ideas
 
+unit teszter gl_compositorhoz
 ujdonsagok video jojjon fel az events windowban, about
 analog mutatos output meterek is visualizacioban
 glossy effekt

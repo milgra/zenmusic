@@ -93,10 +93,6 @@ void songlist_attach(view_t* base,
   sl.textstyle.textcolor   = 0x000000FF;
   sl.textstyle.backcolor   = 0xEFEFEFFF;
 
-  // add list handler to view
-
-  vh_list_add(sl.view, songitem_create, songitem_update, NULL);
-
   // create fields
 
   VADD(sl.fields, sl_cell_new("index", 50, 0));
@@ -116,7 +112,11 @@ void songlist_attach(view_t* base,
 
   // add header handler
 
-  view_t* header = view_get_subview(base, "songlistheader");
+  view_t* header                  = view_new("songlist_header", (r2_t){0, 0, 10, 30});
+  header->layout.background_color = 0xBBBBBBFF;
+  header->layout.shadow_blur      = 3;
+  header->layout.border_radius    = 3;
+  tg_css_add(header);
 
   vh_lhead_add(header);
   vh_lhead_set_on_select(header, on_header_field_select);
@@ -132,6 +132,11 @@ void songlist_attach(view_t* base,
 
     vh_lhead_add_cell(header, cell->id, cell->size, cellview);
   }
+
+  // add list handler to view
+
+  vh_list_add(sl.view, songitem_create, songitem_update, NULL);
+  vh_list_set_header(sl.view, header);
 }
 
 void songlist_update()

@@ -17,7 +17,7 @@
 }
 
 #songlisttop {
-    height: 215px;
+    height: 185px;
     width: 100%;
 }
 
@@ -509,7 +509,7 @@
     width: 380px;
     height: 150px;
     margin: auto;
-    border-radius: 15px;
+    border-radius: 10px;
     background-color: #FFFFFFFF;
     box-shadow: 3px;
 }
@@ -518,7 +518,7 @@
     width: 380px;
     height: 250px;
     margin: auto;
-    border-radius: 15px;
+    border-radius: 10px;
     background-color: #FFFFFFFF;
     box-shadow: 3px;
 }

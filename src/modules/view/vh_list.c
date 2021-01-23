@@ -26,8 +26,10 @@ typedef struct _vh_list_t
 
   // scrollers
 
-  view_t* vscr; // vertical scroller
-  view_t* hscr; // horizontal scroller
+  view_t* vscr;   // vertical scroller
+  view_t* hscr;   // horizontal scroller
+  view_t* header; // header view
+  float   header_size;
 
   uint32_t vtimeout; // vertical scroller timeout
   uint32_t htimeout; // horizontal scroller timeout
@@ -40,6 +42,7 @@ void    vh_list_add(view_t* view,
                     view_t* (*create_item)(view_t* listview, void* userdata),
                     int (*update_item)(view_t* listview, void* userdata, view_t* item, int index, int* item_count),
                     void* userdata);
+void    vh_list_set_header(view_t* view, view_t* headerview);
 vec_t*  vh_list_items(view_t* view);
 vec_t*  vh_list_cache(view_t* view);
 void    vh_list_fill(view_t* view);
@@ -90,6 +93,13 @@ void vh_list_move(view_t* view, float dy)
       outside       = 1;
       vh->bot_index = vh->head_index + index;
     }
+  }
+
+  if (vh->header)
+  {
+    r2_t frame = vh->header->frame.local;
+    frame.x    = vh->item_pos;
+    view_set_frame(vh->header, frame);
   }
 
   if (!outside) vh->bot_index = vh->tail_index;
@@ -164,7 +174,7 @@ void vh_list_evt(view_t* view, ev_t ev)
 
           vh->item_wth = item->frame.global.w; // store maximum width
 
-          view_set_frame(item, (r2_t){0, 0, item->frame.local.w, item->frame.local.h});
+          view_set_frame(item, (r2_t){0, vh->header_size, item->frame.local.w, item->frame.local.h});
         }
         else
           vh->full = 1;
@@ -277,9 +287,9 @@ void vh_list_evt(view_t* view, ev_t ev)
 
       // vertical bounce
 
-      if (head->frame.local.y > 0.001)
+      if (head->frame.local.y > vh->header_size + 0.001)
       {
-        vh_list_move(view, -head->frame.local.y / 5.0);
+        vh_list_move(view, (vh->header_size - head->frame.local.y) / 5.0);
       }
       else if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h - 0.001 - vh->hscr->frame.local.h)
       {
@@ -292,7 +302,7 @@ void vh_list_evt(view_t* view, ev_t ev)
           vh_list_move(view, -head->frame.local.y / 5.0);
         }
       }
-      else if (vh->item_pos > 0.0001 || vh->item_pos < -0.0001)
+      else if (vh->item_pos > vh->header_size + 0.001 || vh->item_pos < -0.0001)
       {
         vh_list_move(view, 0);
       }
@@ -478,6 +488,31 @@ view_t* vh_list_item_for_index(view_t* view, int index)
   }
 
   return NULL;
+}
+
+void vh_list_set_header(view_t* view, view_t* headerview)
+{
+  vh_list_t* vh = view->handler_data;
+
+  if (vh->header != NULL)
+  {
+    view_remove(view, vh->header);
+    REL(vh->header);
+  }
+  RET(headerview);
+  vh->header = headerview;
+
+  // add as subview
+  view_add(view, headerview);
+  vh->header_size = headerview->frame.local.h;
+
+  if (vh->vscr)
+  {
+    r2_t frame = vh->vscr->frame.local;
+    frame.y    = vh->header_size;
+    frame.h    = frame.h - vh->header_size;
+    view_set_frame(vh->vscr, frame);
+  }
 }
 
 #endif
