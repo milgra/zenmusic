@@ -7,8 +7,7 @@
 void ui_init(float width,
              float height,
              char* respath,
-             char* libpath,
-             void (*accept_popup)(char* text));
+             char* libpath);
 void ui_update_position(float ratio);
 void ui_update_volume(float ratio);
 void ui_update_visualizer();
@@ -78,7 +77,6 @@ void ui_show_song_info(int index);
 struct _ui_t
 {
   vec_t* songs;
-  void (*accept_popup)(char* text);
 } ui = {0};
 
 // button events
@@ -419,7 +417,12 @@ void ui_on_accept_libpath(view_t* view, void* data)
   // get path string
   str_t* path    = vh_text_get_text(libinputfield);
   char*  path_ch = str_cstring(path);
-  (*ui.accept_popup)(path_ch);
+
+  map_t* arg = MNEW();
+  MPUT(arg, "path", path_ch);
+  callbacks_call("on_change_library", arg);
+
+  REL(arg);
   REL(path_ch);
 }
 
@@ -435,11 +438,9 @@ void ui_refresh_songlist()
 void ui_init(float width,
              float height,
              char* respath,
-             char* libpath,
-             void (*accept_popup)(char* text))
+             char* libpath)
 {
-  ui.songs        = db_get_songs();
-  ui.accept_popup = accept_popup;
+  ui.songs = db_get_songs();
 
   // init text
 

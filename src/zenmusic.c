@@ -20,6 +20,8 @@ double lasttime = 0.0;
 char*  libpath  = NULL;
 ch_t*  ch; // library channel
 
+void load_library();
+
 void on_save_entry(void* userdata, map_t* entry)
 {
   // update metadata in file
@@ -37,21 +39,9 @@ void on_song_header(void* userdata, map_t* data)
   printf("on_song_header\n");
 }
 
-void load_lib()
+void on_change_library(void* userdata, map_t* data)
 {
-  printf("load_lib %s\n", libpath);
-
-  db_read(libpath);                       // read db
-  lib_read(libpath);                      // read library
-  lib_remove_duplicates(db_get_db());     // remove existing
-  if (lib_entries() > 0) lib_analyze(ch); // start analyzing new entries
-
-  db_sort("artist");
-}
-
-void save_lib(char* path)
-{
-  printf("save_lib %s\n", path);
+  char* path = MGET(data, "path");
 
   if (libpath) REL(libpath);
 
@@ -64,11 +54,21 @@ void save_lib(char* path)
   {
     config_set("library_path", libpath);
     config_write();
-    load_lib();
+    load_library();
     ui_hide_libpath_popup();
   }
   else
     ui_show_libpath_popup("Location doesn't exists, please enter valid location.");
+}
+
+void load_library()
+{
+  db_read(libpath);                       // read db
+  lib_read(libpath);                      // read library
+  lib_remove_duplicates(db_get_db());     // remove existing
+  if (lib_entries() > 0) lib_analyze(ch); // start analyzing new entries
+
+  db_sort("artist");
 }
 
 void init(int width, int height, char* respath)
@@ -78,23 +78,24 @@ void init(int width, int height, char* respath)
   ch = ch_new(100); // comm channel for library entries
 
   db_init();
-  callbacks_init();
   config_init();
   config_read();
 
+  callbacks_init();
   callbacks_set("om_save_entry", cb_new(on_save_entry, NULL));
   callbacks_set("on_song_header", cb_new(on_song_header, NULL));
+  callbacks_set("on_change_library", cb_new(on_change_library, NULL));
 
   libpath = config_get("library_path");
 
-  ui_init(width, height, respath, libpath, save_lib);
+  ui_init(width, height, respath, libpath);
 
   if (!libpath)
   {
     ui_show_libpath_popup("Please enter the location of your music library folder.");
   }
   else
-    load_lib();
+    load_library();
 }
 
 void update(ev_t ev)
