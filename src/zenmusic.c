@@ -20,7 +20,7 @@ double lasttime = 0.0;
 char*  libpath  = NULL;
 ch_t*  ch; // library channel
 
-void save_entry(void* userdata, map_t* entry)
+void on_save_entry(void* userdata, map_t* entry)
 {
   // update metadata in file
   player_set_metadata(entry, "king.jpg");
@@ -30,6 +30,11 @@ void save_entry(void* userdata, map_t* entry)
 
   // save database
   db_write(libpath);
+}
+
+void on_song_header(void* userdata, map_t* data)
+{
+  printf("on_song_header\n");
 }
 
 void load_lib()
@@ -77,7 +82,8 @@ void init(int width, int height, char* respath)
   config_init();
   config_read();
 
-  callbacks_set("save_entry", cb_new(save_entry, NULL));
+  callbacks_set("om_save_entry", cb_new(on_save_entry, NULL));
+  callbacks_set("on_song_header", cb_new(on_song_header, NULL));
 
   libpath = config_get("library_path");
 

@@ -49,6 +49,8 @@ freebsd for os
 
 first version
 
+finish sort and filter
+use callbacks in view generator
 if track number exists, use that in file name
 make instead of gmake, debug, release targets -g -O3, install ffmpeg and sdl2 if needed
 title/aritst/info egy textfield legyen, ugy konnyebb shadow is, time bar passed/remaining

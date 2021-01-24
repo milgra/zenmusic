@@ -158,7 +158,7 @@ void ui_on_editor_accept(view_t* view, void* data)
 
   // notify main namespace to organize and save metadata and database
 
-  callbacks_call("save_entry", old_data);
+  callbacks_call("on_save_entry", old_data);
 
   // reload song list
   songlist_refresh();
@@ -244,6 +244,12 @@ void ui_on_song_edit(int index)
 void ui_on_song_header(char* id)
 {
   printf("on song header %s\n", id);
+
+  map_t* arg = MNEW();
+  MPUT(arg, "id", id);
+  callbacks_call("on_song_header", arg);
+  REL(arg);
+
   // filter db by field id
   // sort(id);
 }

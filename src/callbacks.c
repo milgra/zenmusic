@@ -12,6 +12,7 @@ void  callbacks_call(char* id, map_t* map);
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "mtlog.c"
 #include "mtmap.c"
 
 struct _callbacks_t
@@ -37,7 +38,10 @@ cb_t* callbacks_get(char* id)
 void callbacks_call(char* id, map_t* data)
 {
   cb_t* cb = MGET(callbacks.data, id);
-  (*cb->fp)(cb->userdata, data);
+  if (cb)
+    (*cb->fp)(cb->userdata, data);
+  else
+    LOG("ERROR callback %s doesn't exist", id);
 }
 
 #endif
