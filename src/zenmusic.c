@@ -16,9 +16,7 @@
 
 double lasttime = 0.0;
 char*  libpath  = NULL;
-
 ch_t*  ch;
-map_t* cfg;
 
 void save_db(map_t* entry)
 {
@@ -57,8 +55,8 @@ void save_lib(char* path)
 
   if (lib_exists(libpath))
   {
-    MPUT(cfg, "library_path", libpath);
-    config_write(cfg);
+    config_set("library_path", libpath);
+    config_write();
     load_lib();
     ui_hide_libpath_popup();
   }
@@ -70,24 +68,18 @@ void init(int width, int height, char* respath)
 {
   srand((unsigned int)time(NULL));
 
-  ch  = ch_new(100); // comm channel for library entries
-  cfg = MNEW();      // config map
+  ch = ch_new(100); // comm channel for library entries
 
   db_init();
-  config_read(cfg);
+  config_init();
+  config_read();
 
-  libpath = MGET(cfg, "library_path");
+  libpath = config_get("library_path");
 
-  ui_init(width,
-          height,
-          respath,
-          libpath,
-          save_db,
-          save_lib);
+  ui_init(width, height, respath, libpath, save_db, save_lib);
 
   if (!libpath)
   {
-    config_init(cfg);
     ui_show_libpath_popup("Please enter the location of your music library folder.");
   }
   else
