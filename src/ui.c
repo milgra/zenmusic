@@ -8,7 +8,6 @@ void ui_init(float width,
              float height,
              char* respath,
              char* libpath,
-             void (*save_entry)(map_t* map),
              void (*accept_popup)(char* text));
 void ui_update_position(float ratio);
 void ui_update_volume(float ratio);
@@ -25,6 +24,7 @@ void ui_refresh_songlist();
 #if __INCLUDE_LEVEL__ == 0
 
 #include "activity.c"
+#include "callbacks.c"
 #include "db.c"
 #include "editor.c"
 #include "mtcstring.c"
@@ -32,6 +32,7 @@ void ui_refresh_songlist();
 #include "songlist.c"
 #include "textlist.c"
 #include "tg_knob.c"
+#include "tg_picker.c"
 #include "tg_text.c"
 #include "vh_button.c"
 #include "vh_knob.c"
@@ -40,7 +41,6 @@ void ui_refresh_songlist();
 #include "view_layout.c"
 #include "wm_connector.c"
 // TODO remove fromm zenmusic.c
-#include "tg_picker.c"
 #include "ui_manager.c"
 
 view_t* baseview;
@@ -78,7 +78,6 @@ void ui_show_song_info(int index);
 struct _ui_t
 {
   vec_t* songs;
-  void (*save_entry)(map_t* map);
   void (*accept_popup)(char* text);
 } ui = {0};
 
@@ -158,7 +157,8 @@ void ui_on_editor_accept(view_t* view, void* data)
   }
 
   // notify main namespace to organize and save metadata and database
-  (*ui.save_entry)(old_data);
+
+  callbacks_call("save_entry", old_data);
 
   // reload song list
   songlist_refresh();
@@ -430,11 +430,9 @@ void ui_init(float width,
              float height,
              char* respath,
              char* libpath,
-             void (*save_entry)(map_t* map),
              void (*accept_popup)(char* text))
 {
   ui.songs        = db_get_songs();
-  ui.save_entry   = save_entry;
   ui.accept_popup = accept_popup;
 
   // init text

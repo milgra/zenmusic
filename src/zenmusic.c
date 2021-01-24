@@ -1,6 +1,8 @@
+#include "callbacks.c"
 #include "config.c"
 #include "db.c"
 #include "lib.c"
+#include "mtcallback.c"
 #include "mtchannel.c"
 #include "mtcstring.c"
 #include "mtmap.c"
@@ -16,9 +18,9 @@
 
 double lasttime = 0.0;
 char*  libpath  = NULL;
-ch_t*  ch;
+ch_t*  ch; // library channel
 
-void save_db(map_t* entry)
+void save_entry(void* userdata, map_t* entry)
 {
   // update metadata in file
   player_set_metadata(entry, "king.jpg");
@@ -71,12 +73,15 @@ void init(int width, int height, char* respath)
   ch = ch_new(100); // comm channel for library entries
 
   db_init();
+  callbacks_init();
   config_init();
   config_read();
 
+  callbacks_set("save_entry", cb_new(save_entry, NULL));
+
   libpath = config_get("library_path");
 
-  ui_init(width, height, respath, libpath, save_db, save_lib);
+  ui_init(width, height, respath, libpath, save_lib);
 
   if (!libpath)
   {
