@@ -6,6 +6,7 @@
 #include "mtchannel.c"
 #include "mtcstring.c"
 #include "mtmap.c"
+#include "mtstring.c"
 #include "player.c"
 #include "ui.c"
 #include "ui_manager.c"
@@ -22,8 +23,9 @@ ch_t*  ch; // library channel
 
 void load_library();
 
-void on_save_entry(void* userdata, map_t* entry)
+void on_save_entry(void* userdata, void* data)
 {
+  map_t* entry = data;
   // update metadata in file
   player_set_metadata(entry, "king.jpg");
 
@@ -34,17 +36,25 @@ void on_save_entry(void* userdata, map_t* entry)
   db_write(libpath);
 }
 
-void on_song_header(void* userdata, map_t* data)
+void on_song_header(void* userdata, void* data)
 {
-  char* id = MGET(data, "id");
+  char* id = data;
 
   db_sort(id, 1);
   ui_refresh_songlist();
 }
 
-void on_change_library(void* userdata, map_t* data)
+void on_filter_songs(void* userdata, void* data)
 {
-  char* path = MGET(data, "path");
+  char* text = str_cstring((str_t*)data);
+
+  db_filter(text);
+  ui_reload_songlist();
+}
+
+void on_change_library(void* userdata, void* data)
+{
+  char* path = data;
 
   if (libpath) REL(libpath);
 
@@ -88,6 +98,7 @@ void init(int width, int height, char* respath)
   callbacks_set("om_save_entry", cb_new(on_save_entry, NULL));
   callbacks_set("on_song_header", cb_new(on_song_header, NULL));
   callbacks_set("on_change_library", cb_new(on_change_library, NULL));
+  callbacks_set("on_filter_songs", cb_new(on_filter_songs, NULL));
 
   libpath = config_get("library_path");
 

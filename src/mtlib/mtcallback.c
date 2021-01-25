@@ -6,17 +6,17 @@
 typedef struct _cb_t cb_t;
 struct _cb_t
 {
-  void (*fp)(void* userdata, map_t* map);
+  void (*fp)(void* userdata, void* data);
   void* userdata;
 };
 
-cb_t* cb_new(void (*fp)(void*, map_t*), void* userdata);
+cb_t* cb_new(void (*fp)(void*, void*), void* userdata);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-cb_t* cb_new(void (*fp)(void*, map_t*), void* userdata)
+cb_t* cb_new(void (*fp)(void*, void*), void* userdata)
 {
   cb_t* cb     = mem_calloc(sizeof(cb_t), "mtcallback", NULL, NULL);
   cb->fp       = fp;

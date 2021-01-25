@@ -6,7 +6,7 @@
 void  callbacks_init();
 void  callbacks_set(char* id, cb_t* cb);
 cb_t* callbacks_get(char* id);
-void  callbacks_call(char* id, map_t* map);
+void  callbacks_call(char* id, void* data);
 
 #endif
 
@@ -35,7 +35,7 @@ cb_t* callbacks_get(char* id)
   return MGET(callbacks.data, id);
 }
 
-void callbacks_call(char* id, map_t* data)
+void callbacks_call(char* id, void* data)
 {
   cb_t* cb = MGET(callbacks.data, id);
   if (cb)

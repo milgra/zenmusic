@@ -17,6 +17,7 @@ void ui_toggle_pause(int state);
 void ui_show_libpath_popup(char* message);
 void ui_hide_libpath_popup();
 void ui_refresh_songlist();
+void ui_reload_songlist();
 
 #endif
 
@@ -241,10 +242,7 @@ void ui_on_song_edit(int index)
 
 void ui_on_song_header(char* id)
 {
-  map_t* arg = MNEW();
-  MPUT(arg, "id", id);
-  callbacks_call("on_song_header", arg);
-  REL(arg);
+  callbacks_call("on_song_header", id);
 
   // filter db by field id
   // sort(id);
@@ -416,21 +414,26 @@ void ui_on_accept_libpath(view_t* view, void* data)
   str_t* path    = vh_text_get_text(libinputfield);
   char*  path_ch = str_cstring(path);
 
-  map_t* arg = MNEW();
-  MPUT(arg, "path", path_ch);
-  callbacks_call("on_change_library", arg);
+  callbacks_call("on_change_library", path_ch);
 
-  REL(arg);
   REL(path_ch);
 }
 
 void ui_filter(view_t* view)
 {
+  str_t* text = vh_text_get_text(view);
+
+  callbacks_call("on_filter_songs", text);
 }
 
 void ui_refresh_songlist()
 {
   songlist_refresh();
+}
+
+void ui_reload_songlist()
+{
+  songlist_update();
 }
 
 void ui_init(float width,
