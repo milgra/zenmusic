@@ -18,6 +18,12 @@
 
 #define REL_VEC_ITEMS(X) vec_decrese_item_retcount(X)
 
+typedef enum _vsdir_t
+{
+  VSD_ASC,
+  VSD_DSC
+} vsdir_t;
+
 typedef struct _vec_t vec_t;
 struct _vec_t
 {
@@ -47,7 +53,7 @@ void     vec_reverse(vec_t* vector);
 void*    vec_head(vec_t* vector);
 void*    vec_tail(vec_t* vector);
 uint32_t vec_indexofdata(vec_t* vector, void* data);
-void     vec_sort(vec_t* vector, int (*comp)(void* left, void* right));
+void     vec_sort(vec_t* vector, vsdir_t dir, int (*comp)(void* left, void* right));
 
 void vec_describe(void* p, int level);
 
@@ -278,6 +284,8 @@ uint32_t vec_indexofdata(vec_t* vector, void* data)
   return UINT32_MAX;
 }
 
+// mt vector node for sorting
+
 typedef struct _mtvn_t mtvn_t;
 struct _mtvn_t
 {
@@ -288,7 +296,7 @@ struct _mtvn_t
 
 // TODO use node pool
 
-void vec_sort_ins(mtvn_t* node, void* data, int (*comp)(void* left, void* right))
+void vec_sort_ins(mtvn_t* node, void* data, vsdir_t dir, int (*comp)(void* left, void* right))
 {
   if (node->c == NULL)
   {
@@ -296,15 +304,18 @@ void vec_sort_ins(mtvn_t* node, void* data, int (*comp)(void* left, void* right)
   }
   else
   {
-    if (comp(data, node->c) < 0)
+    int smaller = comp(data, node->c) < 0;
+    if (dir == VSD_DSC) smaller = 1 - smaller;
+
+    if (smaller)
     {
       if (node->l == NULL) node->l = mem_calloc(sizeof(mtvn_t), "mtvn_t", NULL, NULL);
-      vec_sort_ins(node->l, data, comp);
+      vec_sort_ins(node->l, data, dir, comp);
     }
     else
     {
       if (node->r == NULL) node->r = mem_calloc(sizeof(mtvn_t), "mtvn_t", NULL, NULL);
-      vec_sort_ins(node->r, data, comp);
+      vec_sort_ins(node->r, data, dir, comp);
     }
   }
 }
@@ -322,12 +333,12 @@ void vec_sort_ord(mtvn_t* node, vec_t* vector, int* index)
   if (right) vec_sort_ord(right, vector, index);
 }
 
-void vec_sort(vec_t* vector, int (*comp)(void* left, void* right))
+void vec_sort(vec_t* vector, vsdir_t dir, int (*comp)(void* left, void* right))
 {
   mtvn_t* node = mem_calloc(sizeof(mtvn_t), "mtvn_t", NULL, NULL);
   for (int index = 0; index < vector->length; index++)
   {
-    vec_sort_ins(node, vector->data[index], comp);
+    vec_sort_ins(node, vector->data[index], dir, comp);
   }
   int index = 0;
   vec_sort_ord(node, vector, &index);

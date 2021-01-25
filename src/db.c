@@ -6,9 +6,9 @@
 void db_init();
 void db_read(char* libpath);
 void db_write(char* libpath);
-void db_sort(char* field);
 void db_filter(char* text);
 void db_add_entry(char* path, map_t* entry);
+void db_sort(char* field, int toggle);
 
 map_t*   db_get_db();
 vec_t*   db_get_songs();
@@ -23,6 +23,7 @@ uint32_t db_count();
 #include "kvlist.c"
 #include "mtcstring.c"
 #include "mtlog.c"
+#include "mtvector.c"
 
 struct _db_t
 {
@@ -31,7 +32,8 @@ struct _db_t
   vec_t* genres;
   vec_t* artists;
 
-  char* sort_field;
+  char*   sort_field;
+  vsdir_t sort_dir;
 
   vec_t* tmp1;
   vec_t* tmp2;
@@ -196,19 +198,31 @@ void db_filter(char* text)
   db_gen_genres();
   db_gen_artists();
 
-  vec_sort(db.songs, db_comp_artist);
+  vec_sort(db.songs, db.sort_dir, db_comp_artist);
 }
 
-void db_sort(char* field)
+void db_sort(char* field, int toggle)
 {
   if (field != NULL)
   {
+    if (toggle == 1 && db.sort_field != NULL && strcmp(field, db.sort_field) == 0)
+    {
+      if (db.sort_dir == VSD_ASC)
+        db.sort_dir = VSD_DSC;
+      else
+        db.sort_dir = VSD_ASC;
+    }
+    else
+    {
+      db.sort_dir = VSD_ASC;
+    }
+
     db.sort_field = field;
 
     vec_reset(db.songs);
     map_values(db.data, db.songs);
 
-    vec_sort(db.songs, db_comp_artist);
+    vec_sort(db.songs, db.sort_dir, db_comp_artist);
 
     db_gen_genres();
     db_gen_artists();

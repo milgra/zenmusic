@@ -36,7 +36,10 @@ void on_save_entry(void* userdata, map_t* entry)
 
 void on_song_header(void* userdata, map_t* data)
 {
-  printf("on_song_header\n");
+  char* id = MGET(data, "id");
+
+  db_sort(id, 1);
+  ui_refresh_songlist();
 }
 
 void on_change_library(void* userdata, map_t* data)
@@ -68,7 +71,7 @@ void load_library()
   lib_remove_duplicates(db_get_db());     // remove existing
   if (lib_entries() > 0) lib_analyze(ch); // start analyzing new entries
 
-  db_sort("artist");
+  db_sort("artist", 0);
 }
 
 void init(int width, int height, char* respath)
@@ -129,7 +132,7 @@ void update(ev_t ev)
     {
       // analyzing is finished, sort and store database
 
-      db_sort("artist");
+      db_sort("artist", 0);
       db_write(libpath);
 
       int succ = lib_organize(libpath, db_get_db());

@@ -241,8 +241,6 @@ void ui_on_song_edit(int index)
 
 void ui_on_song_header(char* id)
 {
-  printf("on song header %s\n", id);
-
   map_t* arg = MNEW();
   MPUT(arg, "id", id);
   callbacks_call("on_song_header", arg);
