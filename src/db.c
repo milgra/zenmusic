@@ -101,6 +101,25 @@ void db_write(char* libpath)
   LOG("db written");
 }
 
+int db_comp_entry(void* left, void* right)
+{
+  map_t* l = left;
+  map_t* r = right;
+
+  char* la = MGET(l, db.sort_field);
+  char* ra = MGET(r, db.sort_field);
+
+  return strcmp(la, ra);
+}
+
+int db_comp_text(void* left, void* right)
+{
+  char* la = left;
+  char* ra = right;
+
+  return strcmp(la, ra);
+}
+
 void db_gen_genres()
 {
   int ei, gi; // entry, genre index
@@ -135,10 +154,12 @@ void db_gen_artists()
 {
   int ei;
 
+  vec_reset(db.artists);
+
   map_t* artists = MNEW();
 
   for (ei = 0;
-       ei < db.artists->length;
+       ei < db.songs->length;
        ei++)
   {
     map_t* entry  = db.songs->data[ei];
@@ -148,24 +169,16 @@ void db_gen_artists()
   }
 
   map_values(artists, db.artists);
+  vec_sort(db.artists, VSD_ASC, db_comp_text);
 
   REL(artists);
-}
-
-int db_comp_artist(void* left, void* right)
-{
-  map_t* l = left;
-  map_t* r = right;
-
-  char* la = MGET(l, db.sort_field);
-  char* ra = MGET(r, db.sort_field);
-
-  return strcmp(la, ra);
 }
 
 void db_filter(char* text)
 {
   int ei, vi; // entry, value index
+
+  // break up into words, if more than one, find query pairs
 
   vec_reset(db.songs);
 
@@ -198,7 +211,8 @@ void db_filter(char* text)
   db_gen_genres();
   db_gen_artists();
 
-  vec_sort(db.songs, db.sort_dir, db_comp_artist);
+  db.sort_field = "artist";
+  vec_sort(db.songs, db.sort_dir, db_comp_entry);
 }
 
 void db_sort(char* field, int toggle)
@@ -222,7 +236,7 @@ void db_sort(char* field, int toggle)
     vec_reset(db.songs);
     map_values(db.data, db.songs);
 
-    vec_sort(db.songs, db.sort_dir, db_comp_artist);
+    vec_sort(db.songs, db.sort_dir, db_comp_entry);
 
     db_gen_genres();
     db_gen_artists();
