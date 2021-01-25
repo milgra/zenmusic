@@ -9,6 +9,7 @@
 typedef struct _vh_text_t
 {
   str_t*      text;
+  str_t*      phtext;
   textstyle_t style;
   char        editing;
   void*       userdata;
@@ -27,6 +28,7 @@ typedef struct _vh_text_t
 
 void   vh_text_add(view_t*     view,
                    char*       text,
+                   char*       phtext,
                    textstyle_t textstyle,
                    void*       userdata);
 str_t* vh_text_get_text(view_t* view);
@@ -48,9 +50,18 @@ void   vh_text_set_on_deactivate(view_t* view, void (*event)(view_t*));
 
 void vh_text_upd(view_t* view)
 {
-  vh_text_t* data  = view->handler_data;
-  str_t*     text  = data->text;
-  r2_t       frame = view->frame.local;
+  vh_text_t* data = view->handler_data;
+
+  str_t* text           = data->text;
+  data->style.textcolor = 0x000000FF;
+
+  if (text->length == 0 && data->editing == 0)
+  {
+    data->style.textcolor = 0x555555FF;
+    text                  = data->phtext;
+  }
+
+  r2_t frame = view->frame.local;
 
   glyph_t* glyphs = malloc(sizeof(glyph_t) * text->length);
   for (int i = 0; i < text->length; i++) glyphs[i].cp = text->codepoints[i];
@@ -77,7 +88,7 @@ void vh_text_upd(view_t* view)
   //vh_anim_add(glyphview);
   //vh_anim_set(glyphview, sf, ef, 10, AT_LINEAR);
 
-  char* cstr = str_cstring(data->text);
+  char* cstr = str_cstring(text);
 
   tg_text_set(data->pgraph, cstr, data->style);
 
@@ -130,6 +141,8 @@ void vh_text_activate(view_t* view, char state)
       vh_text_close_cursor(view);
     }
   }
+
+  vh_text_upd(view);
 }
 
 void vh_text_evt(view_t* view, ev_t ev)
@@ -186,18 +199,20 @@ void vh_text_evt(view_t* view, ev_t ev)
 
 void vh_text_add(view_t*     view,
                  char*       text,
+                 char*       phtext,
                  textstyle_t textstyle,
                  void*       userdata)
 {
-  printf("vh_text_add %s\n", view->id);
+  printf("vh_text_add %s %s\n", view->id, phtext);
 
   vh_text_t* data = mem_calloc(sizeof(vh_text_t), "vh_text", NULL, NULL);
   data->text      = str_new();
+  data->phtext    = str_new();
   data->style     = textstyle;
   data->crsr_i    = 0; // cursor index
   data->userdata  = userdata;
 
-  str_addbytearray(data->text, text);
+  str_addbytearray(data->phtext, phtext);
 
   view->needs_key    = 1;
   view->needs_text   = 1;
@@ -219,7 +234,6 @@ void vh_text_add(view_t*     view,
   pgraph->needs_touch  = 0;
 
   tg_text_add(pgraph);
-  tg_text_set(pgraph, text, textstyle);
 
   view_add(view, pgraph);
 

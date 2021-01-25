@@ -608,7 +608,7 @@ void ui_init(float width,
   ts.textcolor = 0x000000FF;
   ts.backcolor = 0xFFFFFFFF;
 
-  vh_text_add(filterbar, "Search/Query", ts, NULL);
+  vh_text_add(filterbar, "", "Search/Query", ts, NULL);
   vh_text_set_on_text(filterbar, ui_filter);
   vh_text_set_on_activate(filterbar, ui_on_filter_activate);
 
@@ -628,7 +628,7 @@ void ui_init(float width,
   ts.backcolor = 0;
 
   tg_text_add(libtextfield);
-  vh_text_add(libinputfield, "/home/youruser/Music", ts, NULL);
+  vh_text_add(libinputfield, "", "/home/youruser/Music", ts, NULL);
 
   view_t* acceptlibbtn = view_get_subview(baseview, "acceptlibicon");
   vh_button_add(acceptlibbtn, NULL, ui_on_accept_libpath);

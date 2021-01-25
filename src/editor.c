@@ -86,7 +86,7 @@ void editor_select_item(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
     editor.sel_item            = itemview;
 
     view_t* inputcell = view_new(cstr_fromformat("%s%s%s", itemview->id, key, "edit", NULL), cell->view->frame.local);
-    vh_text_add(inputcell, value, editor.textstyle, key);                  // add text handler with key as userdata
+    vh_text_add(inputcell, "", value, editor.textstyle, key);              // add text handler with key as userdata
     vh_text_set_on_text(inputcell, editor_input_cell_value_changed);       // listen for text change
     vh_text_set_on_deactivate(inputcell, editor_input_cell_edit_finished); // listen for text editing finish
     vh_text_activate(inputcell, 1);                                        // activate text input

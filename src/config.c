@@ -25,8 +25,6 @@ struct _cfg_t
 
 void config_init()
 {
-  printf("config_init\n");
-
   cfg.data = MNEW();
 
   MPUT(cfg.data, "organize_db", cstr_fromcstring("false"));
@@ -42,9 +40,6 @@ void config_read()
 
   map_t* container = MNEW();
   kvlist_read(path, container, "id");
-
-  printf("container\n");
-  mem_describe(container, 0);
 
   if (container->count > 0)
   {
