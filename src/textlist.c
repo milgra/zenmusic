@@ -38,10 +38,11 @@ textlist_t* textlist_new(view_t* view, vec_t* items, textstyle_t textstyle, void
 
   tl->items = items;
 
-  vh_list_add(view, textlist_create_item, textlist_update_item, tl);
-
   tl->view      = view;
   tl->textstyle = textstyle;
+  tl->on_select = on_select;
+
+  vh_list_add(view, textlist_create_item, textlist_update_item, tl);
 
   return tl;
 }
@@ -54,7 +55,6 @@ void textlist_update(textlist_t* tl)
 void on_textitem_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
   vh_litem_t* vh = itemview->handler_data;
-
   textlist_t* tl = vh->userdata;
   (*tl->on_select)(vh->index);
 }
@@ -69,7 +69,7 @@ view_t* textlist_create_item(view_t* listview, void* data)
 
   view_t* rowview  = view_new(idbuffer, (r2_t){0, 0, 0, 35});
   rowview->display = 0;
-  vh_litem_add(rowview, NULL);
+  vh_litem_add(rowview, tl);
   vh_litem_set_on_select(rowview, on_textitem_select);
 
   view_t* cell = view_new(cstr_fromformat("%s%s", rowview->id, "cell", NULL), (r2_t){0, 0, listview->frame.local.w, 35});
@@ -89,6 +89,10 @@ int textlist_update_item(view_t* listview, void* data, view_t* item, int index, 
     return 1; // no more items
 
   *item_count = tl->items->length;
+
+  uint32_t color = (index % 2 == 0) ? 0xFFFFFFFF : 0xFAFAFAFF;
+
+  tl->textstyle.backcolor = color;
 
   vh_litem_upd_index(item, index);
   tg_text_set(vh_litem_get_cell(item, "cell"), tl->items->data[index], tl->textstyle);

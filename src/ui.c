@@ -18,6 +18,7 @@ void ui_show_libpath_popup(char* message);
 void ui_hide_libpath_popup();
 void ui_refresh_songlist();
 void ui_reload_songlist();
+void ui_show_query(char* text);
 
 #endif
 
@@ -65,6 +66,7 @@ view_t* volbtn;
 view_t* mainview;
 view_t* messagelistback;
 view_t* filterlistback;
+view_t* filterbar;
 
 view_t* libpopuppage;
 view_t* libtextfield;
@@ -243,19 +245,24 @@ void ui_on_song_edit(int index)
 void ui_on_song_header(char* id)
 {
   callbacks_call("on_song_header", id);
-
-  // filter db by field id
-  // sort(id);
 }
 
 void ui_on_genre_select(int index)
 {
   printf("on genre select %i\n", index);
+
+  vec_t* genres = db_get_genres();
+  char*  genre  = genres->data[index];
+  callbacks_call("on_genre_selected", genre);
 }
 
 void ui_on_artist_select(int index)
 {
   printf("on artist select %i\n", index);
+
+  vec_t* artists = db_get_artists();
+  char*  artist  = artists->data[index];
+  callbacks_call("on_artist_selected", artist);
 }
 
 void ui_on_position_change(view_t* view, float angle)
@@ -436,6 +443,11 @@ void ui_reload_songlist()
   songlist_update();
 }
 
+void ui_show_query(char* text)
+{
+  vh_text_set_text(filterbar, text);
+}
+
 void ui_init(float width,
              float height,
              char* respath,
@@ -539,7 +551,9 @@ void ui_init(float width,
 
   songlist_attach(baseview, fontpath, ui_on_song_select, ui_on_song_edit, ui_on_song_header);
 
-  ts.align              = TA_RIGHT;
+  ts.align        = TA_RIGHT;
+  ts.margin_right = 20;
+
   textlist_t* genrelist = textlist_new(view_get_subview(baseview, "genrelist"), db_get_genres(), ts, ui_on_genre_select);
 
   ts.align               = TA_LEFT;
@@ -603,8 +617,7 @@ void ui_init(float width,
   view_t* main      = view_get_subview(baseview, "main");
   main->needs_touch = 0;
 
-  view_t* filterbar = view_get_subview(baseview, "filterfield");
-
+  filterbar                          = view_get_subview(baseview, "filterfield");
   filterbar->layout.background_color = 0xFFFFFFFF;
 
   ts.align     = TA_CENTER;

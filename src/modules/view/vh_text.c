@@ -32,6 +32,7 @@ void   vh_text_add(view_t*     view,
                    textstyle_t textstyle,
                    void*       userdata);
 str_t* vh_text_get_text(view_t* view);
+void   vh_text_set_text(view_t* view, char* text);
 void   vh_text_activate(view_t* view, char state);
 void   vh_text_set_on_text(view_t* view, void (*event)(view_t*));
 void   vh_text_set_on_activate(view_t* view, void (*event)(view_t*));
@@ -253,6 +254,15 @@ void vh_text_add(view_t*     view,
 
   // udpate
 
+  vh_text_upd(view);
+}
+
+void vh_text_set_text(view_t* view, char* text)
+{
+  vh_text_t* data = view->handler_data;
+
+  str_reset(data->text);
+  str_addbytearray(data->text, text);
   vh_text_upd(view);
 }
 

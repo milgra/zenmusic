@@ -52,6 +52,28 @@ void on_filter_songs(void* userdata, void* data)
   ui_reload_songlist();
 }
 
+void on_genre_select(void* userdata, void* data)
+{
+  char* genre = data;
+  char* query = cstr_fromformat("genre is %s", genre, NULL);
+
+  // genre select should narrow artist selector
+
+  db_filter(query);
+  ui_reload_songlist();
+  ui_show_query(query);
+}
+
+void on_artist_select(void* userdata, void* data)
+{
+  char* artist = data;
+  char* query  = cstr_fromformat("artist is %s", artist, NULL);
+
+  db_filter(query);
+  ui_reload_songlist();
+  ui_show_query(query);
+}
+
 void on_change_library(void* userdata, void* data)
 {
   char* path = data;
@@ -99,6 +121,8 @@ void init(int width, int height, char* respath)
   callbacks_set("on_song_header", cb_new(on_song_header, NULL));
   callbacks_set("on_change_library", cb_new(on_change_library, NULL));
   callbacks_set("on_filter_songs", cb_new(on_filter_songs, NULL));
+  callbacks_set("on_genre_selected", cb_new(on_genre_select, NULL));
+  callbacks_set("on_artist_selected", cb_new(on_artist_select, NULL));
 
   libpath = config_get("library_path");
 
