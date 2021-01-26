@@ -16,12 +16,14 @@ uint32_t cstr_color_from_cstring(char* string);
 char*    cstr_generate_readablec(uint32_t length);
 char*    cstr_generate_alphanumeric(uint32_t length);
 void     cstr_describe(void* p, int level);
+void     cstr_tolower(char* str);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
 #include "mtmemory.c"
+#include <ctype.h>
 #include <string.h>
 
 static char hexa[] =
@@ -143,6 +145,14 @@ char* cstr_generate_readablec(uint32_t length)
     if (index + 1 < length) result[index + 1] = vowels[rand() % strlen(vowels)];
   }
   return result;
+}
+
+void cstr_tolower(char* str)
+{
+  for (int index = 0; index < strlen(str); index++)
+  {
+    str[index] = tolower(str[index]);
+  }
 }
 
 /* generates alphanumeric string */

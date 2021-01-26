@@ -24,6 +24,7 @@ uint32_t db_count();
 #include "mtcstring.c"
 #include "mtlog.c"
 #include "mtvector.c"
+#include <ctype.h>
 
 struct _db_t
 {
@@ -174,11 +175,82 @@ void db_gen_artists()
   REL(artists);
 }
 
+int db_nextword(char* text, char* part)
+{
+  if (strlen(part) < strlen(text))
+  {
+    for (int i = 0; i < strlen(part); i++)
+    {
+      if (text[i] != part[i]) return 0;
+    }
+    return 1;
+  }
+  return 0;
+}
+
+map_t* db_query_fields(char* text)
+{
+  if (strstr(text, " "))
+  {
+    map_t* fields = MNEW();
+    char*  key    = NULL;
+    char*  val    = NULL;
+    int    last   = 0;
+    int    i      = 0;
+
+    for (i = 0; i < strlen(text); i++)
+    {
+      if (db_nextword(text + i, " is") && key == NULL)
+      {
+        key = mem_calloc(i - last + 1, "char", NULL, NULL);
+        memcpy(key, text + last, i - last);
+        i += 4;
+        last = i;
+        printf("key %s\n", key);
+      }
+
+      if (db_nextword(text + i, " and") && val == NULL)
+      {
+        val = mem_calloc(i - last + 1, "char", NULL, NULL);
+        memcpy(val, text + last, i - last);
+        i += 5;
+        last = i;
+        printf("val %s\n", val);
+
+        cstr_tolower(key);
+        MPUT(fields, key, val);
+        REL(key);
+        REL(val);
+        key = NULL;
+        val = NULL;
+      }
+    }
+    if (last < i && val == NULL && key != NULL)
+    {
+      val = mem_calloc(i - last, "char", NULL, NULL);
+      memcpy(val, text + last, i - last);
+      printf("val %s\n", val);
+
+      cstr_tolower(key);
+      MPUT(fields, key, val);
+      REL(key);
+      REL(val);
+      key = NULL;
+      val = NULL;
+    }
+
+    return fields;
+  }
+  return NULL;
+}
+
 void db_filter(char* text)
 {
-  int ei, vi; // entry, value index
+  int ei, ki; // entry, key index
 
-  // break up into words, if more than one, find query pairs
+  map_t* fields = db_query_fields(text);
+  char*  value  = NULL;
+  char*  query  = NULL;
 
   vec_reset(db.songs);
 
@@ -193,20 +265,48 @@ void db_filter(char* text)
   {
     map_t* entry = db.tmp1->data[ei];
     vec_reset(db.tmp2);
-    map_values(entry, db.tmp2);
 
-    for (vi = 0;
-         vi < db.tmp2->length;
-         vi++)
+    if (fields)
     {
-      char* val = db.tmp2->data[vi];
-      if (strstr(val, text))
+      // use query fields
+      map_keys(fields, db.tmp2);
+    }
+    else
+    {
+      // use all fields
+      map_keys(entry, db.tmp2);
+    }
+
+    for (ki = 0;
+         ki < db.tmp2->length;
+         ki++)
+    {
+      char* field = db.tmp2->data[ki];
+      value       = MGET(entry, field);
+
+      if (value)
       {
-        vec_add(db.songs, entry);
-        break;
+        if (fields)
+          query = MGET(fields, field);
+        else
+          query = text;
+
+        if (strstr(value, query))
+        {
+          vec_add(db.songs, entry);
+          break;
+        }
+      }
+      else
+      {
+        printf("NO %s field in entry :\n", field);
+        mem_describe(entry, 0);
+        printf("\n");
       }
     }
   }
+
+  if (fields) REL(fields);
 
   db_gen_genres();
   db_gen_artists();
