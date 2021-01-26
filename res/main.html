@@ -9,64 +9,69 @@
 	<div id="clearbtn"/>
       </div>
     </div>
-    <div id="header">
-      <div id="header_left" class="headedge">
-	<div id="app_close_btn" class="closebtn">
-	  <div id="app_close_icon" class="closeicon"/>
+    <div id="headerbck">
+      <div id="header">
+	<div id="header_left" class="headedge">
+	  <div id="app_close_btn" class="closebtn" type="button" onclick="on_close_press">
+	    <div id="app_close_icon" class="closeicon"/>
+	  </div>
+	  <div id="playbtn">
+	    <div id="playicon"/>
+	  </div>
 	</div>
-	<div id="playbtn">
-	  <div id="playicon"/>
+	<div id="header_center" class="headcenter">
+	  <div id="prevbtn" type="button" onclick="on_prev_press">
+	    <div id="previcon"/>
+	  </div>
+	  <div id="shufflebtn" type="button" onclick="on_shuffle_press">
+	    <div id="shuffleicon"/>	  
+	  </div>
+	  <div id="nextbtn" type="button" onclick="on_next_press">
+	    <div id="nexticon"/>
+	  </div>
+	  <div id="settingsbtn" type="button" onclick="on_config_press">
+	    <div id="settingsicon"/>
+	  </div>
+	  <div id="aboutbtn" type="button" onclick="on_home_press">
+	    <div id="abouticon"/>	  
+	  </div>
+	  <div id="editbtn" type="button" onclick="on_edit_press">
+	    <div id="editicon"/>
+	  </div>
+	  <div id="timebck">
+	    <div id="minute"/>
+	    <div id="second"/>
+	  </div>
+	  <div id="songbck">
+	    <div id="song"/>
+	    <div id="artist"/>
+	    <div id="info"/>
+	  </div>
 	</div>
-      </div>
-      <div id="header_center" class="headcenter">
-	<div id="prevbtn">
-	  <div id="previcon"/>
-	</div>
-	<div id="shufflebtn">
-	  <div id="shuffleicon"/>	  
-	</div>
-	<div id="nextbtn">
-	  <div id="nexticon"/>
-	</div>
-	<div id="settingsbtn">
-	  <div id="settingsicon"/>
-	</div>
-	<div id="aboutbtn">
-	  <div id="abouticon"/>	  
-	</div>
-	<div id="eventsbtn">
-	  <div id="eventsicon"/>
-	</div>
-	<div id="timebck">
-	  <div id="minute"/>
-	  <div id="second"/>
-	</div>
-	<div id="songbck">
-	  <div id="song"/>
-	  <div id="artist"/>
-	  <div id="info"/>
-	</div>
-      </div>
-      <div id="header_right" class="headedge">
-	<div id="maxbtn">
-	  <div id="maxicon"/>
-	</div>
-	<div id="volbtn">
-	  <didv id="muteicon"/>
+	<div id="header_right" class="headedge">
+	  <div id="maxbtn" type="button" onclick="on_maximize_press">
+	    <div id="maxicon"/>
+	  </div>
+	  <div id="volbtn">
+	    <didv id="muteicon"/>
+	  </div>
 	</div>
       </div>
       
     </div>
     <div id="messagelistback">
       <div id="messagelist"/>
+      <div id="closemessagelistbtn" class="closepopupbtn" type="button" onclick="on_close_messages_press">
+	<div id="closemessagelisticon" class="closeicon"/>
+      </div>
     </div>
     <div id="filterlistback">
       <div id="filterlist">
 	<div id="genrelist"/>
 	<div id="artistlist"/>
       </div>
-      <div id="closefilterbtn" class="closepopupbtn">
-	<div id="closefiltericon" class="closepopupicon"/>
+      <div id="closefilterbtn" class="closepopupbtn" type="button" onclick="on_close_filter_press">
+	<div id="closefiltericon" class="closeicon"/>
       </div>
     </div>
 
@@ -75,14 +80,14 @@
 	<div id="editorlist"/>
       </div>
       <div id="coverview"/>
-      <div id="closeeditorbtn" class="closepopupbtn">
-	<div id="closeeditoricon" class="closepopupicon"/>
+      <div id="closeeditorbtn" class="closepopupbtn" type="button" onclick="on_reject_edit_press">
+	<div id="closeeditoricon" class="closeicon"/>
       </div>
-      <div id="accepteditorbtn">
-	<div id="accepteditoricon"/>
+      <div id="accepteditorbtn" type="button" onclick="on_accept_edit_press">
+	<div id="accepteditoricon" class="accepticon"/>
       </div>
       <div id="uploadbtnbck">
-	<div id="uploadbtn"/>
+	<div id="uploadbtn" type="button" onclick="on_upload_press"/>
       </div>
     </div>
 
@@ -99,8 +104,8 @@
       </div>
       <div id="home_gap_b" class="set_gap"/>
       
-      <div id="closehomebtn" class="closepopupbtn" type="button" onclick="close_home">
-	<div id="closehomeicon" class="closepopupicon"/>
+      <div id="closehomebtn" class="closepopupbtn" type="button" onclick="on_close_home_press">
+	<div id="closehomeicon" class="closeicon"/>
       </div>
     </div>
 
@@ -132,8 +137,8 @@
 	</div>
       </div>
       
-      <div id="closesettingsbtn" class="closepopupbtn" type="button" onclick="close_settings">
-	<div id="closesettingsicon" class="closepopupicon"/>
+      <div id="closesettingsbtn" class="closepopupbtn" type="button" onclick="on_close_settings_press">
+	<div id="closesettingsicon" class="closeicon"/>
       </div>
     </div>
 
@@ -154,8 +159,8 @@
     <div id="libpopupback">
       <div id="libtextfield"/>
       <div id="libinputfield"/>
-      <div id="acceptlibbtn">
-	<div id="acceptlibicon"/>
+      <div id="acceptlibbtn" type="button" onclick="on_accept_libpath_press">
+	<div id="acceptlibicon" class="accepticon"/>
       </div>
     </div>
   </div>

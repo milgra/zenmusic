@@ -87,7 +87,10 @@ void view_gen_apply_style(view_t* view, map_t* style, char* respath)
     else if (strcmp(key, "display") == 0)
     {
       if (strcmp(val, "flex") == 0)
+      {
         view->layout.display = LD_FLEX;
+        view->display        = 0;
+      }
       if (strcmp(val, "none") == 0)
         view->display = 0;
     }
@@ -202,6 +205,14 @@ void view_gen_apply_style(view_t* view, map_t* style, char* respath)
         view->layout.cjustify = JC_CENTER;
       }
     }
+    // TODO remove non standard CSS
+    else if (strcmp(key, "blocks") == 0)
+    {
+      if (strcmp(val, "no") == 0)
+      {
+        view->blocks_touch = 0;
+      }
+    }
   }
   /* printf("layout for %s: ", view->id); */
   /* view_desc_layout(view->layout); */
@@ -288,6 +299,7 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
 
         printf("type %s\n", type);
 
+        // TODO remove non-standard types
         if (strcmp(type, "button") == 0 && t.onclick.len > 0)
         {
           char* onclick = mem_calloc(sizeof(char) * t.onclick.len + 1, "char*", NULL, NULL);
@@ -296,7 +308,7 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
           printf("adding callback %s\n", onclick);
 
           cb_t* callback = MGET(callbacks, onclick);
-          if (callback) vh_button_add(view, NULL, callback->fp);
+          if (callback) vh_button_add(view, callback);
         }
       }
 

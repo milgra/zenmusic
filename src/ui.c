@@ -84,43 +84,46 @@ struct _ui_t
 
 // button events
 
-void ui_on_max_button_down(view_t* view, void* data)
+void ui_on_max_button_down(void* userdata, void* data)
 {
   wm_toggle_fullscreen();
 }
 
-void ui_on_close_button_down(view_t* view, void* data)
+void ui_on_close_button_down(void* userdata, void* data)
 {
   wm_close();
 }
 
-void ui_on_filter_activate(view_t* view)
+void ui_on_prev_button_down(void* userdata, void* data)
 {
-  if (filterlistback->parent)
-    view_remove(mainview, filterlistback);
-  else
-    view_add(mainview, filterlistback);
+  lastindex = lastindex - 1;
+  if (lastindex < 0) lastindex = 0;
+
+  ui_show_song_info(lastindex);
+  map_t* songmap = ui.songs->data[lastindex];
+  player_play(MGET(songmap, "path"));
 }
 
-void ui_on_messagebtn_down(view_t* view, void* data)
+void ui_on_next_button_down(void* userdata, void* data)
 {
-  if (messagelistback->parent)
-    view_remove(mainview, messagelistback);
-  else
-    view_add(mainview, messagelistback);
+  lastindex = lastindex + 1;
+  // if (lastindex == ui.songs->length) lastindex = files->length - 1;
+
+  ui_show_song_info(lastindex);
+  map_t* songmap = ui.songs->data[lastindex];
+  player_play(MGET(songmap, "path"));
 }
 
-void ui_on_play_button_down(view_t* view)
+void ui_on_rand_button_down(void* userdata, void* data)
 {
-  // toggle_pause();
+  lastindex = rand() % ui.songs->length;
+
+  ui_show_song_info(lastindex);
+  map_t* songmap = ui.songs->data[lastindex];
+  player_play(MGET(songmap, "path"));
 }
 
-void ui_on_mute_button_down(view_t* view)
-{
-  player_toggle_mute();
-}
-
-void ui_on_edit_button_down(view_t* view, void* data)
+void ui_on_edit_button_down(void* userdata, void* data)
 {
   if (editorview->parent)
     view_remove(mainview, editorview);
@@ -128,15 +131,31 @@ void ui_on_edit_button_down(view_t* view, void* data)
     view_add(mainview, editorview);
 }
 
-void ui_on_editor_reject(view_t* view, void* data)
+void ui_on_about_button_down(void* userdata, void* data)
 {
-  ui_on_edit_button_down(view, data);
+  if (aboutview->parent)
+    view_remove(mainview, aboutview);
+  else
+    view_add(mainview, aboutview);
 }
 
-void ui_on_editor_accept(view_t* view, void* data)
+void ui_on_settings_button_down(void* userdata, void* data)
+{
+  if (settingsview->parent)
+    view_remove(mainview, settingsview);
+  else
+    view_add(mainview, settingsview);
+}
+
+void ui_on_editor_reject(void* userdata, void* data)
+{
+  ui_on_edit_button_down(NULL, data);
+}
+
+void ui_on_editor_accept(void* userdata, void* data)
 {
   printf("on_editor_accept\n");
-  ui_on_edit_button_down(view, data);
+  ui_on_edit_button_down(NULL, data);
 
   map_t* old_data = editor_get_old_data();
   map_t* new_data = editor_get_new_data();
@@ -165,36 +184,12 @@ void ui_on_editor_accept(view_t* view, void* data)
   songlist_refresh();
 }
 
-void ui_on_prev_button_down(view_t* view, void* data)
+void ui_on_editor_upload(void* userdata, void* data)
 {
-  lastindex = lastindex - 1;
-  if (lastindex < 0) lastindex = 0;
-
-  ui_show_song_info(lastindex);
-  map_t* songmap = ui.songs->data[lastindex];
-  player_play(MGET(songmap, "path"));
+  printf("editor upload\n");
 }
 
-void ui_on_next_button_down(view_t* view, void* data)
-{
-  lastindex = lastindex + 1;
-  // if (lastindex == ui.songs->length) lastindex = files->length - 1;
-
-  ui_show_song_info(lastindex);
-  map_t* songmap = ui.songs->data[lastindex];
-  player_play(MGET(songmap, "path"));
-}
-
-void ui_on_rand_button_down(view_t* view, void* data)
-{
-  lastindex = rand() % ui.songs->length;
-
-  ui_show_song_info(lastindex);
-  map_t* songmap = ui.songs->data[lastindex];
-  player_play(MGET(songmap, "path"));
-}
-
-void ui_on_about_button_down(view_t* view, void* data)
+void ui_on_home_close(void* userdata, void* data)
 {
   if (aboutview->parent)
     view_remove(mainview, aboutview);
@@ -202,12 +197,57 @@ void ui_on_about_button_down(view_t* view, void* data)
     view_add(mainview, aboutview);
 }
 
-void ui_on_settings_button_down(view_t* view, void* data)
+void ui_on_settings_close(void* userdata, void* data)
 {
   if (settingsview->parent)
     view_remove(mainview, settingsview);
   else
     view_add(mainview, settingsview);
+}
+
+void ui_on_filter_close(void* userdata, void* data)
+{
+  if (filterlistback->parent)
+    view_remove(mainview, filterlistback);
+  else
+    view_add(mainview, filterlistback);
+}
+
+void ui_on_accept_libpath(void* userdata, void* data)
+{
+  // get path string
+  str_t* path    = vh_text_get_text(libinputfield);
+  char*  path_ch = str_cstring(path);
+
+  callbacks_call("on_change_library", path_ch);
+
+  REL(path_ch);
+}
+
+void ui_on_filter_activate(view_t* view)
+{
+  if (filterlistback->parent)
+    view_remove(mainview, filterlistback);
+  else
+    view_add(mainview, filterlistback);
+}
+
+void ui_on_messagebtn_down(view_t* view, void* data)
+{
+  if (messagelistback->parent)
+    view_remove(mainview, messagelistback);
+  else
+    view_add(mainview, messagelistback);
+}
+
+void ui_on_play_button_down(view_t* view)
+{
+  // toggle_pause();
+}
+
+void ui_on_mute_button_down(view_t* view)
+{
+  player_toggle_mute();
 }
 
 void ui_on_song_select(int index)
@@ -293,30 +333,6 @@ void ui_on_volume_change(view_t* view, float angle)
   }
 
   player_set_volume(ratio);
-}
-
-void ui_on_home_close(view_t* view, void* data)
-{
-  if (aboutview->parent)
-    view_remove(mainview, aboutview);
-  else
-    view_add(mainview, aboutview);
-}
-
-void ui_on_filter_close(view_t* view, void* data)
-{
-  if (filterlistback->parent)
-    view_remove(mainview, filterlistback);
-  else
-    view_add(mainview, filterlistback);
-}
-
-void ui_on_settings_close(view_t* view, void* data)
-{
-  if (settingsview->parent)
-    view_remove(mainview, settingsview);
-  else
-    view_add(mainview, settingsview);
 }
 
 // api functions
@@ -415,17 +431,6 @@ void ui_hide_libpath_popup()
   }
 }
 
-void ui_on_accept_libpath(view_t* view, void* data)
-{
-  // get path string
-  str_t* path    = vh_text_get_text(libinputfield);
-  char*  path_ch = str_cstring(path);
-
-  callbacks_call("on_change_library", path_ch);
-
-  REL(path_ch);
-}
-
 void ui_filter(view_t* view)
 {
   str_t* text = vh_text_get_text(view);
@@ -469,6 +474,30 @@ void ui_init(float width,
   ts.textcolor    = 0x000000FF;
   ts.backcolor    = 0;
 
+  // event setup
+
+  callbacks_set("on_maximize_press", cb_new(ui_on_max_button_down, NULL));
+  callbacks_set("on_close_press", cb_new(ui_on_close_button_down, NULL));
+
+  callbacks_set("on_prev_press", cb_new(ui_on_prev_button_down, NULL));
+  callbacks_set("on_next_press", cb_new(ui_on_next_button_down, NULL));
+  callbacks_set("on_shuffle_press", cb_new(ui_on_rand_button_down, NULL));
+
+  callbacks_set("on_config_press", cb_new(ui_on_settings_button_down, NULL));
+  callbacks_set("on_home_press", cb_new(ui_on_about_button_down, NULL));
+  callbacks_set("on_edit_press", cb_new(ui_on_edit_button_down, NULL));
+
+  callbacks_set("on_reject_edit_press", cb_new(ui_on_editor_reject, NULL));
+  callbacks_set("on_accept_edit_press", cb_new(ui_on_editor_accept, NULL));
+
+  callbacks_set("on_upload_press", cb_new(ui_on_editor_upload, NULL));
+
+  callbacks_set("on_close_home_press", cb_new(ui_on_home_close, NULL));
+  callbacks_set("on_close_settings_press", cb_new(ui_on_settings_close, NULL));
+  callbacks_set("on_close_filter_press", cb_new(ui_on_filter_close, NULL));
+
+  callbacks_set("on_accept_libpath_press", cb_new(ui_on_accept_libpath, NULL));
+
   // view setup
 
   char* csspath  = cstr_fromformat("%s/../res/main.css", respath, NULL);
@@ -488,31 +517,12 @@ void ui_init(float width,
 
   // buttons
 
-  view_t* maxbtn        = view_get_subview(baseview, "maxicon");
-  view_t* app_close_btn = view_get_subview(baseview, "app_close_icon");
-
-  view_t* prevbtn = view_get_subview(baseview, "previcon");
-  view_t* nextbtn = view_get_subview(baseview, "nexticon");
-  view_t* randbtn = view_get_subview(baseview, "shuffleicon");
-
-  view_t* configbtn = view_get_subview(baseview, "settingsicon");
-  view_t* aboutbtn  = view_get_subview(baseview, "abouticon");
-  view_t* editbtn   = view_get_subview(baseview, "eventsicon");
-
-  view_t* infobtn   = view_get_subview(baseview, "info");
   view_t* uploadbtn = view_get_subview(baseview, "uploadbtn");
-
-  view_t* closeeditorbtn   = view_get_subview(baseview, "closeeditoricon");
-  view_t* closefilterbtn   = view_get_subview(baseview, "closefiltericon");
-  view_t* closehomebtn     = view_get_subview(baseview, "closehomeicon");
-  view_t* closesettingsbtn = view_get_subview(baseview, "closesettingsicon");
-  view_t* accepteditorbtn  = view_get_subview(baseview, "accepteditoricon");
+  tg_text_add(uploadbtn);
+  tg_text_set(uploadbtn, "add new image", ts);
 
   playbtn = view_get_subview(baseview, "playbtn");
   volbtn  = view_get_subview(baseview, "volbtn");
-
-  vh_button_add(maxbtn, NULL, ui_on_max_button_down);
-  vh_button_add(app_close_btn, NULL, ui_on_close_button_down);
 
   tg_knob_add(playbtn);
   vh_knob_add(playbtn, ui_on_position_change, ui_on_play_button_down);
@@ -520,26 +530,7 @@ void ui_init(float width,
   tg_knob_add(volbtn);
   vh_knob_add(volbtn, ui_on_volume_change, ui_on_mute_button_down);
 
-  vh_button_add(prevbtn, NULL, ui_on_prev_button_down);
-  vh_button_add(nextbtn, NULL, ui_on_next_button_down);
-  vh_button_add(randbtn, NULL, ui_on_rand_button_down);
-
-  vh_button_add(configbtn, NULL, ui_on_settings_button_down);
-  vh_button_add(editbtn, NULL, ui_on_edit_button_down);
-  vh_button_add(aboutbtn, NULL, ui_on_about_button_down);
-
-  //  vh_button_add(filterbtn, NULL, ui_on_filterbtn_down);
-  vh_button_add(infobtn, NULL, ui_on_messagebtn_down);
-
-  vh_button_add(closeeditorbtn, NULL, ui_on_editor_reject);
-  vh_button_add(accepteditorbtn, NULL, ui_on_editor_accept);
-
-  vh_button_add(closehomebtn, NULL, ui_on_home_close);
-  vh_button_add(closesettingsbtn, NULL, ui_on_settings_close);
-  vh_button_add(closefilterbtn, NULL, ui_on_filter_close);
-
-  tg_text_add(uploadbtn);
-  tg_text_set(uploadbtn, "add new image", ts);
+  /* vh_button_add(infobtn, NULL, ui_on_messagebtn_down); */
 
   // get visualizer views
 
@@ -644,10 +635,7 @@ void ui_init(float width,
   ts.backcolor = 0;
 
   tg_text_add(libtextfield);
-  vh_text_add(libinputfield, "", "/home/youruser/Music", ts, NULL);
-
-  view_t* acceptlibbtn = view_get_subview(baseview, "acceptlibicon");
-  vh_button_add(acceptlibbtn, NULL, ui_on_accept_libpath);
+  vh_text_add(libinputfield, "/home/youruser/Music", "", ts, NULL);
 
   view_remove(baseview, libpopuppage);
 
@@ -710,17 +698,6 @@ void ui_init(float width,
   tg_text_set(home_org_btn_txt, "Support on Patreon", ts);
 
   view_remove(main, aboutview);
-
-  // additional setup
-  // TODO control these from CSS
-
-  view_t* playicon = view_get_subview(baseview, "playicon");
-  view_t* muteicon = view_get_subview(baseview, "muteicon");
-  view_t* footer   = view_get_subview(baseview, "footer");
-
-  playicon->needs_touch = 0;
-  muteicon->needs_touch = 0;
-  footer->display       = 0;
 
   // set glossy effect on header
 

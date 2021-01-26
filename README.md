@@ -76,6 +76,7 @@ html button onclick - map-ba lehessen rakni function wrappert, main-be legyen az
 generic input popup, choice popup view-k
 popup-ok center align
 go to source/ go to youtube channel button home-ba
+remove non-standard css and html (type=button, blocks)
 
 ideas
 

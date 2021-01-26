@@ -213,7 +213,8 @@ void vh_text_add(view_t*     view,
   data->crsr_i    = 0; // cursor index
   data->userdata  = userdata;
 
-  str_addbytearray(data->phtext, phtext);
+  if (text) str_addbytearray(data->text, text);
+  if (phtext) str_addbytearray(data->phtext, phtext);
 
   view->needs_key    = 1;
   view->needs_text   = 1;
