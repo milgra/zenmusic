@@ -23,7 +23,9 @@ typedef struct _tag_t
   uint32_t parent;
 
   range_t id;
+  range_t type;
   range_t class;
+  range_t onclick;
 } tag_t;
 
 typedef struct _prop_t
@@ -149,8 +151,10 @@ void analyze_tags(char* html, tag_t* tags, uint32_t count)
       }
     }
 
-    tags[i].id    = extract_value(tags[i], "id=\"", html);
-    tags[i].class = extract_value(tags[i], "class=\"", html);
+    tags[i].id      = extract_value(tags[i], "id=\"", html);
+    tags[i].type    = extract_value(tags[i], "type=\"", html);
+    tags[i].class   = extract_value(tags[i], "class=\"", html);
+    tags[i].onclick = extract_value(tags[i], "onclick=\"", html);
 
     if (html[tags[i].pos + 1] == '/')
       l -= 2; // </div>

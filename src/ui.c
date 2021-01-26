@@ -474,7 +474,7 @@ void ui_init(float width,
   char* csspath  = cstr_fromformat("%s/../res/main.css", respath, NULL);
   char* htmlpath = cstr_fromformat("%s/../res/main.html", respath, NULL);
 
-  vec_t* views = view_gen_load(htmlpath, csspath, respath);
+  vec_t* views = view_gen_load(htmlpath, csspath, respath, callbacks_get_data());
 
   baseview = vec_head(views);
 

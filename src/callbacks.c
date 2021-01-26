@@ -3,10 +3,11 @@
 
 #include "mtcallback.c"
 
-void  callbacks_init();
-void  callbacks_set(char* id, cb_t* cb);
-cb_t* callbacks_get(char* id);
-void  callbacks_call(char* id, void* data);
+void   callbacks_init();
+void   callbacks_set(char* id, cb_t* cb);
+cb_t*  callbacks_get(char* id);
+void   callbacks_call(char* id, void* data);
+map_t* callbacks_get_data();
 
 #endif
 
@@ -42,6 +43,11 @@ void callbacks_call(char* id, void* data)
     (*cb->fp)(cb->userdata, data);
   else
     LOG("ERROR callback %s doesn't exist", id);
+}
+
+map_t* callbacks_get_data()
+{
+  return callbacks.data;
 }
 
 #endif

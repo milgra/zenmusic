@@ -1,17 +1,20 @@
 #ifndef view_gen_h
 #define view_gen_h
 
+#include "mtmap.c"
 #include "mtvector.c"
 #include "view.c"
 
-vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath);
+vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callbacks);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
 #include "html.c"
+#include "mtcallback.c"
 #include "tg_css.c"
+#include "vh_button.c"
 #include <limits.h>
 
 void view_gen_apply_style(view_t* view, map_t* style, char* respath)
@@ -205,7 +208,7 @@ void view_gen_apply_style(view_t* view, map_t* style, char* respath)
   /* printf("\n"); */
 }
 
-vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath)
+vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callbacks)
 {
   char* html = html_read(htmlpath);
   char* css  = html_read(csspath);
@@ -275,6 +278,25 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath)
         if (style)
         {
           view_gen_apply_style(view, style, respath);
+        }
+      }
+
+      if (t.type.len > 0)
+      {
+        char* type = mem_calloc(sizeof(char) * t.type.len + 1, "char*", NULL, NULL);
+        memcpy(type, html + t.type.pos + 1, t.type.len);
+
+        printf("type %s\n", type);
+
+        if (strcmp(type, "button") == 0 && t.onclick.len > 0)
+        {
+          char* onclick = mem_calloc(sizeof(char) * t.onclick.len + 1, "char*", NULL, NULL);
+          memcpy(onclick, html + t.onclick.pos + 1, t.onclick.len);
+
+          printf("adding callback %s\n", onclick);
+
+          cb_t* callback = MGET(callbacks, onclick);
+          if (callback) vh_button_add(view, NULL, callback->fp);
         }
       }
 
