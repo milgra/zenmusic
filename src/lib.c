@@ -203,7 +203,7 @@ int analyzer_thread(void* chptr)
     if (ratio != ratio_new)
     {
       ratio = ratio_new;
-      LOG("anaylzer progress : %i%%", ratio);
+      LOG(" anaylzer progress : %i%%", ratio);
     }
   }
 
@@ -264,11 +264,18 @@ char* lib_replace_char(char* str, char find, char replace)
 int lib_organize_entry(char* libpath, map_t* db, map_t* entry)
 {
   int changed = 0;
+  int trackno = 0;
 
   char* path   = MGET(entry, "path");
   char* artist = MGET(entry, "artist");
   char* album  = MGET(entry, "album");
   char* title  = MGET(entry, "title");
+  char* track  = MGET(entry, "track");
+
+  if (track != NULL) trackno = atoi(track);
+
+  char trackstr[3] = {0};
+  snprintf(trackstr, 3, "%.2i", trackno);
 
   // remove slashes before directory creation
 
@@ -290,7 +297,7 @@ int lib_organize_entry(char* libpath, map_t* db, map_t* entry)
   memcpy(ext, path + index, len);
 
   char* new_dirs = cstr_fromformat("%s/%s/%s/", libpath, artist, album, NULL);
-  char* new_path = cstr_fromformat("%s/%s/%s/%s.%s", libpath, artist, album, title, ext, NULL);
+  char* new_path = cstr_fromformat("%s/%s/%s/%s %s.%s", libpath, artist, album, trackstr, title, ext, NULL);
 
   if (strcmp(path, new_path) != 0)
   {

@@ -49,39 +49,36 @@ freebsd for os
 
 first version
 
-use callbacks in view generator
-if track number exists, use that in file name
-make instead of gmake, debug, release targets -g -O3, install ffmpeg and sdl2 if needed
-title/aritst/info egy textfield legyen, ugy konnyebb shadow is, time bar passed/remaining
-increase play count
-fix leaks
+color picker
 scrollbar drag
-save small changes to a delta database, add it to the big one at startup
-amit releaselni kell, csinalodjon new-val!
+increase play count
+title/aritst/info egy textfield legyen, ugy konnyebb shadow is
+time bar passed/remaining
 relative paths in library
-test texture resize and reset, texture overflow and reset
-add text/input selectors to css, use text style from css
 spectrum, bar analyzer, left/right effect button, unshift bmp?
-speed up font rendering by using glyph indexes instead of codepoints
 button on/off alpha change on icon
-grid-based warping of video/album cover based on frequence ( bass in the center )
-andromeda:  monolith-like particle visu
-swithc between multiple glyph views in paragraph/one multiglyph view in paragraph  
-kijelzon shadow
-time onclick = remaining time
 socketes taviranyitas - 1 byteokkal
 accept input on enter
-sanitize css - textfields came class, etc
-html button onclick - map-ba lehessen rakni function wrappert, main-be legyen az osszes callback function ami kell, csak atadni view generatornak
-generic input popup, choice popup view-k
 popup-ok center align
 go to source/ go to youtube channel button home-ba
-remove non-standard css and html (type=button, blocks)
+fix leaks
+
 
 ideas
 
+make instead of gmake, debug, release targets -g -O3, install ffmpeg and sdl2 if needed
+save small changes to a delta database, add it to the big one at startup
+amit releaselni kell, csinalodjon new-val!
+test texture resize and reset, texture overflow and reset
+add text/input selectors to css, use text style from css
+speed up font rendering by using glyph indexes instead of codepoints
+grid-based warping of video/album cover based on frequence ( bass in the center )
+andromeda: monolith-like particle visu
+switch between multiple glyph views in paragraph/one multiglyph view in paragraph  
+sanitize css - textfields came class, etc
+generic input popup, choice popup view-k
+remove non-standard css and html (type=button, blocks)
 unit teszter gl_compositorhoz
-ujdonsagok video jojjon fel az events windowban, about
 analog mutatos output meterek is visualizacioban
 glossy effekt
 scroll-ra lehessen novelni/csokkenteni visuals meretet
@@ -89,8 +86,6 @@ statisztikak - top 10 leghallgatottabb, milyen genre-t hallgatsz foleg elmult 1 
 cortex as visualizer - level gen based on freq, LEFT/DOWN!!!
 glFragaCoord? glScissor optimized render
 volume fade in/out, cover arton is
-donate button /donate popup after 100 startups
-resync library button
 replace stb image with ffmpeg
 
 zen media :

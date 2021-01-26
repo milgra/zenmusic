@@ -12,6 +12,8 @@ void log_set_proxy(void (*proxy)(char*));
 
 #include "mtvector.c"
 
+#define LOG_SIZE 150
+
 struct _mtlog_t
 {
   void (*proxy)(char*);
@@ -25,9 +27,9 @@ void log_set_proxy(void (*proxy)(char*))
 void log_log(char* fmt, ...)
 {
   va_list arglist;
-  char*   str = mem_calloc(100, "char*", NULL, NULL);
+  char*   str = mem_calloc(LOG_SIZE, "char*", NULL, NULL);
   va_start(arglist, fmt);
-  vsnprintf(str, 150, fmt, arglist);
+  vsnprintf(str, LOG_SIZE, fmt, arglist);
   va_end(arglist);
 
   printf("LOG %s\n", str);

@@ -37,8 +37,11 @@ void activity_log(char* log)
 
   char* last = act.logs->data[0];
 
-  if (last && last[0] == log[0])
+  if (last && log[0] == ' ' && last[0] == ' ')
+  {
+    printf("length %i\n", act.logs->length);
     vec_replaceatindex(act.logs, log, 0);
+  }
   else
     vec_ins(act.logs, log, 0);
 
