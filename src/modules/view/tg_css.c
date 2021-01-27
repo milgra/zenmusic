@@ -17,6 +17,7 @@ typedef struct _tg_css_t
 } tg_bitmap_t;
 
 void tg_css_add(view_t* view);
+void tg_css_set_graycolor(uint32_t color);
 
 #endif
 
@@ -27,8 +28,11 @@ void tg_css_add(view_t* view);
 #include "mtgraphics.c"
 #include "stb_image.h"
 
-void tg_css_set_graycolor()
+uint32_t tg_css_graycolor = 0;
+
+void tg_css_set_graycolor(uint32_t color)
 {
+  tg_css_graycolor = color;
 }
 
 void tg_css_gen(view_t* view)
@@ -64,8 +68,40 @@ void tg_css_gen(view_t* view)
     }
     else if (view->layout.background_color)
     {
-      char idbuffer[100] = {0};
-      snprintf(idbuffer, 20, "color %i %i", view->layout.background_color, view->layout.border_radius);
+      uint32_t color = view->layout.background_color;
+
+      if (tg_css_graycolor > 0)
+      {
+        uint8_t cr = (color >> 24) & 0xFF;
+        uint8_t cg = (color >> 16) & 0xFF;
+        uint8_t cb = (color >> 8) & 0xFF;
+
+        uint8_t nr = (tg_css_graycolor >> 24) & 0xFF;
+        uint8_t ng = (tg_css_graycolor >> 16) & 0xFF;
+        uint8_t nb = (tg_css_graycolor >> 8) & 0xFF;
+
+        int dr = 0xFF - cr;
+        if (cr < 0x8F) dr = cr;
+        int dg = 0xFF - cg;
+        if (cg < 0x8F) dg = cg;
+        int db = 0xFF - cb;
+        if (cb < 0x8F) db = cb;
+
+        if (nr > 0x8F)
+          nr -= dr;
+        else
+          nr += dr;
+        if (ng > 0x8F)
+          ng -= dg;
+        else
+          ng += dg;
+        if (nb > 0x8F)
+          nb -= db;
+        else
+          nb += db;
+
+        color = (nr << 24) | (ng << 16) | (nb << 8) | 0xFF;
+      }
 
       float w = view->frame.local.w + 2 * view->layout.shadow_blur;
       float h = view->frame.local.h + 2 * view->layout.shadow_blur;
@@ -80,6 +116,8 @@ void tg_css_gen(view_t* view)
         view_set_texture_bmp(view, bm);
       }
 
+      bm_reset(bm);
+
       gfx_rounded_rect(bm,
                        0,
                        0,
@@ -87,7 +125,7 @@ void tg_css_gen(view_t* view)
                        h,
                        view->layout.border_radius,
                        view->layout.shadow_blur,
-                       view->layout.background_color,
+                       color,
                        0x00000033);
 
       view->texture.changed = 1;

@@ -29,21 +29,24 @@ void ui_show_query(char* text);
 #include "db.c"
 #include "editor.c"
 #include "mtcstring.c"
+#include "mtnumber.c"
 #include "player.c"
 #include "songlist.c"
 #include "textlist.c"
+#include "tg_css.c"
 #include "tg_knob.c"
 #include "tg_picker.c"
 #include "tg_text.c"
 #include "vh_button.c"
 #include "vh_knob.c"
+#include "vh_picker.c"
 #include "vh_text.c"
 #include "view_generator.c"
 #include "view_layout.c"
 #include "wm_connector.c"
 // TODO remove fromm zenmusic.c
+#include "ui_generator.c"
 #include "ui_manager.c"
-#include "vh_picker.c"
 
 view_t* baseview;
 view_t* minuteview;
@@ -72,6 +75,8 @@ view_t* filterbar;
 view_t* libpopuppage;
 view_t* libtextfield;
 view_t* libinputfield;
+
+view_t* set_col_val;
 
 size_t lastindex = 0;
 char*  fontpath;
@@ -227,7 +232,27 @@ void ui_on_accept_libpath(void* userdata, void* data)
 
 void ui_on_color_select(void* userdata, void* data)
 {
-  printf("on color select\n");
+  num_t* val = data;
+
+  uint32_t c = val->uint32v;
+  uint8_t  r = (c >> 24) & 0xFF;
+  uint8_t  g = (c >> 16) & 0xFF;
+  uint8_t  b = (c >> 8) & 0xFF;
+  uint8_t  a = c & 0xFF;
+
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = TA_CENTER;
+  ts.size        = 25.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0;
+
+  char text[10] = {0};
+  snprintf(text, 10, "%.2x%.2x%.2x", r, g, b);
+  tg_text_set(set_col_val, text, ts);
+
+  tg_css_set_graycolor(c);
+  ui_generator_rerender();
 }
 
 void ui_on_filter_activate(view_t* view)
@@ -654,7 +679,7 @@ void ui_init(float width,
   view_t* set_org_val     = view_get_subview(baseview, "set_org_val");
   view_t* set_org_btn_txt = view_get_subview(baseview, "set_org_btn_txt");
   view_t* set_col_text    = view_get_subview(baseview, "set_col_text");
-  view_t* set_col_val     = view_get_subview(baseview, "set_col_val");
+  set_col_val             = view_get_subview(baseview, "set_col_val");
   view_t* set_col_sel     = view_get_subview(baseview, "set_col_sel");
 
   tg_text_add(set_lib_text);

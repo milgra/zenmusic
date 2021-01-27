@@ -49,7 +49,6 @@ freebsd for os
 
 first version
 
-color picker
 scrollbar drag
 increase play count
 title/aritst/info egy textfield legyen, ugy konnyebb shadow is

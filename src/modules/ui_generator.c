@@ -18,6 +18,7 @@ void     ui_generator_render(uint32_t);
 void     ui_generator_use(vec_t* views);
 void     ui_generator_resize(int width, int height);
 uint32_t ui_generate_create_texture();
+void     ui_generator_rerender();
 
 #endif
 
@@ -251,6 +252,15 @@ int ui_generator_workloop()
       view_gen_texture(view);
     }
     SDL_Delay(16);
+  }
+}
+
+void ui_generator_rerender()
+{
+  for (int i = 0; i < uig.views->length; i++)
+  {
+    view_t* view = uig.views->data[i];
+    if (view->texture.type == TT_MANAGED) view->texture.state = TS_BLANK;
   }
 }
 
