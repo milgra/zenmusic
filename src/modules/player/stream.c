@@ -1428,15 +1428,19 @@ int read_thread(void* arg)
         (!is->audio_st || (is->auddec.finished == is->audioq.serial && frame_queue_nb_remaining(&is->sampq) == 0)) &&
         (!is->video_st || (is->viddec.finished == is->videoq.serial && frame_queue_nb_remaining(&is->pictq) == 0)))
     {
-      if (loop != 1 && (!loop || --loop))
-      {
-        stream_seek(is, start_time != AV_NOPTS_VALUE ? start_time : 0, 0, 0);
-      }
-      else if (autoexit)
-      {
-        ret = AVERROR_EOF;
-        goto fail;
-      }
+      printf("loop %i autoexit %i\n", loop, autoexit);
+      /* if (loop != 1 && (!loop || --loop)) */
+      /* { */
+      /*   printf("seek to start\n"); */
+      /*   stream_seek(is, start_time != AV_NOPTS_VALUE ? start_time : 0, 0, 0); */
+      /* } */
+      /* else if (autoexit) */
+      /* { */
+      is->play_finished = 1;
+      printf("autoexit\n");
+      ret = AVERROR_EOF;
+      goto fail;
+      /* } */
     }
     ret = av_read_frame(ic, pkt);
     if (ret < 0)
@@ -1517,9 +1521,10 @@ VideoState* stream_open(const char* filename, AVInputFormat* iformat)
   is->last_subtitle_stream = is->subtitle_stream = -1;
   is->filename                                   = av_strdup(filename);
   if (!is->filename) goto fail;
-  is->iformat = iformat;
-  is->ytop    = 0;
-  is->xleft   = 0;
+  is->iformat       = iformat;
+  is->ytop          = 0;
+  is->xleft         = 0;
+  is->play_finished = 0;
 
   /* start video display */
   if (frame_queue_init(&is->pictq, &is->videoq, VIDEO_PICTURE_QUEUE_SIZE, 1) < 0) goto fail;

@@ -8,7 +8,9 @@
 #include "mtbitmap.c"
 #include "mtmap.c"
 
-void player_play(char* path);
+void  player_init();
+void  player_play(char* path);
+char* player_get_path();
 
 int  player_toggle_pause();
 void player_toggle_mute();
@@ -24,7 +26,7 @@ void player_draw_video(bm_t* bm, int edge);
 void player_draw_video_to_texture(int index, int w, int h);
 void player_draw_waves(int channel, bm_t* bm, int edge);
 void player_draw_rdft(int index, int channel, bm_t* bm);
-void player_refresh();
+int  player_refresh();
 
 bm_t* player_get_album(const char* path);
 int   player_get_metadata(const char* path, map_t* map);
@@ -49,13 +51,23 @@ static AVInputFormat* file_iformat;
 
 VideoState* is             = NULL;
 double      remaining_time = 0.0;
+char*       player_path    = NULL;
+
+void player_init()
+{
+  av_init_packet(&flush_pkt);
+  flush_pkt.data = (uint8_t*)&flush_pkt;
+}
+
+char* player_get_path()
+{
+  return player_path;
+}
 
 void player_play(char* path)
 {
+  player_path = path;
   if (is != NULL) stream_close(is);
-
-  printf("LOG : playing %s\n", path);
-
   is = stream_open(path, file_iformat);
 }
 
@@ -131,15 +143,25 @@ void player_set_volume(float ratio)
   is->audio_volume = (int)((float)SDL_MIX_MAXVOLUME * ratio);
 }
 
-void player_refresh()
+int player_refresh()
 {
   if (is != NULL)
   {
     if (is->show_mode != SHOW_MODE_NONE && (!is->paused || is->force_refresh))
     {
+      remaining_time = 0.01;
       video_refresh(is, &remaining_time, 0);
     }
+
+    if (is->play_finished)
+    {
+      stream_close(is);
+      is = NULL;
+      return 1;
+    }
   }
+
+  return 0;
 }
 
 void player_draw_video_to_texture(int index, int w, int h)
@@ -207,6 +229,23 @@ int player_get_metadata(const char* path, map_t* map)
         char* value = cstr_fromcstring(tag->value);
         MPUT(map, tag->key, value);
         REL(value);
+      }
+
+      // Retrieve stream information
+      retv = avformat_find_stream_info(pFormatCtx, NULL);
+
+      if (retv >= 0)
+      {
+        int   dur   = pFormatCtx->duration / 1000000;
+        char* dur_s = mem_calloc(10, "char*", NULL, NULL);
+        snprintf(dur_s, 10, "%i:%.2i", (int)dur / 60, dur - (int)(dur / 60) * 60);
+        MPUT(map, "duration", dur_s);
+        REL(dur_s);
+      }
+      else
+      {
+        printf("player_get_metadata no stream information found!!!\n");
+        MPUT(map, "duration", cstr_fromcstring("0"));
       }
     }
     else

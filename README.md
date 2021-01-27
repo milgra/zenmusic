@@ -49,9 +49,6 @@ freebsd for os
 
 first version
 
-increase play count
-title/aritst/info egy textfield legyen, ugy konnyebb shadow is
-time bar passed/remaining
 relative paths in library
 spectrum, bar analyzer, left/right effect button, unshift bmp?
 button on/off alpha change on icon

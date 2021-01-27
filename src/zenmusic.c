@@ -113,6 +113,7 @@ void init(int width, int height, char* respath)
   ch = ch_new(100); // comm channel for library entries
 
   db_init();
+  player_init();
   config_init();
   config_read();
 
@@ -181,7 +182,33 @@ void update(ev_t ev)
 
   // update player
 
-  player_refresh();
+  int finished = player_refresh();
+
+  if (finished)
+  {
+    // increase play count of song
+    char*  path  = player_get_path();
+    map_t* entry = MGET(db_get_db(), path);
+
+    if (entry)
+    {
+      char* play_count_s = MGET(entry, "play count");
+      int   play_count_i = 0;
+      if (play_count_s != NULL)
+      {
+        play_count_i = atoi(play_count_s);
+      }
+      play_count_i += 1;
+      char* new_play_count = mem_calloc(10, "char*", NULL, NULL);
+      snprintf(new_play_count, 10, "%i", play_count_i);
+      MPUT(entry, "play count", new_play_count);
+      REL(new_play_count);
+      db_write(libpath);
+    }
+
+    // play next song
+    ui_on_next_button_down(NULL, NULL);
+  }
 
   // update ui
 

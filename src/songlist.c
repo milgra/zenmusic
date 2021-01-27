@@ -100,6 +100,7 @@ void songlist_attach(view_t* base,
   VADD(sl.fields, sl_cell_new("title", 300, 3));
   VADD(sl.fields, sl_cell_new("date", 150, 4));
   VADD(sl.fields, sl_cell_new("genre", 150, 5));
+  VADD(sl.fields, sl_cell_new("duration", 100, 5));
   VADD(sl.fields, sl_cell_new("track", 150, 6));
   VADD(sl.fields, sl_cell_new("disc", 150, 7));
   VADD(sl.fields, sl_cell_new("plays", 150, 8));

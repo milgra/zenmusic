@@ -19,6 +19,7 @@ void ui_hide_libpath_popup();
 void ui_refresh_songlist();
 void ui_reload_songlist();
 void ui_show_query(char* text);
+void ui_on_next_button_down(void* userdata, void* data);
 
 #endif
 
@@ -56,9 +57,8 @@ view_t* aboutview;
 view_t* editorview;
 view_t* settingsview;
 
-view_t* songview;
 view_t* infoview;
-view_t* artistview;
+view_t* infobckview;
 
 view_t* visuleft;
 view_t* visuright;
@@ -263,7 +263,7 @@ void ui_on_filter_activate(view_t* view)
     view_add(mainview, filterlistback);
 }
 
-void ui_on_messagebtn_down(view_t* view, void* data)
+void ui_on_messagebtn_down(void* userdata, void* data)
 {
   if (messagelistback->parent)
     view_remove(mainview, messagelistback);
@@ -283,24 +283,9 @@ void ui_on_mute_button_down(view_t* view)
 
 void ui_on_song_select(int index)
 {
-  // update display
+  ui_show_song_info(index);
+
   map_t* songmap = ui.songs->data[index];
-
-  textstyle_t ts = {0};
-  ts.font        = fontpath;
-  ts.align       = TA_CENTER;
-  ts.size        = 25.0;
-  ts.textcolor   = 0x000000FF;
-  ts.backcolor   = 0;
-
-  tg_text_set(songview, (char*)MGET(songmap, "title"), ts);
-  tg_text_set(artistview, (char*)MGET(songmap, "artist"), ts);
-
-  char buff[100];
-  snprintf(buff, 100, "%s/%s/%s", (char*)MGET(songmap, "date"), (char*)MGET(songmap, "genre"), "192Kb/s");
-  tg_text_set(infoview, buff, ts);
-
-  // LOG started playing xy
 
   player_play(MGET(songmap, "path"));
 }
@@ -374,12 +359,22 @@ void ui_show_song_info(int index)
   ts.font        = fontpath;
   ts.align       = TA_CENTER;
   ts.size        = 25.0;
-  ts.textcolor   = 0x000000FF;
+  ts.textcolor   = 0x333333FF;
   ts.backcolor   = 0;
 
   map_t* songmap = ui.songs->data[index];
-  tg_text_set(songview, (char*)MGET(songmap, "title"), ts);
-  tg_text_set(artistview, (char*)MGET(songmap, "artist"), ts);
+
+  char* infostr = cstr_fromformat("%s\n%s\n%s %s",
+                                  (char*)MGET(songmap, "title"),
+                                  (char*)MGET(songmap, "artist"),
+                                  (char*)MGET(songmap, "genre"),
+                                  "192Kb/s",
+                                  NULL);
+
+  tg_text_set(infoview, infostr, ts);
+
+  ts.textcolor = 0xBBBBBBFF;
+  tg_text_set(infobckview, infostr, ts);
 }
 
 void ui_toggle_pause(int state)
@@ -561,8 +556,6 @@ void ui_init(float width,
   tg_knob_add(volbtn);
   vh_knob_add(volbtn, ui_on_volume_change, ui_on_mute_button_down);
 
-  /* vh_button_add(infobtn, NULL, ui_on_messagebtn_down); */
-
   // get visualizer views
 
   visuleft  = view_get_subview(baseview, "visuleft");
@@ -608,26 +601,19 @@ void ui_init(float width,
   tg_text_add(secondview);
   tg_text_set(secondview, "00", ts);
 
-  ts.align = TA_CENTER;
+  infoview    = view_get_subview(baseview, "info");
+  infobckview = view_get_subview(baseview, "infobck");
 
-  songview              = view_get_subview(baseview, "song");
-  songview->needs_touch = 0;
-
-  tg_text_add(songview);
-  tg_text_set(songview, "-", ts);
-
-  artistview              = view_get_subview(baseview, "artist");
-  artistview->needs_touch = 0;
-
-  tg_text_add(artistview);
-  tg_text_set(artistview, "-", ts);
-
-  infoview = view_get_subview(baseview, "info");
   tg_text_add(infoview);
   tg_text_set(infoview, "-", ts);
+  tg_text_add(infobckview);
+  tg_text_set(infobckview, "-", ts);
 
   ts.align  = TA_LEFT;
   ts.margin = 10.0;
+
+  cb_t* msg_show_cb = cb_new(ui_on_messagebtn_down, NULL);
+  vh_button_add(infoview, msg_show_cb);
 
   // init activity
 

@@ -121,6 +121,7 @@ typedef struct VideoState
   struct SwsContext* img_convert_ctx;
   struct SwsContext* sub_convert_ctx;
   int                eof;
+  int                play_finished;
 
   char* filename;
   int   width, height, xleft, ytop;
