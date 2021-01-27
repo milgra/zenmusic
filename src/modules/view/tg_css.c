@@ -27,6 +27,10 @@ void tg_css_add(view_t* view);
 #include "mtgraphics.c"
 #include "stb_image.h"
 
+void tg_css_set_graycolor()
+{
+}
+
 void tg_css_gen(view_t* view)
 {
   if (view->frame.local.w >= 1.0 &&

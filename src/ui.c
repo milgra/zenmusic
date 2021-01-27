@@ -43,6 +43,7 @@ void ui_show_query(char* text);
 #include "wm_connector.c"
 // TODO remove fromm zenmusic.c
 #include "ui_manager.c"
+#include "vh_picker.c"
 
 view_t* baseview;
 view_t* minuteview;
@@ -222,6 +223,11 @@ void ui_on_accept_libpath(void* userdata, void* data)
   callbacks_call("on_change_library", path_ch);
 
   REL(path_ch);
+}
+
+void ui_on_color_select(void* userdata, void* data)
+{
+  printf("on color select\n");
 }
 
 void ui_on_filter_activate(view_t* view)
@@ -675,7 +681,10 @@ void ui_init(float width,
   tg_text_add(set_col_val);
   tg_text_set(set_col_val, "EFEFEF", ts);
 
+  cb_t* col_sel_cb = cb_new(ui_on_color_select, NULL);
+
   tg_picker_add(set_col_sel);
+  vh_picker_add(set_col_sel, col_sel_cb);
 
   settingsview = view_get_subview(baseview, "settingsback");
   view_remove(main, settingsview);
