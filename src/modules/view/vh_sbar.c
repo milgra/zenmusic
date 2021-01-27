@@ -9,7 +9,7 @@ typedef enum _sbartype_t
   SBAR_V,
 } sbartype_t;
 
-void vh_sbar_add(view_t* view, sbartype_t type, int steps);
+void vh_sbar_add(view_t* view, sbartype_t type, int steps, void (*scroll)(view_t* view, void* userdata, float ratio), void* userdata);
 void vh_sbar_open(view_t* view);
 void vh_sbar_close(view_t* view);
 void vh_sbar_update(view_t* view, float pos, float size);
@@ -31,6 +31,8 @@ typedef struct _vh_sbar_t
   float      size;
   float      fpos; // final pos
   float      fsize;
+  void (*scroll)(view_t*, void*, float);
+  void* userdata;
 } vh_sbar_t;
 
 void vh_sbar_evt(view_t* view, ev_t ev)
@@ -126,14 +128,34 @@ void vh_sbar_evt(view_t* view, ev_t ev)
       view->texture.changed = 1;
     }
   }
+  else if (ev.type == EV_MMOVE)
+  {
+    vh_sbar_t* vh = view->handler_data;
+
+    if (ev.drag)
+    {
+      if (vh->step == 0) vh_sbar_open(view);
+
+      float ratio;
+      if (vh->type == SBAR_V) ratio = (ev.y - view->frame.global.y) / view->frame.local.h;
+      if (vh->type == SBAR_H) ratio = (ev.x - view->frame.global.x) / view->frame.local.w;
+
+      if (vh->scroll) (*vh->scroll)(view, vh->userdata, ratio);
+    }
+  }
+  else if (ev.type == EV_MDOWN)
+  {
+  }
 }
 
-void vh_sbar_add(view_t* view, sbartype_t type, int steps)
+void vh_sbar_add(view_t* view, sbartype_t type, int steps, void (*scroll)(view_t* view, void* userdata, float ratio), void* userdata)
 {
   vh_sbar_t* vh = mem_calloc(sizeof(vh_sbar_t), "vh_sbar", NULL, NULL);
 
-  vh->type  = type;
-  vh->steps = steps;
+  vh->type     = type;
+  vh->steps    = steps;
+  vh->scroll   = scroll;
+  vh->userdata = userdata;
 
   view->handler_data = vh;
   view->handler      = vh_sbar_evt;

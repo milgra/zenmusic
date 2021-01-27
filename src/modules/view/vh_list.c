@@ -65,6 +65,42 @@ void    vh_list_lock_scroll(view_t* view, char state);
 
 #define PRELOAD_DISTANCE 100.0
 
+void vh_list_update_scrollbars(view_t* view)
+{
+  vh_list_t* vh = view->handler_data;
+
+  float sr; // size ratio
+  float pr; // position ratio
+  float s;  // size
+  float p;  // position
+
+  /* // vertical scroller */
+
+  sr = 1.0;
+  pr = 0.0;
+
+  if (vh->bot_index - vh->top_index + 1 < vh->item_count)
+  {
+    sr = (float)(vh->bot_index - vh->top_index + 1) / (float)vh->item_count;
+    pr = (float)(vh->top_index) / (float)(vh->item_count - (vh->bot_index - vh->top_index + 1));
+  }
+
+  vh_sbar_update(vh->vscr, pr, sr);
+
+  // horizontal scroller
+
+  sr = 1.0;
+  pr = 0.0;
+
+  if (vh->item_wth > view->frame.local.w)
+  {
+    sr = view->frame.local.w / vh->item_wth;
+    pr = -vh->item_pos / (vh->item_wth - view->frame.global.w);
+  }
+
+  vh_sbar_update(vh->hscr, pr, sr);
+}
+
 void vh_list_move(view_t* view, float dy)
 {
   vh_list_t* vh = view->handler_data;
@@ -105,36 +141,7 @@ void vh_list_move(view_t* view, float dy)
   if (!outside) vh->bot_index = vh->tail_index;
   if (!inside) vh->top_index = vh->head_index;
 
-  float sr; // size ratio
-  float pr; // position ratio
-  float s;  // size
-  float p;  // position
-
-  /* // vertical scroller */
-
-  sr = 1.0;
-  pr = 0.0;
-
-  if (vh->bot_index - vh->top_index + 1 < vh->item_count)
-  {
-    sr = (float)(vh->bot_index - vh->top_index + 1) / (float)vh->item_count;
-    pr = (float)(vh->top_index) / (float)(vh->item_count - (vh->bot_index - vh->top_index + 1));
-  }
-
-  vh_sbar_update(vh->vscr, pr, sr);
-
-  // horizontal scroller
-
-  sr = 1.0;
-  pr = 0.0;
-
-  if (vh->item_wth > view->frame.local.w)
-  {
-    sr = view->frame.local.w / vh->item_wth;
-    pr = -vh->item_pos / (vh->item_wth - view->frame.global.w);
-  }
-
-  vh_sbar_update(vh->hscr, pr, sr);
+  vh_list_update_scrollbars(view);
 }
 
 view_t* vh_list_get_item(view_t* view)
@@ -414,6 +421,29 @@ void vh_list_reset(view_t* view)
   vh->full       = 0;
 }
 
+void vh_list_scroll_v(view_t* view, void* userdata, float ratio)
+{
+  view_t*    listview  = userdata;
+  vh_list_t* vh        = listview->handler_data;
+  int        new_index = (int)((float)vh->item_count * ratio);
+
+  if (new_index > 0 && new_index < vh->item_count)
+  {
+    vh->head_index = new_index;
+    vh_list_refresh(listview);
+    vh_list_update_scrollbars(listview);
+  }
+}
+
+void vh_list_scroll_h(view_t* view, void* userdata, float ratio)
+{
+  view_t*    listview = userdata;
+  vh_list_t* vh       = listview->handler_data;
+  vh->item_pos        = -vh->item_wth * ratio;
+
+  vh_list_move(listview, 0);
+}
+
 // reload visible items
 
 void vh_list_refresh(view_t* view)
@@ -429,6 +459,9 @@ void vh_list_refresh(view_t* view)
     full         = (*vh->update_item)(view, vh->userdata, item, vh->head_index + index, &vh->item_count);
     if (full) break;
   }
+
+  vh->top_index = vh->head_index;
+  vh->bot_index = vh->head_index + index;
 
   // cache remaining items
 
@@ -478,8 +511,8 @@ void vh_list_add(view_t* view,
   tg_css_add(vscr);
   tg_css_add(hscr);
 
-  vh_sbar_add(vscr, SBAR_V, 30);
-  vh_sbar_add(hscr, SBAR_H, 30);
+  vh_sbar_add(vscr, SBAR_V, 30, vh_list_scroll_v, view);
+  vh_sbar_add(hscr, SBAR_H, 30, vh_list_scroll_h, view);
 
   view_add(view, vscr);
   view_add(view, hscr);
