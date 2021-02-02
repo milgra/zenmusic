@@ -44,8 +44,8 @@ LDFLAGS = \
 	-lavformat \
 	-lavfilter \
 	-lswresample \
-	-lswscale \
-	-Isrc/modules/player
+	-lswscale
+
 
 OBJECTS := $(addprefix $(OBJDIR)/,$(SOURCES:.c=.o))
 

@@ -40,7 +40,7 @@ SDL2 / window/graphics context handling
 stb_truetype / text generation
 
 programs used :
-
+o
 Inkscape for the icons
 emacs for programming
 freebsd for os
@@ -58,7 +58,7 @@ popup-ok center align
 go to source/ go to youtube channel button home-ba
 fix leaks
 fix while heaven wept
-
+fix 00 00 00 file names
 
 ideas
 
