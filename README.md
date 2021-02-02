@@ -1,5 +1,10 @@
 Zen Multimedia Desktop System
 
+Install for FreeBSD :
+git clone https://github.com/milgra/zenmusic.git
+cd zenmusic
+make install
+
 inspired by the golden-era itunes and the tracker module players of the early 90's
 
 slick, lag-free 60 fps smooth and momentum scrolling
@@ -40,7 +45,7 @@ SDL2 / window/graphics context handling
 stb_truetype / text generation
 
 programs used :
-o
+
 Inkscape for the icons
 emacs for programming
 freebsd for os

@@ -1,5 +1,6 @@
 CC = clang
-OBJDIR = bin/obj
+OBJDIRDEV = bin/obj/dev
+OBJDIRREL = bin/obj/rel
 
 SOURCES = \
 	$(wildcard src/*.c) \
@@ -28,8 +29,7 @@ CFLAGS = \
 	-Isrc/modules/html \
 	-Isrc/modules/view \
 	-Isrc/modules/image \
-	-Isrc/modules/player \
-	-g
+	-Isrc/modules/player
 
 LDFLAGS = \
 	-L/usr/local/lib \
@@ -46,15 +46,33 @@ LDFLAGS = \
 	-lswresample \
 	-lswscale
 
+OBJECTSDEV := $(addprefix $(OBJDIRDEV)/,$(SOURCES:.c=.o))
+OBJECTSREL := $(addprefix $(OBJDIRREL)/,$(SOURCES:.c=.o))
 
-OBJECTS := $(addprefix $(OBJDIR)/,$(SOURCES:.c=.o))
-
-zenmusic: $(OBJECTS)
-	$(CC) $^ -o bin/$@ $(LDFLAGS)
-
-$(OBJECTS): $(OBJDIR)/%.o: %.c
+$(OBJECTSDEV): $(OBJDIRDEV)/%.o: %.c
 	mkdir -p $(@D)
-	$(CC) -c $< -o $@ $(CFLAGS)
+	$(CC) -c $< -o $@ $(CFLAGS) -g -DDEBUG
+
+$(OBJECTSREL): $(OBJDIRREL)/%.o: %.c
+	mkdir -p $(@D)
+	$(CC) -c $< -o $@ $(CFLAGS) -O3
+
+#zenmusic: deps $(OBJECTS)
+
+dev: $(OBJECTSDEV)
+	$(CC) $^ -o bin/zenmusicdev $(LDFLAGS)	
+
+rel: $(OBJECTSREL)
+	$(CC) $^ -o bin/zenmusic $(LDFLAGS)
+
+deps:
+	@sudo pkg install ffmpeg sdl2 glew
 
 clean:
-	rm -f $(OBJECTS) zenmusic
+	rm -f $(OBJECTSDEV) zenmusic
+	rm -f $(OBJECTSREL) zenmusic
+
+install: rel
+	/usr/bin/install -c -s -m 755 bin/zenmusic /usr/local/bin
+	/usr/bin/install -d -m 755 /usr/local/share/zenmusic
+	cp res/* /usr/local/share/zenmusic/
