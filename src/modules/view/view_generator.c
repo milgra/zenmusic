@@ -38,7 +38,7 @@ void view_gen_apply_style(view_t* view, map_t* style, char* respath)
       {
         char* url = mem_calloc(sizeof(char) * strlen(val), "char*", NULL, NULL);
         memcpy(url, val + 5, strlen(val) - 7);
-        char* imagepath               = cstr_fromformat("%s/../res/%s", respath, url, NULL);
+        char* imagepath               = cstr_fromformat("%s/%s", respath, url, NULL);
         view->layout.background_image = imagepath;
         REL(url);
         tg_css_add(view);

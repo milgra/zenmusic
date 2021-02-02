@@ -432,10 +432,10 @@ void map_test()
   map_put(m2, "takk", "takkvalue");
   map_put(m2, "kakk", "kakkvalue");
   printf("4 GETTING DATA");
-  printf(" VALUE FOR makk : %s", map_get(m2, "makk"));
+  printf(" VALUE FOR makk : %s", (char*)map_get(m2, "makk"));
   printf("5 SETTING DATA TO NULL");
   map_put(m2, "takk", NULL);
-  printf(" VALUE FOR takk : %s", map_get(m2, "takk"));
+  printf(" VALUE FOR takk : %s", (char*)map_get(m2, "takk"));
   printf("MAP TEST SESSION END");
 }
 #endif

@@ -125,6 +125,11 @@ void init(int width, int height, char* respath)
   callbacks_set("on_genre_selected", cb_new(on_genre_select, NULL));
   callbacks_set("on_artist_selected", cb_new(on_artist_select, NULL));
 
+#ifndef DEBUG
+  respath = "/usr/local/share/zenmusic";
+#else
+  respath = cstr_fromformat("%s/../res", respath, NULL);
+#endif
   libpath = config_get("library_path");
 
   ui_init(width, height, respath, libpath);

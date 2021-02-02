@@ -49,6 +49,14 @@ LDFLAGS = \
 OBJECTSDEV := $(addprefix $(OBJDIRDEV)/,$(SOURCES:.c=.o))
 OBJECTSREL := $(addprefix $(OBJDIRREL)/,$(SOURCES:.c=.o))
 
+#zenmusic: deps $(OBJECTS)
+
+rel: $(OBJECTSREL)
+	$(CC) $^ -o bin/zenmusic $(LDFLAGS)
+
+dev: $(OBJECTSDEV)
+	$(CC) $^ -o bin/zenmusicdev $(LDFLAGS)	
+
 $(OBJECTSDEV): $(OBJDIRDEV)/%.o: %.c
 	mkdir -p $(@D)
 	$(CC) -c $< -o $@ $(CFLAGS) -g -DDEBUG
@@ -56,14 +64,6 @@ $(OBJECTSDEV): $(OBJDIRDEV)/%.o: %.c
 $(OBJECTSREL): $(OBJDIRREL)/%.o: %.c
 	mkdir -p $(@D)
 	$(CC) -c $< -o $@ $(CFLAGS) -O3
-
-#zenmusic: deps $(OBJECTS)
-
-dev: $(OBJECTSDEV)
-	$(CC) $^ -o bin/zenmusicdev $(LDFLAGS)	
-
-rel: $(OBJECTSREL)
-	$(CC) $^ -o bin/zenmusic $(LDFLAGS)
 
 deps:
 	@sudo pkg install ffmpeg sdl2 glew

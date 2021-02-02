@@ -490,7 +490,7 @@ void ui_init(float width,
 
   text_init();
 
-  fontpath = cstr_fromformat("%s/../res/Avenir.ttc", respath, NULL);
+  fontpath = cstr_fromformat("%s/Avenir.ttc", respath, NULL);
 
   textstyle_t ts  = {0};
   ts.font         = fontpath;
@@ -526,8 +526,8 @@ void ui_init(float width,
 
   // view setup
 
-  char* csspath  = cstr_fromformat("%s/../res/main.css", respath, NULL);
-  char* htmlpath = cstr_fromformat("%s/../res/main.html", respath, NULL);
+  char* csspath  = cstr_fromformat("%s/main.css", respath, NULL);
+  char* htmlpath = cstr_fromformat("%s/main.html", respath, NULL);
 
   vec_t* views = view_gen_load(htmlpath, csspath, respath, callbacks_get_data());
 
