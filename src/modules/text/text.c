@@ -251,7 +251,8 @@ void text_break_glyphs(
     // line break
     if (cp == '\n' || cp == '\r' || (xpos > wth && style.multiline))
     {
-      xpos = 0.0;
+      glyph.w = 0; // they should be invisible altough they get an empty unicode font face
+      xpos    = 0.0;
       ypos += (float)lineh * scale;
     }
 
