@@ -55,19 +55,22 @@ freebsd for os
 first version
 
 relative paths in library
+\r \n should be invisible
+no 00 at the start of the file if no track number exists
 spectrum, bar analyzer, left/right effect button, unshift bmp?
 button on/off alpha change on icon
 socketes taviranyitas - 1 byteokkal
 accept input on enter
+enable remote control in settings - opening remote control port, see readme for instructions
+close button teljes terulete
 popup-ok center align
 go to source/ go to youtube channel button home-ba
 fix leaks
-fix while heaven wept
-fix 00 00 00 file names
+fix while heaven wept, black lotus
+fix mp4 playing freezes
 
 ideas
 
-make instead of gmake, debug, release targets -g -O3, install ffmpeg and sdl2 if needed
 save small changes to a delta database, add it to the big one at startup
 amit releaselni kell, csinalodjon new-val!
 test texture resize and reset, texture overflow and reset

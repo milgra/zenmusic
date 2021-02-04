@@ -211,6 +211,14 @@ void ui_on_settings_close(void* userdata, void* data)
     view_add(mainview, settingsview);
 }
 
+void ui_on_messages_close(void* userdata, void* data)
+{
+  if (messagelistback->parent)
+    view_remove(mainview, messagelistback);
+  else
+    view_add(mainview, messagelistback);
+}
+
 void ui_on_filter_close(void* userdata, void* data)
 {
   if (filterlistback->parent)
@@ -261,14 +269,6 @@ void ui_on_filter_activate(view_t* view)
     view_remove(mainview, filterlistback);
   else
     view_add(mainview, filterlistback);
-}
-
-void ui_on_messagebtn_down(void* userdata, void* data)
-{
-  if (messagelistback->parent)
-    view_remove(mainview, messagelistback);
-  else
-    view_add(mainview, messagelistback);
 }
 
 void ui_on_play_button_down(view_t* view)
@@ -484,6 +484,8 @@ void ui_init(float width,
              char* respath,
              char* libpath)
 {
+  printf("ui_init %s %s\n", respath, libpath);
+
   ui.songs = db_get_songs();
 
   // init text
@@ -521,6 +523,7 @@ void ui_init(float width,
   callbacks_set("on_close_home_press", cb_new(ui_on_home_close, NULL));
   callbacks_set("on_close_settings_press", cb_new(ui_on_settings_close, NULL));
   callbacks_set("on_close_filter_press", cb_new(ui_on_filter_close, NULL));
+  callbacks_set("on_close_messages_press", cb_new(ui_on_messages_close, NULL));
 
   callbacks_set("on_accept_libpath_press", cb_new(ui_on_accept_libpath, NULL));
 
@@ -612,7 +615,7 @@ void ui_init(float width,
   ts.align  = TA_LEFT;
   ts.margin = 10.0;
 
-  cb_t* msg_show_cb = cb_new(ui_on_messagebtn_down, NULL);
+  cb_t* msg_show_cb = cb_new(ui_on_messages_close, NULL);
   vh_button_add(infoview, msg_show_cb);
 
   // init activity

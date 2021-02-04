@@ -59,15 +59,19 @@
       
     </div>
     <div id="messagelistback">
-      <div id="messagelist"/>
+      <div id="messagelistshadow" class="popupshadow">
+	<div id="messagelist"/>
+      </div>
       <div id="closemessagelistbtn" class="closepopupbtn" type="button" onclick="on_close_messages_press">
 	<div id="closemessagelisticon" class="closeicon"/>
       </div>
     </div>
     <div id="filterlistback">
-      <div id="filterlist">
-	<div id="genrelist"/>
-	<div id="artistlist"/>
+      <div id="filterlistshadow" class="popupshadow">
+	<div id="filterlist">
+	  <div id="genrelist"/>
+	  <div id="artistlist"/>
+	</div>
       </div>
       <div id="closefilterbtn" class="closepopupbtn" type="button" onclick="on_close_filter_press">
 	<div id="closefiltericon" class="closeicon"/>
@@ -75,73 +79,77 @@
     </div>
 
     <div id="ideditorback">
-      <div id="editorlistback">
-	<div id="editorlist"/>
+      <div id="ideditorshadow" class="popupshadow">
+	<div id="editorlistback">
+	  <div id="editorlist"/>
+	</div>
+	<div id="coverview"/>
+	<div id="accepteditorbtn" type="button" onclick="on_accept_edit_press">
+	  <div id="accepteditoricon" class="accepticon"/>
+	</div>
+	<div id="uploadbtnbck">
+	  <div id="uploadbtn" type="button" onclick="on_upload_press"/>
+	</div>
       </div>
-      <div id="coverview"/>
       <div id="closeeditorbtn" class="closepopupbtn" type="button" onclick="on_reject_edit_press">
 	<div id="closeeditoricon" class="closeicon"/>
-      </div>
-      <div id="accepteditorbtn" type="button" onclick="on_accept_edit_press">
-	<div id="accepteditoricon" class="accepticon"/>
-      </div>
-      <div id="uploadbtnbck">
-	<div id="uploadbtn" type="button" onclick="on_upload_press"/>
       </div>
     </div>
 
     <div id="aboutback">
-      <div id="aboutflex">
-	<div id="home_gap_a" class="set_gap"/>
-	<div id="home_block_a" class="set_block_big">
-	  <div id="home_lib_txt"/>
-	  <div id="home_lib_btn">
-	    <div id="home_lib_btn_txt"/>
-	  </div>
-	  <div id="home_org_btn">
-	    <div id="home_org_btn_txt"/>
-	  </div>
-	</div>
-	<div id="home_gap_b" class="set_gap"/>
-	
-	<div id="closehomebtn" class="closepopupbtn" type="button" onclick="on_close_home_press">
-	  <div id="closehomeicon" class="closeicon"/>
-	</div>
-      </div>
-    </div>
-    
-    <div id="settingsback">
-      <div id="settingsflex">
-	<div id="set_gap_a" class="set_gap"/>
-	<div id="set_block_a" class="set_block">
-	  <div id="set_lib_txt"/>
-	  <div id="set_lib_pth"/>
-	  <div id="set_lib_btn">
-	    <div id="set_lib_btn_txt"/>
-	  </div>
-	</div>
-	<div id="set_gap_b" class="set_gap"/>
-	<div id="set_block_b" class="set_block">
-	  <div id="set_org_text"/>
-	  <div id="set_org_val"/>
-	  <div id="set_org_btn">
-	    <div id="set_org_btn_txt"/>
-	  </div>
-	</div>
-	<div id="set_gap_c" class="set_gap"/>
-	<div id="set_block_c" class="set_block_big">
-	  <div id="set_col_text"/>
-	  <div id="set_col_val"/>
-	  <div id="set_col_sel_bck">
-	    <div id="set_col_sel_msk">
-	      <div id="set_col_sel"/>
+      <div id="aboutshadow" class="popupshadow">
+	<div id="aboutflex">
+	  <div id="home_gap_a" class="set_gap"/>
+	  <div id="home_block_a" class="set_block_big">
+	    <div id="home_lib_txt"/>
+	    <div id="home_lib_btn">
+	      <div id="home_lib_btn_txt"/>
+	    </div>
+	    <div id="home_org_btn">
+	      <div id="home_org_btn_txt"/>
 	    </div>
 	  </div>
+	  <div id="home_gap_b" class="set_gap"/>	  
 	</div>
-	
-	<div id="closesettingsbtn" class="closepopupbtn" type="button" onclick="on_close_settings_press">
-	  <div id="closesettingsicon" class="closeicon"/>
-	</div>
+      </div>
+      <div id="closehomebtn" class="closepopupbtn" type="button" onclick="on_close_home_press">
+	<div id="closehomeicon" class="closeicon"/>
+      </div>
+    </div>
+      
+    <div id="settingsback">
+      <div id="settingsshadow" class="popupshadow">
+	<div id="settingsflex">
+	  <div id="set_gap_a" class="set_gap"/>
+	  <div id="set_block_a" class="set_block">
+	    <div id="set_lib_txt"/>
+	    <div id="set_lib_pth"/>
+	    <div id="set_lib_btn">
+	      <div id="set_lib_btn_txt"/>
+	    </div>
+	  </div>
+	  <div id="set_gap_b" class="set_gap"/>
+	  <div id="set_block_b" class="set_block">
+	    <div id="set_org_text"/>
+	    <div id="set_org_val"/>
+	    <div id="set_org_btn">
+	      <div id="set_org_btn_txt"/>
+	    </div>
+	  </div>
+	  <div id="set_gap_c" class="set_gap"/>
+	  <div id="set_block_c" class="set_block_big">
+	    <div id="set_col_text"/>
+	    <div id="set_col_val"/>
+	    <div id="set_col_sel_bck">
+	      <div id="set_col_sel_msk">
+		<div id="set_col_sel"/>
+	      </div>
+	    </div>
+	  </div>
+	</div>	
+      </div>
+      <div id="closesettingsbtn" class="closepopupbtn" type="button" onclick="on_close_settings_press">
+	<div id="closesettingsicon" class="closeicon"/>
       </div>
     </div>
     

@@ -286,24 +286,26 @@ void gfx_rounded_rect(bm_t* bitmap, int x, int y, int w, int h, int r, float edg
 
   if (r > 0)
   {
-    gfx_arc_grad(bitmap, x + r, y + r, r - e, r, 3.14, 3.14 * 3 / 2.0, c2, c2 & 0xFFFFFF00);
-    gfx_arc_grad(bitmap, x + w - r - 1, y + r, r - e, r, 3.14 * 3 / 2.0, 3.14 * 2, c2, c2 & 0xFFFFFF00);
-    gfx_arc_grad(bitmap, x + r, y + h - r - 1, r - e, r, 3.14 / 2.0, 3.14, c2, c2 & 0xFFFFFF00);
-    gfx_arc_grad(bitmap, x + w - r - 1, y + h - r - 1, r - e, r, 0, 3.14 / 2.0, c2, c2 & 0xFFFFFF00);
+    gfx_arc_grad(bitmap, x + e + r, y + e + r, r, r + e, 3.14, 3.14 * 3 / 2.0, c2, c2 & 0xFFFFFF00); // shadow
+    gfx_arc_grad(bitmap, x + e + r, y + e + r, 0, r + 1, 3.14, 3.14 * 3 / 2.0, c1, c1);              // corner
 
-    gfx_arc_grad(bitmap, x + r, y + r, 0, r - e + 1, 3.14, 3.14 * 3 / 2.0, c1, c1);
-    gfx_arc_grad(bitmap, x + w - r - 1, y + r, 0, r - e + 1, 3.14 * 3 / 2.0, 3.14 * 2, c1, c1);
-    gfx_arc_grad(bitmap, x + r, y + h - r - 1, 0, r - e + 1, 3.14 / 2.0, 3.14, c1, c1);
-    gfx_arc_grad(bitmap, x + w - r - 1, y + h - r - 1, 0, r - e + 1, 0, 3.14 / 2.0, c1, c1);
+    gfx_arc_grad(bitmap, x + w - e - r - 1, y + e + r, r, r + e, 3.14 * 3 / 2.0, 3.14 * 2, c2, c2 & 0xFFFFFF00);
+    gfx_arc_grad(bitmap, x + w - e - r - 1, y + e + r, 0, r + 1, 3.14 * 3 / 2.0, 3.14 * 2, c1, c1);
+
+    gfx_arc_grad(bitmap, x + e + r, y + h - e - r - 1, r, r + e, 3.14 / 2.0, 3.14, c2, c2 & 0xFFFFFF00);
+    gfx_arc_grad(bitmap, x + e + r, y + h - e - r - 1, 0, r + 1, 3.14 / 2.0, 3.14, c1, c1);
+
+    gfx_arc_grad(bitmap, x + w - e - r - 1, y + h - e - r - 1, r, r + e, 0, 3.14 / 2.0, c2, c2 & 0xFFFFFF00);
+    gfx_arc_grad(bitmap, x + w - e - r - 1, y + h - e - r - 1, 0, r + 1, 0, 3.14 / 2.0, c1, c1);
   }
 
-  gfx_grad_h(bitmap, x, y + r, e, h - r - r, c2 & 0xFFFFFF00, c2);             // left vertical grad
-  gfx_grad_h(bitmap, x + w - e, y + r, e - 1, h - r - r, c2, c2 & 0xFFFFFF00); // right vertical grad
-  gfx_grad_v(bitmap, x + r, y, w - r - r, e, c2 & 0xFFFFFF00, c2);             // top horizontal grad
-  gfx_grad_v(bitmap, x + r, y + h - e, w - r - r, e - 1, c2, c2 & 0xFFFFFF00); // bottom horizontal grad
+  gfx_grad_h(bitmap, x, y + e + r, e, h - 2 * e - 2 * r, c2 & 0xFFFFFF00, c2);             // left vertical grad
+  gfx_grad_h(bitmap, x + w - e, y + e + r, e - 1, h - 2 * e - 2 * r, c2, c2 & 0xFFFFFF00); // right vertical grad
+  gfx_grad_v(bitmap, x + e + r, y, w - 2 * e - 2 * r, e, c2 & 0xFFFFFF00, c2);             // top horizontal grad
+  gfx_grad_v(bitmap, x + e + r, y + h - e, w - 2 * e - 2 * r, e - 1, c2, c2 & 0xFFFFFF00); // bottom horizontal grad
 
-  gfx_rect(bitmap, x + e, y + r, w - 2 * e, h - 2 * r, c1, 0);
-  gfx_rect(bitmap, x + r, y + e, w - 2 * r, h - 2 * e, c1, 0);
+  gfx_rect(bitmap, x + e, y + e + r, w - 2 * e, h - 2 * e - 2 * r, c1, 0);
+  gfx_rect(bitmap, x + e + r, y + e, w - 2 * e - 2 * r, h - 2 * e, c1, 0);
 }
 
 void gfx_rect(bm_t*    bm,
