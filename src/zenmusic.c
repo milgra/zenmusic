@@ -85,6 +85,9 @@ void on_change_library(void* userdata, void* data)
   else
     libpath = cstr_fromcstring(path);
 
+  if (path[strlen(path) - 1] != '/')
+    libpath = cstr_fromformat("%s/", path, NULL); // add closing slash
+
   if (lib_exists(libpath))
   {
     config_set("library_path", libpath);

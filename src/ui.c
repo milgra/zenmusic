@@ -79,6 +79,7 @@ view_t* set_col_val;
 
 size_t lastindex = 0;
 char*  fontpath;
+char*  ui_libpath;
 
 void ui_show_song_info(int index);
 
@@ -286,7 +287,11 @@ void ui_on_song_select(int index)
 
   map_t* songmap = ui.songs->data[index];
 
-  player_play(MGET(songmap, "path"));
+  char* path = cstr_fromformat("%s%s", ui_libpath, MGET(songmap, "path"));
+
+  player_play(path);
+
+  REL(path);
 }
 
 void ui_on_song_edit(int index)
@@ -481,6 +486,8 @@ void ui_init(float width,
              char* libpath)
 {
   printf("ui_init %s %s\n", respath, libpath);
+
+  ui_libpath = cstr_fromcstring(libpath);
 
   ui.songs = db_get_songs();
 

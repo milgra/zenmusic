@@ -31,7 +31,8 @@ int  lib_mkpath(char* file_path, mode_t mode);
 
 map_t* lib_db;
 vec_t* rem_db;
-char   lock_db = 0;
+char   lock_db  = 0;
+char*  lib_path = NULL;
 
 int lib_entries()
 {
@@ -51,13 +52,15 @@ static int lib_file_data(const char* fpath, const struct stat* sb, int tflag, st
   if (tflag == FTW_F)
   {
     // TODO use macro for database name
-    if (strstr(fpath, "zmusdb") == NULL)
+    if (strstr(fpath, "zenmusic") == NULL)
     {
       char sizestr[20] = {0};
       snprintf(sizestr, 20, "%li", sb->st_size);
       char* size = cstr_fromcstring(sizestr);
 
-      MPUT(lib_db, fpath, size);
+      // printf("file %s\n", fpath + strlen(lib_path));
+
+      MPUT(lib_db, fpath + strlen(lib_path), size);
       REL(size);
     }
   }
@@ -79,6 +82,8 @@ void lib_read(char* libpath)
 {
   if (lock_db) return;
 
+  if (lib_path) REL(lib_path);
+  lib_path  = cstr_fromcstring(libpath);
   lib_db    = MNEW();
   int flags = 0;
   int id    = 0;
@@ -145,8 +150,10 @@ int analyzer_thread(void* chptr)
       char* size = MGET(lib_db, path);
       MPUT(curr, "path", path);
       MPUT(curr, "size", size);
+      char* real = cstr_fromformat("%s%s", lib_path, path, NULL);
 
-      int res = player_get_metadata(path, curr);
+      int res = player_get_metadata(real, curr);
+      REL(real);
 
       if (res == 0)
       {
@@ -205,7 +212,7 @@ int analyzer_thread(void* chptr)
     if (ratio != ratio_new)
     {
       ratio = ratio_new;
-      LOG(" anaylzer progress : %i%%", ratio);
+      LOG(" analyzer progress : %i%%", ratio);
     }
   }
 
@@ -266,7 +273,6 @@ char* lib_replace_char(char* str, char find, char replace)
 int lib_organize_entry(char* libpath, map_t* db, map_t* entry)
 {
   int changed = 0;
-  int trackno = 0;
 
   char* path   = MGET(entry, "path");
   char* artist = MGET(entry, "artist");
@@ -274,15 +280,12 @@ int lib_organize_entry(char* libpath, map_t* db, map_t* entry)
   char* title  = MGET(entry, "title");
   char* track  = MGET(entry, "track");
 
-  if (track != NULL) trackno = atoi(track);
-
-  char trackstr[3] = {0};
-  snprintf(trackstr, 3, "%.2i", trackno);
-
   // remove slashes before directory creation
 
   lib_replace_char(artist, '/', ' ');
   lib_replace_char(title, '/', ' ');
+
+  // get extension
 
   int index;
   for (index = strlen(path) - 1; index > -1; --index)
@@ -298,29 +301,45 @@ int lib_organize_entry(char* libpath, map_t* db, map_t* entry)
   char* ext = mem_calloc(len + 1, "char*", NULL, NULL);
   memcpy(ext, path + index, len);
 
-  char* new_dirs = cstr_fromformat("%s/%s/%s/", libpath, artist, album, NULL);
-  char* new_path = cstr_fromformat("%s/%s/%s/%s %s.%s", libpath, artist, album, trackstr, title, ext, NULL);
+  char* old_path     = cstr_fromformat("%s%s", libpath, path, NULL);
+  char* new_dirs     = cstr_fromformat("%s%s/%s/", libpath, artist, album, NULL);
+  char* new_path     = NULL;
+  char* new_path_rel = NULL;
 
-  if (strcmp(path, new_path) != 0)
+  if (track)
   {
-    LOG("moving %s to %s\n", path, new_path);
+    int  trackno    = atoi(track);
+    char trackst[5] = {0};
+    snprintf(trackst, 5, "%.3i", trackno);
+    new_path     = cstr_fromformat("%s%s/%s/%s %s.%s", libpath, artist, album, trackst, title, ext, NULL);
+    new_path_rel = cstr_fromformat("%s/%s/%s %s.%s", artist, album, trackst, title, ext, NULL);
+  }
+  else
+  {
+    new_path     = cstr_fromformat("%s%s/%s/%s.%s", libpath, artist, album, title, ext, NULL);
+    new_path_rel = cstr_fromformat("%s/%s/%s.%s", artist, album, title, ext, NULL);
+  }
+
+  if (strcmp(old_path, new_path) != 0)
+  {
+    LOG("moving %s to %s\n", old_path, new_path);
 
     int error = lib_mkpath(new_dirs, 0777);
 
     if (error == 0)
     {
-      error = rename(path, new_path);
+      error = rename(old_path, new_path);
 
       if (error == 0)
       {
         LOG("updating path in db,\n");
-        MPUT(entry, "path", new_path);
-        MPUT(db, new_path, entry);
+        MPUT(entry, "path", new_path_rel);
+        MPUT(db, new_path_rel, entry);
         MDEL(db, path);
         changed = 1;
       }
       else
-        LOG("cannot rename file %s %s %s\n", path, new_path, strerror(errno));
+        LOG("cannot rename file %s %s %s\n", old_path, new_path, strerror(errno));
     }
     else
       LOG("cannot create path %s\n", new_path);
@@ -328,6 +347,8 @@ int lib_organize_entry(char* libpath, map_t* db, map_t* entry)
 
   REL(new_dirs);
   REL(new_path);
+  REL(new_path_rel);
+  REL(old_path);
 
   return 0;
 }

@@ -54,8 +54,7 @@ freebsd for os
 
 first version
 
-relative paths in library
-no 00 at the start of the file if no track number exists
+workgin change lib/organize button
 spectrum, bar analyzer, left/right effect button, unshift bmp?
 button on/off alpha change on icon
 socketes taviranyitas - 1 byteokkal
