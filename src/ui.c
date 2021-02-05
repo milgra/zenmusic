@@ -71,6 +71,9 @@ view_t* messagelistback;
 view_t* filterlistback;
 view_t* filterbar;
 
+view_t* decision_popup;
+view_t* ch_lib_popup;
+
 view_t* libpopuppage;
 view_t* libtextfield;
 view_t* libinputfield;
@@ -658,6 +661,16 @@ void ui_init(float width,
   vh_text_add(libinputfield, "/home/youruser/Music", "", ts, NULL);
 
   view_remove(baseview, libpopuppage);
+
+  // decision popup
+
+  decision_popup = view_get_subview(baseview, "dec_pop_bck");
+  view_remove(main, decision_popup);
+
+  // change lib popup
+
+  ch_lib_popup = view_get_subview(baseview, "chlib_pop_bck");
+  view_remove(main, ch_lib_popup);
 
   // settings
 

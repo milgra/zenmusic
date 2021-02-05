@@ -54,9 +54,9 @@
 	    <didv id="muteicon"/>
 	  </div>
 	</div>
-      </div>
-      
+      </div>  
     </div>
+    
     <div id="messagelistback">
       <div id="messagelistshadow" class="popupshadow">
 	<div id="messagelist"/>
@@ -65,6 +65,7 @@
 	<div id="closemessagelisticon" class="closeicon"/>
       </div>
     </div>
+    
     <div id="filterlistback">
       <div id="filterlistshadow" class="popupshadow">
 	<div id="filterlist">
@@ -83,7 +84,7 @@
 	  <div id="editorlist"/>
 	</div>
 	<div id="coverview"/>
-	<div id="accepteditorbtn" type="button" onclick="on_accept_edit_press">
+	<div id="accepteditorbtn" class="acceptbtn" type="button" onclick="on_accept_edit_press">
 	  <div id="accepteditoricon" class="accepticon"/>
 	</div>
 	<div id="uploadbtnbck">
@@ -152,6 +153,31 @@
       </div>
     </div>
     
+    <div id="chlib_pop_bck">
+      <div id="chlib_pop_shd" class="popupshadow">
+	<div id="chlib_pop_tf" class="ch_lib_tf"/>
+	<div id="chlib_pop_if" class="ch_lib_if"/>
+	<div id="chlib_pop_acc_btn" class="acceptbtn" type="button" onclick="on_accept_change_libpath_press">
+	  <div id="chlib_pop_acc_btn_icn" class="accepticon"/>
+	</div>
+      </div>
+      <div id="chlib_pop_rej_btn" class="closepopupbtn" type="button" onclick="on_close_chlib_press">
+	<div id="chlib_pop_rej_btn_icn" class="closeicon"/>
+      </div>
+    </div>
+
+    <div id="dec_pop_bck">
+      <div id="dec_pop_shd" class="popupshadow">
+	<div id="dec_pop_tf"/>
+	<div id="dec_pop_acc_btn" type="button" onclick="on_acc_dec_press">
+	  <div id="dec_pop_acc_btn_icn" class="accepticon"/>
+	</div>
+	<div id="dec_pop_rej_btn" type="button" onclick="on_rej_dec_press">
+	  <div id="dec_pop_rek_btn_icn" class="closeicon"/>
+	</div>
+      </div>
+    </div>
+    
   </div>
   <div id="footer">
     <div id="footer_left" class="footedge">
@@ -167,12 +193,14 @@
 
   <div id="libpopuppage">
     <div id="libpopupback">
-      <div id="libtextfield"/>
-      <div id="libinputfield"/>
-      <div id="acceptlibbtn" type="button" onclick="on_accept_libpath_press">
-	<div id="acceptlibicon" class="accepticon"/>
+      <div id="lib_pop_shd" class="popupshadow">
+	<div id="libtextfield" class="ch_lib_tf"/>
+	<div id="libinputfield" class="ch_lib_if"/>
+	<div id="acceptlibbtn" class="acceptbtn" type="button" onclick="on_accept_libpath_press">
+	  <div id="acceptlibicon" class="accepticon"/>
+	</div>
       </div>
     </div>
   </div>
-
+  
 </div>
