@@ -683,10 +683,24 @@ void ui_init(float width,
 
   // decision popup
 
+  ts.multiline       = 1;
+  view_t* dec_pop_tf = view_get_subview(baseview, "dec_pop_tf");
+  tg_text_add(dec_pop_tf);
+  tg_text_set(dec_pop_tf, "Files will be renamed and moved to different folders based on artist, album, track number and title, are you sure?", ts);
+
   decision_popup = view_get_subview(baseview, "dec_pop_bck");
   view_remove(main, decision_popup);
 
   // change lib popup
+
+  view_t* chlib_pop_tf = view_get_subview(baseview, "chlib_pop_tf");
+  view_t* chlib_pop_if = view_get_subview(baseview, "chlib_pop_if");
+
+  ts.backcolor = 0;
+
+  tg_text_add(chlib_pop_tf);
+  tg_text_set(chlib_pop_tf, "Use library at", ts);
+  vh_text_add(chlib_pop_if, "/home/youruser/Music", "", ts, NULL);
 
   ch_lib_popup = view_get_subview(baseview, "chlib_pop_bck");
   view_remove(main, ch_lib_popup);
@@ -737,20 +751,22 @@ void ui_init(float width,
 
   aboutview = view_get_subview(baseview, "aboutback");
 
-  view_t* home_lib_text    = view_get_subview(baseview, "home_lib_txt");
-  view_t* home_lib_btn_txt = view_get_subview(baseview, "home_lib_btn_txt");
+  view_t* home_info_text       = view_get_subview(baseview, "home_info_txt");
+  view_t* home_donate_btn_txt  = view_get_subview(baseview, "home_donate_btn_txt");
+  view_t* home_support_btn_txt = view_get_subview(baseview, "home_support_btn_txt");
+  view_t* home_src_btn_txt     = view_get_subview(baseview, "home_src_btn_txt");
 
-  view_t* home_org_text    = view_get_subview(baseview, "home_org_txt");
-  view_t* home_org_btn_txt = view_get_subview(baseview, "home_org_btn_txt");
+  tg_text_add(home_info_text);
+  tg_text_set(home_info_text, "Zen Music v0.8\n by Milan Toth\nFree and Open Source Software.\nIf you like it, please support the development.", ts);
 
-  tg_text_add(home_lib_text);
-  tg_text_set(home_lib_text, "Zen Music v0.8\n by Milan Toth\nFree and Open Source Software.\nIf you like it, please support the development.", ts);
+  tg_text_add(home_donate_btn_txt);
+  tg_text_set(home_donate_btn_txt, "Donate on Paypal", ts);
 
-  tg_text_add(home_lib_btn_txt);
-  tg_text_set(home_lib_btn_txt, "Donate on Paypal", ts);
+  tg_text_add(home_support_btn_txt);
+  tg_text_set(home_support_btn_txt, "Support on Patreon", ts);
 
-  tg_text_add(home_org_btn_txt);
-  tg_text_set(home_org_btn_txt, "Support on Patreon", ts);
+  tg_text_add(home_src_btn_txt);
+  tg_text_set(home_src_btn_txt, "Open Source", ts);
 
   view_remove(main, aboutview);
 

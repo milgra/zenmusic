@@ -167,6 +167,7 @@ void text_break_glyphs(
     if (!font) return;
   }
 
+  int   spc_a, spc_p;      // actual space, prev space
   int   asc, desc, lgap;   // glyph ascent, descent, linegap
   int   lsb, advx;         // left side bearing, glyph advance
   int   fonth, lineh;      // base height, line height
@@ -178,7 +179,9 @@ void text_break_glyphs(
   fonth = asc - desc;
   lineh = fonth + lgap;
 
-  ypos = (float)asc * scale;
+  spc_a = 0;
+  spc_p = 0;
+  ypos  = (float)asc * scale;
 
   for (int index = 0; index < count; index++)
   {
@@ -249,15 +252,26 @@ void text_break_glyphs(
     if (ncp > 0) xpos += scale * stbtt_GetCodepointKernAdvance(font, cp, ncp);
 
     // line break
-    if (cp == '\n' || cp == '\r' || (xpos > wth && style.multiline))
-    {
-      glyph.w = 0; // they should be invisible altough they get an empty unicode font face
-      xpos    = 0.0;
-      ypos += (float)lineh * scale;
-    }
+    if (cp == '\n' || cp == '\r') glyph.w = 0; // they should be invisible altough they get an empty unicode font face
+    if (cp == ' ') spc_a = index;
 
     // store glyph
     glyphs[index] = glyph;
+
+    if (cp == '\n' || cp == '\r' || (xpos > wth && style.multiline))
+    {
+      if (xpos > wth && style.multiline)
+      {
+        // check if we already fell back to this index, break word if yes
+        if (spc_a == spc_p)
+          index -= 1;
+        else
+          index = spc_a;
+        spc_p = spc_a;
+      }
+      xpos = 0.0;
+      ypos += (float)lineh * scale;
+    }
   }
 }
 
