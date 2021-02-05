@@ -58,7 +58,6 @@ view_t* editorview;
 view_t* settingsview;
 
 view_t* infoview;
-view_t* infobckview;
 
 view_t* visuleft;
 view_t* visuright;
@@ -372,9 +371,6 @@ void ui_show_song_info(int index)
                                   NULL);
 
   tg_text_set(infoview, infostr, ts);
-
-  ts.textcolor = 0xBBBBBBFF;
-  tg_text_set(infobckview, infostr, ts);
 }
 
 void ui_toggle_pause(int state)
@@ -604,13 +600,10 @@ void ui_init(float width,
   tg_text_add(secondview);
   tg_text_set(secondview, "00", ts);
 
-  infoview    = view_get_subview(baseview, "info");
-  infobckview = view_get_subview(baseview, "infobck");
+  infoview = view_get_subview(baseview, "info");
 
   tg_text_add(infoview);
   tg_text_set(infoview, "-", ts);
-  tg_text_add(infobckview);
-  tg_text_set(infobckview, "-", ts);
 
   ts.align  = TA_LEFT;
   ts.margin = 10.0;

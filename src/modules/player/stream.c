@@ -421,9 +421,9 @@ int audio_decode_frame(VideoState* is)
 #ifdef DEBUG
   {
     double last_clock;
-    printf("audio: delay=%0.3f clock=%0.3f clock0=%0.3f\n",
-           is->audio_clock - last_clock,
-           is->audio_clock, audio_clock0);
+    /* printf("audio: delay=%0.3f clock=%0.3f clock0=%0.3f\n", */
+    /*        is->audio_clock - last_clock, */
+    /*        is->audio_clock, audio_clock0); */
     last_clock = is->audio_clock;
   }
 #endif

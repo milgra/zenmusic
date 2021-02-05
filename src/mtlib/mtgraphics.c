@@ -286,17 +286,17 @@ void gfx_rounded_rect(bm_t* bitmap, int x, int y, int w, int h, int r, float edg
 
   if (r > 0)
   {
-    gfx_arc_grad(bitmap, x + e + r, y + e + r, r, r + e, 3.14, 3.14 * 3 / 2.0, c2, c2 & 0xFFFFFF00); // shadow
     gfx_arc_grad(bitmap, x + e + r, y + e + r, 0, r + 1, 3.14, 3.14 * 3 / 2.0, c1, c1);              // corner
+    gfx_arc_grad(bitmap, x + e + r, y + e + r, r, r + e, 3.14, 3.14 * 3 / 2.0, c2, c2 & 0xFFFFFF00); // shadow
 
-    gfx_arc_grad(bitmap, x + w - e - r - 1, y + e + r, r, r + e, 3.14 * 3 / 2.0, 3.14 * 2, c2, c2 & 0xFFFFFF00);
     gfx_arc_grad(bitmap, x + w - e - r - 1, y + e + r, 0, r + 1, 3.14 * 3 / 2.0, 3.14 * 2, c1, c1);
+    gfx_arc_grad(bitmap, x + w - e - r - 1, y + e + r, r, r + e, 3.14 * 3 / 2.0, 3.14 * 2, c2, c2 & 0xFFFFFF00);
 
-    gfx_arc_grad(bitmap, x + e + r, y + h - e - r - 1, r, r + e, 3.14 / 2.0, 3.14, c2, c2 & 0xFFFFFF00);
     gfx_arc_grad(bitmap, x + e + r, y + h - e - r - 1, 0, r + 1, 3.14 / 2.0, 3.14, c1, c1);
+    gfx_arc_grad(bitmap, x + e + r, y + h - e - r - 1, r, r + e, 3.14 / 2.0, 3.14, c2, c2 & 0xFFFFFF00);
 
-    gfx_arc_grad(bitmap, x + w - e - r - 1, y + h - e - r - 1, r, r + e, 0, 3.14 / 2.0, c2, c2 & 0xFFFFFF00);
     gfx_arc_grad(bitmap, x + w - e - r - 1, y + h - e - r - 1, 0, r + 1, 0, 3.14 / 2.0, c1, c1);
+    gfx_arc_grad(bitmap, x + w - e - r - 1, y + h - e - r - 1, r, r + e, 0, 3.14 / 2.0, c2, c2 & 0xFFFFFF00);
   }
 
   gfx_grad_h(bitmap, x, y + e + r, e, h - 2 * e - 2 * r, c2 & 0xFFFFFF00, c2);             // left vertical grad
