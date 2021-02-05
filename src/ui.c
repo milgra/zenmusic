@@ -156,6 +156,22 @@ void ui_on_settings_button_down(void* userdata, void* data)
     view_add(mainview, settingsview);
 }
 
+void ui_on_change_library_press(void* userdata, void* data)
+{
+  if (ch_lib_popup->parent)
+    view_remove(mainview, ch_lib_popup);
+  else
+    view_add(mainview, ch_lib_popup);
+}
+
+void ui_on_change_organize_press(void* userdata, void* data)
+{
+  if (decision_popup->parent)
+    view_remove(mainview, decision_popup);
+  else
+    view_add(mainview, decision_popup);
+}
+
 void ui_on_editor_reject(void* userdata, void* data)
 {
   ui_on_edit_button_down(NULL, data);
@@ -532,6 +548,9 @@ void ui_init(float width,
   callbacks_set("on_close_messages_press", cb_new(ui_on_messages_close, NULL));
 
   callbacks_set("on_accept_libpath_press", cb_new(ui_on_accept_libpath, NULL));
+
+  callbacks_set("on_change_library_press", cb_new(ui_on_change_library_press, NULL));
+  callbacks_set("on_change_organize_press", cb_new(ui_on_change_organize_press, NULL));
 
   // view setup
 
