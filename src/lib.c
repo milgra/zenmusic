@@ -17,11 +17,13 @@ int  lib_mkpath(char* file_path, mode_t mode);
 
 #if __INCLUDE_LEVEL__ == 0
 
+#define __USE_XOPEN_EXTENDED 1 // needed for linux
+#include <ftw.h>
+
 #include "mtcstring.c"
 #include "mtlog.c"
 #include "player.c"
 #include <errno.h>
-#include <ftw.h>
 #include <limits.h>
 #include <stdio.h>
 #include <sys/stat.h>
