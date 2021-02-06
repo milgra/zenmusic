@@ -54,14 +54,12 @@ freebsd for os
 
 first version
 
-workgin change lib/organize button
 spectrum, bar analyzer, left/right effect button, unshift bmp?
 button on/off alpha change on icon
 socketes taviranyitas - 1 byteokkal
 accept input on enter
 enable remote control in settings - opening remote control port, see readme for instructions
 popup-ok center align
-go to source/ go to youtube channel button home-ba
 fix leaks
 fix while heaven wept, black lotus
 fix mp4 playing freezes

@@ -83,6 +83,8 @@ void lib_read(char* libpath)
   if (lock_db) return;
 
   if (lib_path) REL(lib_path);
+  if (lib_db) REL(lib_db);
+
   lib_path  = cstr_fromcstring(libpath);
   lib_db    = MNEW();
   int flags = 0;
@@ -231,6 +233,8 @@ void lib_analyze(ch_t* channel)
   LOG("analyzing entires...");
 
   lock_db = 1;
+
+  if (rem_db) REL(rem_db);
 
   rem_db = VNEW();
   map_keys(lib_db, rem_db);

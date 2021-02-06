@@ -15,6 +15,7 @@ vec_t*   db_get_songs();
 vec_t*   db_get_genres();
 vec_t*   db_get_artists();
 uint32_t db_count();
+void     db_reset();
 
 #endif
 
@@ -49,6 +50,14 @@ void db_init()
 
   db.tmp1 = VNEW();
   db.tmp2 = VNEW();
+}
+
+void db_reset()
+{
+  map_reset(db.data);
+  vec_reset(db.songs);
+  vec_reset(db.genres);
+  vec_reset(db.artists);
 }
 
 map_t* db_get_db()

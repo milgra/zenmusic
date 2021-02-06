@@ -15,8 +15,9 @@ typedef struct _tg_text_t
   textstyle_t style;
 } tg_text_t;
 
-void tg_text_add(view_t* view);
-void tg_text_set(view_t* view, char* text, textstyle_t style);
+void  tg_text_add(view_t* view);
+void  tg_text_set(view_t* view, char* text, textstyle_t style);
+char* tg_text_get(view_t* view);
 
 #endif
 
@@ -87,6 +88,12 @@ void tg_text_set(view_t* view, char* text, textstyle_t style)
   gen->text           = cstr_fromcstring(text);
   gen->style          = style;
   view->texture.state = TS_BLANK;
+}
+
+char* tg_text_get(view_t* view)
+{
+  tg_text_t* gen = view->tex_gen_data;
+  return gen->text;
 }
 
 #endif

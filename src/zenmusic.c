@@ -19,6 +19,7 @@
 
 double lasttime = 0.0;
 char*  libpath  = NULL;
+int    organize = 0;
 ch_t*  ch; // library channel
 
 void load_library();
@@ -90,17 +91,42 @@ void on_change_library(void* userdata, void* data)
 
   if (lib_exists(libpath))
   {
+    printf("CHANGE LIBRARY %s\n", libpath);
     config_set("library_path", libpath);
     config_write();
+
+    libpath = config_get("library_path");
     load_library();
+    ui_set_libpath(libpath);
     ui_hide_libpath_popup();
   }
   else
     ui_show_libpath_popup("Location doesn't exists, please enter valid location.");
 }
 
+void on_change_organize(void* userdata, void* data)
+{
+  char* value = data;
+  organize    = strcmp(value, "Enable") == 0;
+
+  char* newval = cstr_fromcstring(organize ? "true" : "false");
+  config_set("organize_db", newval);
+  REL(newval);
+
+  ui_set_org_btn_lbl(organize ? "Disable" : "Enable");
+
+  if (organize)
+  {
+    int succ = lib_organize(libpath, db_get_db());
+    if (succ == 0) db_write(libpath);
+    ui_refresh_songlist();
+  }
+}
+
 void load_library()
 {
+  db_reset();
+
   db_read(libpath);                       // read db
   lib_read(libpath);                      // read library
   lib_remove_duplicates(db_get_db());     // remove existing
@@ -124,6 +150,7 @@ void init(int width, int height, char* respath)
   callbacks_set("om_save_entry", cb_new(on_save_entry, NULL));
   callbacks_set("on_song_header", cb_new(on_song_header, NULL));
   callbacks_set("on_change_library", cb_new(on_change_library, NULL));
+  callbacks_set("on_change_organize", cb_new(on_change_organize, NULL));
   callbacks_set("on_filter_songs", cb_new(on_filter_songs, NULL));
   callbacks_set("on_genre_selected", cb_new(on_genre_select, NULL));
   callbacks_set("on_artist_selected", cb_new(on_artist_select, NULL));
@@ -134,6 +161,9 @@ void init(int width, int height, char* respath)
   respath = cstr_fromformat("%s/../res", respath, NULL);
 #endif
   libpath = config_get("library_path");
+
+  char* orgstr = config_get("organize_db");
+  organize     = strcmp(orgstr, "true") == 0;
 
   ui_init(width, height, respath, libpath);
 
@@ -179,8 +209,11 @@ void update(ev_t ev)
       db_sort("artist", 0);
       db_write(libpath);
 
-      int succ = lib_organize(libpath, db_get_db());
-      if (succ == 0) db_write(libpath);
+      if (organize)
+      {
+        int succ = lib_organize(libpath, db_get_db());
+        if (succ == 0) db_write(libpath);
+      }
 
       ui_refresh_songlist();
     }

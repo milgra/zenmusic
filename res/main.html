@@ -61,7 +61,7 @@
       <div id="messagelistshadow" class="popupshadow">
 	<div id="messagelist"/>
       </div>
-      <div id="closemessagelistbtn" class="closepopupbtn" type="button" onclick="on_close_messages_press">
+      <div id="closemessagelistbtn" class="closepopupbtn" type="button" onclick="on_button_press">
 	<div id="closemessagelisticon" class="closeicon"/>
       </div>
     </div>
@@ -73,7 +73,7 @@
 	  <div id="artistlist"/>
 	</div>
       </div>
-      <div id="closefilterbtn" class="closepopupbtn" type="button" onclick="on_close_filter_press">
+      <div id="closefilterbtn" class="closepopupbtn" type="button" onclick="on_button_press">
 	<div id="closefiltericon" class="closeicon"/>
       </div>
     </div>
@@ -84,14 +84,14 @@
 	  <div id="editorlist"/>
 	</div>
 	<div id="coverview"/>
-	<div id="accepteditorbtn" class="acceptbtn" type="button" onclick="on_accept_edit_press">
+	<div id="accepteditorbtn" class="acceptbtn" type="button" onclick="on_button_press">
 	  <div id="accepteditoricon" class="accepticon"/>
 	</div>
 	<div id="uploadbtnbck">
 	  <div id="uploadbtn" type="button" onclick="on_upload_press"/>
 	</div>
       </div>
-      <div id="closeeditorbtn" class="closepopupbtn" type="button" onclick="on_reject_edit_press">
+      <div id="closeeditorbtn" class="closepopupbtn" type="button" onclick="on_button_press">
 	<div id="closeeditoricon" class="closeicon"/>
       </div>
     </div>
@@ -111,11 +111,14 @@
 	    <div id="home_src_btn">
 	      <div id="home_src_btn_txt"/>
 	    </div>
+	    <div id="home_yt_btn">
+	      <div id="home_yt_btn_txt"/>
+	    </div>
 	  </div>
 	  <div id="home_gap_b" class="set_gap"/>	  
 	</div>
       </div>
-      <div id="closehomebtn" class="closepopupbtn" type="button" onclick="on_close_home_press">
+      <div id="closehomebtn" class="closepopupbtn" type="button" onclick="on_button_press">
 	<div id="closehomeicon" class="closeicon"/>
       </div>
     </div>
@@ -127,7 +130,7 @@
 	  <div id="set_block_a" class="set_block">
 	    <div id="set_lib_txt"/>
 	    <div id="set_lib_pth"/>
-	    <div id="set_lib_btn" type="button" onclick="on_change_library_press">
+	    <div id="set_lib_btn" type="button" onclick="on_button_press">
 	      <div id="set_lib_btn_txt"/>
 	    </div>
 	  </div>
@@ -135,7 +138,7 @@
 	  <div id="set_block_b" class="set_block">
 	    <div id="set_org_text"/>
 	    <div id="set_org_val"/>
-	    <div id="set_org_btn" type="button" onclick="on_change_organize_press">
+	    <div id="set_org_btn" type="button" onclick="on_button_press">
 	      <div id="set_org_btn_txt"/>
 	    </div>
 	  </div>
@@ -151,7 +154,7 @@
 	  </div>
 	</div>	
       </div>
-      <div id="closesettingsbtn" class="closepopupbtn" type="button" onclick="on_close_settings_press">
+      <div id="closesettingsbtn" class="closepopupbtn" type="button" onclick="on_button_press">
 	<div id="closesettingsicon" class="closeicon"/>
       </div>
     </div>
@@ -160,11 +163,11 @@
       <div id="chlib_pop_shd" class="popupshadow">
 	<div id="chlib_pop_tf" class="ch_lib_tf"/>
 	<div id="chlib_pop_if" class="ch_lib_if"/>
-	<div id="chlib_pop_acc_btn" class="acceptbtn" type="button" onclick="on_accept_change_libpath_press">
+	<div id="chlib_pop_acc_btn" class="acceptbtn" type="button" onclick="on_button_press">
 	  <div id="chlib_pop_acc_btn_icn" class="accepticon"/>
 	</div>
       </div>
-      <div id="chlib_pop_rej_btn" class="closepopupbtn" type="button" onclick="on_change_library_press">
+      <div id="chlib_pop_rej_btn" class="closepopupbtn" type="button" onclick="on_button_press">
 	<div id="chlib_pop_rej_btn_icn" class="closeicon"/>
       </div>
     </div>
@@ -172,10 +175,10 @@
     <div id="dec_pop_bck">
       <div id="dec_pop_shd" class="popupshadow">
 	<div id="dec_pop_tf"/>
-	<div id="dec_pop_acc_btn" type="button" onclick="on_acc_dec_press">
+	<div id="dec_pop_acc_btn" type="button" onclick="on_button_press">
 	  <div id="dec_pop_acc_btn_icn" class="accepticon"/>
 	</div>
-	<div id="dec_pop_rej_btn" type="button" onclick="on_change_organize_press">
+	<div id="dec_pop_rej_btn" type="button" onclick="on_button_press">
 	  <div id="dec_pop_rek_btn_icn" class="closeicon"/>
 	</div>
       </div>
@@ -199,7 +202,7 @@
       <div id="lib_pop_shd" class="popupshadow">
 	<div id="libtextfield" class="ch_lib_tf"/>
 	<div id="libinputfield" class="ch_lib_if"/>
-	<div id="acceptlibbtn" class="acceptbtn" type="button" onclick="on_accept_libpath_press">
+	<div id="acceptlibbtn" class="acceptbtn" type="button" onclick="on_button_press">
 	  <div id="acceptlibicon" class="accepticon"/>
 	</div>
       </div>
