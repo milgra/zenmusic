@@ -215,7 +215,7 @@ void update(ev_t ev)
     }
 
     // play next song
-    ui_on_next_button_down(NULL, NULL);
+    ui_play_next();
   }
 
   // update ui

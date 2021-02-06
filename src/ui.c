@@ -19,7 +19,7 @@ void ui_hide_libpath_popup();
 void ui_refresh_songlist();
 void ui_reload_songlist();
 void ui_show_query(char* text);
-void ui_on_next_button_down(void* userdata, void* data);
+void ui_play_next();
 
 #endif
 
@@ -93,67 +93,44 @@ struct _ui_t
 
 // button events
 
-void ui_on_max_button_down(void* userdata, void* data)
+void ui_play_index(int index)
 {
-  wm_toggle_fullscreen();
-}
-
-void ui_on_close_button_down(void* userdata, void* data)
-{
-  wm_close();
-}
-
-void ui_on_prev_button_down(void* userdata, void* data)
-{
-  lastindex = lastindex - 1;
+  lastindex = index;
   if (lastindex < 0) lastindex = 0;
+  if (lastindex == ui.songs->length) lastindex = ui.songs->length - 1;
 
   ui_show_song_info(lastindex);
   map_t* songmap = ui.songs->data[lastindex];
-  player_play(MGET(songmap, "path"));
+  char*  path    = cstr_fromformat("%s%s", ui_libpath, MGET(songmap, "path"));
+  player_play(path);
+  REL(path);
 }
 
-void ui_on_next_button_down(void* userdata, void* data)
+void ui_play_next()
 {
-  lastindex = lastindex + 1;
-  // if (lastindex == ui.songs->length) lastindex = files->length - 1;
-
-  ui_show_song_info(lastindex);
-  map_t* songmap = ui.songs->data[lastindex];
-  player_play(MGET(songmap, "path"));
+  ui_play_index(lastindex + 1);
 }
 
-void ui_on_rand_button_down(void* userdata, void* data)
+void ui_toggle_mainview(view_t* view)
 {
-  lastindex = rand() % ui.songs->length;
-
-  ui_show_song_info(lastindex);
-  map_t* songmap = ui.songs->data[lastindex];
-  player_play(MGET(songmap, "path"));
-}
-
-void ui_on_edit_button_down(void* userdata, void* data)
-{
-  if (editorview->parent)
-    view_remove(mainview, editorview);
+  if (view->parent)
+    view_remove(mainview, view);
   else
-    view_add(mainview, editorview);
+    view_add(mainview, view);
 }
 
-void ui_on_about_button_down(void* userdata, void* data)
+void ui_on_button_down(void* userdata, void* data)
 {
-  if (aboutview->parent)
-    view_remove(mainview, aboutview);
-  else
-    view_add(mainview, aboutview);
-}
+  char* id = ((view_t*)data)->id;
 
-void ui_on_settings_button_down(void* userdata, void* data)
-{
-  if (settingsview->parent)
-    view_remove(mainview, settingsview);
-  else
-    view_add(mainview, settingsview);
+  if (strcmp(id, "maxbtn") == 0) wm_toggle_fullscreen();
+  if (strcmp(id, "app_close_btn") == 0) wm_close();
+  if (strcmp(id, "nextbtn") == 0) ui_play_index(lastindex + 1);
+  if (strcmp(id, "shufflebtn") == 0) ui_play_index(rand() % ui.songs->length);
+  if (strcmp(id, "prevbtn") == 0) ui_play_index(lastindex - 1);
+  if (strcmp(id, "settingsbtn") == 0) ui_toggle_mainview(settingsview);
+  if (strcmp(id, "aboutbtn") == 0) ui_toggle_mainview(aboutview);
+  if (strcmp(id, "editbtn") == 0) ui_toggle_mainview(editorview);
 }
 
 void ui_on_change_library_press(void* userdata, void* data)
@@ -174,13 +151,13 @@ void ui_on_change_organize_press(void* userdata, void* data)
 
 void ui_on_editor_reject(void* userdata, void* data)
 {
-  ui_on_edit_button_down(NULL, data);
+  ui_toggle_mainview(editorview);
 }
 
 void ui_on_editor_accept(void* userdata, void* data)
 {
   printf("on_editor_accept\n");
-  ui_on_edit_button_down(NULL, data);
+  ui_toggle_mainview(editorview);
 
   map_t* old_data = editor_get_old_data();
   map_t* new_data = editor_get_new_data();
@@ -298,19 +275,6 @@ void ui_on_play_button_down(view_t* view)
 void ui_on_mute_button_down(view_t* view)
 {
   player_toggle_mute();
-}
-
-void ui_on_song_select(int index)
-{
-  ui_show_song_info(index);
-
-  map_t* songmap = ui.songs->data[index];
-
-  char* path = cstr_fromformat("%s%s", ui_libpath, MGET(songmap, "path"));
-
-  player_play(path);
-
-  REL(path);
 }
 
 void ui_on_song_edit(int index)
@@ -526,16 +490,7 @@ void ui_init(float width,
 
   // event setup
 
-  callbacks_set("on_maximize_press", cb_new(ui_on_max_button_down, NULL));
-  callbacks_set("on_close_press", cb_new(ui_on_close_button_down, NULL));
-
-  callbacks_set("on_prev_press", cb_new(ui_on_prev_button_down, NULL));
-  callbacks_set("on_next_press", cb_new(ui_on_next_button_down, NULL));
-  callbacks_set("on_shuffle_press", cb_new(ui_on_rand_button_down, NULL));
-
-  callbacks_set("on_config_press", cb_new(ui_on_settings_button_down, NULL));
-  callbacks_set("on_home_press", cb_new(ui_on_about_button_down, NULL));
-  callbacks_set("on_edit_press", cb_new(ui_on_edit_button_down, NULL));
+  callbacks_set("on_button_press", cb_new(ui_on_button_down, NULL));
 
   callbacks_set("on_reject_edit_press", cb_new(ui_on_editor_reject, NULL));
   callbacks_set("on_accept_edit_press", cb_new(ui_on_editor_accept, NULL));
@@ -592,7 +547,7 @@ void ui_init(float width,
 
   // list setup
 
-  songlist_attach(baseview, fontpath, ui_on_song_select, ui_on_song_edit, ui_on_song_header);
+  songlist_attach(baseview, fontpath, ui_play_index, ui_on_song_edit, ui_on_song_header);
 
   ts.align        = TA_RIGHT;
   ts.margin_right = 20;
