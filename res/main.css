@@ -354,11 +354,11 @@
 
 .set_block_big {
     width: 380px;
-    height: 350px;
+    height: 250px;
     margin: auto;
     border-radius: 10px;
     background-color: #FFFFFFFF;
-    box-shadow: 3px;
+    box-shadow: 5px #FFFFFF88;
 }
 
 .set_gap {

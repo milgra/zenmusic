@@ -196,46 +196,40 @@ uint32_t count_props(char* css)
 void analyze_classes(char* css, prop_t* props)
 {
   int      start = 0;
-  char     in_w  = 0; // in word
-  char     in_c  = 0; // in class
-  char     in_p  = 0; // in property
+  char     in_l  = 0; // in line
   uint32_t index = 0;
   range_t class  = {0};
   char* c        = css;
   while (*c)
   {
-    if (!in_w)
+    if (*c == '}' || *c == ' ' || *c == '\r' || *c == '\n')
     {
-      if (*c != ' ' && *c != '\n' && *c != '\r' && *c != '{' && *c != '}')
-      {
-        start = c - css;
-        in_w  = 1;
-      }
+      if (c - css - 1 == start) start = c - css; // skip starting empty chars
     }
-    else
+    else if (*c == '{') // class name
     {
-      if (*c == ' ')
-      {
-        in_w      = 0;
-        class.pos = start;
-        class.len = c - css - start;
-      }
-      else if (*c == ':')
-      {
-        in_w                 = 0;
-        props[index].class   = class;
-        props[index].key.pos = start;
-        props[index].key.len = c - css - start;
-      }
-      else if (*c == ';')
-      {
-        in_w                   = 0;
-        props[index].class     = class;
-        props[index].value.pos = start;
-        props[index].value.len = c - css - start;
-        index++;
-      }
+      class.pos = start + 1;
+      class.len = c - css - start - 2;
+      while (*(css + class.pos + class.len) == ' ') class.len--;
+      class.len++;
+      start = c - css;
     }
+    else if (*c == ':') // property name
+    {
+      props[index].class   = class;
+      props[index].key.pos = start + 1;
+      props[index].key.len = c - css - start - 1;
+      start                = c - css;
+    }
+    else if (*c == ';') // value name
+    {
+      props[index].class     = class;
+      props[index].value.pos = start + 1;
+      props[index].value.len = c - css - start - 1;
+      start                  = c - css;
+      index++;
+    }
+
     c++;
   }
 }
