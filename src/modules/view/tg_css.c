@@ -142,7 +142,7 @@ void tg_css_gen(view_t* view)
                        view->layout.border_radius,
                        view->layout.shadow_blur,
                        color,
-                       0x00000033);
+                       view->layout.shadow_color);
 
       view->texture.changed = 1;
     }

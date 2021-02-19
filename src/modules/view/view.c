@@ -212,6 +212,7 @@ view_t* view_new(char* id, r2_t frame)
   view->layout.left          = INT_MAX;
   view->layout.right         = INT_MAX;
   view->layout.bottom        = INT_MAX;
+  view->layout.shadow_color  = 0x00000033;
 
   return view;
 }
