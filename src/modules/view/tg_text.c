@@ -41,26 +41,6 @@ void tg_text_gen(view_t* view)
     bm_t* fontmap = bm_new((int)view->frame.local.w, (int)view->frame.local.h);
 
     textstyle_t style = gen->style;
-    if (tg_css_get_graycolor() > 0)
-    {
-      uint32_t gray   = tg_css_get_graycolor();
-      style.backcolor = tg_css_get_newcolor(style.backcolor);
-
-      int nr = (gray >> 24) & 0xFF;
-      int ng = (gray >> 16) & 0xFF;
-      int nb = (gray >> 8) & 0xFF;
-
-      int light = (nr + ng + nb) / 2 > 130;
-
-      if (!light)
-      {
-        int cr          = 255 - (style.textcolor >> 24) & 0xFF;
-        int cg          = 255 - (style.textcolor >> 16) & 0xFF;
-        int cb          = 255 - (style.textcolor >> 8) & 0xFF;
-        int ca          = style.textcolor & 0xFF;
-        style.textcolor = (cr << 24) | (cg << 16) | (cb << 8) | ca;
-      }
-    }
 
     text_render(
         str,

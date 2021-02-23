@@ -90,7 +90,7 @@ void songlist_attach(view_t* base,
   sl.textstyle.margin_left = 10;
   sl.textstyle.size        = 25.0;
   sl.textstyle.textcolor   = 0x000000FF;
-  sl.textstyle.backcolor   = 0xEFEFEFFF;
+  sl.textstyle.backcolor   = 0xF5F5F5FF;
 
   // create fields
 
@@ -112,10 +112,10 @@ void songlist_attach(view_t* base,
 
   // add header handler
 
-  view_t* header                  = view_new("songlist_header", (r2_t){0, 0, 10, 30});
-  header->layout.background_color = 0xBBBBBBFF;
-  header->layout.shadow_blur      = 3;
-  header->layout.border_radius    = 3;
+  view_t* header = view_new("songlist_header", (r2_t){0, 0, 10, 30});
+  /* header->layout.background_color = 0x333333FF; */
+  /* header->layout.shadow_blur      = 3; */
+  /* header->layout.border_radius    = 3; */
   tg_css_add(header);
 
   vh_lhead_add(header);

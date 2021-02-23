@@ -211,25 +211,9 @@ void ui_on_color_select(void* userdata, void* data)
 {
   num_t* val = data;
 
-  uint32_t c = val->uint32v;
-  uint8_t  r = (c >> 24) & 0xFF;
-  uint8_t  g = (c >> 16) & 0xFF;
-  uint8_t  b = (c >> 8) & 0xFF;
-  uint8_t  a = c & 0xFF;
-
-  textstyle_t ts = {0};
-  ts.font        = fontpath;
-  ts.align       = TA_CENTER;
-  ts.size        = 25.0;
-  ts.textcolor   = 0x000000FF;
-  ts.backcolor   = 0;
-
-  char text[10] = {0};
-  snprintf(text, 10, "%.2x%.2x%.2x", r, g, b);
-  tg_text_set(set_col_val, text, ts);
-
-  tg_css_set_graycolor(c);
-  ui_generator_rerender();
+  /* char text[10] = {0}; */
+  /* snprintf(text, 10, "%.2x%.2x%.2x", r, g, b); */
+  /* tg_text_set(set_col_val, text, ts); */
 }
 
 void ui_on_filter_activate(view_t* view)

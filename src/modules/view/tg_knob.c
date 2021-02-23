@@ -32,15 +32,15 @@ void tg_knob_gen(view_t* view)
       tg->back  = bm_new(view->frame.local.w, view->frame.local.h);
       tg->fore  = bm_new(view->frame.local.w, view->frame.local.h);
 
-      gfx_arc_grad(tg->back,
-                   (view->frame.local.w - 1.0) / 2.0,
-                   (view->frame.local.h - 1.0) / 2.0,
-                   (view->frame.local.w / 2.0) - 3.0,
-                   (view->frame.local.w / 2.0),
-                   0,
-                   3.14 * 2,
-                   0x00000044,
-                   0);
+      /* gfx_arc_grad(tg->back, */
+      /*              (view->frame.local.w - 1.0) / 2.0, */
+      /*              (view->frame.local.h - 1.0) / 2.0, */
+      /*              (view->frame.local.w / 2.0) - 3.0, */
+      /*              (view->frame.local.w / 2.0), */
+      /*              0, */
+      /*              3.14 * 2, */
+      /*              0x00000044, */
+      /*              0); */
 
       gfx_arc_grad(tg->back,
                    (view->frame.local.w - 1.0) / 2.0,
@@ -59,18 +59,18 @@ void tg_knob_gen(view_t* view)
                    35,
                    0,
                    3.14 * 2,
-                   0x00000011,
-                   0x00000011);
+                   0xDEDEDEFF,
+                   0xDEDEDEFF);
 
-      gfx_arc_grad(tg->fore,
-                   (view->frame.local.w - 1.0) / 2.0,
-                   (view->frame.local.h - 1.0) / 2.0,
-                   27.0,
-                   30.0,
-                   0,
-                   3.14 * 2,
-                   0x00000044,
-                   0);
+      /* gfx_arc_grad(tg->fore, */
+      /*              (view->frame.local.w - 1.0) / 2.0, */
+      /*              (view->frame.local.h - 1.0) / 2.0, */
+      /*              27.0, */
+      /*              30.0, */
+      /*              0, */
+      /*              3.14 * 2, */
+      /*              0x00000044, */
+      /*              0); */
 
       gfx_arc_grad(tg->fore,
                    (view->frame.local.w - 1.0) / 2.0,
@@ -79,8 +79,8 @@ void tg_knob_gen(view_t* view)
                    28.0,
                    0,
                    3.14 * 2,
-                   0xDDDDDDFF,
-                   0xDDDDDDFF);
+                   0xFFFFFFFF,
+                   0xFFFFFFFF);
 
       view_set_texture_bmp(view, bmp);
     }
