@@ -188,6 +188,11 @@ void update(ev_t ev)
     }
   }
 
+  ui_manager_event(ev);
+}
+
+void render(uint32_t time)
+{
   // get analyzed song entries
 
   map_t* entry;
@@ -253,15 +258,15 @@ void update(ev_t ev)
 
   // update ui
 
-  double time = player_time();
-  if (time > 0.0)
+  double phead = player_time();
+  if (phead > 0.0)
   {
     // update timer
-    if (floor(time) != lasttime)
+    if (floor(phead) != lasttime)
     {
-      lasttime = floor(time);
+      lasttime = floor(phead);
 
-      double posratio = time / player_duration();
+      double posratio = phead / player_duration();
       double volratio = player_volume();
 
       ui_update_time(lasttime);
@@ -273,11 +278,6 @@ void update(ev_t ev)
     ui_update_video();
   }
 
-  ui_manager_event(ev);
-}
-
-void render(uint32_t time)
-{
   ui_manager_render(time);
 }
 

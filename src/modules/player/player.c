@@ -25,7 +25,7 @@ double player_duration();
 void player_draw_video(bm_t* bm, int edge);
 void player_draw_video_to_texture(int index, int w, int h);
 void player_draw_waves(int channel, bm_t* bm, int edge);
-void player_draw_rdft(int index, int channel, bm_t* bm);
+void player_draw_rdft(int channel, bm_t* bm, int edge);
 int  player_refresh();
 
 bm_t* player_get_album(const char* path);
@@ -197,8 +197,15 @@ void player_draw_waves(int channel, bm_t* bm, int edge)
   }
 }
 
-void player_draw_rdft(int index, int channel, bm_t* bm)
+void player_draw_rdft(int channel, bm_t* bm, int edge)
 {
+  if (is != NULL)
+  {
+    if (is->show_mode != SHOW_MODE_NONE && (!is->paused || is->force_refresh))
+    {
+      render_draw_rdft(is, channel, bm, edge);
+    }
+  }
 }
 
 int player_get_metadata(const char* path, map_t* map)

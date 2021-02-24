@@ -93,6 +93,7 @@ void ui_show_song_info(int index);
 struct _ui_t
 {
   vec_t* songs;
+  int    visu;
 } ui = {0};
 
 void ui_play_index(int index)
@@ -179,6 +180,11 @@ void ui_set_organize_lib()
   callbacks_call("on_change_organize", text);
 }
 
+void ui_change_visu()
+{
+  ui.visu = 1 - ui.visu;
+}
+
 void ui_on_button_down(void* userdata, void* data)
 {
   char* id = ((view_t*)data)->id;
@@ -205,6 +211,7 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "chlib_pop_rej_btn") == 0) ui_toggle_mainview(ch_lib_popup);
   if (strcmp(id, "dec_pop_acc_btn") == 0) ui_set_organize_lib();
   if (strcmp(id, "dec_pop_rej_btn") == 0) ui_toggle_mainview(decision_popup);
+  if (strcmp(id, "visuright_chg_btn") == 0) ui_change_visu();
 }
 
 void ui_on_color_select(void* userdata, void* data)
@@ -352,8 +359,16 @@ void ui_update_volume(float ratio)
 
 void ui_update_visualizer()
 {
-  player_draw_waves(0, visuleft->texture.bitmap, 3);
-  player_draw_waves(1, visuright->texture.bitmap, 3);
+  if (ui.visu)
+  {
+    player_draw_rdft(0, visuleft->texture.bitmap, 3);
+    player_draw_rdft(1, visuright->texture.bitmap, 3);
+  }
+  else
+  {
+    player_draw_waves(0, visuleft->texture.bitmap, 3);
+    player_draw_waves(1, visuright->texture.bitmap, 3);
+  }
 
   visuleft->texture.changed  = 1;
   visuright->texture.changed = 1;

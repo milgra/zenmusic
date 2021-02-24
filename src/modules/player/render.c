@@ -5,7 +5,8 @@
 #include "mtbitmap.c"
 
 void video_show(void* opaque, int index, int w, int h, bm_t* bitmap, int edge);
-void render_draw_waves(void* opaque, int index, bm_t* bitmap, int edge);
+void render_draw_waves(void* opaque, int channel, bm_t* bitmap, int edge);
+void render_draw_rdft(void* opaque, int channel, bm_t* bitmap, int edge);
 void video_refresh(void* opaque, double* remaining_time, int index);
 
 #endif
@@ -28,7 +29,7 @@ void video_refresh(void* opaque, double* remaining_time, int index);
 #define AV_SYNC_THRESHOLD_MIN 0.04
 /* AV sync correction is done if above the maximum AV sync threshold */
 #define AV_SYNC_THRESHOLD_MAX 0.1
-/* If a frame duration is longer than this, it will not be duplicated to compensate AV sync */
+/* If a frame duration is longer than this, it will not be vduplicated to compensate AV sync */
 #define AV_SYNC_FRAMEDUP_THRESHOLD 0.1
 /* no AV correction is done if too big error */
 #define AV_NOSYNC_THRESHOLD 10.0
@@ -152,7 +153,7 @@ void check_external_clock_speed(VideoState* is)
   }
 }
 
-static void video_audio_display(VideoState* s, int index, bm_t* bitmap, int edge)
+static void video_audio_display(VideoState* s, int index, bm_t* bitmap, int edge, enum ShowMode showmode)
 {
   int     i, i_start, x, y1, y2, y, ys, delay, n, nb_display_channels;
   int     ch, channels, h, h2;
@@ -166,7 +167,7 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap, int edge
     ;
   nb_freq = 1 << (rdft_bits - 1);
 
-  s->show_mode = SHOW_MODE_WAVES;
+  s->show_mode = showmode;
 
   /* compute display index : center on currently output samples */
   channels            = s->audio_tgt.channels;
@@ -289,7 +290,7 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap, int edge
       int        pitch;
 
       ch = index;
-      //for (ch = 0; ch < nb_display_channels; ch++)
+      for (ch = 0; ch < nb_display_channels; ch++)
       {
         data[ch] = s->rdft_data + 2 * nb_freq * ch;
         i        = i_start + ch;
@@ -323,7 +324,9 @@ static void video_audio_display(VideoState* s, int index, bm_t* bitmap, int edge
         pixels -= pitch;
         uint32_t color = ((a << 16) + (b << 8) + ((a + b) >> 1)) << 8 | 0xFF;
 
-        gfx_rect(bitmap, s->xpos, y, 1, 1, color, 0);
+        int h = bitmap->h;
+        gfx_rect(bitmap, s->xpos + edge, h - edge - y, 1, 1, color, 1);
+        gfx_rect(bitmap, s->xpos + edge + 1, 0, 1, h, 0xFFFFFFFF, 1);
         /*}*/
         /* SDL_UnlockTexture(s->vis_texture); */
       }
@@ -571,7 +574,23 @@ void render_draw_waves(void* opaque, int index, bm_t* bitmap, int edge)
     //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     //SDL_RenderClear(renderer);
     /* if (is->audio_st && is->show_mode != SHOW_MODE_VIDEO) */
-    video_audio_display(is, index, bitmap, edge);
+    video_audio_display(is, index, bitmap, edge, SHOW_MODE_WAVES);
+    /* else if (is->video_st) */
+    //video_image_display(is, index);
+    //SDL_RenderPresent(renderer);
+  }
+}
+
+void render_draw_rdft(void* opaque, int index, bm_t* bitmap, int edge)
+{
+  VideoState* is = opaque;
+
+  if (!display_disable)
+  {
+    //SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    //SDL_RenderClear(renderer);
+    /* if (is->audio_st && is->show_mode != SHOW_MODE_VIDEO) */
+    video_audio_display(is, index, bitmap, edge, SHOW_MODE_RDFT);
     /* else if (is->video_st) */
     //video_image_display(is, index);
     //SDL_RenderPresent(renderer);

@@ -54,7 +54,6 @@ freebsd for os
 
 first version
 
-spectrum, bar analyzer, left/right effect button, unshift bmp?
 button on/off alpha change on icon
 socketes taviranyitas - 1 byteokkal
 accept input on enter

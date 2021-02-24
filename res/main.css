@@ -839,3 +839,12 @@
     margin: auto;
     top: 190px;
 }
+
+#visuright_chg_btn {
+    width: 30px;
+    height: 30px;
+    right: 2px;
+    top: 2px;    
+    border-radius: 14px;
+    background-color: #FFFFFFFF;
+}
