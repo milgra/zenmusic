@@ -54,7 +54,10 @@ freebsd for os
 
 first version
 
+alpha attrob for view, in compositor, button alpha anim
 button on/off alpha change on icon
+select item/remove google.id / select anim
+hover button over visualizer
 socketes taviranyitas - 1 byteokkal
 accept input on enter
 enable remote control in settings - opening remote control port, see readme for instructions
@@ -65,6 +68,8 @@ fix mp4 playing freezes
 
 ideas
 
+rdft left/right channel
+full screen visualizers
 save small changes to a delta database, add it to the big one at startup
 amit releaselni kell, csinalodjon new-val!
 test texture resize and reset, texture overflow and reset

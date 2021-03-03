@@ -564,7 +564,7 @@ void ui_init(float width,
   ts.margin = 10.0;
 
   cb_t* msg_show_cb = cb_new(ui_on_button_down, NULL);
-  vh_button_add(infoview, msg_show_cb);
+  vh_button_add(infoview, VH_BUTTON_NORMAL, msg_show_cb);
 
   // init activity
 

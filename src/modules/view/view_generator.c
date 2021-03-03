@@ -300,7 +300,7 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
           memcpy(onclick, html + t.onclick.pos + 1, t.onclick.len);
 
           cb_t* callback = MGET(callbacks, onclick);
-          if (callback) vh_button_add(view, callback);
+          if (callback) vh_button_add(view, VH_BUTTON_NORMAL, callback);
         }
       }
 

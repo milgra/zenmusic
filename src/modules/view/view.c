@@ -19,7 +19,7 @@ typedef enum _laydis_t // layout display
   LD_FLEX,
 } laydis_t;
 
-typedef enum _exdir_t // flexdir
+typedef enum _flexdir_t // flexdir
 {
   FD_ROW = 0,
   FD_COL,
@@ -91,6 +91,7 @@ typedef struct _texture_t
   textype_t type;    /* managed or external */
   uint32_t  page;    /* texture page */
   rentype_t rentype; /* background or immediate rendering */
+  float     alpha;
 
   // internal texture
 
@@ -191,16 +192,17 @@ void view_del(void* pointer)
 
 view_t* view_new(char* id, r2_t frame)
 {
-  view_t* view       = mem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
-  view->id           = cstr_fromcstring(id);
-  view->views        = VNEW();
-  view->frame.local  = frame;
-  view->frame.global = frame;
-  view->texture.page = -1;
-  view->texture.id   = cstr_fromcstring(id);
-  view->needs_touch  = 1;
-  view->blocks_touch = 1;
-  view->display      = 0; // by default no display, tex generators will set this to 1
+  view_t* view        = mem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
+  view->id            = cstr_fromcstring(id);
+  view->views         = VNEW();
+  view->frame.local   = frame;
+  view->frame.global  = frame;
+  view->texture.page  = -1;
+  view->texture.id    = cstr_fromcstring(id);
+  view->texture.alpha = 1;
+  view->needs_touch   = 1;
+  view->blocks_touch  = 1;
+  view->display       = 0; // by default no display, tex generators will set this to 1
 
   // reset margins
 
