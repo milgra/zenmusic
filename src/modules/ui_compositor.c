@@ -27,11 +27,11 @@ void ui_compositor_add(char* id,
                        char  masked,
                        char  hidden,
                        r2_t  frame,
-                       float alpha,
                        float border, // view border
-                       int   page,   // texture pagev
-                       int   full,   // needs full texture
-                       int   ext,    // external texture
+                       float alpha,
+                       int   page, // texture pagev
+                       int   full, // needs full texture
+                       int   ext,  // external texture
                        char* texid,
                        int   tex_w,
                        int   tex_h); // texture id
@@ -131,11 +131,11 @@ void ui_compositor_add(char* id,
                        char  masked,
                        char  hidden,
                        r2_t  frame,
-                       float alpha,
                        float border, // view border
-                       int   page,   // texture page
-                       int   full,   // needs full texture
-                       int   ext,    // external texture
+                       float alpha,
+                       int   page, // texture page
+                       int   full, // needs full texture
+                       int   ext,  // external texture
                        char* texid,
                        int   tex_w,
                        int   tex_h) // texture id
@@ -168,7 +168,7 @@ void ui_compositor_add(char* id,
   crect_set_page(rect, page);
 
   // set alpha
-  crect_set_alpha(rect, 1.0);
+  crect_set_alpha(rect, alpha);
 
   // TEXTURE COORDS
 

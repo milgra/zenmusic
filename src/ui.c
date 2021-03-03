@@ -65,6 +65,7 @@ view_t* visuleft;
 view_t* visuright;
 view_t* visuvideo;
 
+view_t* seekknob;
 view_t* playbtn;
 view_t* volbtn;
 
@@ -349,7 +350,7 @@ void ui_toggle_pause(int state)
 
 void ui_update_position(float ratio)
 {
-  tg_knob_set_angle(playbtn, ratio * 6.28 - 3.14 / 2.0);
+  tg_knob_set_angle(seekknob, ratio * 6.28 - 3.14 / 2.0);
 }
 
 void ui_update_volume(float ratio)
@@ -501,14 +502,18 @@ void ui_init(float width,
   tg_text_add(uploadbtn);
   tg_text_set(uploadbtn, "add new image", ts);
 
-  playbtn = view_get_subview(baseview, "playbtn");
-  volbtn  = view_get_subview(baseview, "volbtn");
+  seekknob = view_get_subview(baseview, "seekknob");
+  playbtn  = view_get_subview(baseview, "playbtn");
+  volbtn   = view_get_subview(baseview, "volbtn");
 
-  tg_knob_add(playbtn);
-  vh_knob_add(playbtn, ui_on_position_change, ui_on_play_button_down);
+  tg_knob_add(seekknob);
+  vh_knob_add(seekknob, ui_on_position_change, ui_on_play_button_down);
 
   tg_knob_add(volbtn);
   vh_knob_add(volbtn, ui_on_volume_change, ui_on_mute_button_down);
+
+  cb_t* msg_play_pause_cb = cb_new(ui_on_button_down, NULL);
+  vh_button_add(playbtn, VH_BUTTON_TOGGLE, msg_play_pause_cb);
 
   // get visualizer views
 

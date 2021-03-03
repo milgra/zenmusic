@@ -114,10 +114,11 @@ void ui_generator_resend_views()
                       view->hidden,
                       view->frame.global,       // frame
                       view->layout.shadow_blur, // view border
-                      view->texture.page,       // texture page
-                      view->texture.full,       // needs full texture
-                      view->texture.page > 0,   // external texture
-                      view->texture.id,         // texture id
+                      view->texture.alpha,
+                      view->texture.page,     // texture page
+                      view->texture.full,     // needs full texture
+                      view->texture.page > 0, // external texture
+                      view->texture.id,       // texture id
                       uig.wpwr,
                       uig.hpwr);
 
@@ -218,6 +219,13 @@ void ui_generator_render(uint32_t time)
 
       view->frame.dim_changed = 0;
       view->texture.changed   = 0;
+    }
+
+    if (view->texture.alpha_changed)
+    {
+      ui_compositor_upd_alpha(i, view->texture.alpha);
+
+      view->texture.alpha_changed = 0;
     }
 
     if (view->vis_changed)

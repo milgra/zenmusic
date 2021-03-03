@@ -34,7 +34,21 @@ void vh_button_evt(view_t* view, ev_t ev)
   if (ev.type == EV_MDOWN)
   {
     vh_button_t* vh = view->handler_data;
+
+    view_t* first = view->views->data[0];
+    view_set_texture_alpha(first, 0.5);
+    printf("set alpha 0.5!!!\n");
+
     if (vh->event) (*vh->event->fp)(vh->event->userdata, view);
+  }
+  else if (ev.type == EV_MUP)
+  {
+    vh_button_t* vh = view->handler_data;
+
+    view_t* first = view->views->data[0];
+    view_set_texture_alpha(first, 1.0);
+
+    printf("set alpha 1.0!!!\n");
   }
 }
 
@@ -47,6 +61,8 @@ void vh_button_set_state(view_t* view, vh_button_state_t state)
 
 void vh_button_add(view_t* view, vh_button_type_t type, cb_t* event)
 {
+  printf("vh button add %i\n", view->views->length);
+
   vh_button_t* vh = mem_calloc(sizeof(vh_button_t), "vh_button", NULL, NULL);
   vh->event       = event;
   vh->type        = type;

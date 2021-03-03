@@ -171,18 +171,24 @@
     background-image: url("loop.png");
 }
 
-#playbtn {
+#seekknob {
     width: 100px;
     height: 100px;
     right: 20px;
     padding: 15px;
 }
 
-#playicon {
+#playbtn {
     width: 40px;
     height: 40px;
     top: 30px;
     left: 32px;
+    padding: 15px;
+}
+
+#playicon {
+    width: 40px;
+    height: 40px;
     background-image: url("play.png");
     blocks: no;
 }
@@ -190,9 +196,8 @@
 #pauseicon {
     width: 40px;
     height: 40px;
-    top: 30px;
-    left: 32px;
     background-image: url("pause.png");
+    blocks: no;
 }
 
 #volbtn {

@@ -39,11 +39,7 @@ void vh_knob_evt(view_t* view, ev_t ev)
 
     if (angle < 0) angle += 6.28;
 
-    if (r < 30.0)
-    {
-      (*vh->button_pushed)(view);
-    }
-    else if (r < view->frame.global.w / 2.0)
+    if (r < view->frame.global.w / 2.0)
     {
       tg_knob_set_angle(view, angle);
       (*vh->ratio_changed)(view, angle);
