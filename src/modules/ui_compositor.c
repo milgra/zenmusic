@@ -27,6 +27,7 @@ void ui_compositor_add(char* id,
                        char  masked,
                        char  hidden,
                        r2_t  frame,
+                       float alpha,
                        float border, // view border
                        int   page,   // texture pagev
                        int   full,   // needs full texture
@@ -37,6 +38,7 @@ void ui_compositor_add(char* id,
 void ui_compositor_upd_pos(int index, r2_t frame, float border);
 char ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_t* bm);
 void ui_compositor_upd_vis(int index, char hidden);
+void ui_compositor_upd_alpha(int index, float alpha);
 void ui_compositor_render(uint32_t time, int width, int height, int wpwr, int hpwr);
 
 #endif
@@ -56,7 +58,7 @@ typedef struct _crect_t
 {
   char* id;
   char* tex_id;
-  float data[30];
+  float data[36];
   char  hidden;
   char  masked;
   r2_t  frame;
@@ -69,6 +71,7 @@ void     crect_set_id(crect_t* rect, char* id);
 void     crect_set_hidden(crect_t* r, char hidden);
 void     crect_set_masked(crect_t* r, char masked);
 void     crect_set_page(crect_t* rect, uint32_t page);
+void     crect_set_alpha(crect_t* r, float alpha);
 void     crect_set_frame(crect_t* rect, r2_t uirect);
 void     crect_set_texture(crect_t* rect, float tlx, float tly, float brx, float bry);
 
@@ -128,6 +131,7 @@ void ui_compositor_add(char* id,
                        char  masked,
                        char  hidden,
                        r2_t  frame,
+                       float alpha,
                        float border, // view border
                        int   page,   // texture page
                        int   full,   // needs full texture
@@ -162,6 +166,9 @@ void ui_compositor_add(char* id,
 
   // set page
   crect_set_page(rect, page);
+
+  // set alpha
+  crect_set_alpha(rect, 1.0);
 
   // TEXTURE COORDS
 
@@ -226,6 +233,13 @@ void ui_compositor_upd_pos(int index, r2_t frame, float border)
   uic.upd_geo = 1;
 }
 
+void ui_compositor_upd_alpha(int index, float alpha)
+{
+  crect_t* rect = uic.cache->data[index];
+  crect_set_alpha(rect, alpha);
+  uic.upd_geo = 1;
+}
+
 char ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_t* bm)
 {
   crect_t* rect = uic.cache->data[index];
@@ -276,7 +290,7 @@ void ui_compositor_render(uint32_t time, int width, int height, int tex_w, int t
     for (int i = 0; i < uic.cache_ind; i++)
     {
       crect_t* rect = uic.cache->data[i];
-      if (!rect->hidden) fb_add(uic.fb, rect->data, 30);
+      if (!rect->hidden) fb_add(uic.fb, rect->data, 36);
     }
 
     gl_upload_vertexes(uic.fb);
@@ -453,20 +467,20 @@ void crect_set_frame(crect_t* r, r2_t rect)
   r->data[0] = rect.x;
   r->data[1] = rect.y;
 
-  r->data[5] = rect.x + rect.w;
-  r->data[6] = rect.y + rect.h;
+  r->data[6] = rect.x + rect.w;
+  r->data[7] = rect.y + rect.h;
 
-  r->data[10] = rect.x;
-  r->data[11] = rect.y + rect.h;
+  r->data[12] = rect.x;
+  r->data[13] = rect.y + rect.h;
 
-  r->data[15] = rect.x + rect.w;
-  r->data[16] = rect.y;
+  r->data[18] = rect.x + rect.w;
+  r->data[19] = rect.y;
 
-  r->data[20] = rect.x;
-  r->data[21] = rect.y;
+  r->data[24] = rect.x;
+  r->data[25] = rect.y;
 
-  r->data[25] = rect.x + rect.w;
-  r->data[26] = rect.y + rect.h;
+  r->data[30] = rect.x + rect.w;
+  r->data[31] = rect.y + rect.h;
 }
 
 void crect_set_texture(crect_t* r, float tlx, float tly, float brx, float bry)
@@ -474,30 +488,40 @@ void crect_set_texture(crect_t* r, float tlx, float tly, float brx, float bry)
   r->data[2] = tlx;
   r->data[3] = tly;
 
-  r->data[7] = brx;
-  r->data[8] = bry;
+  r->data[8] = brx;
+  r->data[9] = bry;
 
-  r->data[12] = tlx;
-  r->data[13] = bry;
+  r->data[14] = tlx;
+  r->data[15] = bry;
 
-  r->data[17] = brx;
-  r->data[18] = tly;
+  r->data[20] = brx;
+  r->data[21] = tly;
 
-  r->data[22] = tlx;
-  r->data[23] = tly;
+  r->data[26] = tlx;
+  r->data[27] = tly;
 
-  r->data[27] = brx;
-  r->data[28] = bry;
+  r->data[32] = brx;
+  r->data[33] = bry;
 }
 
 void crect_set_page(crect_t* r, uint32_t page)
 {
   r->data[4]  = (float)page;
-  r->data[9]  = (float)page;
-  r->data[14] = (float)page;
-  r->data[19] = (float)page;
-  r->data[24] = (float)page;
-  r->data[29] = (float)page;
+  r->data[10] = (float)page;
+  r->data[16] = (float)page;
+  r->data[22] = (float)page;
+  r->data[28] = (float)page;
+  r->data[34] = (float)page;
+}
+
+void crect_set_alpha(crect_t* r, float alpha)
+{
+  r->data[5]  = alpha;
+  r->data[11] = alpha;
+  r->data[17] = alpha;
+  r->data[23] = alpha;
+  r->data[29] = alpha;
+  r->data[35] = alpha;
 }
 
 void crect_desc(crect_t* r)

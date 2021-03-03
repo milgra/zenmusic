@@ -89,9 +89,9 @@ glsha_t create_texture_shader()
   char* vsh =
       "#version 120\n"
       "attribute vec3 position;"
-      "attribute vec3 texcoord;"
+      "attribute vec4 texcoord;"
       "uniform mat4 projection;"
-      "varying vec3 vUv;"
+      "varying vec4 vUv;"
       "void main ( )"
       "{"
       "    gl_Position = projection * vec4(position,1.0);"
@@ -103,11 +103,12 @@ glsha_t create_texture_shader()
       "uniform sampler2D sampler[10];"
       "uniform int domask;"
       "uniform ivec2 texdim;"
-      "varying vec3 vUv;"
+      "varying vec4 vUv;"
       "void main( )"
       "{"
       " vec4 col = vec4(1.0);"
       " int unit = int(vUv.z);"
+      " float alpha = vUv.w;"
       "	if (unit == 0) col = texture2D(sampler[0], vUv.xy);"
       "	else if (unit == 1) col = texture2D(sampler[1], vUv.xy);"
       "	else if (unit == 2) col = texture2D(sampler[2], vUv.xy);"
@@ -122,6 +123,7 @@ glsha_t create_texture_shader()
       "  vec4 msk = texture2D(sampler[1], vec2(gl_FragCoord.x / texdim.x, gl_FragCoord.y / texdim.y));"
       "  if (msk.a < col.a) col.a = msk.a;"
       " }"
+      " if (alpha < 1.0) col.w *= alpha;"
       " gl_FragColor = col;"
       "}";
 
@@ -154,7 +156,7 @@ glsha_t create_color_shader()
   char* vsh =
       "#version 120\n"
       "attribute vec3 position;"
-      "attribute vec3 texcoord;"
+      "attribute vec4 texcoord;"
       "uniform mat4 projection;"
       "void main ( )"
       "{"
@@ -182,7 +184,7 @@ glsha_t create_blur_shader()
   char* vsh =
       "#version 120\n"
       "attribute vec3 position;"
-      "attribute vec3 texcoord;"
+      "attribute vec4 texcoord;"
       "uniform mat4 projection;"
       "uniform sampler2D samplera;"
       "varying vec3 vUv;"
@@ -195,7 +197,7 @@ glsha_t create_blur_shader()
   char* fsh =
       "#version 120\n"
       "uniform sampler2D samplera;\n"
-      "varying vec3 vUv;"
+      "varying vec4 vUv;"
 
       "void main()"
       "{"
@@ -236,7 +238,7 @@ glsha_t create_draw_shader()
   char* vsh =
       "#version 120\n"
       "attribute vec3 position;"
-      "attribute vec3 texcoord;"
+      "attribute vec4 texcoord;"
       "uniform mat4 projection;"
       "uniform sampler2D samplera;"
       "varying vec3 vUv;"
@@ -249,7 +251,7 @@ glsha_t create_draw_shader()
   char* fsh =
       "#version 120\n"
       "uniform sampler2D samplera;\n"
-      "varying vec3 vUv;"
+      "varying vec4 vUv;"
       "void main()"
       "{"
       " gl_FragColor = texture2D(samplera, vUv.xy);"
@@ -307,8 +309,8 @@ glbuf_t create_buffer()
   glBindVertexArray(vb.vao);
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 20, 0);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 20, (const GLvoid*)8);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 24, 0);
+  glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 24, (const GLvoid*)8);
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -383,40 +385,46 @@ void gl_draw_rectangle(glrect_t src_reg, glrect_t tgt_reg)
           0.0,
           (float)src_reg.h / 4096.0,
           0.0,
+          1.0,
 
           tgt_reg.w,
           tgt_reg.h,
           (float)src_reg.w / 4096.0,
           0.0,
           0.0,
+          1.0,
 
           0.0,
           tgt_reg.h,
           0.0,
           0.0,
           0.0,
+          1.0,
 
           0.0,
           0.0,
           0.0,
           (float)src_reg.h / 4096.0,
           0.0,
+          1.0,
 
           tgt_reg.w,
           0.0,
           (float)src_reg.w / 4096.0,
           (float)src_reg.h / 4096.0,
           0.0,
+          1.0,
 
           tgt_reg.w,
           tgt_reg.h,
           (float)src_reg.w / 4096.0,
           0.0,
           0.0,
+          1.0,
       };
 
   glBindBuffer(GL_ARRAY_BUFFER, gl.vertexes[0].vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 5, data, GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 6, data, GL_DYNAMIC_DRAW);
   glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
