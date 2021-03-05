@@ -327,8 +327,8 @@ void ui_show_song_info(int index)
   textstyle_t ts = {0};
   ts.font        = fontpath;
   ts.align       = TA_CENTER;
-  ts.size        = 25.0;
-  ts.textcolor   = 0x333333FF;
+  ts.size        = 28.0;
+  ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0;
 
   map_t* songmap = ui.songs->data[index];
@@ -386,8 +386,8 @@ void ui_update_time(double time)
   textstyle_t ts = {0};
   ts.font        = fontpath;
   ts.align       = TA_RIGHT;
-  ts.size        = 25.0;
-  ts.textcolor   = 0x555555FF;
+  ts.size        = 30.0;
+  ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0;
 
   char timebuff[20];
@@ -465,7 +465,7 @@ void ui_init(float width,
 
   text_init();
 
-  fontpath = cstr_fromformat("%s/Avenir.ttc", respath, NULL);
+  fontpath = cstr_fromformat("%s/Baloo.ttf", respath, NULL);
 
   textstyle_t ts  = {0};
   ts.font         = fontpath;
