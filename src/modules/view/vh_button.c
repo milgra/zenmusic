@@ -31,6 +31,7 @@ typedef struct _vh_button_t
 } vh_button_t;
 
 void vh_button_add(view_t* view, vh_button_type_t type, cb_t* event);
+void vh_button_set_state(view_t* view, vh_button_state_t state);
 
 #endif
 
@@ -75,7 +76,10 @@ void vh_button_evt(view_t* view, ev_t ev)
     if (vh->type == VH_BUTTON_TOGGLE)
     {
       if (vh->target == 1.0)
+      {
         vh->target = 0.0;
+        if (vh->event) (*vh->event->fp)(vh->event->userdata, view);
+      }
       else
       {
         vh->target = 1.0;
@@ -92,10 +96,13 @@ void vh_button_evt(view_t* view, ev_t ev)
 }
 
 void vh_button_set_state(view_t* view, vh_button_state_t state)
-
 {
   vh_button_t* vh = view->handler_data;
   vh->state       = state;
+  if (state == VH_BUTTON_DOWN)
+    vh->target = 1.0;
+  else
+    vh->target = 0.0;
 }
 
 void vh_button_add(view_t* view, vh_button_type_t type, cb_t* event)

@@ -200,28 +200,26 @@
     blocks: no;
 }
 
-#volbtn {
+#volknob {
     width: 100px;
     height: 100px;
     left: 20px;
     padding: 15px;
 }
 
+#mutebtn {
+    width: 40px;
+    height: 40px;
+    top: 30px;
+    right: 31px;
+    padding: 15px;
+}
+
 #muteicon {
     width: 40px;
     height: 40px;
-    top: 30px;
-    left: 28px;
     background-image: url("mute.png");
     blocks: no;
-}
-
-#unmuteicon {
-    width: 40px;
-    height: 40px;
-    top: 30px;
-    left: 28px;
-    background-image: url("unmute.png");
 }
 
 #display {

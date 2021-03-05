@@ -81,7 +81,7 @@ int player_toggle_pause()
     return is->paused;
   }
 
-  return 0;
+  return -1;
 }
 
 void player_toggle_mute()

@@ -67,7 +67,8 @@ view_t* visuvideo;
 
 view_t* seekknob;
 view_t* playbtn;
-view_t* volbtn;
+view_t* volknob;
+view_t* mutebtn;
 
 view_t* mainview;
 view_t* messagelistback;
@@ -102,6 +103,8 @@ void ui_play_index(int index)
   lastindex = index;
   if (lastindex < 0) lastindex = 0;
   if (lastindex == ui.songs->length) lastindex = ui.songs->length - 1;
+
+  vh_button_set_state(playbtn, VH_BUTTON_DOWN);
 
   ui_show_song_info(lastindex);
   map_t* songmap = ui.songs->data[lastindex];
@@ -186,12 +189,28 @@ void ui_change_visu()
   ui.visu = 1 - ui.visu;
 }
 
+void ui_on_play_button_down(view_t* view)
+{
+  if (player_toggle_pause() < 0)
+  {
+    ui_play_index(0);
+  }
+  //ui_toggle_pause();
+}
+
+void ui_on_mute_button_down(view_t* view)
+{
+  player_toggle_mute();
+}
+
 void ui_on_button_down(void* userdata, void* data)
 {
   char* id = ((view_t*)data)->id;
 
   if (strcmp(id, "maxbtn") == 0) wm_toggle_fullscreen();
   if (strcmp(id, "app_close_btn") == 0) wm_close();
+  if (strcmp(id, "playbtn") == 0) ui_on_play_button_down(NULL);
+  if (strcmp(id, "mutebtn") == 0) ui_on_mute_button_down(NULL);
   if (strcmp(id, "nextbtn") == 0) ui_play_index(lastindex + 1);
   if (strcmp(id, "shufflebtn") == 0) ui_play_index(rand() % ui.songs->length);
   if (strcmp(id, "prevbtn") == 0) ui_play_index(lastindex - 1);
@@ -227,17 +246,6 @@ void ui_on_color_select(void* userdata, void* data)
 void ui_on_filter_activate(view_t* view)
 {
   ui_toggle_mainview(filterlistback);
-}
-
-void ui_on_play_button_down(view_t* view)
-{
-  player_toggle_pause();
-  //ui_toggle_pause();
-}
-
-void ui_on_mute_button_down(view_t* view)
-{
-  player_toggle_mute();
 }
 
 void ui_on_song_edit(int index)
@@ -355,7 +363,7 @@ void ui_update_position(float ratio)
 
 void ui_update_volume(float ratio)
 {
-  tg_knob_set_angle(volbtn, ratio * 6.28 - 3.14 / 2.0);
+  tg_knob_set_angle(volknob, ratio * 6.28 - 3.14 / 2.0);
 }
 
 void ui_update_visualizer()
@@ -504,16 +512,18 @@ void ui_init(float width,
 
   seekknob = view_get_subview(baseview, "seekknob");
   playbtn  = view_get_subview(baseview, "playbtn");
-  volbtn   = view_get_subview(baseview, "volbtn");
+  volknob  = view_get_subview(baseview, "volknob");
+  mutebtn  = view_get_subview(baseview, "mutebtn");
 
   tg_knob_add(seekknob);
   vh_knob_add(seekknob, ui_on_position_change, ui_on_play_button_down);
 
-  tg_knob_add(volbtn);
-  vh_knob_add(volbtn, ui_on_volume_change, ui_on_mute_button_down);
+  tg_knob_add(volknob);
+  vh_knob_add(volknob, ui_on_volume_change, ui_on_mute_button_down);
 
   cb_t* msg_play_pause_cb = cb_new(ui_on_button_down, NULL);
   vh_button_add(playbtn, VH_BUTTON_TOGGLE, msg_play_pause_cb);
+  vh_button_add(mutebtn, VH_BUTTON_TOGGLE, msg_play_pause_cb);
 
   // get visualizer views
 

@@ -54,8 +54,6 @@ freebsd for os
 
 first version
 
-alpha attrob for view, in compositor, button alpha anim
-button on/off alpha change on icon
 select item/remove google.id / select anim
 hover button over visualizer
 socketes taviranyitas - 1 byteokkal
