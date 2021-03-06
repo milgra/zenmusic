@@ -598,7 +598,7 @@ void ui_init(float width,
   ts.textcolor = 0x000000FF;
   ts.backcolor = 0xFFFFFFFF;
 
-  vh_text_add(filterbar, "", "Search/Query", ts, NULL);
+  vh_text_add(filterbar, "", "Search/Filter", ts, NULL);
   vh_text_set_on_text(filterbar, ui_filter);
   vh_text_set_on_activate(filterbar, ui_on_filter_activate);
 

@@ -175,14 +175,14 @@
     width: 100px;
     height: 100px;
     right: 20px;
-    padding: 15px;
+    padding: 0px;
 }
 
 #playbtn {
     width: 40px;
     height: 40px;
     top: 30px;
-    left: 31px;
+    left: 30px;
     padding: 15px;
 }
 
@@ -211,7 +211,7 @@
     width: 40px;
     height: 40px;
     top: 30px;
-    right: 31px;
+    right: 30px;
     padding: 15px;
 }
 
@@ -219,6 +219,13 @@
     width: 40px;
     height: 40px;
     background-image: url("mute.png");
+    blocks: no;
+}
+
+#unmuteicon {
+    width: 40px;
+    height: 40px;
+    background-image: url("unmute.png");
     blocks: no;
 }
 
