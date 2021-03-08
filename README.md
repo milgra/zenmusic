@@ -54,8 +54,10 @@ freebsd for os
 
 first version
 
+random toggle
+time/left toggle
 select item/remove google.id / select anim
-hover button over visualizer
+header resize on hscroll problem
 socketes taviranyitas - 1 byteokkal
 accept input on enter
 enable remote control in settings - opening remote control port, see readme for instructions

@@ -181,6 +181,7 @@ void text_break_glyphs(
 
   spc_a = 0;
   spc_p = 0;
+  xpos  = 0;
   ypos  = (float)asc * scale;
 
   for (int index = 0; index < count; index++)

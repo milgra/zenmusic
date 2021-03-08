@@ -67,20 +67,20 @@
     border-radius: 10px;
 }
 
-#minute {
-    width: 50%;
+#time {
+    width: 100%;
     height: 100%;
     top: 1px;
-    left: 0px;
     background-color: #FF0000FF;
+    blocks: no;
 }
 
-#second {
-    width: 50%;
+#left {
+    width: 100%;
     height: 100%;
     top: 1px;
-    right: 0px;
     background-color: #FF0000FF;
+    blocks: no;
 }
 
 #songbck {
@@ -640,6 +640,7 @@
     border-radius: 15px;
     right: 10px;
     box-shadow: 3px;
+    align-items: center;
 }
 
 #visuright {
@@ -649,6 +650,7 @@
     border-radius: 15px;
     left: 10px;
     box-shadow: 3px;
+    align-items: center;
 }
 
 #visuvideo {
@@ -746,7 +748,7 @@
     background-color: #FFFFFFFF;
 }
 
-#previcon {
+.previcon {
     width: 30px;
     height: 30px;
     background-image: url("prev.png");
@@ -762,7 +764,7 @@
     background-color: #FFFFFFFF;
 }
 
-#nexticon {
+.nexticon {
     width: 30px;
     height: 30px;
     background-image: url("next.png");
@@ -850,11 +852,10 @@
     top: 190px;
 }
 
-#visuright_chg_btn {
+.visuchange_btn {
     width: 30px;
     height: 30px;
-    right: 2px;
-    top: 2px;    
+    margin: auto;
     border-radius: 14px;
     background-color: #FFFFFFFF;
 }

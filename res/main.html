@@ -24,13 +24,13 @@
 	</div>
 	<div id="header_center" class="headcenter">
 	  <div id="prevbtn" type="button" onclick="on_button_press">
-	    <div id="previcon"/>
+	    <div id="previcon" class="previcon"/>
 	  </div>
 	  <div id="shufflebtn" type="button" onclick="on_button_press">
-	    <div id="shuffleicon"/>	  
+	    <div id="shuffleicon"/>
 	  </div>
 	  <div id="nextbtn" type="button" onclick="on_button_press">
-	    <div id="nexticon"/>
+	    <div id="nexticon" class="nexticon"/>
 	  </div>
 	  <div id="settingsbtn" type="button" onclick="on_button_press">
 	    <div id="settingsicon"/>
@@ -42,8 +42,8 @@
 	    <div id="editicon"/>
 	  </div>
 	  <div id="timebck">
-	    <div id="minute"/>
-	    <div id="second"/>
+	    <div id="time"/>
+	    <div id="left"/>
 	  </div>
 	  <div id="songbck">
 	    <div id="info"/>
@@ -193,14 +193,20 @@
   </div>
   <div id="footer">
     <div id="footer_left" class="footedge">
-      <div id="visuleft"/>
+      <div id="visuleft">
+	<div id="visuleft_btn" class="visuchange_btn" type="button" onclick="on_button_press">
+	  <div id="prevvisu" class="previcon"/>
+	</div>
+      </div>
     </div>
     <div id="footer_center" class="footcenter">
       <div id="visuvideo"/>
     </div>
     <div id="footer_right" class="footedge">
       <div id="visuright">
-	<div id="visuright_chg_btn" type="button" onclick="on_button_press"/>
+	<div id="visuright_btn" class="visuchange_btn" type="button" onclick="on_button_press">
+	  <div id="nextvisu" class="nexticon"/>
+	</div>
       </div>
     </div>
   </div>

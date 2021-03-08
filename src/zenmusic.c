@@ -269,7 +269,7 @@ void render(uint32_t time)
       double posratio = phead / player_duration();
       double volratio = player_volume();
 
-      ui_update_time(lasttime);
+      ui_update_time(lasttime, player_duration() - lasttime, player_duration());
       ui_update_position(posratio);
       ui_update_volume(volratio);
     }

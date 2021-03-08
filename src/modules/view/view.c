@@ -286,10 +286,10 @@ void view_remove(view_t* view, view_t* subview)
 
 void view_coll_touched(view_t* view, ev_t ev, vec_t* queue)
 {
-  if (ev.x < view->frame.global.x + view->frame.global.w &&
-      ev.x > view->frame.global.x &&
-      ev.y < view->frame.global.y + view->frame.global.h &&
-      ev.y > view->frame.global.y)
+  if (ev.x <= view->frame.global.x + view->frame.global.w &&
+      ev.x >= view->frame.global.x &&
+      ev.y <= view->frame.global.y + view->frame.global.h &&
+      ev.y >= view->frame.global.y)
   {
     VADD(queue, view);
     for (int i = 0; i < view->views->length; i++)

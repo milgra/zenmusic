@@ -12,7 +12,7 @@ void ui_update_position(float ratio);
 void ui_update_volume(float ratio);
 void ui_update_visualizer();
 void ui_update_video();
-void ui_update_time(double time);
+void ui_update_time(double time, double left, double duration);
 void ui_toggle_pause(int state);
 void ui_show_libpath_popup(char* message);
 void ui_hide_libpath_popup();
@@ -43,6 +43,7 @@ void ui_set_org_btn_lbl(char* text);
 #include "vh_button.c"
 #include "vh_knob.c"
 #include "vh_picker.c"
+#include "vh_roll.c"
 #include "vh_text.c"
 #include "view_generator.c"
 #include "view_layout.c"
@@ -52,8 +53,8 @@ void ui_set_org_btn_lbl(char* text);
 #include "ui_manager.c"
 
 view_t* baseview;
-view_t* minuteview;
-view_t* secondview;
+view_t* timeview;
+view_t* leftview;
 
 view_t* aboutview;
 view_t* editorview;
@@ -64,6 +65,8 @@ view_t* infoview;
 view_t* visuleft;
 view_t* visuright;
 view_t* visuvideo;
+view_t* visuleftbtn;
+view_t* visurightbtn;
 
 view_t* seekknob;
 view_t* playbtn;
@@ -231,7 +234,8 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "chlib_pop_rej_btn") == 0) ui_toggle_mainview(ch_lib_popup);
   if (strcmp(id, "dec_pop_acc_btn") == 0) ui_set_organize_lib();
   if (strcmp(id, "dec_pop_rej_btn") == 0) ui_toggle_mainview(decision_popup);
-  if (strcmp(id, "visuright_chg_btn") == 0) ui_change_visu();
+  if (strcmp(id, "visuright_btn") == 0) ui_change_visu();
+  if (strcmp(id, "visuleft_btn") == 0) ui_change_visu();
 }
 
 void ui_on_color_select(void* userdata, void* data)
@@ -307,6 +311,18 @@ void ui_on_volume_change(view_t* view, float angle)
   }
 
   player_set_volume(ratio);
+}
+
+void ui_on_roll_in_visu(void* userdata, void* data)
+{
+  view_add(visuleft, visuleftbtn);
+  view_add(visuright, visurightbtn);
+}
+
+void ui_on_roll_out_visu(void* userdata, void* data)
+{
+  view_remove(visuleft, visuleftbtn);
+  view_remove(visuright, visurightbtn);
 }
 
 // api functions
@@ -389,7 +405,7 @@ void ui_update_video()
   visuvideo->texture.changed = 1;
 }
 
-void ui_update_time(double time)
+void ui_update_time(double time, double left, double dur)
 {
   textstyle_t ts = {0};
   ts.font        = fontpath;
@@ -400,13 +416,18 @@ void ui_update_time(double time)
 
   char timebuff[20];
 
-  snprintf(timebuff, 20, "%.2i:", (int)floor(time / 60.0));
-  tg_text_set(minuteview, timebuff, ts);
+  int tmin = (int)floor(time / 60.0);
+  int tsec = (int)time % 60;
+  int lmin = (int)floor(left / 60.0);
+  int lsec = (int)left % 60;
+  int dmin = (int)floor(dur / 60.0);
+  int dsec = (int)dur % 60;
 
-  ts.align = TA_LEFT;
-
-  snprintf(timebuff, 20, "%.2i", (int)time % 60);
-  tg_text_set(secondview, timebuff, ts);
+  ts.align = TA_CENTER;
+  snprintf(timebuff, 20, "%.2i:%.2i / %.2i:%.2i", dmin, dsec, tmin, tsec);
+  tg_text_set(timeview, timebuff, ts);
+  snprintf(timebuff, 20, "%.2i:%.2i / %.2i:%.2i", dmin, dsec, lmin, lsec);
+  tg_text_set(leftview, timebuff, ts);
 }
 
 void ui_show_libpath_popup(char* text)
@@ -527,9 +548,22 @@ void ui_init(float width,
 
   // get visualizer views
 
-  visuleft  = view_get_subview(baseview, "visuleft");
-  visuright = view_get_subview(baseview, "visuright");
-  visuvideo = view_get_subview(baseview, "visuvideo");
+  visuleft     = view_get_subview(baseview, "visuleft");
+  visuright    = view_get_subview(baseview, "visuright");
+  visuvideo    = view_get_subview(baseview, "visuvideo");
+  visuleftbtn  = view_get_subview(visuleft, "visuleft_btn");
+  visurightbtn = view_get_subview(visuright, "visuright_btn");
+
+  view_remove(visuleft, visuleftbtn);
+  view_remove(visuright, visurightbtn);
+
+  // visualise roll over
+
+  cb_t* cb_roll_in_visu  = cb_new(ui_on_roll_in_visu, NULL);
+  cb_t* cb_roll_out_visu = cb_new(ui_on_roll_out_visu, NULL);
+
+  vh_roll_add(visuleft, cb_roll_in_visu, cb_roll_out_visu);
+  vh_roll_add(visuright, cb_roll_in_visu, cb_roll_out_visu);
 
   // list setup
 
@@ -553,22 +587,27 @@ void ui_init(float width,
 
   // display views
 
-  minuteview = view_get_subview(baseview, "minute");
-  secondview = view_get_subview(baseview, "second");
+  view_t* timeback = view_get_subview(baseview, "timebck");
+  timeview         = view_get_subview(baseview, "time");
+  leftview         = view_get_subview(baseview, "left");
+
+  vh_button_add(timeback, VH_BUTTON_TOGGLE, NULL);
 
   ts.margin_right = 0;
   ts.textcolor    = 0x000000FF;
   ts.backcolor    = 0x0;
 
-  ts.align = TA_RIGHT;
-
-  tg_text_add(minuteview);
-  tg_text_set(minuteview, "00:", ts);
-
   ts.align = TA_LEFT;
 
-  tg_text_add(secondview);
-  tg_text_set(secondview, "00", ts);
+  tg_text_add(timeview);
+  tg_text_set(timeview, "00:", ts);
+
+  ts.align = TA_RIGHT;
+
+  tg_text_add(leftview);
+  tg_text_set(leftview, "00:", ts);
+
+  ts.align = TA_LEFT;
 
   infoview = view_get_subview(baseview, "info");
 

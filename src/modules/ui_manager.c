@@ -69,17 +69,15 @@ void ui_manager_event(ev_t ev)
            ev.type == EV_MDOWN ||
            ev.type == EV_MUP)
   {
-    if (ev.type == EV_MDOWN)
+    if (ev.type == EV_MMOVE)
     {
-      // send mouse move event to previous uim.queue to detect move down outside
+      // send mouse move event to previous uim.queue to detect move move outside
       for (int i = uim.touchqueue->length - 1; i > -1; i--)
       {
-        ev_t outev = ev;
-        outev.type = EV_MDOWN_OUTSIDE;
-        view_t* v  = uim.touchqueue->data[i];
+        view_t* v = uim.touchqueue->data[i];
         if (v->needs_touch)
         {
-          if (v->handler) (*v->handler)(v, outev);
+          if (v->handler) (*v->handler)(v, ev);
           if (v->blocks_touch) break;
         }
       }
