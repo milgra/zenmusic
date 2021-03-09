@@ -169,11 +169,13 @@ void vh_text_evt(view_t* view, ev_t ev)
   {
     vh_text_activate(view, 1);
     if (data->on_activate) (*data->on_activate)(view);
-  }
-  else if (ev.type == EV_MDOWN_OUTSIDE)
-  {
-    vh_text_activate(view, 0);
-    if (data->on_deactivate) (*data->on_deactivate)(view);
+    r2_t frame = view->frame.global;
+
+    if (ev.x >= frame.x &&
+        ev.x <= frame.x + frame.w &&
+        ev.y >= frame.y &&
+        ev.y <= frame.y + frame.h &&
+        data->on_deactivate) (*data->on_deactivate)(view);
   }
   else if (ev.type == EV_TEXT)
   {

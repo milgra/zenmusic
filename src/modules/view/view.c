@@ -163,7 +163,7 @@ void view_set_texture_bmp(view_t* view, bm_t* tex);
 void view_set_texture_id(view_t* view, char* id);
 void view_set_texture_page(view_t* view, uint32_t page);
 void view_set_texture_type(view_t* view, textype_t type);
-void view_set_texture_alpha(view_t* view, float alpha);
+void view_set_texture_alpha(view_t* view, float alpha, char recur);
 
 void view_desc(void* pointer, int level);
 void view_desc_layout(vlayout_t l);
@@ -405,10 +405,16 @@ void view_set_texture_type(view_t* view, textype_t type)
   view->texture.type = type;
 }
 
-void view_set_texture_alpha(view_t* view, float alpha)
+void view_set_texture_alpha(view_t* view, float alpha, char recur)
 {
   view->texture.alpha         = alpha;
   view->texture.alpha_changed = 1;
+
+  if (recur)
+  {
+    view_t* v;
+    while ((v = VNXT(view->views))) view_set_texture_alpha(v, alpha, recur);
+  }
 }
 
 void view_set_layout(view_t* view, vlayout_t layout)

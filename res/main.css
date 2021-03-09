@@ -852,10 +852,15 @@
     top: 190px;
 }
 
-.visuchange_btn {
+.visuchange_btn_bck {
     width: 30px;
     height: 30px;
     margin: auto;
+}
+
+.visuchange_btn {
+    width: 30px;
+    height: 30px;
     border-radius: 14px;
     background-color: #FFFFFFFF;
 }

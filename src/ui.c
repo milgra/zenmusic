@@ -41,6 +41,7 @@ void ui_set_org_btn_lbl(char* text);
 #include "tg_picker.c"
 #include "tg_text.c"
 #include "vh_button.c"
+#include "vh_fade.c"
 #include "vh_knob.c"
 #include "vh_picker.c"
 #include "vh_roll.c"
@@ -67,6 +68,8 @@ view_t* visuright;
 view_t* visuvideo;
 view_t* visuleftbtn;
 view_t* visurightbtn;
+view_t* visuleftbtnbck;
+view_t* visurightbtnbck;
 
 view_t* seekknob;
 view_t* playbtn;
@@ -315,14 +318,14 @@ void ui_on_volume_change(view_t* view, float angle)
 
 void ui_on_roll_in_visu(void* userdata, void* data)
 {
-  view_add(visuleft, visuleftbtn);
-  view_add(visuright, visurightbtn);
+  vh_fade_set(visuleftbtnbck, 1.0, 10.0, 1);
+  vh_fade_set(visurightbtnbck, 1.0, 10.0, 1);
 }
 
 void ui_on_roll_out_visu(void* userdata, void* data)
 {
-  view_remove(visuleft, visuleftbtn);
-  view_remove(visuright, visurightbtn);
+  vh_fade_set(visuleftbtnbck, 0.0, 10.0, 1);
+  vh_fade_set(visurightbtnbck, 0.0, 10.0, 1);
 }
 
 // api functions
@@ -548,14 +551,19 @@ void ui_init(float width,
 
   // get visualizer views
 
-  visuleft     = view_get_subview(baseview, "visuleft");
-  visuright    = view_get_subview(baseview, "visuright");
-  visuvideo    = view_get_subview(baseview, "visuvideo");
-  visuleftbtn  = view_get_subview(visuleft, "visuleft_btn");
-  visurightbtn = view_get_subview(visuright, "visuright_btn");
+  visuleft        = view_get_subview(baseview, "visuleft");
+  visuright       = view_get_subview(baseview, "visuright");
+  visuvideo       = view_get_subview(baseview, "visuvideo");
+  visuleftbtn     = view_get_subview(visuleft, "visuleft_btn");
+  visurightbtn    = view_get_subview(visuright, "visuright_btn");
+  visuleftbtnbck  = view_get_subview(visuleft, "visuleft_btn_bck");
+  visurightbtnbck = view_get_subview(visuright, "visuright_btn_bck");
 
-  view_remove(visuleft, visuleftbtn);
-  view_remove(visuright, visurightbtn);
+  vh_fade_add(visuleftbtnbck);
+  vh_fade_add(visurightbtnbck);
+
+  /* view_remove(visuleft, visuleftbtn); */
+  /* view_remove(visuright, visurightbtn); */
 
   // visualise roll over
 
