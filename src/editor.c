@@ -175,7 +175,7 @@ void editor_attach(view_t* view, char* fontpath)
   ts.font        = fontpath;
   ts.margin      = 10.0;
   ts.align       = TA_LEFT;
-  ts.size        = 25.0;
+  ts.size        = 30.0;
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0xFFFFFFFF;
 

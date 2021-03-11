@@ -446,7 +446,7 @@ void ui_show_libpath_popup(char* text)
   textstyle_t ts = {0};
   ts.font        = fontpath;
   ts.align       = TA_CENTER;
-  ts.size        = 25.0;
+  ts.size        = 30.0;
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0;
 
@@ -511,7 +511,7 @@ void ui_init(float width,
   ts.font         = fontpath;
   ts.align        = TA_CENTER;
   ts.margin_right = 0;
-  ts.size         = 25.0;
+  ts.size         = 30.0;
   ts.textcolor    = 0x000000FF;
   ts.backcolor    = 0;
 

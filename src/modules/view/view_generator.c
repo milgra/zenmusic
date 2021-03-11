@@ -182,10 +182,10 @@ void view_gen_apply_style(view_t* view, map_t* style, char* respath)
     }
     else if (strcmp(key, "box-shadow") == 0)
     {
-      char* tok = strtok(val, " ");
-      if (tok) view->layout.shadow_blur = atoi(val);
-      tok = strtok(NULL, " ");
-      if (tok) view->layout.shadow_color = (int)strtol(tok + 1, NULL, 16);
+      view->layout.shadow_blur = atoi(val);
+      char* color              = strstr(val + 1, " ");
+
+      if (color) view->layout.shadow_color = (int)strtol(color + 2, NULL, 16);
     }
     else if (strcmp(key, "align-items") == 0)
     {
