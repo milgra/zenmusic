@@ -54,8 +54,14 @@ freebsd for os
 
 first version
 
-random toggle
-time/left toggle
+songboard
+songboard / selected songs, conversion
+artist-album sort
+select all, remove google id
+filter fix
+select deselect select until select all edit delete, fade popup
+search/filter history ( use filters for playlists)
+on mute fade in/out volume with alpha
 select item/remove google.id / select anim
 header resize on hscroll problem
 socketes taviranyitas - 1 byteokkal

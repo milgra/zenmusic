@@ -102,6 +102,7 @@ struct _ui_t
 {
   vec_t* songs;
   int    visu;
+  char   shuffle;
 } ui = {0};
 
 void ui_play_index(int index)
@@ -121,7 +122,15 @@ void ui_play_index(int index)
 
 void ui_play_next()
 {
-  ui_play_index(lastindex + 1);
+  if (ui.shuffle)
+    ui_play_index(rand() % ui.songs->length);
+  else
+    ui_play_index(lastindex + 1);
+}
+
+void ui_toggle_shuffle()
+{
+  ui.shuffle = !ui.shuffle;
 }
 
 void ui_toggle_mainview(view_t* view)
@@ -134,7 +143,6 @@ void ui_toggle_mainview(view_t* view)
 
 void ui_editor_accept()
 {
-  printf("ui_editor_accept\n");
   ui_toggle_mainview(editorview);
 
   map_t* old_data = editor_get_old_data();
@@ -217,8 +225,8 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "app_close_btn") == 0) wm_close();
   if (strcmp(id, "playbtn") == 0) ui_on_play_button_down(NULL);
   if (strcmp(id, "mutebtn") == 0) ui_on_mute_button_down(NULL);
-  if (strcmp(id, "nextbtn") == 0) ui_play_index(lastindex + 1);
-  if (strcmp(id, "shufflebtn") == 0) ui_play_index(rand() % ui.songs->length);
+  if (strcmp(id, "nextbtn") == 0) ui_play_next();
+  if (strcmp(id, "shufflebtn") == 0) ui_toggle_shuffle();
   if (strcmp(id, "prevbtn") == 0) ui_play_index(lastindex - 1);
   if (strcmp(id, "settingsbtn") == 0) ui_toggle_mainview(settingsview);
   if (strcmp(id, "closesettingsbtn") == 0) ui_toggle_mainview(settingsview);
@@ -572,6 +580,9 @@ void ui_init(float width,
 
   vh_roll_add(visuleft, cb_roll_in_visu, cb_roll_out_visu);
   vh_roll_add(visuright, cb_roll_in_visu, cb_roll_out_visu);
+
+  vh_fade_set(visuleftbtnbck, 0.0, 10.0, 1);
+  vh_fade_set(visurightbtnbck, 0.0, 10.0, 1);
 
   // list setup
 

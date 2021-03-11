@@ -45,7 +45,6 @@ void vh_button_evt(view_t* view, ev_t ev)
     if (!vh->inited)
     {
       vh->inited = 1;
-
       if (view->views->length > 0)
       {
         vh->offview = view->views->data[0];
@@ -67,8 +66,8 @@ void vh_button_evt(view_t* view, ev_t ev)
 
     if (vh->type == VH_BUTTON_NORMAL)
     {
-      vh_fade_set(vh->offview, 0.0, 10.0, 0);
-      vh_fade_set(vh->onview, 1.0, 10.0, 0);
+      if (vh->offview) vh_fade_set(vh->offview, 0.0, 10.0, 0);
+      if (vh->onview) vh_fade_set(vh->onview, 1.0, 10.0, 0);
     }
   }
   else if (ev.type == EV_MUP)
@@ -80,22 +79,22 @@ void vh_button_evt(view_t* view, ev_t ev)
       if (vh->state == VH_BUTTON_UP)
       {
         vh->state = VH_BUTTON_DOWN;
-        vh_fade_set(vh->offview, 0.0, 10.0, 0);
-        vh_fade_set(vh->onview, 1.0, 10.0, 0);
+        if (vh->offview) vh_fade_set(vh->offview, 0.0, 10.0, 0);
+        if (vh->onview) vh_fade_set(vh->onview, 1.0, 10.0, 0);
       }
       else
       {
         vh->state = VH_BUTTON_UP;
-        vh_fade_set(vh->offview, 1.0, 10.0, 0);
-        vh_fade_set(vh->onview, 0.0, 10.0, 0);
+        if (vh->offview) vh_fade_set(vh->offview, 1.0, 10.0, 0);
+        if (vh->onview) vh_fade_set(vh->onview, 0.0, 10.0, 0);
       }
       if (vh->event) (*vh->event->fp)(vh->event->userdata, view);
     }
     else
     {
       if (vh->event) (*vh->event->fp)(vh->event->userdata, view);
-      vh_fade_set(vh->offview, 1.0, 10.0, 0);
-      vh_fade_set(vh->onview, 0.0, 10.0, 0);
+      if (vh->offview) vh_fade_set(vh->offview, 1.0, 10.0, 0);
+      if (vh->onview) vh_fade_set(vh->onview, 0.0, 10.0, 0);
     }
   }
 }

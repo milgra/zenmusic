@@ -302,6 +302,14 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
           cb_t* callback = MGET(callbacks, onclick);
           if (callback) vh_button_add(view, VH_BUTTON_NORMAL, callback);
         }
+        else if (strcmp(type, "checkbox") == 0 && t.onclick.len > 0)
+        {
+          char* onclick = mem_calloc(sizeof(char) * t.onclick.len + 1, "char*", NULL, NULL);
+          memcpy(onclick, html + t.onclick.pos + 1, t.onclick.len);
+
+          cb_t* callback = MGET(callbacks, onclick);
+          if (callback) vh_button_add(view, VH_BUTTON_TOGGLE, callback);
+        }
       }
 
       REL(id);

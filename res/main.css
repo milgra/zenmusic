@@ -776,8 +776,22 @@
     height: 30px;
     left: 55px;
     top: 10px;    
+}
+
+#shuffleoff {
+    width: 30px;
+    height: 30px;
     border-radius: 10px;
     background-color: #FFFFFFFF;
+    blocks: no;
+}
+
+#shuffleon {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+    background-color: #00000022;
+    blocks: no;
 }
 
 #shuffleicon {
