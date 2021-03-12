@@ -16,7 +16,7 @@ void songlist_toggle_selected(int state);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "db.c"
+#include "filtered.c"
 #include "tg_css.c"
 #include "tg_text.c"
 #include "vh_button.c"
@@ -35,7 +35,6 @@ void on_header_field_resize(view_t* view, char* id, int size);
 struct songlist_t
 {
   view_t*     view;   // table view
-  vec_t*      songs;  // songs to be shown in list
   vec_t*      fields; // fileds in table
   textstyle_t textstyle;
 
@@ -75,7 +74,6 @@ void songlist_attach(view_t* base,
   assert(fontpath != NULL);
 
   sl.view   = view_get_subview(base, "songlist");
-  sl.songs  = db_get_songs();
   sl.fields = VNEW();
 
   sl.index_s = 0;
@@ -146,6 +144,7 @@ void songlist_update()
 
 void songlist_refresh()
 {
+  printf("songlist refresh %i\n", filtered_song_count());
   vh_list_refresh(sl.view);
 }
 
@@ -158,7 +157,7 @@ void songlist_toggle_selected(int state)
 
   view_t* item = vh_list_item_for_index(sl.view, sl.index_s);
 
-  if (item) songitem_update_row(item, sl.index_s, sl.songs->data[sl.index_s], sl.color_s);
+  // if (item) songitem_update_row(item, sl.index_s, sl.songs->data[sl.index_s], sl.color_s);
 }
 
 // header
@@ -232,7 +231,7 @@ void songlist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t
     {
       uint32_t color1 = (sl.index_s % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
 
-      songitem_update_row(olditem, sl.index_s, sl.songs->data[sl.index_s], color1);
+      // songitem_update_row(olditem, sl.index_s, sl.songs->data[sl.index_s], color1);
     }
 
     // indicate list item
@@ -242,7 +241,7 @@ void songlist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t
 
     if (newitem)
     {
-      songitem_update_row(newitem, sl.index_s, sl.songs->data[sl.index_s], sl.color_s);
+      // songitem_update_row(newitem, sl.index_s, sl.songs->data[sl.index_s], sl.color_s);
     }
 
     if (sl.on_select) (*sl.on_select)(index);
@@ -311,21 +310,21 @@ int songitem_update(view_t* listview, void* userdata, view_t* item, int index, i
 {
   if (index < 0)
     return 1; // no items before 0
-  if (index >= sl.songs->length)
+  if (index >= filtered_song_count())
     return 1; // no more items
 
-  *item_count = sl.songs->length;
+  *item_count = filtered_song_count();
 
   if (sl.index_s == index)
   {
-    songitem_update_row(item, index, sl.songs->data[index], sl.color_s);
+    songitem_update_row(item, index, filtered_song_at_index(index), sl.color_s);
   }
   else
   {
     uint32_t color1 = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
     uint32_t color2 = (index % 2 == 0) ? 0xE5E5E5FF : 0xEFEFEFFF;
 
-    songitem_update_row(item, index, sl.songs->data[index], color1);
+    songitem_update_row(item, index, filtered_song_at_index(index), color1);
   }
   return 0;
 }

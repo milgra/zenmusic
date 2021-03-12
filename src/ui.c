@@ -31,6 +31,7 @@ void ui_set_org_btn_lbl(char* text);
 #include "callbacks.c"
 #include "db.c"
 #include "editor.c"
+#include "filtered.c"
 #include "mtcstring.c"
 #include "mtnumber.c"
 #include "player.c"
@@ -109,21 +110,22 @@ void ui_play_index(int index)
 {
   lastindex = index;
   if (lastindex < 0) lastindex = 0;
-  if (lastindex == ui.songs->length) lastindex = ui.songs->length - 1;
+  if (lastindex < filtered_song_count())
+  {
+    vh_button_set_state(playbtn, VH_BUTTON_DOWN);
 
-  vh_button_set_state(playbtn, VH_BUTTON_DOWN);
-
-  ui_show_song_info(lastindex);
-  map_t* songmap = ui.songs->data[lastindex];
-  char*  path    = cstr_fromformat("%s%s", ui_libpath, MGET(songmap, "path"), NULL);
-  player_play(path);
-  REL(path);
+    ui_show_song_info(lastindex);
+    map_t* songmap = ui.songs->data[lastindex];
+    char*  path    = cstr_fromformat("%s%s", ui_libpath, MGET(songmap, "path"), NULL);
+    player_play(path);
+    REL(path);
+  }
 }
 
 void ui_play_next()
 {
   if (ui.shuffle)
-    ui_play_index(rand() % ui.songs->length);
+    ui_play_index(rand() % filtered_song_count());
   else
     ui_play_index(lastindex + 1);
 }
@@ -280,7 +282,7 @@ void ui_on_genre_select(int index)
 {
   printf("on genre select %i\n", index);
 
-  vec_t* genres = db_get_genres();
+  vec_t* genres = filtered_get_genres();
   char*  genre  = genres->data[index];
   callbacks_call("on_genre_selected", genre);
 }
@@ -289,7 +291,7 @@ void ui_on_artist_select(int index)
 {
   printf("on artist select %i\n", index);
 
-  vec_t* artists = db_get_artists();
+  vec_t* artists = filtered_get_artists();
   char*  artist  = artists->data[index];
   callbacks_call("on_artist_selected", artist);
 }
@@ -499,7 +501,7 @@ void ui_init(float width,
              char* libpath)
 {
   ui_libpath = cstr_fromcstring(libpath);
-  ui.songs   = db_get_songs();
+  ui.songs   = filtered_get_songs();
 
   // init text
 
@@ -591,10 +593,10 @@ void ui_init(float width,
   ts.align        = TA_RIGHT;
   ts.margin_right = 20;
 
-  textlist_t* genrelist = textlist_new(view_get_subview(baseview, "genrelist"), db_get_genres(), ts, ui_on_genre_select);
+  textlist_t* genrelist = textlist_new(view_get_subview(baseview, "genrelist"), filtered_get_genres(), ts, ui_on_genre_select);
 
   ts.align               = TA_LEFT;
-  textlist_t* artistlist = textlist_new(view_get_subview(baseview, "artistlist"), db_get_artists(), ts, ui_on_artist_select);
+  textlist_t* artistlist = textlist_new(view_get_subview(baseview, "artistlist"), filtered_get_artists(), ts, ui_on_artist_select);
 
   messagelistback     = view_get_subview(baseview, "messagelistback");
   view_t* messagelist = view_get_subview(baseview, "messagelist");

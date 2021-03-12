@@ -41,7 +41,8 @@ void on_song_header(void* userdata, void* data)
 {
   char* id = data;
 
-  db_sort(id, 1);
+  filtered_set_sortfield(id, 1);
+  // todo filtered should notify ui
   ui_refresh_songlist();
 }
 
@@ -49,7 +50,7 @@ void on_filter_songs(void* userdata, void* data)
 {
   char* text = str_cstring((str_t*)data);
 
-  db_filter(text);
+  filtered_set_filter(text);
   ui_reload_songlist();
 }
 
@@ -60,7 +61,7 @@ void on_genre_select(void* userdata, void* data)
 
   // genre select should narrow artist selector
 
-  db_filter(query);
+  filtered_set_filter(query);
   ui_reload_songlist();
   ui_show_query(query);
 }
@@ -70,7 +71,7 @@ void on_artist_select(void* userdata, void* data)
   char* artist = data;
   char* query  = cstr_fromformat("artist is %s", artist, NULL);
 
-  db_filter(query);
+  filtered_set_filter(query);
   ui_reload_songlist();
   ui_show_query(query);
 }
@@ -132,7 +133,7 @@ void load_library()
   lib_remove_duplicates(db_get_db());     // remove existing
   if (lib_entries() > 0) lib_analyze(ch); // start analyzing new entries
 
-  db_sort("artist", 0);
+  filtered_set_sortfield("artist", 0);
 }
 
 void init(int width, int height, char* respath)
@@ -145,6 +146,7 @@ void init(int width, int height, char* respath)
   player_init();
   config_init();
   config_read();
+  filtered_init();
 
   callbacks_init();
   callbacks_set("om_save_entry", cb_new(on_save_entry, NULL));
@@ -211,7 +213,6 @@ void render(uint32_t time)
     {
       // analyzing is finished, sort and store database
 
-      db_sort("artist", 0);
       db_write(libpath);
 
       if (organize)
@@ -220,6 +221,7 @@ void render(uint32_t time)
         if (succ == 0) db_write(libpath);
       }
 
+      filtered_set_sortfield("artist", 0);
       ui_refresh_songlist();
     }
     // cleanup, ownership was passed with the channel from analyzer

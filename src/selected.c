@@ -3,29 +3,29 @@
   does batch edit/conversion on songs
  */
 
-#ifndef songboard_h
-#define songboard_h
+#ifndef selected_h
+#define selected_h
 
 #include "mtmap.c"
 #include "view.c"
 
-void songboard_attach();
-void songboard_add(map_t* song);
-void songboard_rem(map_t* song);
+void selected_attach();
+void selected_add(map_t* song);
+void selected_rem(map_t* song);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-void songboard_attach()
+void selected_attach()
 {
 }
 
-void songboard_add(map_t* song)
+void selected_add(map_t* song)
 {
 }
 
-void songboard_rem(map_t* song)
+void selected_rem(map_t* song)
 {
 }
 
