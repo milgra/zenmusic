@@ -71,6 +71,7 @@ popup-ok center align
 fix leaks
 fix while heaven wept, black lotus
 fix mp4 playing freezes
+rdft ne logaritmikus legyen, alig latszik a kozep tartomany
 
 ideas
 

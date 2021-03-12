@@ -333,6 +333,9 @@ void vec_sort_ord(mtvn_t* node, vec_t* vector, int* index)
   if (right) vec_sort_ord(right, vector, index);
 }
 
+// sorts values in vector, needs a comparator function
+// or just use strcmp for strings
+
 void vec_sort(vec_t* vector, vsdir_t dir, int (*comp)(void* left, void* right))
 {
   mtvn_t* node = mem_calloc(sizeof(mtvn_t), "mtvn_t", NULL, NULL);

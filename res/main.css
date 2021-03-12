@@ -250,7 +250,7 @@
     height: 100%;
     margin: 20px;
     border-radius: 15px;
-    background-color: #FFFFFFFF;
+    background-color: #EEEEEEFF;
     box-shadow: 30px #00000012;
 }
 
@@ -258,6 +258,7 @@
     overflow: hidden;
     width: 100%;
     height: 100%;
+    margin: 10px;
     border-radius: 15px;
     background-color: #FFFFFFFF;
     box-shadow: 2px;
@@ -281,20 +282,19 @@
 }
 
 #ideditorback {
-    width: 680px;
+    width: 750px;
     height: 520px;
     top: 300px;
     margin: auto;
 }
 
 #editorlistback {
-    width: 500px;
-    height: 500px;
+    width: 530px;
+    height: 460px;
     top: 10px;
     left: 10px;
     border-radius: 10px;
     background-color: #FFFFFFFF;
-    box-shadow: 3px;
 }
 
 #editorlist {
@@ -323,7 +323,6 @@
     height: 30px;
     background-color: #FFFFFFFF;
     border-radius: 10px;
-    box-shadow: 3px;
 }
 
 #uploadbtn {
@@ -332,7 +331,7 @@
 }
 
 #settingsback {
-    width: 420px;
+    width: 500px;
     height: 610px;
     top: 220px;
     margin: auto;
@@ -350,7 +349,6 @@
     height: 150px;
     margin: auto;
     border-radius: 10px;
-    background-color: #DEDEDEFF;
 }
 
 .set_block_big {
@@ -396,7 +394,6 @@
     height: 30px;
     margin: auto;
     border-radius: 14px;
-    box-shadow: 3px;
 }
 
 #set_lib_btn_txt {
@@ -723,7 +720,7 @@
     width: 30px;
     height: 30px;
     border-radius: 14px;
-    box-shadow: 20px #00000012;
+    box-shadow: 10px #00000012;
 }
 
 .closeicon {
@@ -857,7 +854,6 @@
     right: 12px;
     bottom: 12px;
     border-radius: 14px;
-    box-shadow: 3px;
 }
 
 #chlib_pop_bck {

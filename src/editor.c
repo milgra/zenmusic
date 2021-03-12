@@ -13,12 +13,14 @@ map_t* editor_get_new_data();
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "mtvector.c"
 #include "text.c"
 #include "tg_text.c"
 #include "ui_manager.c"
 #include "vh_list.c"
 #include "vh_list_item.c"
 #include "vh_text.c"
+#include <string.h>
 
 struct _editor_t
 {
@@ -151,6 +153,27 @@ int editor_update_item(view_t* listview, void* userdata, view_t* item, int index
   return 0;
 }
 
+int editor_comp_text(void* left, void* right)
+{
+  char* la = left;
+  char* ra = right;
+
+  return strcmp(la, ra);
+}
+
+void editor_remove_str(vec_t* vec, char* str)
+{
+  for (int index = 0; index < vec->length; index++)
+  {
+    char* val = (char*)vec->data[index];
+    if (strcmp(val, str) == 0)
+    {
+      vec_rematindex(vec, index);
+      return;
+    }
+  }
+}
+
 void editor_set_song(map_t* map)
 {
   printf("editor set song\n");
@@ -162,6 +185,18 @@ void editor_set_song(map_t* map)
   // store song and extract fields
   editor.song = map;
   map_keys(map, editor.fields);
+
+  // sort fields
+  vec_sort(editor.fields, VSD_ASC, editor_comp_text);
+
+  editor_remove_str(editor.fields, "artist");
+  editor_remove_str(editor.fields, "album");
+  editor_remove_str(editor.fields, "title");
+  editor_remove_str(editor.fields, "path");
+  vec_ins(editor.fields, cstr_fromcstring("title"), 0);
+  vec_ins(editor.fields, cstr_fromcstring("album"), 0);
+  vec_ins(editor.fields, cstr_fromcstring("artist"), 0);
+  vec_add(editor.fields, cstr_fromcstring("path"));
 
   // reset list handler
   vh_list_reset(editor.view);
