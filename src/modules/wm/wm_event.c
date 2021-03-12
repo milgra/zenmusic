@@ -33,6 +33,8 @@ typedef struct _ev_t
   uint32_t    dtime;
   int         button;
   int         dclick;
+  int         ctrl_down;
+  int         shift_down;
   SDL_KeyCode keycode;
 } ev_t;
 

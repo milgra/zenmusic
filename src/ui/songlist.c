@@ -223,17 +223,19 @@ void songlist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t
 {
   if (ev.button == 1)
   {
-    selected_add(index);
+    if (!ev.ctrl_down && !ev.shift_down) selected_res();
 
-    // indicate list item
-    view_t* selitem = vh_list_item_for_index(sl.view, index);
-    if (selitem)
+    if (ev.shift_down)
     {
-      map_t* song = filtered_song_at_index(index);
-      songitem_update_row(selitem, index, song, sl.color_s);
+      selected_rng(index);
     }
-
+    else
+    {
+      selected_add(index);
+    }
     if (ev.dclick && sl.on_select) (*sl.on_select)(index);
+
+    vh_list_refresh(sl.view);
   }
   else if (ev.button == 3)
   {

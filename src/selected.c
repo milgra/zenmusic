@@ -9,13 +9,15 @@
 void selected_attach();
 void selected_add(int i);
 void selected_rem(int i);
-void selected_rng(int s, int e);
+void selected_rng(int i);
 void selected_res();
 int  selected_has(int i);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
+
+#include <stdio.h>
 
 typedef struct _sel_rng_t
 {
@@ -77,13 +79,13 @@ void selected_rem(int i)
   }
 }
 
-void selected_rng(int s, int e)
+void selected_rng(int i)
 {
-  // remove unnecessary ranges ?
-  // store in a range
-  sel.ranges[sel.length].s = s;
-  sel.ranges[sel.length].e = e;
-  sel.length++;
+  // extend last range
+  if (i > sel.ranges[sel.length - 1].s)
+    sel.ranges[sel.length - 1].e = i + 1;
+  else
+    sel.ranges[sel.length - 1].s = i;
 }
 
 void selected_res()

@@ -131,6 +131,9 @@ void wm_init(void (*init)(int, int, char*),
                 event.type == SDL_MOUSEBUTTONUP ||
                 event.type == SDL_MOUSEMOTION)
             {
+              ev.ctrl_down  = SDL_GetModState() & KMOD_CTRL;
+              ev.shift_down = SDL_GetModState() & KMOD_SHIFT;
+
               SDL_GetMouseState(&ev.x, &ev.y);
 
               if (event.type == SDL_MOUSEBUTTONDOWN)
