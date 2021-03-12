@@ -29,7 +29,7 @@ void ui_set_org_btn_lbl(char* text);
 
 #include "activity.c"
 #include "callbacks.c"
-#include "db.c"
+#include "database.c"
 #include "editor.c"
 #include "filtered.c"
 #include "mtcstring.c"
@@ -382,7 +382,7 @@ void ui_show_song_info(int index)
 
 void ui_toggle_pause(int state)
 {
-  songlist_toggle_selected(state);
+  songlist_toggle_pause(state);
 }
 
 void ui_update_position(float ratio)

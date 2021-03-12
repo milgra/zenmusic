@@ -10,13 +10,14 @@
 void songlist_attach(view_t* base, char* fontpath, void (*on_select)(int), void (*on_edit)(int), void (*on_header_select)(char*));
 void songlist_update();
 void songlist_refresh();
-void songlist_toggle_selected(int state);
+void songlist_toggle_pause(int state);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
 #include "filtered.c"
+#include "selected.c"
 #include "tg_css.c"
 #include "tg_text.c"
 #include "vh_button.c"
@@ -38,7 +39,6 @@ struct songlist_t
   vec_t*      fields; // fileds in table
   textstyle_t textstyle;
 
-  uint32_t index_s; // selected index
   uint32_t color_s; // color selected
 
   void (*on_edit)(int index);
@@ -76,7 +76,6 @@ void songlist_attach(view_t* base,
   sl.view   = view_get_subview(base, "songlist");
   sl.fields = VNEW();
 
-  sl.index_s = 0;
   sl.color_s = 0x55FF55FF;
 
   sl.on_edit          = on_edit;
@@ -148,14 +147,14 @@ void songlist_refresh()
   vh_list_refresh(sl.view);
 }
 
-void songlist_toggle_selected(int state)
+void songlist_toggle_pause(int state)
 {
   if (state)
     sl.color_s = 0xFF5555FF;
   else
     sl.color_s = 0x55FF55FF;
 
-  view_t* item = vh_list_item_for_index(sl.view, sl.index_s);
+  // view_t* item = vh_list_item_for_index(sl.view, sl.index_s);
 
   // if (item) songitem_update_row(item, sl.index_s, sl.songs->data[sl.index_s], sl.color_s);
 }
@@ -224,27 +223,17 @@ void songlist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t
 {
   if (ev.button == 1)
   {
-    // deselect prev item
-    view_t* olditem = vh_list_item_for_index(sl.view, sl.index_s);
-
-    if (olditem)
-    {
-      uint32_t color1 = (sl.index_s % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
-
-      // songitem_update_row(olditem, sl.index_s, sl.songs->data[sl.index_s], color1);
-    }
+    selected_add(index);
 
     // indicate list item
-    view_t* newitem = vh_list_item_for_index(sl.view, index);
-
-    sl.index_s = index;
-
-    if (newitem)
+    view_t* selitem = vh_list_item_for_index(sl.view, index);
+    if (selitem)
     {
-      // songitem_update_row(newitem, sl.index_s, sl.songs->data[sl.index_s], sl.color_s);
+      map_t* song = filtered_song_at_index(index);
+      songitem_update_row(selitem, index, song, sl.color_s);
     }
 
-    if (sl.on_select) (*sl.on_select)(index);
+    if (ev.dclick && sl.on_select) (*sl.on_select)(index);
   }
   else if (ev.button == 3)
   {
@@ -315,7 +304,7 @@ int songitem_update(view_t* listview, void* userdata, view_t* item, int index, i
 
   *item_count = filtered_song_count();
 
-  if (sl.index_s == index)
+  if (selected_has(index))
   {
     songitem_update_row(item, index, filtered_song_at_index(index), sl.color_s);
   }

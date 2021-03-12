@@ -4,6 +4,7 @@ OBJDIRREL = bin/obj/rel
 
 SOURCES = \
 	$(wildcard src/*.c) \
+	$(wildcard src/ui/*.c) \
 	$(wildcard src/mtlib/*.c) \
 	$(wildcard src/modules/*.c) \
 	$(wildcard src/modules/gl/*.c) \

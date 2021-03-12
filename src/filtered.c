@@ -14,11 +14,14 @@ vec_t* filtered_get_songs();
 vec_t* filtered_get_genres();
 vec_t* filtered_get_artists();
 
+void filtered_set_sortfield(char* field, int toggle);
+void filtered_set_filter(char* text);
+
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "db.c"
+#include "database.c"
 #include "mtcstring.c"
 
 struct _filtered_t

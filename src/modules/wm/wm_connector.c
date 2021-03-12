@@ -108,6 +108,7 @@ void wm_init(void (*init)(int, int, char*),
         ev_t      ev = {0}; // zen event
         SDL_Event event;
         uint32_t  lastticks = SDL_GetTicks();
+        uint32_t  lastclick = 0;
 
         struct scroll_t
         {
@@ -137,6 +138,18 @@ void wm_init(void (*init)(int, int, char*),
                 ev.type   = EV_MDOWN;
                 ev.button = event.button.button;
                 ev.drag   = 1;
+
+                if (lastclick == 0)
+                {
+                  lastclick = ev.time;
+                  ev.dclick = 0;
+                }
+                else
+                {
+                  uint32_t delta = ev.time - lastclick;
+                  if (delta < 300) ev.dclick = 1;
+                  lastclick = 0;
+                }
               }
               else if (event.type == SDL_MOUSEBUTTONUP)
               {
@@ -191,7 +204,6 @@ void wm_init(void (*init)(int, int, char*),
             }
             else if (event.type == SDL_TEXTEDITING)
             {
-              printf("TEXTEDIT\n");
               ev.type = EV_TEXT;
               ev.text = event.text.text;
             }

@@ -14,7 +14,7 @@ char* config_get(char* key);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "kvlist.c"
-#include "lib.c"
+#include "library.c"
 #include "mtcstring.c"
 #include "mtlog.c"
 
