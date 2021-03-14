@@ -103,7 +103,7 @@ void editor_select_item(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
   }
 }
 
-view_t* editor_create_item(view_t* listview, void* userdata)
+view_t* editor_create_item()
 {
   static int itemcnt;
   char       idbuffer[100] = {0};
@@ -127,14 +127,16 @@ view_t* editor_create_item(view_t* listview, void* userdata)
   return rowview;
 }
 
-int editor_update_item(view_t* listview, void* userdata, view_t* item, int index, int* item_count)
+view_t* editor_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
 {
   if (index < 0)
-    return 1; // no items before 0
+    return NULL; // no items before 0
   if (index >= editor.fields->length)
-    return 1; // no more items
+    return NULL; // no more items
 
   *item_count = editor.fields->length;
+
+  view_t* item = editor_create_item();
 
   char* key   = editor.fields->data[index];
   char* value = MGET(editor.song, key);
@@ -193,6 +195,7 @@ void editor_set_song(map_t* map)
   editor_remove_str(editor.fields, "album");
   editor_remove_str(editor.fields, "title");
   editor_remove_str(editor.fields, "path");
+
   vec_ins(editor.fields, cstr_fromcstring("title"), 0);
   vec_ins(editor.fields, cstr_fromcstring("album"), 0);
   vec_ins(editor.fields, cstr_fromcstring("artist"), 0);
@@ -204,7 +207,7 @@ void editor_set_song(map_t* map)
 
 void editor_attach(view_t* view, char* fontpath)
 {
-  vh_list_add(view, editor_create_item, editor_update_item, NULL);
+  vh_list_add(view, editor_item_for_index, NULL, NULL);
 
   textstyle_t ts = {0};
   ts.font        = fontpath;

@@ -54,12 +54,13 @@ freebsd for os
 
 first version
 
-songboard
-songboard / selected songs, conversion
+list_generator tarolja a fix elemeket
+vh_list-nek legyen nocache opcioja fix listak eseten
+list based settings, right click menu, about menu
+select deselect select until select all edit delete, fade popup
 artist-album sort
 select all, remove google id
 filter fix
-select deselect select until select all edit delete, fade popup
 search/filter history ( use filters for playlists)
 on mute fade in/out volume with alpha
 select item/remove google.id / select anim
