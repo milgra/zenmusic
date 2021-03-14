@@ -32,6 +32,7 @@ void ui_set_org_btn_lbl(char* text);
 #include "database.c"
 #include "editor.c"
 #include "filtered.c"
+#include "itemlist.c"
 #include "mtcstring.c"
 #include "mtnumber.c"
 #include "player.c"
@@ -708,47 +709,72 @@ void ui_init(float width,
 
   // settings
 
-  view_t* set_lib_text    = view_get_subview(baseview, "set_lib_txt");
-  view_t* set_lib_path    = view_get_subview(baseview, "set_lib_pth");
-  view_t* set_lib_btn_txt = view_get_subview(baseview, "set_lib_btn_txt");
-  view_t* set_org_text    = view_get_subview(baseview, "set_org_text");
-  view_t* set_org_val     = view_get_subview(baseview, "set_org_val");
-  set_org_btn_txt         = view_get_subview(baseview, "set_org_btn_txt");
-  view_t* set_col_text    = view_get_subview(baseview, "set_col_text");
-  set_col_val             = view_get_subview(baseview, "set_col_val");
-  view_t* set_col_sel     = view_get_subview(baseview, "set_col_sel");
+  /* view_t* set_lib_text    = view_get_subview(baseview, "set_lib_txt"); */
+  /* view_t* set_lib_path    = view_get_subview(baseview, "set_lib_pth"); */
+  /* view_t* set_lib_btn_txt = view_get_subview(baseview, "set_lib_btn_txt"); */
+  /* view_t* set_org_text    = view_get_subview(baseview, "set_org_text"); */
+  /* view_t* set_org_val     = view_get_subview(baseview, "set_org_val"); */
+  /* set_org_btn_txt         = view_get_subview(baseview, "set_org_btn_txt"); */
+  /* view_t* set_col_text    = view_get_subview(baseview, "set_col_text"); */
+  /* set_col_val             = view_get_subview(baseview, "set_col_val"); */
+  /* view_t* set_col_sel     = view_get_subview(baseview, "set_col_sel"); */
 
-  tg_text_add(set_lib_text);
-  tg_text_set(set_lib_text, "Music Library Location", ts);
+  /* tg_text_add(set_lib_text); */
+  /* tg_text_set(set_lib_text, "Music Library Location", ts); */
 
-  tg_text_add(set_lib_path);
-  tg_text_set(set_lib_path, libpath, ts);
+  /* tg_text_add(set_lib_path); */
+  /* tg_text_set(set_lib_path, libpath, ts); */
 
-  tg_text_add(set_lib_btn_txt);
-  tg_text_set(set_lib_btn_txt, "Use Other Library", ts);
+  /* tg_text_add(set_lib_btn_txt); */
+  /* tg_text_set(set_lib_btn_txt, "Use Other Library", ts); */
 
-  tg_text_add(set_org_text);
-  tg_text_set(set_org_text, "Keep Library Organized", ts);
+  /* tg_text_add(set_org_text); */
+  /* tg_text_set(set_org_text, "Keep Library Organized", ts); */
 
-  tg_text_add(set_org_val);
-  tg_text_set(set_org_val, "Disabled", ts);
+  /* tg_text_add(set_org_val); */
+  /* tg_text_set(set_org_val, "Disabled", ts); */
 
-  tg_text_add(set_org_btn_txt);
-  tg_text_set(set_org_btn_txt, "Enable", ts);
+  /* tg_text_add(set_org_btn_txt); */
+  /* tg_text_set(set_org_btn_txt, "Enable", ts); */
 
-  tg_text_add(set_col_text);
-  tg_text_set(set_col_text, "User Interface Color", ts);
+  /* tg_text_add(set_col_text); */
+  /* tg_text_set(set_col_text, "User Interface Color", ts); */
 
-  tg_text_add(set_col_val);
-  tg_text_set(set_col_val, "EFEFEF", ts);
+  /* tg_text_add(set_col_val); */
+  /* tg_text_set(set_col_val, "EFEFEF", ts); */
 
-  cb_t* col_sel_cb = cb_new(ui_on_color_select, NULL);
+  /* cb_t* col_sel_cb = cb_new(ui_on_color_select, NULL); */
 
-  tg_picker_add(set_col_sel);
-  vh_picker_add(set_col_sel, col_sel_cb);
+  /* tg_picker_add(set_col_sel); */
+  /* vh_picker_add(set_col_sel, col_sel_cb); */
+
+  view_t* settingslist = view_get_subview(baseview, "settingslist");
+
+  // items
+  // library path | /user/home/Music/ | use other library
+  // keep library organized | disabled | enable
+  // dark mode | disabled  | enable
+  // animations | enabled | disable
+
+  view_t* itembase1                  = view_new("settings_item_1", (r2_t){0, 0, settingslist->frame.local.w, 60});
+  itembase1->layout.background_color = 0xFF00FFFF;
+  tg_css_add(itembase1);
+
+  view_t* itembase2                  = view_new("settings_item_2", (r2_t){0, 0, settingslist->frame.local.w, 60});
+  itembase2->layout.background_color = 0xFFFF00FF;
+  tg_css_add(itembase2);
+
+  vec_t* itemlist = VNEW();
+
+  VADD(itemlist, itembase1);
+  VADD(itemlist, itembase2);
+
+  itemlist_t* il = itemlist_new(settingslist, itemlist);
 
   settingsview = view_get_subview(baseview, "settingsback");
   view_remove(main, settingsview);
+
+  // about view
 
   aboutview = view_get_subview(baseview, "aboutback");
 

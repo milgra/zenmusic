@@ -22,7 +22,13 @@ void        itemlist_update(itemlist_t* tl);
 view_t* itemlist_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
 {
   itemlist_t* il = userdata;
-  if (index < il->items->length && index > 0) return il->items->data[index];
+
+  *item_count = il->items->length;
+
+  if (index < il->items->length && index >= 0)
+  {
+    return il->items->data[index];
+  }
 
   return NULL;
 }
@@ -40,7 +46,7 @@ itemlist_t* itemlist_new(view_t* view, vec_t* items)
   il->view       = view;
   il->items      = items;
 
-  vh_list_add(view, itemlist_item_for_index, NULL, NULL);
+  vh_list_add(view, itemlist_item_for_index, NULL, il);
 
   return il;
 }

@@ -264,6 +264,16 @@
     box-shadow: 2px;
 }
 
+#settingslist {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    margin: 10px;
+    border-radius: 15px;
+    background-color: #FFFFFFFF;
+    box-shadow: 2px;
+}
+
 #filterlistback {
     width: 480px;
     height: 620px;
@@ -331,7 +341,7 @@
 }
 
 #settingsback {
-    width: 500px;
+    width: 700px;
     height: 610px;
     top: 220px;
     margin: auto;

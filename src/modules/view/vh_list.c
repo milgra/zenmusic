@@ -217,7 +217,7 @@ void vh_list_evt(view_t* view, ev_t ev)
 
             VADD(vh->items, item);
 
-            view_add(view, item);
+            view_insert(view, item, 0);
 
             vh->full     = 0;                    // there is probably more to come
             vh->item_wth = item->frame.global.w; // store maximum width
