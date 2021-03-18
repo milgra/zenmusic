@@ -30,12 +30,14 @@ void ui_set_org_btn_lbl(char* text);
 #include "activity.c"
 #include "callbacks.c"
 #include "database.c"
+#include "donatelist.c"
 #include "editor.c"
 #include "filtered.c"
 #include "itemlist.c"
 #include "mtcstring.c"
 #include "mtnumber.c"
 #include "player.c"
+#include "settingslist.c"
 #include "songlist.c"
 #include "textlist.c"
 #include "tg_css.c"
@@ -45,12 +47,14 @@ void ui_set_org_btn_lbl(char* text);
 #include "vh_button.c"
 #include "vh_fade.c"
 #include "vh_knob.c"
+#include "vh_list_item.c"
 #include "vh_picker.c"
 #include "vh_roll.c"
 #include "vh_text.c"
 #include "view_generator.c"
 #include "view_layout.c"
 #include "wm_connector.c"
+#include <limits.h>
 // TODO remove fromm zenmusic.c
 #include "ui_generator.c"
 #include "ui_manager.c"
@@ -748,7 +752,7 @@ void ui_init(float width,
   /* tg_picker_add(set_col_sel); */
   /* vh_picker_add(set_col_sel, col_sel_cb); */
 
-  view_t* settingslist = view_get_subview(baseview, "settingslist");
+  /* view_t* settingslist = view_get_subview(baseview, "settingslist"); */
 
   // items
   // library path | /user/home/Music/ | use other library
@@ -756,48 +760,60 @@ void ui_init(float width,
   // dark mode | disabled  | enable
   // animations | enabled | disable
 
-  view_t* itembase1                  = view_new("settings_item_1", (r2_t){0, 0, settingslist->frame.local.w, 60});
-  itembase1->layout.background_color = 0xFF00FFFF;
-  tg_css_add(itembase1);
+  /* view_t* itembase1                  = view_new("settings_item_1", (r2_t){0, 0, settingslist->frame.local.w, 60}); */
+  /* itembase1->layout.background_color = 0xFF00FFFF; */
+  /* tg_css_add(itembase1); */
 
-  view_t* itembase2                  = view_new("settings_item_2", (r2_t){0, 0, settingslist->frame.local.w, 60});
-  itembase2->layout.background_color = 0xFFFF00FF;
-  tg_css_add(itembase2);
+  /* view_t* itembase2                  = view_new("settings_item_2", (r2_t){0, 0, settingslist->frame.local.w, 60}); */
+  /* itembase2->layout.background_color = 0xFFFF00FF; */
+  /* tg_css_add(itembase2); */
 
-  vec_t* itemlist = VNEW();
+  /* vec_t* itemlist = VNEW(); */
 
-  VADD(itemlist, itembase1);
-  VADD(itemlist, itembase2);
+  /* view_t* row0 = ui_settings_item("0", fontpath, "Library Path", "/home/user/milgra/Music", "Use other library"); */
+  /* view_t* row1 = ui_settings_item("1", fontpath, "Keep Library Organized", "Disabled", "Enable"); */
+  /* view_t* row2 = ui_settings_item("2", fontpath, "Dark Mode", "Disabled", "Enable"); */
 
-  itemlist_t* il = itemlist_new(settingslist, itemlist);
+  /* VADD(itemlist, row0); */
+  /* VADD(itemlist, row1); */
+  /* VADD(itemlist, row2); */
+
+  /* itemlist_t* il = itemlist_new(settingslist, itemlist); */
 
   settingsview = view_get_subview(baseview, "settingsback");
+
+  view_t* settingslist = view_get_subview(baseview, "settingslist");
+  settingslist_attach(settingslist, fontpath);
+
   view_remove(main, settingsview);
 
   // about view
 
-  aboutview = view_get_subview(baseview, "aboutback");
+  aboutview         = view_get_subview(baseview, "aboutback");
+  view_t* aboutlist = view_get_subview(baseview, "aboutlist");
 
-  view_t* home_info_text       = view_get_subview(baseview, "home_info_txt");
-  view_t* home_donate_btn_txt  = view_get_subview(baseview, "home_donate_btn_txt");
-  view_t* home_support_btn_txt = view_get_subview(baseview, "home_support_btn_txt");
-  view_t* home_src_btn_txt     = view_get_subview(baseview, "home_src_btn_txt");
-  view_t* home_yt_btn_txt      = view_get_subview(baseview, "home_yt_btn_txt");
+  donatelist_attach(aboutlist, fontpath);
 
-  tg_text_add(home_info_text);
-  tg_text_set(home_info_text, "Zen Music v0.8\n by Milan Toth\nFree and Open Source Software.\nIf you like it, please support the development.", ts);
+  /* view_t* home_info_text       = view_get_subview(baseview, "home_info_txt"); */
+  /* view_t* home_donate_btn_txt  = view_get_subview(baseview, "home_donate_btn_txt"); */
+  /* view_t* home_support_btn_txt = view_get_subview(baseview, "home_support_btn_txt"); */
+  /* view_t* home_src_btn_txt     = view_get_subview(baseview, "home_src_btn_txt"); */
+  /* view_t* home_yt_btn_txt      = view_get_subview(baseview, "home_yt_btn_txt"); */
 
-  tg_text_add(home_donate_btn_txt);
-  tg_text_set(home_donate_btn_txt, "Donate on Paypal", ts);
+  /* tg_text_add(home_info_text); */
+  /* tg_text_set(home_info_text, "Zen Music v0.8\n by Milan Toth\nFree and Open Source Software.\nIf you like it, please support the development.", ts); */
 
-  tg_text_add(home_support_btn_txt);
-  tg_text_set(home_support_btn_txt, "Support on Patreon", ts);
+  /* tg_text_add(home_donate_btn_txt); */
+  /* tg_text_set(home_donate_btn_txt, "Donate on Paypal", ts); */
 
-  tg_text_add(home_src_btn_txt);
-  tg_text_set(home_src_btn_txt, "Open Source", ts);
+  /* tg_text_add(home_support_btn_txt); */
+  /* tg_text_set(home_support_btn_txt, "Support on Patreon", ts); */
 
-  tg_text_add(home_yt_btn_txt);
-  tg_text_set(home_yt_btn_txt, "Open Youtube Channel", ts);
+  /* tg_text_add(home_src_btn_txt); */
+  /* tg_text_set(home_src_btn_txt, "Open Source", ts); */
+
+  /* tg_text_add(home_yt_btn_txt); */
+  /* tg_text_set(home_yt_btn_txt, "Open Youtube Channel", ts); */
 
   view_remove(main, aboutview);
 

@@ -238,7 +238,7 @@
 }
 
 #messagelistback {
-    width: 480px;
+    width: 700px;
     height: 620px;
     top: 210px;
     margin: auto;
@@ -261,7 +261,6 @@
     margin: 10px;
     border-radius: 15px;
     background-color: #FFFFFFFF;
-    box-shadow: 2px;
 }
 
 #settingslist {
@@ -269,9 +268,8 @@
     width: 100%;
     height: 100%;
     margin: 10px;
-    border-radius: 15px;
-    background-color: #FFFFFFFF;
-    box-shadow: 2px;
+    border-radius: 10px;
+    background-color: #AAAAAAFF;
 }
 
 #filterlistback {
@@ -379,7 +377,7 @@
     width: 100%;
     height: 100%;
     border-radius: 15px;
-    background-color: #FFFFFFFF;
+    background-color: #666666FF;
     box-shadow: 2px;
 }
 
@@ -524,13 +522,14 @@
     margin: auto;
 }
 
-#aboutflex {
+#aboutlist {
+    overflow: hidden;
     width: 100%;
     height: 100%;
-    display: flex;
-    flex-direction: column;
+    margin: 10px;
+    border-radius: 10px;
+    background-color: #AAAAAAFF;
 }
-
 
 #home_info_txt {
     top: 10px;

@@ -157,8 +157,6 @@ void vh_list_evt(view_t* view, ev_t ev)
 
         if (item)
         {
-          view_set_block_touch(item, 0, 1);
-
           VADD(vh->items, item);
 
           view_insert(view, item, 0);
@@ -185,8 +183,6 @@ void vh_list_evt(view_t* view, ev_t ev)
 
           if (item)
           {
-            view_set_block_touch(item, 0, 1);
-
             vec_ins(vh->items, item, 0);
 
             view_insert(view, item, 0);
@@ -213,8 +209,6 @@ void vh_list_evt(view_t* view, ev_t ev)
 
           if (item)
           {
-            view_set_block_touch(item, 0, 1);
-
             VADD(vh->items, item);
 
             view_insert(view, item, 0);
@@ -483,6 +477,8 @@ void vh_list_add(view_t* view,
 
   view->handler_data = vh;
   view->handler      = vh_list_evt;
+
+  view->blocks_scroll = 1;
 }
 
 view_t* vh_list_item_for_index(view_t* view, int index)

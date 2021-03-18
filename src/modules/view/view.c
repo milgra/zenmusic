@@ -124,11 +124,12 @@ struct _view_t
   char display;  /* view should be displayed? */
   char masked;   /* view should be used as mask for subviews? */
 
-  char needs_key;    /* accepts key events */
-  char needs_text;   /* accepts text events */
-  char needs_time;   /* accepts time events */
-  char needs_touch;  /* accepts touch events */
-  char blocks_touch; /* blocks touch events */
+  char needs_key;     /* accepts key events */
+  char needs_text;    /* accepts text events */
+  char needs_time;    /* accepts time events */
+  char needs_touch;   /* accepts touch events */
+  char blocks_touch;  /* blocks touch events */
+  char blocks_scroll; /* blocks scroll events */
 
   char*    id;     /* identifier for handling view */
   vec_t*   views;  /* subviews */

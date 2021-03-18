@@ -122,6 +122,12 @@ void ui_generator_resend_views()
                       uig.wpwr,
                       uig.hpwr);
 
+    // TODO make this switchable from options
+    if (view->texture.type == TT_MANAGED && view->texture.state == TS_BLANK)
+    {
+      view_gen_texture(view);
+    }
+
     if (view->texture.state == TS_READY)
     {
       resize_texmap |= ui_compositor_upd_bmp(index,
@@ -195,15 +201,15 @@ void ui_generator_render(uint32_t time)
 
     if (view->texture.type == TT_MANAGED && view->texture.state == TS_BLANK)
     {
-      if (view->texture.rentype == RT_BACKGROUND)
-      {
-        // printf("SENDING TEXTURE %s %f %f\n", view->layout.background_image, view->frame.local.w, view->frame.local.h);
-        if (ch_send(uig.channel, view)) view->texture.state = TS_PENDING;
-      }
-      else
-      {
-        view_gen_texture(view);
-      }
+      /* if (view->texture.rentype == RT_BACKGROUND) */
+      /* { */
+      /*   // printf("SENDING TEXTURE %s %f %f\n", view->layout.background_image, view->frame.local.w, view->frame.local.h); */
+      /*   if (ch_send(uig.channel, view)) view->texture.state = TS_PENDING; */
+      /* } */
+      /* else */
+      /* { */
+      view_gen_texture(view);
+      /* } */
     }
 
     if (view->frame.pos_changed)

@@ -108,7 +108,7 @@ void ui_manager_event(ev_t ev)
       if (v->needs_touch && v->parent)
       {
         if (v->handler) (*v->handler)(v, ev);
-        if (v->blocks_touch) break;
+        if (v->blocks_scroll) break;
       }
     }
   }
