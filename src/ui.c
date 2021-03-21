@@ -81,6 +81,8 @@ view_t* seekknob;
 view_t* playbtn;
 view_t* volknob;
 view_t* mutebtn;
+view_t* sim_pop_bck;
+view_t* sim_pop_txt;
 
 view_t* mainview;
 view_t* messagelistback;
@@ -252,6 +254,7 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "chlib_pop_rej_btn") == 0) ui_toggle_mainview(ch_lib_popup);
   if (strcmp(id, "dec_pop_acc_btn") == 0) ui_set_organize_lib();
   if (strcmp(id, "dec_pop_rej_btn") == 0) ui_toggle_mainview(decision_popup);
+  if (strcmp(id, "close_sim_pop_btn") == 0) ui_toggle_mainview(sim_pop_bck);
   if (strcmp(id, "visuright_btn") == 0) ui_change_visu();
   if (strcmp(id, "visuleft_btn") == 0) ui_change_visu();
 }
@@ -476,6 +479,19 @@ void ui_hide_libpath_popup()
     ui_manager_remove(libpopuppage);
     ui_manager_add(baseview);
   }
+}
+
+void ui_show_simple_popup(char* text)
+{
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = TA_CENTER;
+  ts.size        = 30.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0;
+
+  tg_text_set(sim_pop_txt, text, ts);
+  view_add(mainview, sim_pop_bck);
 }
 
 void ui_filter(view_t* view)
@@ -711,74 +727,15 @@ void ui_init(float width,
   ch_lib_popup = view_get_subview(baseview, "chlib_pop_bck");
   view_remove(main, ch_lib_popup);
 
+  // simple popup
+
+  sim_pop_bck = view_get_subview(baseview, "sim_pop_bck");
+  sim_pop_txt = view_get_subview(baseview, "sim_pop_txt");
+
+  tg_text_add(sim_pop_txt);
+  view_remove(main, sim_pop_bck);
+
   // settings
-
-  /* view_t* set_lib_text    = view_get_subview(baseview, "set_lib_txt"); */
-  /* view_t* set_lib_path    = view_get_subview(baseview, "set_lib_pth"); */
-  /* view_t* set_lib_btn_txt = view_get_subview(baseview, "set_lib_btn_txt"); */
-  /* view_t* set_org_text    = view_get_subview(baseview, "set_org_text"); */
-  /* view_t* set_org_val     = view_get_subview(baseview, "set_org_val"); */
-  /* set_org_btn_txt         = view_get_subview(baseview, "set_org_btn_txt"); */
-  /* view_t* set_col_text    = view_get_subview(baseview, "set_col_text"); */
-  /* set_col_val             = view_get_subview(baseview, "set_col_val"); */
-  /* view_t* set_col_sel     = view_get_subview(baseview, "set_col_sel"); */
-
-  /* tg_text_add(set_lib_text); */
-  /* tg_text_set(set_lib_text, "Music Library Location", ts); */
-
-  /* tg_text_add(set_lib_path); */
-  /* tg_text_set(set_lib_path, libpath, ts); */
-
-  /* tg_text_add(set_lib_btn_txt); */
-  /* tg_text_set(set_lib_btn_txt, "Use Other Library", ts); */
-
-  /* tg_text_add(set_org_text); */
-  /* tg_text_set(set_org_text, "Keep Library Organized", ts); */
-
-  /* tg_text_add(set_org_val); */
-  /* tg_text_set(set_org_val, "Disabled", ts); */
-
-  /* tg_text_add(set_org_btn_txt); */
-  /* tg_text_set(set_org_btn_txt, "Enable", ts); */
-
-  /* tg_text_add(set_col_text); */
-  /* tg_text_set(set_col_text, "User Interface Color", ts); */
-
-  /* tg_text_add(set_col_val); */
-  /* tg_text_set(set_col_val, "EFEFEF", ts); */
-
-  /* cb_t* col_sel_cb = cb_new(ui_on_color_select, NULL); */
-
-  /* tg_picker_add(set_col_sel); */
-  /* vh_picker_add(set_col_sel, col_sel_cb); */
-
-  /* view_t* settingslist = view_get_subview(baseview, "settingslist"); */
-
-  // items
-  // library path | /user/home/Music/ | use other library
-  // keep library organized | disabled | enable
-  // dark mode | disabled  | enable
-  // animations | enabled | disable
-
-  /* view_t* itembase1                  = view_new("settings_item_1", (r2_t){0, 0, settingslist->frame.local.w, 60}); */
-  /* itembase1->layout.background_color = 0xFF00FFFF; */
-  /* tg_css_add(itembase1); */
-
-  /* view_t* itembase2                  = view_new("settings_item_2", (r2_t){0, 0, settingslist->frame.local.w, 60}); */
-  /* itembase2->layout.background_color = 0xFFFF00FF; */
-  /* tg_css_add(itembase2); */
-
-  /* vec_t* itemlist = VNEW(); */
-
-  /* view_t* row0 = ui_settings_item("0", fontpath, "Library Path", "/home/user/milgra/Music", "Use other library"); */
-  /* view_t* row1 = ui_settings_item("1", fontpath, "Keep Library Organized", "Disabled", "Enable"); */
-  /* view_t* row2 = ui_settings_item("2", fontpath, "Dark Mode", "Disabled", "Enable"); */
-
-  /* VADD(itemlist, row0); */
-  /* VADD(itemlist, row1); */
-  /* VADD(itemlist, row2); */
-
-  /* itemlist_t* il = itemlist_new(settingslist, itemlist); */
 
   settingsview = view_get_subview(baseview, "settingsback");
 
@@ -792,28 +749,7 @@ void ui_init(float width,
   aboutview         = view_get_subview(baseview, "aboutback");
   view_t* aboutlist = view_get_subview(baseview, "aboutlist");
 
-  donatelist_attach(aboutlist, fontpath);
-
-  /* view_t* home_info_text       = view_get_subview(baseview, "home_info_txt"); */
-  /* view_t* home_donate_btn_txt  = view_get_subview(baseview, "home_donate_btn_txt"); */
-  /* view_t* home_support_btn_txt = view_get_subview(baseview, "home_support_btn_txt"); */
-  /* view_t* home_src_btn_txt     = view_get_subview(baseview, "home_src_btn_txt"); */
-  /* view_t* home_yt_btn_txt      = view_get_subview(baseview, "home_yt_btn_txt"); */
-
-  /* tg_text_add(home_info_text); */
-  /* tg_text_set(home_info_text, "Zen Music v0.8\n by Milan Toth\nFree and Open Source Software.\nIf you like it, please support the development.", ts); */
-
-  /* tg_text_add(home_donate_btn_txt); */
-  /* tg_text_set(home_donate_btn_txt, "Donate on Paypal", ts); */
-
-  /* tg_text_add(home_support_btn_txt); */
-  /* tg_text_set(home_support_btn_txt, "Support on Patreon", ts); */
-
-  /* tg_text_add(home_src_btn_txt); */
-  /* tg_text_set(home_src_btn_txt, "Open Source", ts); */
-
-  /* tg_text_add(home_yt_btn_txt); */
-  /* tg_text_set(home_yt_btn_txt, "Open Youtube Channel", ts); */
+  donatelist_attach(aboutlist, fontpath, ui_show_simple_popup);
 
   view_remove(main, aboutview);
 

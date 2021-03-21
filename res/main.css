@@ -340,7 +340,7 @@
 
 #settingsback {
     width: 700px;
-    height: 610px;
+    height: 340px;
     top: 220px;
     margin: auto;
 }
@@ -513,6 +513,19 @@
     left: 12px;
     bottom: 12px;
     border-radius: 14px;
+}
+
+#sim_pop_bck {
+    width: 600px;
+    height: 200px;
+    top: 220px;
+    margin: auto;
+}
+
+#sim_pop_txt {
+    width: 100%;
+    height: 100%;
+    background-color: #00000000;
 }
 
 #aboutback {

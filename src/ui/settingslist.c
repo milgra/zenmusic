@@ -115,27 +115,7 @@ void settingslist_on_header_field_resize(view_t* view, char* id, int size)
 
 void settingslist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
-  if (ev.button == 1)
-  {
-    if (!ev.ctrl_down && !ev.shift_down) selected_res();
-
-    if (ev.shift_down)
-    {
-      selected_rng(index);
-    }
-    else
-    {
-      selected_add(index);
-    }
-
-    // if (ev.dclick && setl.on_select) (*setl.on_select)(index);
-
-    vh_list_refresh(setl.view);
-  }
-  else if (ev.button == 3)
-  {
-    //if (setl.on_edit) (*setl.on_edit)(index);
-  }
+  printf("item select %i\n", index);
 }
 
 view_t* settingsitem_create()
@@ -166,6 +146,8 @@ void settingsitem_update_row(view_t* rowview, int index, char* field, char* valu
 {
   uint32_t color1          = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
   setl.textstyle.backcolor = color1;
+
+  vh_litem_upd_index(rowview, index);
 
   tg_text_set(vh_litem_get_cell(rowview, "key"), field, setl.textstyle);
   tg_text_set(vh_litem_get_cell(rowview, "value"), value, setl.textstyle);

@@ -4,7 +4,7 @@
 #include "mtmap.c"
 #include "view.c"
 
-void donatelist_attach(view_t* base, char* fontpath);
+void donatelist_attach(view_t* base, char* fontpath, void (*popup)(char* text));
 void donatelist_update();
 void donatelist_refresh();
 void donatelist_toggle_pause(int state);
@@ -32,6 +32,7 @@ struct donatelist_t
   vec_t*      fields; // fileds in table
   vec_t*      items;
   textstyle_t textstyle;
+  void (*popup)(char* text);
 } donl = {0};
 
 typedef struct _sl_cell_t
@@ -112,7 +113,7 @@ void donatelist_on_header_field_resize(view_t* view, char* id, int size)
 
 void donatelist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
-  printf("select %i\n", index);
+  if (donl.popup) (*donl.popup)("The link is opened in the browser.");
 
   switch (index)
   {
@@ -179,14 +180,14 @@ view_t* donatelist_item_for_index(int index, void* userdata, view_t* listview, i
   return donl.items->data[index];
 }
 
-void donatelist_attach(view_t* view,
-                       char*   fontpath)
+void donatelist_attach(view_t* view, char* fontpath, void (*popup)(char* text))
 {
   assert(fontpath != NULL);
 
   donl.view   = view;
   donl.fields = VNEW();
   donl.items  = VNEW();
+  donl.popup  = popup;
 
   donl.textstyle.font      = fontpath;
   donl.textstyle.align     = TA_CENTER;
