@@ -103,6 +103,8 @@ void vh_litem_add_cell(view_t* view, char* id, int size, view_t* cellview)
   vh_litem_t* vh   = view->handler_data;
   vh_lcell_t* cell = vh_lcell_new(id, size, cellview, vh->cells->length);
 
+  view_set_block_touch(cellview, 0, 1);
+
   // add subview
   view_add(view, cellview);
 

@@ -112,36 +112,34 @@ void donatelist_on_header_field_resize(view_t* view, char* id, int size)
 
 void donatelist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
-  if (ev.button == 1)
+  printf("select %i\n", index);
+
+  switch (index)
   {
-    if (!ev.ctrl_down && !ev.shift_down) selected_res();
-
-    if (ev.shift_down)
-    {
-      selected_rng(index);
-    }
-    else
-    {
-      selected_add(index);
-    }
-
-    // if (ev.dclick && donl.on_select) (*donl.on_select)(index);
-
-    vh_list_refresh(donl.view);
-  }
-  else if (ev.button == 3)
-  {
-    //if (donl.on_edit) (*donl.on_edit)(index);
+  case 1:
+    system("xdg-open https://paypal.me/milgra");
+    break;
+  case 2:
+    system("xdg-open https://patreon.com/milgra");
+    break;
+  case 3:
+    system("xdg-open https://github.com/milgra/zenmusic");
+    break;
+  case 4:
+    system("xdg-open https://yotubue.com/milgra");
+    break;
   }
 }
 
-view_t* donateitem_create()
+view_t* donateitem_create(int index)
 {
   static int item_cnt      = 0;
   char       idbuffer[100] = {0};
   snprintf(idbuffer, 100, "donlist_item%i", item_cnt++);
 
-  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 50});
+  float height = index == 0 ? 150 : 50;
+
+  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 460, height});
   rowview->hidden = 1;
 
   vh_litem_add(rowview, NULL);
@@ -150,7 +148,7 @@ view_t* donateitem_create()
   sl_cell_t* cell;
   while ((cell = VNXT(donl.fields)))
   {
-    view_t* cellview = view_new(cstr_fromformat("%s%s", rowview->id, cell->id, NULL), (r2_t){0, 0, cell->size, 50});
+    view_t* cellview = view_new(cstr_fromformat("%s%s", rowview->id, cell->id, NULL), (r2_t){0, 0, cell->size, height});
     tg_text_add(cellview);
 
     vh_litem_add_cell(rowview, cell->id, cell->size, cellview);
@@ -159,13 +157,14 @@ view_t* donateitem_create()
   return rowview;
 }
 
-void donateitem_update_row(view_t* rowview, int index, char* field, char* value)
+void donateitem_update_row(view_t* rowview, int index, char* field)
 {
   uint32_t color1          = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
   donl.textstyle.backcolor = color1;
 
-  tg_text_set(vh_litem_get_cell(rowview, "key"), field, donl.textstyle);
-  tg_text_set(vh_litem_get_cell(rowview, "value"), value, donl.textstyle);
+  vh_litem_upd_index(rowview, index);
+
+  tg_text_set(vh_litem_get_cell(rowview, "field"), field, donl.textstyle);
 }
 
 view_t* donatelist_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
@@ -189,57 +188,36 @@ void donatelist_attach(view_t* view,
   donl.fields = VNEW();
   donl.items  = VNEW();
 
-  donl.textstyle.font        = fontpath;
-  donl.textstyle.align       = 0;
-  donl.textstyle.margin_left = 10;
-  donl.textstyle.size        = 30.0;
-  donl.textstyle.textcolor   = 0x000000FF;
-  donl.textstyle.backcolor   = 0xF5F5F5FF;
+  donl.textstyle.font      = fontpath;
+  donl.textstyle.align     = TA_CENTER;
+  donl.textstyle.margin    = 10;
+  donl.textstyle.size      = 30.0;
+  donl.textstyle.textcolor = 0x000000FF;
+  donl.textstyle.backcolor = 0xF5F5F5FF;
 
   // create fields
 
-  VADD(donl.fields, donl_cell_new("key", 300, 0));
-  VADD(donl.fields, donl_cell_new("value", 340, 1));
+  VADD(donl.fields, donl_cell_new("field", 460, 0));
 
   vec_dec_retcount(donl.fields);
-
-  // add header handler
-
-  view_t* header = view_new("donatelist_header", (r2_t){0, 0, 10, 30});
-  /* header->layout.background_color = 0x333333FF; */
-  /* header->layout.shadow_blur      = 3; */
-  /* header->layout.border_radius    = 3; */
-  tg_css_add(header);
-
-  vh_lhead_add(header);
-  vh_lhead_set_on_select(header, donatelist_on_header_field_select);
-  vh_lhead_set_on_insert(header, donatelist_on_header_field_insert);
-  vh_lhead_set_on_resize(header, donatelist_on_header_field_resize);
-
-  sl_cell_t* cell;
-  while ((cell = VNXT(donl.fields)))
-  {
-    view_t* cellview = view_new(cstr_fromformat("%s%s", header->id, cell->id, NULL), (r2_t){0, 0, cell->size, 30});
-    tg_text_add(cellview);
-    tg_text_set(cellview, cell->id, donl.textstyle);
-
-    vh_lhead_add_cell(header, cell->id, cell->size, cellview);
-  }
 
   // add list handler to view
 
   vh_list_add(donl.view, donatelist_item_for_index, NULL, NULL);
-  vh_list_set_header(donl.view, header);
 
   // create items
 
-  VADD(donl.items, donateitem_create());
-  VADD(donl.items, donateitem_create());
-  VADD(donl.items, donateitem_create());
+  VADD(donl.items, donateitem_create(0));
+  VADD(donl.items, donateitem_create(1));
+  VADD(donl.items, donateitem_create(2));
+  VADD(donl.items, donateitem_create(3));
+  VADD(donl.items, donateitem_create(4));
 
-  donateitem_update_row(donl.items->data[0], 0, "Library Path", "/home/user/milgra/Music");
-  donateitem_update_row(donl.items->data[1], 1, "Keep Library Organized", "Disabled");
-  donateitem_update_row(donl.items->data[2], 2, "Dark Mode", "Disabled");
+  donateitem_update_row(donl.items->data[0], 0, "Zen Music v0.8\n by Milan Toth\nFree and Open Source Software.\nIf you like it, please support the development.");
+  donateitem_update_row(donl.items->data[1], 1, "Donate on Paypal");
+  donateitem_update_row(donl.items->data[2], 2, "Support on Patreon");
+  donateitem_update_row(donl.items->data[3], 3, "GitHub Page");
+  donateitem_update_row(donl.items->data[4], 4, "Youtube Channel");
 }
 
 #endif

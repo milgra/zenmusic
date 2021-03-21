@@ -144,7 +144,7 @@ view_t* settingsitem_create()
   char       idbuffer[100] = {0};
   snprintf(idbuffer, 100, "setlist_item%i", item_cnt++);
 
-  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 50});
+  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 640, 50});
   rowview->hidden = 1;
 
   vh_litem_add(rowview, NULL);
@@ -239,10 +239,14 @@ void settingslist_attach(view_t* view,
   VADD(setl.items, settingsitem_create());
   VADD(setl.items, settingsitem_create());
   VADD(setl.items, settingsitem_create());
+  VADD(setl.items, settingsitem_create());
+  VADD(setl.items, settingsitem_create());
 
   settingsitem_update_row(setl.items->data[0], 0, "Library Path", "/home/user/milgra/Music");
-  settingsitem_update_row(setl.items->data[1], 1, "Keep Library Organized", "Disabled");
+  settingsitem_update_row(setl.items->data[1], 1, "Organize Library", "Disabled");
   settingsitem_update_row(setl.items->data[2], 2, "Dark Mode", "Disabled");
+  settingsitem_update_row(setl.items->data[3], 3, "Config Path", "/home/.config/zenmusic/config");
+  settingsitem_update_row(setl.items->data[4], 4, "Style Path", "/usr/local/share/zenmusic");
 }
 
 #endif
