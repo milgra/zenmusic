@@ -7,7 +7,11 @@
 #include "mtmap.c"
 #include "view.c"
 
-void settingslist_attach(view_t* base, char* fontpath);
+void settingslist_attach(view_t* view,
+                         char*   fontpath,
+                         void (*libpath_popup)(char* text),
+                         void (*liborg_popup)(char* text),
+                         void (*info_popup)(char* text));
 void settingslist_update();
 void settingslist_refresh();
 void settingslist_toggle_pause(int state);
@@ -35,6 +39,10 @@ struct settingslist_t
   vec_t*      fields; // fileds in table
   vec_t*      items;
   textstyle_t textstyle;
+
+  void (*libpath_popup)(char* text);
+  void (*liborg_popup)(char* text);
+  void (*info_popup)(char* text);
 } setl = {0};
 
 typedef struct _sl_cell_t
@@ -116,6 +124,22 @@ void settingslist_on_header_field_resize(view_t* view, char* id, int size)
 void settingslist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
   printf("item select %i\n", index);
+
+  switch (index)
+  {
+  case 0:
+    (*setl.libpath_popup)(NULL);
+    break;
+  case 1:
+    (*setl.liborg_popup)(NULL);
+    break;
+  case 3:
+    (*setl.info_popup)("You cannot set the config path");
+    break;
+  case 4:
+    (*setl.info_popup)("You cannot set the style path");
+    break;
+  }
 }
 
 view_t* settingsitem_create()
@@ -166,13 +190,20 @@ view_t* settingslist_item_for_index(int index, void* userdata, view_t* listview,
 }
 
 void settingslist_attach(view_t* view,
-                         char*   fontpath)
+                         char*   fontpath,
+                         void (*libpath_popup)(char* text),
+                         void (*liborg_popup)(char* text),
+                         void (*info_popup)(char* text))
 {
   assert(fontpath != NULL);
 
   setl.view   = view;
   setl.fields = VNEW();
   setl.items  = VNEW();
+
+  setl.libpath_popup = libpath_popup;
+  setl.liborg_popup  = liborg_popup;
+  setl.info_popup    = info_popup;
 
   setl.textstyle.font        = fontpath;
   setl.textstyle.align       = 0;

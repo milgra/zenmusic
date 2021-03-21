@@ -90,7 +90,6 @@ view_t* filterlistback;
 view_t* filterbar;
 
 view_t* decision_popup;
-view_t* ch_lib_popup;
 
 view_t* libpopuppage;
 view_t* libtextfield;
@@ -98,6 +97,7 @@ view_t* libinputfield;
 
 view_t* set_col_val;
 view_t* chlib_pop_if;
+view_t* ch_lib_popup;
 view_t* set_org_btn_txt;
 
 size_t lastindex = 0;
@@ -247,8 +247,6 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "closeeditorbtn") == 0) ui_toggle_mainview(editorview);
   if (strcmp(id, "accepteditorbtn") == 0) ui_editor_accept();
   if (strcmp(id, "closehomebtn") == 0) ui_toggle_mainview(aboutview);
-  if (strcmp(id, "set_lib_btn") == 0) ui_toggle_mainview(ch_lib_popup);
-  if (strcmp(id, "set_org_btn") == 0) ui_toggle_mainview(decision_popup);
   if (strcmp(id, "chlib_pop_acc_btn") == 0) ui_change_library();
   if (strcmp(id, "acceptlibbtn") == 0) ui_set_library();
   if (strcmp(id, "chlib_pop_rej_btn") == 0) ui_toggle_mainview(ch_lib_popup);
@@ -492,6 +490,16 @@ void ui_show_simple_popup(char* text)
 
   tg_text_set(sim_pop_txt, text, ts);
   view_add(mainview, sim_pop_bck);
+}
+
+void ui_show_libpath_popup1(char* text)
+{
+  ui_toggle_mainview(ch_lib_popup);
+}
+
+void ui_show_liborg_popup(char* text)
+{
+  ui_toggle_mainview(decision_popup);
 }
 
 void ui_filter(view_t* view)
@@ -740,7 +748,7 @@ void ui_init(float width,
   settingsview = view_get_subview(baseview, "settingsback");
 
   view_t* settingslist = view_get_subview(baseview, "settingslist");
-  settingslist_attach(settingslist, fontpath);
+  settingslist_attach(settingslist, fontpath, ui_show_libpath_popup1, ui_show_liborg_popup, ui_show_simple_popup);
 
   view_remove(main, settingsview);
 
