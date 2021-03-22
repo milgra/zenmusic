@@ -83,6 +83,8 @@ view_t* volknob;
 view_t* mutebtn;
 view_t* sim_pop_bck;
 view_t* sim_pop_txt;
+view_t* song_popup;
+view_t* song_popup_list;
 
 view_t* mainview;
 view_t* messagelistback;
@@ -760,6 +762,15 @@ void ui_init(float width,
   donatelist_attach(aboutlist, fontpath, ui_show_simple_popup);
 
   view_remove(main, aboutview);
+
+  // song popup
+
+  song_popup      = view_get_subview(baseview, "song_popup");
+  song_popup_list = view_get_subview(baseview, "song_popup_list");
+
+  //donatelist_attach(aboutlist, fontpath, ui_show_simple_popup);
+
+  view_remove(main, song_popup);
 
   // set glossy effect on header
 
