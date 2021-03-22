@@ -62,15 +62,15 @@ void tg_knob_gen(view_t* view)
                    0xDEDEDEFF,
                    0xDEDEDEFF);
 
-      /* gfx_arc_grad(tg->fore, */
-      /*              (view->frame.local.w - 1.0) / 2.0, */
-      /*              (view->frame.local.h - 1.0) / 2.0, */
-      /*              27.0, */
-      /*              30.0, */
-      /*              0, */
-      /*              3.14 * 2, */
-      /*              0x00000044, */
-      /*              0); */
+      gfx_arc_grad(tg->fore,
+                   (view->frame.local.w - 1.0) / 2.0,
+                   (view->frame.local.h - 1.0) / 2.0,
+                   27.0,
+                   31.0,
+                   0,
+                   3.14 * 2,
+                   0x0000000A,
+                   0);
 
       gfx_arc_grad(tg->fore,
                    (view->frame.local.w - 1.0) / 2.0,

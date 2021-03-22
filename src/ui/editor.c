@@ -28,6 +28,7 @@ struct _editor_t
   map_t*      song;
   map_t*      temp;
   vec_t*      fields;
+  vec_t*      items;
   view_t*     sel_item;
   textstyle_t textstyle;
 } editor = {0};
@@ -131,28 +132,12 @@ view_t* editor_item_for_index(int index, void* userdata, view_t* listview, int* 
 {
   if (index < 0)
     return NULL; // no items before 0
-  if (index >= editor.fields->length)
+  if (index >= editor.items->length)
     return NULL; // no more items
 
-  *item_count = editor.fields->length;
+  *item_count = editor.items->length;
 
-  view_t* item = editor_create_item();
-
-  char* key   = editor.fields->data[index];
-  char* value = MGET(editor.song, key);
-
-  uint32_t color1            = (index % 2 == 0) ? 0xFEFEFEFF : 0xEFEFEFFF;
-  editor.textstyle.backcolor = color1;
-
-  vh_litem_upd_index(item, index);
-  tg_text_set(vh_litem_get_cell(item, "key"), key, editor.textstyle);
-
-  uint32_t color2            = (index % 2 == 0) ? 0xF8F8F8FF : 0xE8E8E8FF;
-  editor.textstyle.backcolor = color2;
-
-  tg_text_set(vh_litem_get_cell(item, "val"), value, editor.textstyle);
-
-  return 0;
+  return editor.items->data[index];
 }
 
 int editor_comp_text(void* left, void* right)
@@ -179,10 +164,12 @@ void editor_remove_str(vec_t* vec, char* str)
 void editor_set_song(map_t* map)
 {
   printf("editor set song\n");
+  mem_describe(map, 0);
 
   // reset temporary fields containers
   map_reset(editor.temp);
   vec_reset(editor.fields);
+  vec_reset(editor.items);
 
   // store song and extract fields
   editor.song = map;
@@ -203,6 +190,31 @@ void editor_set_song(map_t* map)
 
   // reset list handler
   vh_list_reset(editor.view);
+
+  // create items
+
+  for (int index = 0; index < editor.fields->length; index++)
+  {
+    view_t* item = editor_create_item();
+
+    char* key   = editor.fields->data[index];
+    char* value = MGET(editor.song, key);
+
+    printf("ITEM %s %s\n", key, value);
+
+    uint32_t color1            = (index % 2 == 0) ? 0xFEFEFEFF : 0xEFEFEFFF;
+    editor.textstyle.backcolor = color1;
+
+    vh_litem_upd_index(item, index);
+    tg_text_set(vh_litem_get_cell(item, "key"), key, editor.textstyle);
+
+    uint32_t color2            = (index % 2 == 0) ? 0xF8F8F8FF : 0xE8E8E8FF;
+    editor.textstyle.backcolor = color2;
+
+    tg_text_set(vh_litem_get_cell(item, "val"), value, editor.textstyle);
+
+    VADD(editor.items, item);
+  }
 }
 
 void editor_attach(view_t* view, char* fontpath)
@@ -221,6 +233,7 @@ void editor_attach(view_t* view, char* fontpath)
   editor.temp      = MNEW();
   editor.fields    = VNEW();
   editor.textstyle = ts;
+  editor.items     = VNEW();
 }
 
 map_t* editor_get_old_data()

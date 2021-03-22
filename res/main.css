@@ -46,6 +46,7 @@
     width: 100%;
     height: 35px;
     background-color: #FFFFFFFF;
+    box-shadow: 5px #0000000A;
 }
 
 #clearbtn {
@@ -65,6 +66,7 @@
     height: 30px;
     background-color: #FFFFFFFF;
     border-radius: 10px;
+    box-shadow: 5px #0000000A;
 }
 
 #time {
@@ -90,6 +92,7 @@
     height: 90px;
     background-color: #FFFFFFFF;
     border-radius: 15px;
+    box-shadow: 5px #0000000A;
 }
 
 #info {
@@ -297,8 +300,8 @@
 }
 
 #editorlistback {
-    width: 530px;
-    height: 460px;
+    width: 510px;
+    height: 440px;
     top: 10px;
     left: 10px;
     border-radius: 10px;
@@ -311,7 +314,14 @@
     height: 100%;
     border-radius: 15px;
     background-color: #FFFFFFFF;
-    box-shadow: 2px;
+}
+
+#ideditor {
+    width: 100%;
+    height: 100%;
+    margin: 10px;
+    border-radius: 15px;
+    background-color: #EEEEEEFF;
 }
 
 #coverview {
@@ -624,6 +634,7 @@
     width: 150px;
     height: 150px;
     background-color: #998899FF;
+    box-shadow: 5px #0000000A;
 }
 
 #footer {
@@ -717,6 +728,7 @@
     top:60px;
     left: 155px;
     border-radius: 14px;
+    box-shadow: 5px #0000000A;
 }
 
 #maxicon {
@@ -733,6 +745,7 @@
     right: 155px;
     top: 60px;
     border-radius: 14px;
+    box-shadow: 5px #0000000A;
 }
 
 .closepopupbtn {
@@ -766,6 +779,7 @@
     top: 10px;    
     border-radius: 10px;
     background-color: #FFFFFFFF;
+    box-shadow: 5px #0000000A;
 }
 
 .previcon {
@@ -782,6 +796,7 @@
     top: 10px;    
     border-radius: 10px;
     background-color: #FFFFFFFF;
+    box-shadow: 5px #0000000A;
 }
 
 .nexticon {
@@ -804,6 +819,7 @@
     border-radius: 10px;
     background-color: #FFFFFFFF;
     blocks: no;
+    box-shadow: 5px #0000000A;
 }
 
 #shuffleon {
@@ -812,6 +828,7 @@
     border-radius: 10px;
     background-color: #00000022;
     blocks: no;
+    box-shadow: 5px #0000000A;
 }
 
 #shuffleicon {
@@ -828,6 +845,7 @@
     top: 10px;    
     border-radius: 10px;
     background-color: #FFFFFFFF;
+    box-shadow: 5px #0000000A;
 }
 
 #settingsicon {
@@ -844,6 +862,7 @@
     top: 10px;    
     border-radius: 10px;
     background-color: #FFFFFFFF;
+    box-shadow: 5px #0000000A;
 }
 
 #abouticon {
@@ -860,6 +879,7 @@
     top: 10px;    
     border-radius: 10px;
     background-color: #FFFFFFFF;
+    box-shadow: 5px #0000000A;
 }
 
 #editicon {
