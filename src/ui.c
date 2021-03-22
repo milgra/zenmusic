@@ -39,6 +39,7 @@ void ui_set_org_btn_lbl(char* text);
 #include "player.c"
 #include "settingslist.c"
 #include "songlist.c"
+#include "songlistpopup.c"
 #include "textlist.c"
 #include "tg_css.c"
 #include "tg_knob.c"
@@ -149,7 +150,14 @@ void ui_toggle_mainview(view_t* view)
   if (view->parent)
     view_remove(mainview, view);
   else
+  {
+    r2_t basef = baseview->frame.local;
+    r2_t viewf = view->frame.local;
+    viewf.x    = (basef.w - viewf.w) / 2;
+    viewf.y    = (basef.h - viewf.h) / 2;
+    view_set_frame(view, viewf);
     view_add(mainview, view);
+  }
 }
 
 void ui_editor_accept()
@@ -255,6 +263,7 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "dec_pop_acc_btn") == 0) ui_set_organize_lib();
   if (strcmp(id, "dec_pop_rej_btn") == 0) ui_toggle_mainview(decision_popup);
   if (strcmp(id, "close_sim_pop_btn") == 0) ui_toggle_mainview(sim_pop_bck);
+  if (strcmp(id, "close_song_popup_btn") == 0) ui_toggle_mainview(song_popup);
   if (strcmp(id, "visuright_btn") == 0) ui_change_visu();
   if (strcmp(id, "visuleft_btn") == 0) ui_change_visu();
 }
@@ -275,10 +284,11 @@ void ui_on_filter_activate(view_t* view)
 
 void ui_on_song_edit(int index)
 {
-  map_t* songmap = ui.songs->data[index];
+  ui_toggle_mainview(song_popup);
+  /* map_t* songmap = ui.songs->data[index]; */
 
-  editor_set_song(songmap);
-  view_add(mainview, editorview);
+  /* editor_set_song(songmap); */
+  /* view_add(mainview, editorview); */
 }
 
 void ui_on_song_header(char* id)
@@ -768,6 +778,7 @@ void ui_init(float width,
   song_popup      = view_get_subview(baseview, "song_popup");
   song_popup_list = view_get_subview(baseview, "song_popup_list");
 
+  songlistpopup_attach(song_popup_list, fontpath, NULL);
   //donatelist_attach(aboutlist, fontpath, ui_show_simple_popup);
 
   view_remove(main, song_popup);
