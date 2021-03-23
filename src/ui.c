@@ -155,15 +155,8 @@ void ui_toggle_mainview(view_t* view)
 {
   if (view->parent)
   {
-    if (view == settingsview)
-    {
-      view->texture.alpha = 1.0;
-      vh_fade_set(view, 0.0, 20.0, 1);
-    }
-    else
-    {
-      view_remove(mainview, view);
-    }
+    view->texture.alpha = 1.0;
+    vh_fade_set(view, 0.0, 20.0, 1);
   }
   else
   {
@@ -174,11 +167,8 @@ void ui_toggle_mainview(view_t* view)
     view_set_frame(view, viewf);
     view_add(mainview, view);
 
-    if (view == settingsview)
-    {
-      view->texture.alpha = 0.0;
-      vh_fade_set(view, 1.0, 20.0, 1);
-    }
+    view->texture.alpha = 0.0;
+    vh_fade_set(view, 1.0, 20.0, 1);
   }
 }
 
@@ -725,8 +715,12 @@ void ui_init(float width,
   vh_text_set_on_text(filterbar, ui_filter);
   vh_text_set_on_activate(filterbar, ui_on_filter_activate);
 
+  // song editor
+
   editorview     = view_get_subview(baseview, "ideditorback");
   view_t* editor = view_get_subview(baseview, "editorlist");
+
+  vh_fade_add(editorview, editorview, ui_remove_from_main);
 
   view_remove(main, editorview);
 
@@ -793,6 +787,8 @@ void ui_init(float width,
   aboutview         = view_get_subview(baseview, "aboutback");
   view_t* aboutlist = view_get_subview(baseview, "aboutlist");
 
+  vh_fade_add(aboutview, aboutview, ui_remove_from_main);
+
   donatelist_attach(aboutlist, fontpath, ui_show_simple_popup);
 
   view_remove(main, aboutview);
@@ -801,6 +797,8 @@ void ui_init(float width,
 
   song_popup      = view_get_subview(baseview, "song_popup");
   song_popup_list = view_get_subview(baseview, "song_popup_list");
+
+  vh_fade_add(song_popup, song_popup, ui_remove_from_main);
 
   songlistpopup_attach(song_popup_list, fontpath, NULL);
   //donatelist_attach(aboutlist, fontpath, ui_show_simple_popup);

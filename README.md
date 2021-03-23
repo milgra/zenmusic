@@ -60,7 +60,6 @@ seek bar decisec update
 clear cover art if not available
 show cover art in editor popup
 list based settings, right click menu, about menu
-select deselect select until select all edit delete, fade popup
 artist-album sort
 select all, remove google id
 filter fix
