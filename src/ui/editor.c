@@ -124,8 +124,12 @@ view_t* editor_create_item()
   view_t* valcell = view_new(cstr_fromformat("%s%s", rowview->id, "val", NULL), (r2_t){0, 0, 300, 35});
   tg_text_add(valcell);
 
+  view_t* delcell = view_new(cstr_fromformat("%s%s", rowview->id, "del", NULL), (r2_t){0, 0, 100, 35});
+  tg_text_add(delcell);
+
   vh_litem_add_cell(rowview, "key", 200, keycell);
   vh_litem_add_cell(rowview, "val", 200, valcell);
+  vh_litem_add_cell(rowview, "del", 200, delcell);
 
   return rowview;
 }
@@ -214,6 +218,8 @@ void editor_set_song(map_t* map)
     editor.textstyle.backcolor = color2;
 
     tg_text_set(vh_litem_get_cell(item, "val"), value, editor.textstyle);
+
+    tg_text_set(vh_litem_get_cell(item, "del"), "Remove", editor.textstyle);
 
     VADD(editor.items, item);
   }
