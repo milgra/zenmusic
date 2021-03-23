@@ -611,10 +611,6 @@ void ui_init(float width,
 
   // buttons
 
-  view_t* uploadbtn = view_get_subview(baseview, "uploadbtn");
-  tg_text_add(uploadbtn);
-  tg_text_set(uploadbtn, "add new image", ts);
-
   seekknob = view_get_subview(baseview, "seekknob");
   playbtn  = view_get_subview(baseview, "playbtn");
   volknob  = view_get_subview(baseview, "volknob");
@@ -740,14 +736,13 @@ void ui_init(float width,
 
   // song editor
 
-  editor_popup   = view_get_subview(baseview, "song_editor_popup");
-  view_t* editor = view_get_subview(baseview, "editorlist");
+  editor_popup = view_get_subview(baseview, "song_editor_popup");
+
+  editor_attach(editor_popup, fontpath);
 
   vh_fade_add(editor_popup, editor_popup, ui_remove_from_main);
 
   view_remove(main, editor_popup);
-
-  editor_attach(editor, fontpath);
 
   // lib input popup
 

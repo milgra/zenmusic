@@ -54,22 +54,20 @@ freebsd for os
 
 first version
 
-remove background rendering ( ui renderer? )
-seek bar decisec update
-clear cover art if not available
 show cover art in editor popup
-list based settings, right click menu, about menu
+edit multiple items
+remove google id
+
+remove background rendering ( ui renderer? )
+clear cover art if not available
 artist-album sort
-select all, remove google id
 filter fix
 search/filter history ( use filters for playlists)
 on mute fade in/out volume with alpha
-select item/remove google.id / select anim
+select anim
 header resize on hscroll problem
 socketes taviranyitas - 1 byteokkal
 accept input on enter
-enable remote control in settings - opening remote control port, see readme for instructions
-popup-ok center align
 fix leaks
 fix while heaven wept, black lotus
 fix mp4 playing freezes

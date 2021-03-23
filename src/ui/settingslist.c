@@ -254,12 +254,14 @@ void settingslist_attach(view_t* view,
   VADD(setl.items, settingsitem_create());
   VADD(setl.items, settingsitem_create());
   VADD(setl.items, settingsitem_create());
+  VADD(setl.items, settingsitem_create());
 
   settingsitem_update_row(setl.items->data[0], 0, "Library Path", "/home/user/milgra/Music");
   settingsitem_update_row(setl.items->data[1], 1, "Organize Library", "Disabled");
   settingsitem_update_row(setl.items->data[2], 2, "Dark Mode", "Disabled");
-  settingsitem_update_row(setl.items->data[3], 3, "Config Path", "/home/.config/zenmusic/config");
-  settingsitem_update_row(setl.items->data[4], 4, "Style Path", "/usr/local/share/zenmusic");
+  settingsitem_update_row(setl.items->data[3], 3, "Remote Control", "Disabled");
+  settingsitem_update_row(setl.items->data[4], 4, "Config Path", "/home/.config/zenmusic/config");
+  settingsitem_update_row(setl.items->data[5], 5, "Style Path", "/usr/local/share/zenmusic");
 }
 
 #endif

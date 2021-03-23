@@ -309,8 +309,8 @@
 
 #editorlistback {
     width: 510px;
-    height: 440px;
-    top: 10px;
+    height: 400px;
+    top: 50px;
     left: 10px;
     border-radius: 10px;
     background-color: #FFFFFFFF;
@@ -332,8 +332,17 @@
     background-color: #EEEEEEFF;
 }
 
-#coverview {
+#ideditorheader {
+    width: 670px;
+    left: 10px;
     top: 10px;
+    height: 30px;
+    border-radius: 10px;
+    background-color: #FFFFFFFF;
+}
+
+#coverview {
+    top: 50px;
     right: 10px;
     width: 150px;
     height: 150px;
@@ -343,7 +352,7 @@
 }
 
 #uploadbtnbck {
-    top: 170px;
+    top: 210px;
     right: 10px;
     width: 150px;
     height: 30px;
@@ -358,7 +367,7 @@
 
 #settings_popup {
     width: 700px;
-    height: 340px;
+    height: 390px;
     top: 220px;
     margin: auto;
 }

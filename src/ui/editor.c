@@ -25,7 +25,8 @@ map_t* editor_get_new_data();
 
 struct _editor_t
 {
-  view_t*     view;
+  view_t*     listview;
+  view_t*     headview;
   map_t*      song;
   map_t*      temp;
   vec_t*      fields;
@@ -69,7 +70,7 @@ void editor_input_cell_edit_finished(view_t* inputview)
   printf("replacing intpu cell with text cell\n");
 
   // unlock scrolling
-  vh_list_lock_scroll(editor.view, 0);
+  vh_list_lock_scroll(editor.listview, 0);
 }
 
 void editor_select_item(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
@@ -95,7 +96,7 @@ void editor_select_item(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
     vh_text_set_on_deactivate(inputcell, editor_input_cell_edit_finished); // listen for text editing finish
     vh_text_activate(inputcell, 1);                                        // activate text input
     ui_manager_activate(inputcell);                                        // set text input as event receiver
-    vh_list_lock_scroll(editor.view, 1);                                   // lock scrolling of list to avoid going out screen
+    vh_list_lock_scroll(editor.listview, 1);                               // lock scrolling of list to avoid going out screen
     vh_litem_rpl_cell(itemview, cell->id, inputcell);                      // replacing simple text cell with input cell
 
     // TODO check if previous cell gets released
@@ -190,7 +191,7 @@ void editor_set_song(map_t* map)
   vec_add(editor.fields, cstr_fromcstring("path"));
 
   // reset list handler
-  vh_list_reset(editor.view);
+  vh_list_reset(editor.listview);
 
   // create items
 
@@ -220,7 +221,10 @@ void editor_set_song(map_t* map)
 
 void editor_attach(view_t* view, char* fontpath)
 {
-  vh_list_add(view, editor_item_for_index, NULL, NULL);
+  view_t* listview = view_get_subview(view, "editorlist");
+  view_t* headview = view_get_subview(view, "ideditorheader");
+
+  vh_list_add(listview, editor_item_for_index, NULL, NULL);
 
   textstyle_t ts = {0};
   ts.font        = fontpath;
@@ -230,11 +234,22 @@ void editor_attach(view_t* view, char* fontpath)
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0xFFFFFFFF;
 
-  editor.view      = view;
+  editor.headview  = headview;
+  editor.listview  = listview;
   editor.temp      = MNEW();
   editor.fields    = VNEW();
   editor.textstyle = ts;
   editor.items     = VNEW();
+
+  ts.backcolor = 0;
+
+  view_t* uploadbtn = view_get_subview(view, "uploadbtn");
+  tg_text_add(uploadbtn);
+  tg_text_set(uploadbtn, "add new image", ts);
+
+  ts.align = TA_CENTER;
+  tg_text_add(headview);
+  tg_text_set(headview, "Editing 1 song", ts);
 }
 
 map_t* editor_get_old_data()
@@ -258,6 +273,11 @@ void editor_set_songs(vec_t* vec)
     else
     {
     }
+
+    char text[100];
+    snprintf(text, 100, "Editing %i song(s)", vec->length);
+    tg_text_add(editor.headview);
+    tg_text_set(editor.headview, text, editor.textstyle);
   }
 }
 
