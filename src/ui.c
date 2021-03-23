@@ -145,10 +145,26 @@ void ui_toggle_shuffle()
   ui.shuffle = !ui.shuffle;
 }
 
+void ui_remove_from_main(void* p)
+{
+  view_t* view = p;
+  if (view->texture.alpha < 1.0) view_remove(mainview, view);
+}
+
 void ui_toggle_mainview(view_t* view)
 {
   if (view->parent)
-    view_remove(mainview, view);
+  {
+    if (view == settingsview)
+    {
+      view->texture.alpha = 1.0;
+      vh_fade_set(view, 0.0, 20.0, 1);
+    }
+    else
+    {
+      view_remove(mainview, view);
+    }
+  }
   else
   {
     r2_t basef = baseview->frame.local;
@@ -157,6 +173,12 @@ void ui_toggle_mainview(view_t* view)
     viewf.y    = (basef.h - viewf.h) / 2;
     view_set_frame(view, viewf);
     view_add(mainview, view);
+
+    if (view == settingsview)
+    {
+      view->texture.alpha = 0.0;
+      vh_fade_set(view, 1.0, 20.0, 1);
+    }
   }
 }
 
@@ -610,8 +632,8 @@ void ui_init(float width,
   visuleftbtnbck  = view_get_subview(visuleft, "visuleft_btn_bck");
   visurightbtnbck = view_get_subview(visuright, "visuright_btn_bck");
 
-  vh_fade_add(visuleftbtnbck);
-  vh_fade_add(visurightbtnbck);
+  vh_fade_add(visuleftbtnbck, NULL, NULL);
+  vh_fade_add(visurightbtnbck, NULL, NULL);
 
   /* view_remove(visuleft, visuleftbtn); */
   /* view_remove(visuright, visurightbtn); */
@@ -758,6 +780,8 @@ void ui_init(float width,
   // settings
 
   settingsview = view_get_subview(baseview, "settingsback");
+
+  vh_fade_add(settingsview, settingsview, ui_remove_from_main);
 
   view_t* settingslist = view_get_subview(baseview, "settingslist");
   settingslist_attach(settingslist, fontpath, ui_show_libpath_popup1, ui_show_liborg_popup, ui_show_simple_popup);

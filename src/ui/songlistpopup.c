@@ -4,7 +4,7 @@
 #include "mtmap.c"
 #include "view.c"
 
-void songlistpopup_attach(view_t* base, char* fontpath, void (*popup)(char* text));
+void songlistpopup_attach(view_t* view, char* fontpath, void (*on_select)(int));
 void songlistpopup_update();
 void songlistpopup_refresh();
 void songlistpopup_toggle_pause(int state);
@@ -32,7 +32,7 @@ struct songlistpopup_t
   vec_t*      fields; // fileds in table
   vec_t*      items;
   textstyle_t textstyle;
-  void (*popup)(char* text);
+  void (*on_select)(int index);
 } slp = {0};
 
 typedef struct _sl_cell_t
@@ -113,7 +113,7 @@ void songlistpopup_on_header_field_resize(view_t* view, char* id, int size)
 
 void songlistpopup_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
-  if (slp.popup) (*slp.popup)("The link is opened in the browser.");
+  if (slp.on_select) (*slp.on_select)(index);
 
   switch (index)
   {
@@ -178,14 +178,14 @@ view_t* songlistpopup_item_for_index(int index, void* userdata, view_t* listview
   return slp.items->data[index];
 }
 
-void songlistpopup_attach(view_t* view, char* fontpath, void (*popup)(char* text))
+void songlistpopup_attach(view_t* view, char* fontpath, void (*on_select)(int))
 {
   assert(fontpath != NULL);
 
-  slp.view   = view;
-  slp.fields = VNEW();
-  slp.items  = VNEW();
-  slp.popup  = popup;
+  slp.view      = view;
+  slp.fields    = VNEW();
+  slp.items     = VNEW();
+  slp.on_select = on_select;
 
   slp.textstyle.font      = fontpath;
   slp.textstyle.align     = TA_CENTER;
