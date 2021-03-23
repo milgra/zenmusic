@@ -7,6 +7,11 @@
 #include "mtmap.c"
 #include "view.c"
 
+void songlist_select(int index);
+void songlist_select_all();
+void songlist_select_range(int index);
+void songlist_get_selected(vec_t* vec);
+
 void songlist_attach(view_t* base, char* fontpath, void (*on_select)(int), void (*on_edit)(int), void (*on_header_select)(char*));
 void songlist_update();
 void songlist_refresh();
@@ -37,6 +42,7 @@ struct songlist_t
   textstyle_t textstyle;
 
   uint32_t color_s; // color selected
+  int32_t  index_s; // index selected
 
   void (*on_edit)(int index);
   void (*on_select)(int index);
@@ -132,10 +138,36 @@ void on_header_field_resize(view_t* view, char* id, int size)
   }
 }
 
+void songlist_select(int index)
+{
+  selected_res();
+  selected_add(sl.index_s);
+}
+
+void songlist_select_range(int index)
+{
+  selected_rng(sl.index_s);
+}
+
+void songlist_select_all()
+{
+  selected_res();
+  selected_add(0);
+  selected_rng(filtered_song_count());
+}
+
+void songlist_get_selected(vec_t* vec)
+{
+  // if selection is empty, select current index
+  if (selected_cnt() == 0) selected_add(sl.index_s);
+  selected_add_selected(filtered_get_songs(), vec);
+}
+
 // items
 
 void songlist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
+  sl.index_s = index;
   if (ev.button == 1)
   {
     if (!ev.ctrl_down && !ev.shift_down) selected_res();

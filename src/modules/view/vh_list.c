@@ -22,6 +22,7 @@ typedef struct _vh_list_t
 
   float item_wth; // width of all items
   float item_pos; // horizontal position of all items
+  float head_pos; // vertical position of head ( for refresh )
 
   // scrollers
 
@@ -153,7 +154,7 @@ void vh_list_evt(view_t* view, ev_t ev)
     {
       if (vh->items->length == 0)
       {
-        view_t* item = (*vh->item_for_index)(0, vh->userdata, view, &vh->item_count);
+        view_t* item = (*vh->item_for_index)(vh->head_index, vh->userdata, view, &vh->item_count);
 
         if (item)
         {
@@ -161,11 +162,9 @@ void vh_list_evt(view_t* view, ev_t ev)
 
           view_insert(view, item, 0);
 
-          view_set_frame(item, (r2_t){0, -item->frame.local.h, item->frame.local.w, item->frame.local.h});
+          view_set_frame(item, (r2_t){0, vh->head_pos, item->frame.local.w, item->frame.local.h});
 
           vh->item_wth = item->frame.global.w; // store maximum width
-
-          view_set_frame(item, (r2_t){0, vh->header_size, item->frame.local.w, item->frame.local.h});
         }
         else
           vh->full = 1;
@@ -421,18 +420,18 @@ void vh_list_refresh(view_t* view)
 {
   vh_list_t* vh = view->handler_data;
 
-  /* int full  = 0; */
-  /* int index = 0; */
+  for (int index = 0; index < vh->items->length; index++)
+  {
+    view_t* item = vh->items->data[index];
+    if (index == 0) vh->head_pos = item->frame.local.y;
+    view_remove(view, item);
+    (*vh->item_recycle)(item);
+  }
 
-  /* for (index = 0; index < vh->items->length; index++) */
-  /* { */
-  /*   view_t* item = vh->items->data[index]; */
-  /*   full         = (*vh->update_item)(view, vh->userdata, item, vh->head_index + index, &vh->item_count); */
-  /*   if (full) break; */
-  /* } */
+  vec_reset(vh->items);
 
-  /* vh->top_index = vh->head_index; */
-  /* vh->bot_index = vh->head_index + index; */
+  vh->full       = 0;
+  vh->tail_index = vh->head_index;
 }
 
 void vh_list_add(view_t* view,
@@ -449,16 +448,16 @@ void vh_list_add(view_t* view,
   char* vid = cstr_fromformat("%s%s", view->id, "vscr", NULL);
   char* hid = cstr_fromformat("%s%s", view->id, "hscr", NULL);
 
-  view_t* vscr = view_new(vid, (r2_t){view->frame.local.w - 18, 0, 15, view->frame.local.h});
-  view_t* hscr = view_new(hid, (r2_t){0, view->frame.local.h - 18, view->frame.local.w, 15});
+  view_t* vscr = view_new(vid, (r2_t){view->frame.local.w - 15, 0, 15, view->frame.local.h});
+  view_t* hscr = view_new(hid, (r2_t){0, view->frame.local.h - 15, view->frame.local.w, 15});
 
   REL(vid);
   REL(hid);
 
   vscr->layout.h_per  = 1.0;
-  vscr->layout.right  = 3;
+  vscr->layout.right  = 0;
   hscr->layout.w_per  = 1.0;
-  hscr->layout.bottom = 3;
+  hscr->layout.bottom = 0;
 
   vscr->layout.background_color = 0x00000001;
   hscr->layout.background_color = 0x00000001;
@@ -509,6 +508,7 @@ void vh_list_set_header(view_t* view, view_t* headerview)
   // add as subview
   view_add(view, headerview);
   vh->header_size = headerview->frame.local.h;
+  vh->head_pos    = vh->header_size;
 
   if (vh->vscr)
   {

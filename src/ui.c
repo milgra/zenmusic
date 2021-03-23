@@ -64,9 +64,9 @@ view_t* baseview;
 view_t* timeview;
 view_t* leftview;
 
-view_t* aboutview;
-view_t* editorview;
-view_t* settingsview;
+view_t* about_popup;
+view_t* editor_popup;
+view_t* settings_popup;
 
 view_t* infoview;
 
@@ -82,25 +82,25 @@ view_t* seekknob;
 view_t* playbtn;
 view_t* volknob;
 view_t* mutebtn;
-view_t* sim_pop_bck;
+view_t* simple_popup;
 view_t* sim_pop_txt;
 view_t* song_popup;
 view_t* song_popup_list;
 
 view_t* mainview;
-view_t* messagelistback;
-view_t* filterlistback;
+view_t* messages_popup;
+view_t* filters_popup;
 view_t* filterbar;
 
 view_t* decision_popup;
 
-view_t* libpopuppage;
+view_t* library_page;
 view_t* libtextfield;
 view_t* libinputfield;
 
 view_t* set_col_val;
 view_t* chlib_pop_if;
-view_t* ch_lib_popup;
+view_t* library_popup;
 view_t* set_org_btn_txt;
 
 size_t lastindex = 0;
@@ -114,6 +114,7 @@ struct _ui_t
   vec_t* songs;
   int    visu;
   char   shuffle;
+  vec_t* selected;
 } ui = {0};
 
 void ui_play_index(int index)
@@ -174,7 +175,7 @@ void ui_toggle_mainview(view_t* view)
 
 void ui_editor_accept()
 {
-  ui_toggle_mainview(editorview);
+  ui_toggle_mainview(editor_popup);
 
   map_t* old_data = editor_get_old_data();
   map_t* new_data = editor_get_new_data();
@@ -259,22 +260,22 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "nextbtn") == 0) ui_play_next();
   if (strcmp(id, "shufflebtn") == 0) ui_toggle_shuffle();
   if (strcmp(id, "prevbtn") == 0) ui_play_index(lastindex - 1);
-  if (strcmp(id, "settingsbtn") == 0) ui_toggle_mainview(settingsview);
-  if (strcmp(id, "closesettingsbtn") == 0) ui_toggle_mainview(settingsview);
-  if (strcmp(id, "aboutbtn") == 0) ui_toggle_mainview(aboutview);
-  if (strcmp(id, "editbtn") == 0) ui_toggle_mainview(editorview);
-  if (strcmp(id, "closemessagelistbtn") == 0) ui_toggle_mainview(messagelistback);
-  if (strcmp(id, "info") == 0) ui_toggle_mainview(messagelistback);
-  if (strcmp(id, "closefilterbtn") == 0) ui_toggle_mainview(filterlistback);
-  if (strcmp(id, "closeeditorbtn") == 0) ui_toggle_mainview(editorview);
+  if (strcmp(id, "settingsbtn") == 0) ui_toggle_mainview(settings_popup);
+  if (strcmp(id, "closesettingsbtn") == 0) ui_toggle_mainview(settings_popup);
+  if (strcmp(id, "aboutbtn") == 0) ui_toggle_mainview(about_popup);
+  if (strcmp(id, "editbtn") == 0) ui_toggle_mainview(editor_popup);
+  if (strcmp(id, "closemessagelistbtn") == 0) ui_toggle_mainview(messages_popup);
+  if (strcmp(id, "info") == 0) ui_toggle_mainview(messages_popup);
+  if (strcmp(id, "closefilterbtn") == 0) ui_toggle_mainview(filters_popup);
+  if (strcmp(id, "closeeditorbtn") == 0) ui_toggle_mainview(editor_popup);
   if (strcmp(id, "accepteditorbtn") == 0) ui_editor_accept();
-  if (strcmp(id, "closehomebtn") == 0) ui_toggle_mainview(aboutview);
+  if (strcmp(id, "closehomebtn") == 0) ui_toggle_mainview(about_popup);
   if (strcmp(id, "chlib_pop_acc_btn") == 0) ui_change_library();
   if (strcmp(id, "acceptlibbtn") == 0) ui_set_library();
-  if (strcmp(id, "chlib_pop_rej_btn") == 0) ui_toggle_mainview(ch_lib_popup);
+  if (strcmp(id, "library_popup_close_btn") == 0) ui_toggle_mainview(library_popup);
   if (strcmp(id, "dec_pop_acc_btn") == 0) ui_set_organize_lib();
   if (strcmp(id, "dec_pop_rej_btn") == 0) ui_toggle_mainview(decision_popup);
-  if (strcmp(id, "close_sim_pop_btn") == 0) ui_toggle_mainview(sim_pop_bck);
+  if (strcmp(id, "close_sim_pop_btn") == 0) ui_toggle_mainview(simple_popup);
   if (strcmp(id, "close_song_popup_btn") == 0) ui_toggle_mainview(song_popup);
   if (strcmp(id, "visuright_btn") == 0) ui_change_visu();
   if (strcmp(id, "visuleft_btn") == 0) ui_change_visu();
@@ -291,16 +292,12 @@ void ui_on_color_select(void* userdata, void* data)
 
 void ui_on_filter_activate(view_t* view)
 {
-  ui_toggle_mainview(filterlistback);
+  ui_toggle_mainview(filters_popup);
 }
 
 void ui_on_song_edit(int index)
 {
   ui_toggle_mainview(song_popup);
-  /* map_t* songmap = ui.songs->data[index]; */
-
-  /* editor_set_song(songmap); */
-  /* view_add(mainview, editorview); */
 }
 
 void ui_on_song_header(char* id)
@@ -473,32 +470,11 @@ void ui_update_time(double time, double left, double dur)
   tg_text_set(leftview, timebuff, ts);
 }
 
-void ui_show_libpath_popup(char* text)
-{
-  textstyle_t ts = {0};
-  ts.font        = fontpath;
-  ts.align       = TA_CENTER;
-  ts.size        = 30.0;
-  ts.textcolor   = 0x000000FF;
-  ts.backcolor   = 0;
-
-  tg_text_set(libtextfield, text, ts);
-
-  if (!libpopuppage->parent)
-  {
-    ui_manager_remove(baseview);
-    ui_manager_add(libpopuppage);
-  }
-
-  vh_text_activate(libinputfield, 1); // activate text input
-  ui_manager_activate(libinputfield); // set text input as event receiver
-}
-
 void ui_hide_libpath_popup()
 {
-  if (libpopuppage->parent)
+  if (library_page->parent)
   {
-    ui_manager_remove(libpopuppage);
+    ui_manager_remove(library_page);
     ui_manager_add(baseview);
   }
 }
@@ -513,17 +489,58 @@ void ui_show_simple_popup(char* text)
   ts.backcolor   = 0;
 
   tg_text_set(sim_pop_txt, text, ts);
-  view_add(mainview, sim_pop_bck);
+
+  ui_toggle_mainview(simple_popup);
 }
 
 void ui_show_libpath_popup1(char* text)
 {
-  ui_toggle_mainview(ch_lib_popup);
+  ui_toggle_mainview(library_popup);
 }
 
 void ui_show_liborg_popup(char* text)
 {
   ui_toggle_mainview(decision_popup);
+}
+
+void ui_show_libpath_popup(char* text)
+{
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.align       = TA_CENTER;
+  ts.size        = 30.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0;
+
+  tg_text_set(libtextfield, text, ts);
+
+  if (!library_page->parent)
+  {
+    ui_manager_remove(baseview);
+    ui_manager_add(library_page);
+  }
+
+  vh_text_activate(libinputfield, 1); // activate text input
+  ui_manager_activate(libinputfield); // set text input as event receiver
+}
+
+void ui_on_songlistpopup_select(int index)
+{
+  ui_toggle_mainview(song_popup);
+  if (index == 0) songlist_select(index);
+  if (index == 1) songlist_select_range(index);
+  if (index == 2) songlist_select_all();
+  if (index == 3)
+  {
+    vec_reset(ui.selected);
+    songlist_get_selected(ui.selected);
+    editor_set_songs(ui.selected);
+    ui_toggle_mainview(editor_popup);
+  }
+  if (index == 4)
+  {
+    ui_show_simple_popup("Are you sure you want to delete x items?");
+  }
 }
 
 void ui_filter(view_t* view)
@@ -553,8 +570,9 @@ void ui_init(float width,
              char* respath,
              char* libpath)
 {
-  ui_libpath = cstr_fromcstring(libpath);
-  ui.songs   = filtered_get_songs();
+  ui_libpath  = cstr_fromcstring(libpath);
+  ui.songs    = filtered_get_songs();
+  ui.selected = VNEW();
 
   // init text
 
@@ -651,13 +669,18 @@ void ui_init(float width,
   ts.align               = TA_LEFT;
   textlist_t* artistlist = textlist_new(view_get_subview(baseview, "artistlist"), filtered_get_artists(), ts, ui_on_artist_select);
 
-  messagelistback     = view_get_subview(baseview, "messagelistback");
+  messages_popup      = view_get_subview(baseview, "messages_popup");
   view_t* messagelist = view_get_subview(baseview, "messagelist");
 
-  view_remove(mainview, messagelistback);
+  vh_fade_add(messages_popup, messages_popup, ui_remove_from_main);
 
-  filterlistback = view_get_subview(baseview, "filterlistback");
-  view_remove(mainview, filterlistback);
+  view_remove(mainview, messages_popup);
+
+  filters_popup = view_get_subview(baseview, "filters_popup");
+
+  vh_fade_add(filters_popup, filters_popup, ui_remove_from_main);
+
+  view_remove(mainview, filters_popup);
 
   // display views
 
@@ -717,18 +740,18 @@ void ui_init(float width,
 
   // song editor
 
-  editorview     = view_get_subview(baseview, "ideditorback");
+  editor_popup   = view_get_subview(baseview, "song_editor_popup");
   view_t* editor = view_get_subview(baseview, "editorlist");
 
-  vh_fade_add(editorview, editorview, ui_remove_from_main);
+  vh_fade_add(editor_popup, editor_popup, ui_remove_from_main);
 
-  view_remove(main, editorview);
+  view_remove(main, editor_popup);
 
   editor_attach(editor, fontpath);
 
   // lib input popup
 
-  libpopuppage  = view_get_subview(baseview, "libpopuppage");
+  library_page  = view_get_subview(baseview, "library_page");
   libtextfield  = view_get_subview(baseview, "libtextfield");
   libinputfield = view_get_subview(baseview, "libinputfield");
 
@@ -737,7 +760,7 @@ void ui_init(float width,
   tg_text_add(libtextfield);
   vh_text_add(libinputfield, "/home/youruser/Music", "", ts, NULL);
 
-  view_remove(baseview, libpopuppage);
+  view_remove(baseview, library_page);
 
   // decision popup
 
@@ -746,7 +769,10 @@ void ui_init(float width,
   tg_text_add(dec_pop_tf);
   tg_text_set(dec_pop_tf, "Files will be renamed and moved to different folders based on artist, album, track number and title, are you sure?", ts);
 
-  decision_popup = view_get_subview(baseview, "dec_pop_bck");
+  decision_popup = view_get_subview(baseview, "decision_popup");
+
+  vh_fade_add(decision_popup, decision_popup, ui_remove_from_main);
+
   view_remove(main, decision_popup);
 
   // change lib popup
@@ -760,38 +786,43 @@ void ui_init(float width,
   tg_text_set(chlib_pop_tf, "Use library at", ts);
   vh_text_add(chlib_pop_if, "/home/youruser/Music", "", ts, NULL);
 
-  ch_lib_popup = view_get_subview(baseview, "chlib_pop_bck");
-  view_remove(main, ch_lib_popup);
+  library_popup = view_get_subview(baseview, "library_popup");
+
+  vh_fade_add(library_popup, library_popup, ui_remove_from_main);
+
+  view_remove(main, library_popup);
 
   // simple popup
 
-  sim_pop_bck = view_get_subview(baseview, "sim_pop_bck");
-  sim_pop_txt = view_get_subview(baseview, "sim_pop_txt");
+  simple_popup = view_get_subview(baseview, "simple_popup");
+  sim_pop_txt  = view_get_subview(baseview, "sim_pop_txt");
+
+  vh_fade_add(simple_popup, simple_popup, ui_remove_from_main);
 
   tg_text_add(sim_pop_txt);
-  view_remove(main, sim_pop_bck);
+  view_remove(main, simple_popup);
 
   // settings
 
-  settingsview = view_get_subview(baseview, "settingsback");
+  settings_popup = view_get_subview(baseview, "settings_popup");
 
-  vh_fade_add(settingsview, settingsview, ui_remove_from_main);
+  vh_fade_add(settings_popup, settings_popup, ui_remove_from_main);
 
   view_t* settingslist = view_get_subview(baseview, "settingslist");
   settingslist_attach(settingslist, fontpath, ui_show_libpath_popup1, ui_show_liborg_popup, ui_show_simple_popup);
 
-  view_remove(main, settingsview);
+  view_remove(main, settings_popup);
 
   // about view
 
-  aboutview         = view_get_subview(baseview, "aboutback");
+  about_popup       = view_get_subview(baseview, "about_popup");
   view_t* aboutlist = view_get_subview(baseview, "aboutlist");
 
-  vh_fade_add(aboutview, aboutview, ui_remove_from_main);
+  vh_fade_add(about_popup, about_popup, ui_remove_from_main);
 
   donatelist_attach(aboutlist, fontpath, ui_show_simple_popup);
 
-  view_remove(main, aboutview);
+  view_remove(main, about_popup);
 
   // song popup
 
@@ -800,7 +831,7 @@ void ui_init(float width,
 
   vh_fade_add(song_popup, song_popup, ui_remove_from_main);
 
-  songlistpopup_attach(song_popup_list, fontpath, NULL);
+  songlistpopup_attach(song_popup_list, fontpath, ui_on_songlistpopup_select);
   //donatelist_attach(aboutlist, fontpath, ui_show_simple_popup);
 
   view_remove(main, song_popup);

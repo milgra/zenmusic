@@ -6,12 +6,16 @@
 #ifndef selected_h
 #define selected_h
 
+#include "mtvector.c"
+
 void selected_attach();
 void selected_add(int i);
 void selected_rem(int i);
 void selected_rng(int i);
 void selected_res();
 int  selected_has(int i);
+int  selected_cnt();
+void selected_add_selected(vec_t* vec, vec_t* res);
 
 #endif
 
@@ -102,6 +106,28 @@ int selected_has(int i)
     if (rng.s <= i && rng.e > i) return 1;
   }
   return 0;
+}
+
+int selected_cnt()
+{
+  return sel.length;
+}
+
+void selected_add_selected(vec_t* vec, vec_t* res)
+{
+  for (int index = 0; index < sel.length; index++)
+  {
+    sel_rng_t rng = sel.ranges[index];
+    for (int r = rng.s; r < rng.e; r++)
+    {
+      printf("range %i %i\n", rng.s, rng.e);
+      if (r >= 0 && r < vec->length)
+      {
+        printf("SELECTED ADDING %i TO RES\n", r);
+        VADD(res, vec->data[r]);
+      }
+    }
+  }
 }
 
 #endif

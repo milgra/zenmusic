@@ -48,12 +48,12 @@ void vh_button_evt(view_t* view, ev_t ev)
       if (view->views->length > 0)
       {
         vh->offview = view->views->data[0];
-        vh_fade_add(vh->offview);
+        vh_fade_add(vh->offview, NULL, NULL);
       }
       if (view->views->length > 1)
       {
         vh->onview = view->views->data[1];
-        vh_fade_add(vh->onview);
+        vh_fade_add(vh->onview, NULL, NULL);
       }
 
       if (vh->offview) view_set_texture_alpha(vh->offview, 1.0, 0);

@@ -114,22 +114,6 @@ void songlistpopup_on_header_field_resize(view_t* view, char* id, int size)
 void songlistpopup_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
   if (slp.on_select) (*slp.on_select)(index);
-
-  switch (index)
-  {
-  case 1:
-    system("xdg-open https://paypal.me/milgra");
-    break;
-  case 2:
-    system("xdg-open https://patreon.com/milgra");
-    break;
-  case 3:
-    system("xdg-open https://github.com/milgra/zenmusic");
-    break;
-  case 4:
-    system("xdg-open https://yotubue.com/milgra");
-    break;
-  }
 }
 
 view_t* songlistpopupitem_create(int index)

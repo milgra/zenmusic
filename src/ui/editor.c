@@ -6,6 +6,7 @@
 
 void   editor_attach(view_t* view, char* fontpath);
 void   editor_set_song(map_t* map);
+void   editor_set_songs(vec_t* vec);
 map_t* editor_get_old_data();
 map_t* editor_get_new_data();
 
@@ -244,6 +245,20 @@ map_t* editor_get_old_data()
 map_t* editor_get_new_data()
 {
   return editor.temp;
+}
+
+void editor_set_songs(vec_t* vec)
+{
+  if (vec->length > 0)
+  {
+    if (vec->length == 1)
+    {
+      editor_set_song(vec->data[0]);
+    }
+    else
+    {
+    }
+  }
 }
 
 #endif

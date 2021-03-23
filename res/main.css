@@ -240,7 +240,7 @@
     box-shadow: 3px;
 }
 
-#messagelistback {
+#messages_popup {
     width: 700px;
     height: 620px;
     top: 210px;
@@ -272,10 +272,18 @@
     height: 100%;
     margin: 10px;
     border-radius: 10px;
-    background-color: #AAAAAAFF;
+    background-color: #EEEEEEFF;
 }
 
-#filterlistback {
+.popup_content {
+    width: 100%;
+    height: 100%;
+    margin: 10px;
+    border-radius: 10px;
+    background-color: #EEEEEEFF;
+}
+
+#filters_popup {
     width: 480px;
     height: 620px;
     top: 210px;
@@ -292,7 +300,7 @@
     box-shadow: 2px;
 }
 
-#ideditorback {
+#song_editor_popup {
     width: 750px;
     height: 520px;
     top: 300px;
@@ -348,7 +356,7 @@
     height: 100%;
 }
 
-#settingsback {
+#settings_popup {
     width: 700px;
     height: 340px;
     top: 220px;
@@ -360,7 +368,7 @@
     width: 100%;
     height: 100%;
     border-radius: 15px;
-    background-color: #666666FF;
+    background-color: #EEEEEEFF;
     box-shadow: 2px;
 }
 
@@ -377,21 +385,21 @@
     height: 100%;
     margin: 10px;
     border-radius: 10px;
-    background-color: #666666FF;
+    background-color: #EEEEEEFF;
     box-shadow: 2px;
 }
 
-#dec_pop_bck {
+#decision_popup {
     width: 600px;
-    height: 200px;
+    height: 220px;
     top: 220px;
     margin: auto;
 }
 
 #dec_pop_tf {
     top: 20px;
-    width: 460px;
-    height: 70px;
+    width: 500px;
+    height: 100px;
     margin: auto;
     background-color: #00000000;
 }
@@ -400,21 +408,12 @@
     background-color: #FFFFFFFF;
     width: 30px;
     height: 30px;
+    bottom: 12px;
+    border-radius: 14px;
     right: 12px;
-    bottom: 12px;
-    border-radius: 14px;
 }
 
-#dec_pop_rej_btn {
-    background-color: #FFFFFFFF;
-    width: 30px;
-    height: 30px;
-    left: 12px;
-    bottom: 12px;
-    border-radius: 14px;
-}
-
-#sim_pop_bck {
+#simple_popup {
     width: 600px;
     height: 200px;
     top: 220px;
@@ -427,7 +426,7 @@
     background-color: #00000000;
 }
 
-#aboutback {
+#about_popup {
     width: 520px;
     height: 410px;
     top: 220px;
@@ -440,7 +439,7 @@
     height: 100%;
     margin: 10px;
     border-radius: 10px;
-    background-color: #AAAAAAFF;
+    background-color: #EEEEEEFF;
 }
 
 #home_info_txt {
@@ -579,7 +578,7 @@
     box-shadow: 3px;
 }
 
-#libpopuppage {
+#library_page {
     width: 100%;
     height: 100%;
     display: none;
@@ -593,7 +592,6 @@
 }
 
 .ch_lib_tf {
-    top: 20px;
     width: 460px;
     height: 70px;
     margin: auto;
@@ -601,12 +599,11 @@
 }
 
 .ch_lib_if {
-    top: 85px;
+    bottom: 10px;
     left: 10px;
-    width: 420px;
+    width: 380px;
     height: 35px;
     border-radius: 10px;
-    box-shadow: 3px;
     background-color: #FFFFFFFF;
 }
 
@@ -787,9 +784,9 @@
     border-radius: 14px;
 }
 
-#chlib_pop_bck {
+#library_popup {
     width: 500px;
-    height: 150px;
+    height: 180px;
     margin: auto;
     top: 190px;
 }
