@@ -142,11 +142,13 @@ void songlist_select(int index)
 {
   selected_res();
   selected_add(sl.index_s);
+  vh_list_refresh(sl.view);
 }
 
 void songlist_select_range(int index)
 {
   selected_rng(sl.index_s);
+  vh_list_refresh(sl.view);
 }
 
 void songlist_select_all()
@@ -154,12 +156,13 @@ void songlist_select_all()
   selected_res();
   selected_add(0);
   selected_rng(filtered_song_count());
+  vh_list_refresh(sl.view);
 }
 
 void songlist_get_selected(vec_t* vec)
 {
   // if selection is empty, select current index
-  if (selected_cnt() == 0) selected_add(sl.index_s);
+  if (selected_cnt() < 2) selected_add(sl.index_s);
   selected_add_selected(filtered_get_songs(), vec);
 }
 
@@ -180,6 +183,7 @@ void songlist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t
     {
       selected_add(index);
     }
+    printf("%i %i\n", index, ev.dclick);
     if (ev.dclick && sl.on_select) (*sl.on_select)(index);
 
     vh_list_refresh(sl.view);
@@ -187,6 +191,12 @@ void songlist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t
   else if (ev.button == 3)
   {
     if (sl.on_edit) (*sl.on_edit)(index);
+    if (selected_cnt() < 2)
+    {
+      selected_res();
+      selected_add(index);
+      vh_list_refresh(sl.view);
+    }
   }
 }
 

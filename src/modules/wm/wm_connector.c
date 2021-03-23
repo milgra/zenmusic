@@ -150,7 +150,7 @@ void wm_init(void (*init)(int, int, char*),
                 else
                 {
                   uint32_t delta = ev.time - lastclick;
-                  if (delta < 300) ev.dclick = 1;
+                  if (delta < 1000) ev.dclick = 1;
                   lastclick = 0;
                 }
               }

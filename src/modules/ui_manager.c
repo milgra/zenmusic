@@ -81,10 +81,10 @@ void ui_manager_event(ev_t ev)
           if (v->blocks_touch) break;
         }
       }
-
-      vec_reset(uim.touchqueue);
-      view_coll_touched(uim.root, ev, uim.touchqueue);
     }
+
+    vec_reset(uim.touchqueue);
+    view_coll_touched(uim.root, ev, uim.touchqueue);
 
     if (uim.scrollqueue->length > 0) vec_reset(uim.scrollqueue);
 

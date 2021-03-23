@@ -54,7 +54,6 @@ freebsd for os
 
 first version
 
-collect views on mouse down also ( if scrolled away )
 remove background rendering ( ui renderer? )
 seek bar decisec update
 clear cover art if not available

@@ -110,7 +110,16 @@ int selected_has(int i)
 
 int selected_cnt()
 {
-  return sel.length;
+  int cnt = 0;
+  for (int index = 0; index < sel.length; index++)
+  {
+    sel_rng_t rng = sel.ranges[index];
+    for (int r = rng.s; r < rng.e; r++)
+    {
+      cnt += rng.e - rng.s;
+    }
+  }
+  return cnt;
 }
 
 void selected_add_selected(vec_t* vec, vec_t* res)
