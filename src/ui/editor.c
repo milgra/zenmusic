@@ -5,7 +5,6 @@
 #include "view.c"
 
 void   editor_attach(view_t* view, char* fontpath);
-void   editor_set_song(map_t* map);
 void   editor_set_songs(vec_t* vec);
 map_t* editor_get_old_data();
 map_t* editor_get_new_data();
@@ -14,6 +13,7 @@ map_t* editor_get_new_data();
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "mtcstring.c"
 #include "mtvector.c"
 #include "text.c"
 #include "tg_text.c"
@@ -27,7 +27,7 @@ struct _editor_t
 {
   view_t*     listview;
   view_t*     headview;
-  map_t*      song;
+  map_t*      data;
   map_t*      temp;
   vec_t*      fields;
   vec_t*      items;
@@ -81,7 +81,7 @@ void editor_select_item(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
   if (strcmp(cell->id, "val") == 0)
   {
     char* key   = editor.fields->data[index];
-    char* value = MGET(editor.song, key);
+    char* value = MGET(editor.data, key);
 
     printf("key for item %s value %s\n", key, value);
 
@@ -167,19 +167,15 @@ void editor_remove_str(vec_t* vec, char* str)
   }
 }
 
-void editor_set_song(map_t* map)
+void editor_set_song()
 {
-  printf("editor set song\n");
-  mem_describe(map, 0);
-
   // reset temporary fields containers
   map_reset(editor.temp);
   vec_reset(editor.fields);
   vec_reset(editor.items);
 
   // store song and extract fields
-  editor.song = map;
-  map_keys(map, editor.fields);
+  map_keys(editor.data, editor.fields);
 
   // sort fields
   vec_sort(editor.fields, VSD_ASC, editor_comp_text);
@@ -204,9 +200,7 @@ void editor_set_song(map_t* map)
     view_t* item = editor_create_item();
 
     char* key   = editor.fields->data[index];
-    char* value = MGET(editor.song, key);
-
-    printf("ITEM %s %s\n", key, value);
+    char* value = MGET(editor.data, key);
 
     uint32_t color1            = (index % 2 == 0) ? 0xFEFEFEFF : 0xEFEFEFFF;
     editor.textstyle.backcolor = color1;
@@ -246,6 +240,7 @@ void editor_attach(view_t* view, char* fontpath)
   editor.fields    = VNEW();
   editor.textstyle = ts;
   editor.items     = VNEW();
+  editor.data      = MNEW();
 
   ts.backcolor = 0;
 
@@ -255,12 +250,12 @@ void editor_attach(view_t* view, char* fontpath)
 
   ts.align = TA_CENTER;
   tg_text_add(headview);
-  tg_text_set(headview, "Editing 1 song", ts);
+  tg_text_set(headview, "Editing 1 data", ts);
 }
 
 map_t* editor_get_old_data()
 {
-  return editor.song;
+  return editor.data;
 }
 
 map_t* editor_get_new_data()
@@ -272,19 +267,44 @@ void editor_set_songs(vec_t* vec)
 {
   if (vec->length > 0)
   {
-    if (vec->length == 1)
-    {
-      editor_set_song(vec->data[0]);
-    }
-    else
-    {
-    }
+    map_reset(editor.data);
 
-    char text[100];
-    snprintf(text, 100, "Editing %i song(s)", vec->length);
-    tg_text_add(editor.headview);
-    tg_text_set(editor.headview, text, editor.textstyle);
+    vec_t* fields = VNEW();
+    vec_t* values = VNEW();
+
+    for (int index = 0; index < vec->length; index++)
+    {
+      map_t* song = vec->data[index];
+      vec_reset(fields);
+      vec_reset(values);
+      map_keys(song, fields);
+
+      for (int fi = 0; fi < fields->length; fi++)
+      {
+        char* field = fields->data[fi];
+        char* value = MGET(song, field);
+        char* curr  = MGET(editor.data, field);
+
+        if (curr == NULL)
+        {
+          MPUT(editor.data, field, value);
+        }
+        else
+        {
+          if (strcmp(curr, value) != 0) MPUT(editor.data, field, cstr_fromcstring("MULTIPLE"));
+        }
+      }
+    }
+    editor_set_song();
+
+    REL(fields);
+    REL(values);
   }
+
+  char text[100];
+  snprintf(text, 100, "Editing %i song(s)", vec->length);
+  tg_text_add(editor.headview);
+  tg_text_set(editor.headview, text, editor.textstyle);
 }
 
 #endif
