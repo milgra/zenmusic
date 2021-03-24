@@ -22,6 +22,7 @@ void ui_show_query(char* text);
 void ui_play_next();
 void ui_set_libpath(char* libpath);
 void ui_set_org_btn_lbl(char* text);
+void ui_show_simple_popup(char* text);
 
 #endif
 
@@ -31,7 +32,7 @@ void ui_set_org_btn_lbl(char* text);
 #include "callbacks.c"
 #include "database.c"
 #include "donatelist.c"
-#include "editor.c"
+#include "editor_popup.c"
 #include "filtered.c"
 #include "itemlist.c"
 #include "mtcstring.c"
@@ -177,30 +178,46 @@ void ui_editor_accept()
 {
   ui_toggle_mainview(editor_popup);
 
-  map_t* old_data = editor_get_old_data();
-  map_t* new_data = editor_get_new_data();
+  map_t* changes = editor_popup_get_changes();
 
-  // update modified entity in database
-  vec_t* keys = VNEW();
-  map_keys(new_data, keys);
-  for (int index = 0; index < keys->length; index++)
-  {
-    char* key    = keys->data[index];
-    char* oldval = MGET(old_data, key);
-    char* newval = MGET(new_data, key);
+  printf("CHANGES:");
+  mem_describe(changes, 0);
 
-    if (strcmp(oldval, newval) != 0)
-    {
-      printf("%s changed from %s to %s, writing to db\n", key, oldval, newval);
-      MPUT(old_data, key, newval);
-    }
-  }
+  printf("SELECTED:");
+  mem_describe(ui.selected, 0);
 
-  // notify main namespace to organize and save metadata and database
-  callbacks_call("on_save_entry", old_data);
+  ui_show_simple_popup("ARE YOU SURE?");
 
-  // reload song list
-  songlist_refresh();
+  // update metadata in media files
+
+  // update metadata in database
+
+  // organize library ( if path has to change )
+
+  /* map_t* old_data = editor_popup_get_old_data(); */
+  /* map_t* new_data = editor_popup_get_new_data(); */
+
+  /* // update modified entity in database */
+  /* vec_t* keys = VNEW(); */
+  /* map_keys(new_data, keys); */
+  /* for (int index = 0; index < keys->length; index++) */
+  /* { */
+  /*   char* key    = keys->data[index]; */
+  /*   char* oldval = MGET(old_data, key); */
+  /*   char* newval = MGET(new_data, key); */
+
+  /*   if (strcmp(oldval, newval) != 0) */
+  /*   { */
+  /*     printf("%s changed from %s to %s, writing to db\n", key, oldval, newval); */
+  /*     MPUT(old_data, key, newval); */
+  /*   } */
+  /* } */
+
+  /* // notify main namespace to organize and save metadata and database */
+  /* callbacks_call("on_save_entry", old_data); */
+
+  /* // reload song list */
+  /* songlist_refresh(); */
 }
 
 void ui_change_library()
@@ -534,7 +551,7 @@ void ui_on_songlistpopup_select(int index)
   {
     vec_reset(ui.selected);
     songlist_get_selected(ui.selected);
-    editor_set_songs(ui.selected);
+    editor_popup_set_songs(ui.selected);
     ui_toggle_mainview(editor_popup);
   }
   if (index == 4)
@@ -738,7 +755,7 @@ void ui_init(float width,
 
   editor_popup = view_get_subview(baseview, "song_editor_popup");
 
-  editor_attach(editor_popup, fontpath);
+  editor_popup_attach(editor_popup, fontpath);
 
   vh_fade_add(editor_popup, editor_popup, ui_remove_from_main);
 

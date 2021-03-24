@@ -308,6 +308,7 @@
 }
 
 #editorlistback {
+    overflow: hidden;
     width: 510px;
     height: 400px;
     top: 50px;
@@ -317,10 +318,8 @@
 }
 
 #editorlist {
-    overflow: hidden;
     width: 100%;
     height: 100%;
-    border-radius: 15px;
     background-color: #FFFFFFFF;
 }
 
@@ -361,6 +360,20 @@
 }
 
 #uploadbtn {
+    width: 100%;
+    height: 100%;
+}
+
+#newfieldbtnbck {
+    top: 250px;
+    right: 10px;
+    width: 150px;
+    height: 30px;
+    background-color: #FFFFFFFF;
+    border-radius: 10px;
+}
+
+#newfieldbtn {
     width: 100%;
     height: 100%;
 }
