@@ -56,7 +56,7 @@ first version
 
 show cover art in editor popup
 edit multiple items
-remove google id
+remove google id    
 
 remove background rendering ( ui renderer? )
 clear cover art if not available

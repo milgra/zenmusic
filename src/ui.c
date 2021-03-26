@@ -62,8 +62,11 @@ void ui_show_simple_popup(char* text);
 #include "ui_manager.c"
 
 view_t* baseview;
+
 view_t* timeview;
 view_t* leftview;
+view_t* timeview;
+view_t* lengthview;
 
 view_t* about_popup;
 view_t* editor_popup;
@@ -470,6 +473,7 @@ void ui_update_time(double time, double left, double dur)
   ts.size        = 30.0;
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0;
+  ts.margin_left = 12;
 
   char timebuff[20];
 
@@ -480,10 +484,12 @@ void ui_update_time(double time, double left, double dur)
   int dmin = (int)floor(dur / 60.0);
   int dsec = (int)dur % 60;
 
-  ts.align = TA_CENTER;
-  snprintf(timebuff, 20, "%.2i:%.2i / %.2i:%.2i", dmin, dsec, tmin, tsec);
+  ts.align = TA_LEFT;
+  snprintf(timebuff, 20, "%.2i:%.2i", dmin, dsec);
+  tg_text_set(lengthview, timebuff, ts);
+  snprintf(timebuff, 20, "%.2i:%.2i", tmin, tsec);
   tg_text_set(timeview, timebuff, ts);
-  snprintf(timebuff, 20, "%.2i:%.2i / %.2i:%.2i", dmin, dsec, lmin, lsec);
+  snprintf(timebuff, 20, "%.2i:%.2i", lmin, lsec);
   tg_text_set(leftview, timebuff, ts);
 }
 
@@ -697,25 +703,17 @@ void ui_init(float width,
 
   // display views
 
-  view_t* timeback = view_get_subview(baseview, "timebck");
-  timeview         = view_get_subview(baseview, "time");
-  leftview         = view_get_subview(baseview, "left");
+  timeview   = view_get_subview(baseview, "time");
+  leftview   = view_get_subview(baseview, "left");
+  lengthview = view_get_subview(baseview, "length");
 
-  vh_button_add(timeback, VH_BUTTON_TOGGLE, NULL);
+  tg_text_add(timeview);
+  tg_text_add(leftview);
+  tg_text_add(lengthview);
 
   ts.margin_right = 0;
   ts.textcolor    = 0x000000FF;
   ts.backcolor    = 0x0;
-
-  ts.align = TA_LEFT;
-
-  tg_text_add(timeview);
-  tg_text_set(timeview, "00:", ts);
-
-  ts.align = TA_RIGHT;
-
-  tg_text_add(leftview);
-  tg_text_set(leftview, "00:", ts);
 
   ts.align = TA_LEFT;
 

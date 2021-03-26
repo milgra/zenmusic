@@ -9,7 +9,9 @@
 #include "mtmap.c"
 #include "mtvector.c"
 
-void editor_update_metadata(vec_t* songs, map_t* data);
+void editor_update_metadata(vec_t* songs, map_t* data, map_t* drop, char* cover);
+int  editor_get_metadata(const char* path, map_t* map);
+int  editor_set_metadata(map_t* data, char* img_path);
 
 #endif
 
@@ -21,6 +23,16 @@ void editor_update_metadata(vec_t* songs, map_t* data);
 #include "mtcstring.c"
 #include "mtgraphics.c"
 #include "mtlog.c"
+
+void editor_update_metadata(vec_t* songs, map_t* data, map_t* drop, char* cover)
+{
+  for (int index = 0; index < songs->length; index++)
+  {
+    map_t* data = songs->data[index];
+    char*  path = MGET(data, "path");
+    //  editor_set_metadata(path, data, drop, cover);
+  }
+}
 
 int editor_get_metadata(const char* path, map_t* map)
 {

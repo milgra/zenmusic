@@ -1,6 +1,7 @@
 #include "callbacks.c"
 #include "config.c"
 #include "database.c"
+#include "editor.c"
 #include "filtered.c"
 #include "library.c"
 #include "mtcallback.c"
@@ -29,7 +30,7 @@ void on_save_entry(void* userdata, void* data)
 {
   map_t* entry = data;
   // update metadata in file
-  player_set_metadata(entry, "king.jpg");
+  editor_set_metadata(entry, "king.jpg");
 
   // move song to new place if needed
   lib_organize_entry(libpath, db_get_db(), entry);

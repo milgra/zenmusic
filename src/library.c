@@ -20,9 +20,9 @@ int  lib_mkpath(char* file_path, mode_t mode);
 #define __USE_XOPEN_EXTENDED 1 // needed for linux
 #include <ftw.h>
 
+#include "editor.c"
 #include "mtcstring.c"
 #include "mtlog.c"
-#include "player.c"
 #include <errno.h>
 #include <limits.h>
 #include <stdio.h>
@@ -154,7 +154,7 @@ int analyzer_thread(void* chptr)
       MPUT(curr, "size", size);
       char* real = cstr_fromformat("%s%s", lib_path, path, NULL);
 
-      int res = player_get_metadata(real, curr);
+      int res = editor_get_metadata(real, curr);
       REL(real);
 
       if (res == 0)
