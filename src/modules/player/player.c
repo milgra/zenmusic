@@ -32,7 +32,6 @@ int  player_refresh();
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "SDL_image.h"
 #include "libavformat/avformat.h"
 #include "libavutil/imgutils.h"
 #include "mtcstring.c"

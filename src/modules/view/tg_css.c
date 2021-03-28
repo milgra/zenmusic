@@ -22,10 +22,9 @@ void tg_css_add(view_t* view);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#define STB_IMAGE_IMPLEMENTATION
+#include "editor.c"
 #include "mtcstring.c"
 #include "mtgraphics.c"
-#include "stb_image.h"
 
 uint32_t tg_css_graycolor = 0;
 
@@ -46,19 +45,9 @@ void tg_css_gen(view_t* view)
         view_set_texture_bmp(view, bm);
       }
 
-      int            c, w, h;
-      unsigned char* imagebytes = stbi_load(view->layout.background_image, &w, &h, &c, 4);
-      if (imagebytes != NULL)
-      {
-        bm_t* imagebmp = bm_new(w, h);
-        memcpy(imagebmp->data, imagebytes, imagebmp->size);
-        stbi_image_free(imagebytes);
-        gfx_insert(bm, imagebmp, 0, 0);
-        REL(imagebmp);
-        view->texture.changed = 1;
-      }
-      else
-        printf("invalid image : %s\n", view->layout.background_image);
+      bm_t* bmap = editor_get_image(view->layout.background_image);
+      view_set_texture_bmp(view, bmap);
+      REL(bmap);
     }
     else if (view->layout.background_color)
     {

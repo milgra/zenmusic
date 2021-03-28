@@ -9,17 +9,17 @@
 #include "mtmap.c"
 #include "mtvector.c"
 
-void editor_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop, char* cover);
-int  editor_get_metadata(const char* path, map_t* map);
-int  editor_set_metadata(map_t* data, char* img_path);
-void editor_get_album(const char* path, bm_t* bitmap);
-void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* drop, char* cover);
+void  editor_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop, char* cover);
+int   editor_get_metadata(const char* path, map_t* map);
+int   editor_set_metadata(map_t* data, char* img_path);
+void  editor_get_album(const char* path, bm_t* bitmap);
+void  editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* drop, char* cover);
+bm_t* editor_get_image(const char* path);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "SDL_image.h"
 #include "libavformat/avformat.h"
 #include "libavutil/imgutils.h"
 #include "libswscale/swscale.h"
@@ -470,6 +470,98 @@ void editor_get_album(const char* path, bm_t* bitmap)
       }
     }
   }
+}
+
+bm_t* editor_get_image(const char* path)
+{
+  printf("editor_get_image %s\n", path);
+
+  int i, ret = 0;
+
+  AVFormatContext* src_ctx = avformat_alloc_context();
+
+  /* // open the specified path */
+  if (avformat_open_input(&src_ctx, path, NULL, NULL) != 0)
+  {
+    printf("avformat_open_input() failed");
+  }
+
+  // find the first attached picture, if available
+  for (i = 0; i < src_ctx->nb_streams; i++)
+  {
+    if (src_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
+    {
+      AVCodecParameters* param = src_ctx->streams[i]->codecpar;
+
+      printf("codec %i\n", param->codec_id);
+
+      const AVCodec*  codec        = avcodec_find_decoder(param->codec_id);
+      AVCodecContext* codecContext = avcodec_alloc_context3(codec);
+
+      avcodec_parameters_to_context(codecContext, param);
+      avcodec_open2(codecContext, codec, NULL);
+
+      AVPacket* packet = av_packet_alloc();
+      AVFrame*  frame  = av_frame_alloc();
+
+      while (av_read_frame(src_ctx, packet) >= 0)
+      {
+        avcodec_send_packet(codecContext, packet);
+      }
+
+      avcodec_receive_frame(codecContext, frame);
+
+      printf("received frame %i %i\n", frame->width, frame->height);
+
+      static unsigned sws_flags = SWS_BICUBIC;
+
+      struct SwsContext* img_convert_ctx = sws_getContext(frame->width,
+                                                          frame->height,
+                                                          frame->format,
+                                                          frame->width,
+                                                          frame->height,
+                                                          AV_PIX_FMT_RGBA,
+                                                          sws_flags,
+                                                          NULL,
+                                                          NULL,
+                                                          NULL);
+
+      if (img_convert_ctx != NULL)
+      {
+        bm_t* bitmap = bm_new(frame->width, frame->height);
+
+        uint8_t* scaledpixels[1];
+        scaledpixels[0] = malloc(bitmap->w * bitmap->h * 4);
+
+        printf("converting...\n");
+
+        uint8_t* pixels[4];
+        int      pitch[4];
+
+        pitch[0] = bitmap->w * 4;
+        sws_scale(img_convert_ctx,
+                  (const uint8_t* const*)frame->data,
+                  frame->linesize,
+                  0,
+                  frame->height,
+                  scaledpixels,
+                  pitch);
+
+        gfx_rect(bitmap, 0, 0, bitmap->w, bitmap->h, 0xFF0000FF, 0);
+
+        gfx_insert_rgba(bitmap,
+                        scaledpixels[0],
+                        bitmap->w,
+                        bitmap->h,
+                        0,
+                        0);
+
+        return bitmap;
+      }
+    }
+  }
+
+  return NULL;
 }
 
 // get duration

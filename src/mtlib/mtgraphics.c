@@ -33,7 +33,9 @@ void gfx_rect(bm_t*    bm,
               char     la); // leave alpha channel untouched
 void gfx_blend_rgba(bm_t* bm, int nx, int ny, bm_t* nbm);
 void gfx_insert(bm_t* base, bm_t* src, int sx, int sy);
+void gfx_insert_rgba(bm_t* base, uint8_t* src, int w, int h, int sx, int sy);
 void gfx_insert_rgb(bm_t* base, uint8_t* src, int w, int h, int sx, int sy);
+void gfx_insert_rgba(bm_t* base, uint8_t* src, int w, int h, int sx, int sy);
 void gfx_blend_8(bm_t* bm, int nx, int ny, uint32_t color, unsigned char* ndata, int nw, int nh);
 void gfx_blend_pixel(bm_t* bm, int x, int y, uint32_t color);
 
@@ -451,6 +453,36 @@ void gfx_insert_rgb(bm_t* base, uint8_t* src, int w, int h, int sx, int sy)
       bdata[bi]     = r;
       bdata[bi + 1] = g;
       bdata[bi + 2] = b;
+    }
+  }
+}
+
+void gfx_insert_rgba(bm_t* base, uint8_t* src, int w, int h, int sx, int sy)
+{
+  int bx = sx + w;
+  if (bx > base->w) bx = base->w;
+  int by = sy + h;
+  if (by > base->h) by = base->h;
+
+  uint8_t* sdata = src;        // src data
+  uint8_t* bdata = base->data; // base data
+
+  for (int y = sy; y < by; y++)
+  {
+    for (int x = sx; x < bx; x++)
+    {
+      int si = ((y - sy) * w + (x - sx)) * 4; // src index
+      int bi = (y * base->w + x) * 4;         // base index
+
+      uint8_t r = sdata[si];
+      uint8_t g = sdata[si + 1];
+      uint8_t b = sdata[si + 2];
+      uint8_t a = sdata[si + 3];
+
+      bdata[bi]     = r;
+      bdata[bi + 1] = g;
+      bdata[bi + 2] = b;
+      bdata[bi + 3] = a;
     }
   }
 }

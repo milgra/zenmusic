@@ -38,7 +38,6 @@ LDFLAGS = \
 	-lGL \
 	-lGLEW \
 	-lSDL2 \
-	-lSDL2_image \
 	-lavutil \
 	-lavcodec \
 	-lavdevice \

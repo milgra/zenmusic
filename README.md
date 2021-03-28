@@ -56,7 +56,6 @@ first version
 
 filter fix
 remove google id    
-remove stb image and sdl image
 remove background rendering ( ui renderer? )
 clear cover art if not available
 artist-album sort
