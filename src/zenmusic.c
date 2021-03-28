@@ -30,13 +30,13 @@ void on_save_entry(void* userdata, void* data)
 {
   map_t* entry = data;
   // update metadata in file
-  editor_set_metadata(entry, "king.jpg");
+  //editor_set_metadata(entry, "king.jpg");
 
   // move song to new place if needed
-  lib_organize_entry(libpath, db_get_db(), entry);
+  //lib_organize_entry(libpath, db_get_db(), entry);
 
   // save database
-  db_write(libpath);
+  //db_write(libpath);
 }
 
 void on_song_header(void* userdata, void* data)

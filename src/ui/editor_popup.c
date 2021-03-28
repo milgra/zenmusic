@@ -6,9 +6,9 @@
 
 void   editor_popup_attach(view_t* view, char* fontpath);
 void   editor_popup_set_songs(vec_t* vec);
-map_t* editor_popup_get_old_data();
-map_t* editor_popup_get_new_data();
-map_t* editor_popup_get_changes();
+map_t* editor_popup_get_changed();
+vec_t* editor_popup_get_removed();
+char*  editor_popup_get_cover();
 
 #endif
 
@@ -35,7 +35,9 @@ struct _editor_popup_t
   vec_t* fields;
   vec_t* items;
 
-  map_t* changes;
+  map_t* changed;
+  vec_t* removed;
+  char*  cover;
 
   view_t*     sel_item;
   textstyle_t textstyle;
@@ -60,7 +62,7 @@ void editor_popup_input_cell_edit_finished(view_t* inputview)
   char* key  = data->userdata;
   char* text = str_cstring(data->text);
 
-  MPUT(ep.changes, key, text);
+  MPUT(ep.changed, key, text);
 
   printf("editor_popup_input_cell_edit_finished key %s text %s\n", key, text);
 
@@ -126,7 +128,7 @@ void editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, ev_
     tg_text_set(vh_litem_get_cell(itemview, "val"), value, ep.textstyle);
     tg_text_set(vh_litem_get_cell(itemview, "del"), "Remove", ep.textstyle);
 
-    MPUT(ep.changes, key, cstr_fromcstring(""));
+    VADD(ep.removed, key);
   }
 }
 
@@ -265,7 +267,9 @@ void editor_popup_attach(view_t* view, char* fontpath)
   ep.textstyle = ts;
   ep.items     = VNEW();
   ep.data      = MNEW();
-  ep.changes   = MNEW();
+  ep.changed   = MNEW();
+  ep.removed   = VNEW();
+  ep.cover     = NULL;
 
   ts.backcolor = 0;
 
@@ -282,19 +286,19 @@ void editor_popup_attach(view_t* view, char* fontpath)
   tg_text_set(headview, "Editing 1 data", ts);
 }
 
-map_t* editor_popup_get_old_data()
+map_t* editor_popup_get_changed()
 {
-  return ep.data;
+  return ep.changed;
 }
 
-map_t* editor_popup_get_new_data()
+vec_t* editor_popup_get_removed()
 {
-  return ep.temp;
+  return ep.removed;
 }
 
-map_t* editor_popup_get_changes()
+char* editor_popup_get_cover()
 {
-  return ep.changes;
+  return ep.cover;
 }
 
 void editor_popup_set_songs(vec_t* vec)
@@ -302,7 +306,8 @@ void editor_popup_set_songs(vec_t* vec)
   if (vec->length > 0)
   {
     map_reset(ep.data);
-    map_reset(ep.changes);
+    map_reset(ep.changed);
+    vec_reset(ep.removed);
 
     vec_t* fields = VNEW();
     vec_t* values = VNEW();

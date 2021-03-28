@@ -30,8 +30,10 @@ void ui_show_simple_popup(char* text);
 
 #include "activity.c"
 #include "callbacks.c"
+#include "config.c"
 #include "database.c"
 #include "donatelist.c"
+#include "editor.c"
 #include "editor_popup.c"
 #include "filtered.c"
 #include "itemlist.c"
@@ -181,15 +183,15 @@ void ui_editor_accept()
 {
   ui_toggle_mainview(editor_popup);
 
-  map_t* changes = editor_popup_get_changes();
+  map_t* changed = editor_popup_get_changed();
+  vec_t* removed = editor_popup_get_removed();
+  char*  cover   = editor_popup_get_cover();
 
-  printf("CHANGES:");
-  mem_describe(changes, 0);
+  // ui_show_simple_popup("ARE YOU SURE?");
 
-  printf("SELECTED:");
-  mem_describe(ui.selected, 0);
+  char* libpath = config_get("library_path");
 
-  ui_show_simple_popup("ARE YOU SURE?");
+  editor_update_metadata(libpath, ui.selected, changed, removed, cover);
 
   // update metadata in media files
 
