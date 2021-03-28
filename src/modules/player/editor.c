@@ -12,6 +12,7 @@
 void editor_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop, char* cover);
 int  editor_get_metadata(const char* path, map_t* map);
 int  editor_set_metadata(map_t* data, char* img_path);
+void editor_get_album(const char* path, bm_t* bitmap);
 void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* drop, char* cover);
 
 #endif
@@ -21,6 +22,7 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
 #include "SDL_image.h"
 #include "libavformat/avformat.h"
 #include "libavutil/imgutils.h"
+#include "libswscale/swscale.h"
 #include "mtcstring.c"
 #include "mtgraphics.c"
 #include "mtlog.c"
@@ -334,6 +336,7 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
               if (img_codecpar)
               {
                 printf("adding new cover art\n");
+                // TODO check stream index!!!
                 img_pkt->stream_index = 1;
 
                 res = av_write_frame(out_ctx, img_pkt);
@@ -354,6 +357,11 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
               avformat_free_context(src_ctx);
 
               printf("written file : %s\n", newpath);
+
+              // rename new file to old name
+
+              if (rename(newpath, oldpath) != 0)
+                LOG("ERROR : editor_set_metadata : cannot rename new file to old name\n");
             }
             else
               LOG("ERROR : editor_set_metadata : cannot write header\n");
@@ -374,62 +382,94 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
     LOG("ERROR : editor_set_metadata : cannot open input file\n");
 }
 
-bm_t* editor_get_album(const char* path)
+void editor_get_album(const char* path, bm_t* bitmap)
 {
   assert(path != NULL);
 
+  printf("editor_get_album %s %i %i\n", path, bitmap->w, bitmap->h);
+
   int i, ret = 0;
 
-  AVFormatContext* pFormatCtx = avformat_alloc_context();
+  AVFormatContext* src_ctx = avformat_alloc_context();
 
   /* // open the specified path */
-  if (avformat_open_input(&pFormatCtx, path, NULL, NULL) != 0)
+  if (avformat_open_input(&src_ctx, path, NULL, NULL) != 0)
   {
     printf("avformat_open_input() failed");
-    goto fail;
   }
 
   bm_t* result = NULL;
 
   // find the first attached picture, if available
-  for (i = 0; i < pFormatCtx->nb_streams; i++)
-    if (pFormatCtx->streams[i]->disposition & AV_DISPOSITION_ATTACHED_PIC)
+  for (i = 0; i < src_ctx->nb_streams; i++)
+  {
+    if (src_ctx->streams[i]->disposition & AV_DISPOSITION_ATTACHED_PIC)
     {
-      AVPacket pkt = pFormatCtx->streams[i]->attached_pic;
+      AVPacket pkt = src_ctx->streams[i]->attached_pic;
+
       printf("ALBUM ART SIZE %i\n", pkt.size);
 
-      SDL_RWops*   rw = SDL_RWFromMem(pkt.data, pkt.size);
-      SDL_Surface* image;
-      image = IMG_Load_RW(rw, 1);
-      if (!image)
+      AVCodecParameters* param = src_ctx->streams[i]->codecpar;
+
+      printf("Resolution %d x %d codec %i\n", param->width, param->height, param->codec_id);
+
+      const AVCodec*  codec        = avcodec_find_decoder(param->codec_id);
+      AVCodecContext* codecContext = avcodec_alloc_context3(codec);
+
+      avcodec_parameters_to_context(codecContext, param);
+      avcodec_open2(codecContext, codec, NULL);
+
+      AVFrame* frame = av_frame_alloc();
+
+      avcodec_send_packet(codecContext, &pkt);
+      avcodec_receive_frame(codecContext, frame);
+
+      printf("received frame %i %i\n", frame->width, frame->height);
+
+      static unsigned sws_flags = SWS_BICUBIC;
+
+      struct SwsContext* img_convert_ctx = sws_getContext(frame->width,
+                                                          frame->height,
+                                                          frame->format,
+                                                          bitmap->w,
+                                                          bitmap->h,
+                                                          AV_PIX_FMT_RGBA,
+                                                          sws_flags,
+                                                          NULL,
+                                                          NULL,
+                                                          NULL);
+
+      if (img_convert_ctx != NULL)
       {
-        printf("IMG_Load_RW: %s\n", IMG_GetError());
-        // handle error
+        uint8_t* scaledpixels[1];
+        scaledpixels[0] = malloc(bitmap->w * bitmap->h * 4);
+
+        printf("converting...\n");
+
+        uint8_t* pixels[4];
+        int      pitch[4];
+
+        pitch[0] = bitmap->w * 4;
+        sws_scale(img_convert_ctx,
+                  (const uint8_t* const*)frame->data,
+                  frame->linesize,
+                  0,
+                  frame->height,
+                  scaledpixels,
+                  pitch);
+
+        if (bitmap)
+        {
+          gfx_insert_rgb(bitmap,
+                         scaledpixels[0],
+                         bitmap->w,
+                         bitmap->h,
+                         0,
+                         0);
+        }
       }
-      else
-        printf("IMG SUCCESS %i %i %i\n", image->format->BytesPerPixel, image->w, image->h);
-
-      /* int            components, w, h; */
-      /* unsigned char* bytes = stbi_load_from_memory(pkt.data, pkt.size, &w, &h, &components, 4); */
-
-      result = bm_new(image->w, image->h);
-      gfx_insert_rgb(result, image->pixels, image->w, image->h, 0, 0);
-      //memcpy(result->data, image->pixels, image->w * image->h * 4);
-
-      av_packet_unref(&pkt);
-      break;
     }
-
-  //avformat_free_context(pFormatCtx);
-
-  printf("returning\n");
-  return result;
-
-fail:
-  av_free(pFormatCtx);
-  return NULL;
-  // this line crashes for some reason...
-  //avformat_free_context(pFormatCtx);
+  }
 }
 
 // get duration

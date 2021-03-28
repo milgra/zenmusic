@@ -54,14 +54,12 @@ freebsd for os
 
 first version
 
-show cover art in editor popup
-edit multiple items
+filter fix
 remove google id    
-
+remove stb image and sdl image
 remove background rendering ( ui renderer? )
 clear cover art if not available
 artist-album sort
-filter fix
 search/filter history ( use filters for playlists)
 on mute fade in/out volume with alpha
 select anim

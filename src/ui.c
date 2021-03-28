@@ -559,7 +559,7 @@ void ui_on_songlistpopup_select(int index)
   {
     vec_reset(ui.selected);
     songlist_get_selected(ui.selected);
-    editor_popup_set_songs(ui.selected);
+    editor_popup_set_songs(ui.selected, ui_libpath);
     ui_toggle_mainview(editor_popup);
   }
   if (index == 4)

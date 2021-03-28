@@ -5,7 +5,7 @@
 #include "view.c"
 
 void   editor_popup_attach(view_t* view, char* fontpath);
-void   editor_popup_set_songs(vec_t* vec);
+void   editor_popup_set_songs(vec_t* vec, char* libpath);
 map_t* editor_popup_get_changed();
 vec_t* editor_popup_get_removed();
 char*  editor_popup_get_cover();
@@ -14,6 +14,7 @@ char*  editor_popup_get_cover();
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "editor.c"
 #include "mtcstring.c"
 #include "mtvector.c"
 #include "text.c"
@@ -28,6 +29,7 @@ struct _editor_popup_t
 {
   view_t* listview;
   view_t* headview;
+  view_t* coverview;
 
   map_t* data;
   map_t* temp;
@@ -247,8 +249,9 @@ void editor_popup_set_song()
 
 void editor_popup_attach(view_t* view, char* fontpath)
 {
-  view_t* listview = view_get_subview(view, "editorlist");
-  view_t* headview = view_get_subview(view, "ideditorheader");
+  view_t* listview  = view_get_subview(view, "editorlist");
+  view_t* headview  = view_get_subview(view, "ideditorheader");
+  view_t* coverview = view_get_subview(view, "coverview");
 
   vh_list_add(listview, editor_popup_item_for_index, NULL, NULL);
 
@@ -262,6 +265,7 @@ void editor_popup_attach(view_t* view, char* fontpath)
 
   ep.headview  = headview;
   ep.listview  = listview;
+  ep.coverview = coverview;
   ep.temp      = MNEW();
   ep.fields    = VNEW();
   ep.textstyle = ts;
@@ -301,7 +305,7 @@ char* editor_popup_get_cover()
   return ep.cover;
 }
 
-void editor_popup_set_songs(vec_t* vec)
+void editor_popup_set_songs(vec_t* vec, char* libpath)
 {
   if (vec->length > 0)
   {
@@ -345,6 +349,19 @@ void editor_popup_set_songs(vec_t* vec)
   snprintf(text, 100, "Editing %i song(s)", vec->length);
   tg_text_add(ep.headview);
   tg_text_set(ep.headview, text, ep.textstyle);
+
+  // load cover
+
+  if (ep.coverview->texture.bitmap)
+  {
+
+    map_t* song = vec->data[0];
+    char*  path = MGET(song, "path");
+    char*  file = cstr_fromformat("%s%s", libpath, path, NULL);
+
+    editor_get_album(file, ep.coverview->texture.bitmap);
+    ep.coverview->texture.changed = 1;
+  }
 }
 
 #endif
