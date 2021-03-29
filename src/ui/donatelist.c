@@ -213,12 +213,14 @@ void donatelist_attach(view_t* view, char* fontpath, void (*popup)(char* text))
   VADD(donl.items, donateitem_create(2));
   VADD(donl.items, donateitem_create(3));
   VADD(donl.items, donateitem_create(4));
+  VADD(donl.items, donateitem_create(5));
 
   donateitem_update_row(donl.items->data[0], 0, "Zen Music v0.8\n by Milan Toth\nFree and Open Source Software.\nIf you like it, please support the development.");
   donateitem_update_row(donl.items->data[1], 1, "Donate on Paypal");
   donateitem_update_row(donl.items->data[2], 2, "Support on Patreon");
   donateitem_update_row(donl.items->data[3], 3, "GitHub Page");
   donateitem_update_row(donl.items->data[4], 4, "Youtube Channel");
+  donateitem_update_row(donl.items->data[5], 5, "Report an Issue");
 }
 
 #endif

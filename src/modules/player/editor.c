@@ -474,8 +474,6 @@ void editor_get_album(const char* path, bm_t* bitmap)
 
 bm_t* editor_get_image(const char* path)
 {
-  printf("editor_get_image %s\n", path);
-
   int i, ret = 0;
 
   AVFormatContext* src_ctx = avformat_alloc_context();
@@ -493,8 +491,6 @@ bm_t* editor_get_image(const char* path)
     {
       AVCodecParameters* param = src_ctx->streams[i]->codecpar;
 
-      printf("codec %i\n", param->codec_id);
-
       const AVCodec*  codec        = avcodec_find_decoder(param->codec_id);
       AVCodecContext* codecContext = avcodec_alloc_context3(codec);
 
@@ -510,8 +506,6 @@ bm_t* editor_get_image(const char* path)
       }
 
       avcodec_receive_frame(codecContext, frame);
-
-      printf("received frame %i %i\n", frame->width, frame->height);
 
       static unsigned sws_flags = SWS_BICUBIC;
 
@@ -532,8 +526,6 @@ bm_t* editor_get_image(const char* path)
 
         uint8_t* scaledpixels[1];
         scaledpixels[0] = malloc(bitmap->w * bitmap->h * 4);
-
-        printf("converting...\n");
 
         uint8_t* pixels[4];
         int      pitch[4];

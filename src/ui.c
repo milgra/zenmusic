@@ -109,6 +109,9 @@ view_t* chlib_pop_if;
 view_t* library_popup;
 view_t* set_org_btn_txt;
 
+textlist_t* artistlist;
+textlist_t* genrelist;
+
 size_t lastindex = 0;
 char*  fontpath;
 char*  ui_libpath;
@@ -314,6 +317,9 @@ void ui_on_color_select(void* userdata, void* data)
 
 void ui_on_filter_activate(view_t* view)
 {
+  textlist_update(genrelist);
+  textlist_update(artistlist);
+
   ui_toggle_mainview(filters_popup);
 }
 
@@ -685,10 +691,10 @@ void ui_init(float width,
   ts.align        = TA_RIGHT;
   ts.margin_right = 20;
 
-  textlist_t* genrelist = textlist_new(view_get_subview(baseview, "genrelist"), filtered_get_genres(), ts, ui_on_genre_select);
+  genrelist = textlist_new(view_get_subview(baseview, "genrelist"), filtered_get_genres(), ts, ui_on_genre_select);
 
-  ts.align               = TA_LEFT;
-  textlist_t* artistlist = textlist_new(view_get_subview(baseview, "artistlist"), filtered_get_artists(), ts, ui_on_artist_select);
+  ts.align   = TA_LEFT;
+  artistlist = textlist_new(view_get_subview(baseview, "artistlist"), filtered_get_artists(), ts, ui_on_artist_select);
 
   messages_popup      = view_get_subview(baseview, "messages_popup");
   view_t* messagelist = view_get_subview(baseview, "messagelist");

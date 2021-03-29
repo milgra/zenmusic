@@ -55,6 +55,8 @@ freebsd for os
 first version
 
 filter fix
+search history popup
+genre/artist popup
 remove google id    
 remove background rendering ( ui renderer? )
 clear cover art if not available

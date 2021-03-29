@@ -35,6 +35,8 @@ textlist_t* textlist_new(view_t* view, vec_t* items, textstyle_t textstyle, void
 {
   textlist_t* tl = mem_calloc(sizeof(textlist_t), "textlist", textlist_del, NULL);
 
+  mem_describe(items, 0);
+
   tl->items = items;
 
   tl->view      = view;
@@ -80,6 +82,7 @@ view_t* textlist_create_item(textlist_t* tl)
 
 view_t* textlist_item_for_index(int index, void* data, view_t* listview, int* item_count)
 {
+  printf("ITEM FORMIDEX%i\n", index);
   textlist_t* tl = data;
   if (index < 0)
     return NULL; // no items before 0
@@ -95,9 +98,10 @@ view_t* textlist_item_for_index(int index, void* data, view_t* listview, int* it
   tl->textstyle.backcolor = color;
 
   vh_litem_upd_index(item, index);
+
   tg_text_set(vh_litem_get_cell(item, "cell"), tl->items->data[index], tl->textstyle);
 
-  return 0;
+  return item;
 }
 
 #endif

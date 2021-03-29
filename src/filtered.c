@@ -295,6 +295,8 @@ void filtered_update()
   {
     vec_reset(flt.songs);
     map_values(db_get_db(), flt.songs);
+    filtered_gen_genres();
+    filtered_gen_artists();
   }
 
   vec_sort(flt.songs, flt.sort_dir, filtered_comp_entry);
