@@ -9,28 +9,29 @@
 typedef struct _vh_text_t
 {
   str_t*      text;
-  str_t*      phtext;
+  str_t*      phtext; // placeholder text
   textstyle_t style;
-  char        editing;
+  char        active; // we are under editing
   void*       userdata;
-  uint32_t    time;
+  uint32_t    time; // time for cursos animation
   char        open;
 
-  r2_t     crsr_f;
-  view_t*  crsr_v;
-  uint32_t crsr_i;
+  r2_t     crsr_f; // cursor frame
+  view_t*  crsr_v; // cursor view
+  uint32_t crsr_i; // cursor index
 
-  view_t* pgraph;
+  view_t* pgraph; // paragraph
   void (*on_text)(view_t* view);
   void (*on_activate)(view_t* view);
   void (*on_deactivate)(view_t* view);
 } vh_text_t;
 
-void   vh_text_add(view_t*     view,
-                   char*       text,
-                   char*       phtext,
-                   textstyle_t textstyle,
-                   void*       userdata);
+void vh_text_add(view_t*     view,
+                 char*       text,
+                 char*       phtext,
+                 textstyle_t textstyle,
+                 void*       userdata);
+
 str_t* vh_text_get_text(view_t* view);
 void   vh_text_set_text(view_t* view, char* text);
 void   vh_text_activate(view_t* view, char state);
@@ -51,18 +52,25 @@ void   vh_text_set_on_deactivate(view_t* view, void (*event)(view_t*));
 
 void vh_text_upd(view_t* view)
 {
-  vh_text_t* data = view->handler_data;
+  vh_text_t* data  = view->handler_data;
+  str_t*     text  = data->text;
+  r2_t       frame = view->frame.local;
 
-  str_t* text           = data->text;
-  data->style.textcolor = 0x000000FF;
-
-  if (text->length == 0 && data->editing == 0)
+  if (data->active)
   {
+    data->style.textcolor = 0x000000FF;
+    // update text
+    // update cursor
+  }
+  else
+  {
+    // update placeholder text
+    if (text->length == 0 && data->phtext->length > 0) text = data->phtext;
     data->style.textcolor = 0x555555FF;
-    text                  = data->phtext;
   }
 
-  r2_t frame = view->frame.local;
+  char empty = text->length == 0;
+  if (empty) str_addbytearray(text, " ");
 
   glyph_t* glyphs = malloc(sizeof(glyph_t) * text->length);
   for (int i = 0; i < text->length; i++) glyphs[i].cp = text->codepoints[i];
@@ -94,6 +102,8 @@ void vh_text_upd(view_t* view)
   tg_text_set(data->pgraph, cstr, data->style);
 
   REL(cstr);
+
+  if (empty) str_removecodepointatindex(text, 0);
 }
 
 void vh_text_open_cursor(view_t* view)
@@ -126,18 +136,18 @@ void vh_text_activate(view_t* view, char state)
 
   if (state)
   {
-    if (!data->editing)
+    if (!data->active)
     {
-      data->editing = 1;
+      data->active = 1;
       view_add(view, data->crsr_v);
       vh_text_open_cursor(view);
     }
   }
   else
   {
-    if (data->editing)
+    if (data->active)
     {
-      data->editing = 0;
+      data->active = 0;
       view_remove(view, data->crsr_v);
       vh_text_close_cursor(view);
     }
@@ -151,7 +161,7 @@ void vh_text_evt(view_t* view, ev_t ev)
   vh_text_t* data = view->handler_data;
   if (ev.type == EV_TIME)
   {
-    if (data->editing)
+    if (data->active)
     {
       if (ev.time > data->time + 1000)
       {

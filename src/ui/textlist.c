@@ -82,7 +82,6 @@ view_t* textlist_create_item(textlist_t* tl)
 
 view_t* textlist_item_for_index(int index, void* data, view_t* listview, int* item_count)
 {
-  printf("ITEM FORMIDEX%i\n", index);
   textlist_t* tl = data;
   if (index < 0)
     return NULL; // no items before 0
