@@ -12,6 +12,7 @@ typedef struct _vh_textinput_t
   vec_t*  glyph_v;
   view_t* cursor_v;
 
+  int         glyph_index;
   textstyle_t style;
   char        active;
   void*       userdata;
@@ -51,20 +52,16 @@ void vh_textinput_upd(view_t* view)
   str_t*          text_s = data->text_s;
   r2_t            frame  = view->frame.local;
 
-  if (data->active)
-  {
-    data->style.textcolor = 0x000000FF;
-    // update text
-    // update cursor
-  }
-
-  char empty = text_s->length == 0;
-  if (empty) str_addbytearray(text_s, " ");
-
   glyph_t* glyphs = malloc(sizeof(glyph_t) * text_s->length);
   for (int i = 0; i < text_s->length; i++) glyphs[i].cp = text_s->codepoints[i];
-
   text_layout(glyphs, text_s->length, data->style, frame.w, frame.h);
+
+  for (int i = 0; i < text_s->length; i++)
+  {
+    glyph_t g  = glyphs[i];
+    view_t* gv = data->glyph_v->data[i];
+    view_set_frame(gv, (r2_t){g.x, g.y, g.w, g.h});
+  }
 
   // update cursor position
 
@@ -92,8 +89,6 @@ void vh_textinput_upd(view_t* view)
   tg_text_set(view, cstr, data->style);
 
   REL(cstr);
-
-  if (empty) str_removecodepointatindex(text_s, 0);
 }
 
 void vh_textinput_activate(view_t* view, char state)
@@ -145,6 +140,22 @@ void vh_textinput_evt(view_t* view, ev_t ev)
   {
     str_addbytearray(data->text_s, ev.text);
 
+    // create view for glyph
+
+    char view_id[100];
+    snprintf(view_id, 100, "%sglyph%i", view->id, data->glyph_index++);
+    view_t* glyph_view = view_new(view_id, (r2_t){0, 0, 10, 10});
+    tg_text_add(glyph_view);
+    tg_text_set(glyph_view, ev.text, data->style);
+
+    VADD(data->glyph_v, glyph_view);
+
+    view_add(view, glyph_view);
+
+    printf("string length %u glyphs length %u\n", data->text_s->length, data->glyph_v->length);
+
+    // append or break-insert new glyph(s)
+
     vh_textinput_upd(view);
 
     if (data->on_text) (*data->on_text)(view);
@@ -154,6 +165,9 @@ void vh_textinput_evt(view_t* view, ev_t ev)
     if (ev.keycode == SDLK_BACKSPACE && data->text_s->length > 0)
     {
       str_removecodepointatindex(data->text_s, data->text_s->length - 1);
+
+      vec_rematindex(data->glyph_v, data->glyph_v->length - 1);
+
       vh_textinput_upd(view);
       if (data->on_text) (*data->on_text)(view);
     }
@@ -175,6 +189,8 @@ void vh_textinput_add(view_t*     view,
   char* id_c = cstr_fromformat("%s%s", view->id, "crsr", NULL);
 
   vh_textinput_t* data = mem_calloc(sizeof(vh_textinput_t), "vh_text", NULL, NULL);
+
+  textstyle.backcolor = 0;
 
   data->text_s   = str_new();
   data->glyph_v  = VNEW();
@@ -201,8 +217,27 @@ void vh_textinput_add(view_t*     view,
 
   // text_s setup
 
-  if (text) str_addbytearray(data->text_s, text);
+  if (text)
+  {
+    str_addbytearray(data->text_s, text);
 
+    for (int i = 0; i < data->text_s->length; i++)
+    {
+      str_t* charstr = str_new();
+      str_addcodepoint(charstr, data->text_s->codepoints[i]);
+      char view_id[100];
+      snprintf(view_id, 100, "%sglyph%i", view->id, data->glyph_index++);
+      view_t* glyph_view = view_new(view_id, (r2_t){0, 0, 10, 10});
+      tg_text_add(glyph_view);
+      tg_text_set(glyph_view, str_cstring(charstr), data->style);
+
+      VADD(data->glyph_v, glyph_view);
+
+      view_add(view, glyph_view);
+
+      REL(charstr);
+    }
+  }
   // update text
 
   vh_textinput_upd(view);
