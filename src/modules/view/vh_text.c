@@ -1,10 +1,18 @@
-#ifndef vhand_text_h
+#ifndef vh_text_h
 #define vh_text_h
 
 #include "mtstring.c"
 #include "text.c"
 #include "view.c"
 #include "wm_event.c"
+
+typedef struct _pg_t
+{
+  str_t* text;
+  vec_t* views;
+} pg_t;
+
+void pg_toggle_static();
 
 typedef struct _vh_text_t
 {
@@ -13,8 +21,6 @@ typedef struct _vh_text_t
   textstyle_t style;
   char        active; // we are under editing
   void*       userdata;
-  uint32_t    time; // time for cursos animation
-  char        open;
 
   r2_t     crsr_f; // cursor frame
   view_t*  crsr_v; // cursor view
@@ -84,12 +90,15 @@ void vh_text_upd(view_t* view)
 
   r2_t crsr_f = {0};
   crsr_f.x    = last.x + last.w + 1;
-  crsr_f.y    = last.base_y - last.asc;
+  crsr_f.y    = last.base_y - last.asc - last.desc / 2.0;
   crsr_f.w    = 2;
-  crsr_f.h    = last.asc - last.desc;
+  crsr_f.h    = last.asc;
 
   data->crsr_f = crsr_f;
-  view_set_frame(data->crsr_v, crsr_f);
+
+  vh_anim_set(data->crsr_v, data->crsr_v->frame.local, crsr_f, 10, AT_LINEAR);
+
+  // view_set_frame(data->crsr_v, crsr_f);
 
   free(glyphs);
 
@@ -106,30 +115,6 @@ void vh_text_upd(view_t* view)
   if (empty) str_removecodepointatindex(text, 0);
 }
 
-void vh_text_open_cursor(view_t* view)
-{
-  vh_text_t* data = view->handler_data;
-
-  r2_t sf = data->crsr_f;
-  r2_t ef = sf;
-  sf.h    = 0;
-  sf.y    = ef.y + ef.h / 2.0;
-
-  vh_anim_set(data->crsr_v, sf, ef, 10, AT_LINEAR);
-}
-
-void vh_text_close_cursor(view_t* view)
-{
-  vh_text_t* data = view->handler_data;
-
-  r2_t sf = data->crsr_f;
-  r2_t ef = sf;
-  ef.h    = 0;
-  ef.y    = sf.y + sf.h / 2.0;
-
-  vh_anim_set(data->crsr_v, sf, ef, 10, AT_LINEAR);
-}
-
 void vh_text_activate(view_t* view, char state)
 {
   vh_text_t* data = view->handler_data;
@@ -140,7 +125,6 @@ void vh_text_activate(view_t* view, char state)
     {
       data->active = 1;
       view_add(view, data->crsr_v);
-      vh_text_open_cursor(view);
     }
   }
   else
@@ -149,7 +133,6 @@ void vh_text_activate(view_t* view, char state)
     {
       data->active = 0;
       view_remove(view, data->crsr_v);
-      vh_text_close_cursor(view);
     }
   }
 
@@ -163,16 +146,6 @@ void vh_text_evt(view_t* view, ev_t ev)
   {
     if (data->active)
     {
-      if (ev.time > data->time + 1000)
-      {
-        if (data->open)
-          vh_text_close_cursor(view);
-        else
-          vh_text_open_cursor(view);
-
-        data->open = 1 - data->open;
-        data->time = ev.time;
-      }
     }
   }
   else if (ev.type == EV_MDOWN)

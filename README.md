@@ -55,11 +55,12 @@ freebsd for os
 first version
 
 filter fix
+clear cover art if not available
+set starting volume
 search history popup
 genre/artist popup
 remove google id    
 remove background rendering ( ui renderer? )
-clear cover art if not available
 artist-album sort
 search/filter history ( use filters for playlists)
 on mute fade in/out volume with alpha
