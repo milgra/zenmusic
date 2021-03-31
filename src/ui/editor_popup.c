@@ -22,7 +22,7 @@ char*  editor_popup_get_cover();
 #include "ui_manager.c"
 #include "vh_list.c"
 #include "vh_list_item.c"
-#include "vh_text.c"
+#include "vh_textinput.c"
 #include <string.h>
 
 struct _editor_popup_t
@@ -47,7 +47,7 @@ struct _editor_popup_t
 
 void editor_popup_input_cell_value_changed(view_t* inputview)
 {
-  vh_text_t* data = inputview->handler_data;
+  vh_textinput_t* data = inputview->handler_data;
 
   char* key  = data->userdata;
   char* text = str_cstring(data->text);
@@ -59,7 +59,7 @@ void editor_popup_input_cell_value_changed(view_t* inputview)
 
 void editor_popup_input_cell_edit_finished(view_t* inputview)
 {
-  vh_text_t* data = inputview->handler_data;
+  vh_textinput_t* data = inputview->handler_data;
 
   char* key  = data->userdata;
   char* text = str_cstring(data->text);
@@ -103,13 +103,13 @@ void editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, ev_
     ep.sel_item            = itemview;
 
     view_t* inputcell = view_new(cstr_fromformat("%s%s%s", itemview->id, key, "edit", NULL), cell->view->frame.local);
-    vh_text_add(inputcell, "", value, ep.textstyle, key);                        // add text handler with key as userdata
-    vh_text_set_on_text(inputcell, editor_popup_input_cell_value_changed);       // listen for text change
-    vh_text_set_on_deactivate(inputcell, editor_popup_input_cell_edit_finished); // listen for text editing finish
-    vh_text_activate(inputcell, 1);                                              // activate text input
-    ui_manager_activate(inputcell);                                              // set text input as event receiver
-    vh_list_lock_scroll(ep.listview, 1);                                         // lock scrolling of list to avoid going out screen
-    vh_litem_rpl_cell(itemview, cell->id, inputcell);                            // replacing simple text cell with input cell
+    vh_textinput_add(inputcell, "", value, ep.textstyle, key);                        // add text handler with key as userdata
+    vh_textinput_set_on_text(inputcell, editor_popup_input_cell_value_changed);       // listen for text change
+    vh_textinput_set_on_deactivate(inputcell, editor_popup_input_cell_edit_finished); // listen for text editing finish
+    vh_textinput_activate(inputcell, 1);                                              // activate text input
+    ui_manager_activate(inputcell);                                                   // set text input as event receiver
+    vh_list_lock_scroll(ep.listview, 1);                                              // lock scrolling of list to avoid going out screen
+    vh_litem_rpl_cell(itemview, cell->id, inputcell);                                 // replacing simple text cell with input cell
 
     // TODO check if previous cell gets released
 

@@ -54,7 +54,7 @@ void ui_show_simple_popup(char* text);
 #include "vh_list_item.c"
 #include "vh_picker.c"
 #include "vh_roll.c"
-#include "vh_text.c"
+#include "vh_textinput.c"
 #include "view_generator.c"
 #include "view_layout.c"
 #include "wm_connector.c"
@@ -231,7 +231,7 @@ void ui_editor_accept()
 void ui_change_library()
 {
   // get path string
-  str_t* path    = vh_text_get_text(chlib_pop_if);
+  str_t* path    = vh_textinput_get_text(chlib_pop_if);
   char*  path_ch = str_cstring(path);
 
   callbacks_call("on_change_library", path_ch);
@@ -241,7 +241,7 @@ void ui_change_library()
 void ui_set_library()
 {
   // get path string
-  str_t* path    = vh_text_get_text(libinputfield);
+  str_t* path    = vh_textinput_get_text(libinputfield);
   char*  path_ch = str_cstring(path);
 
   callbacks_call("on_change_library", path_ch);
@@ -551,8 +551,8 @@ void ui_show_libpath_popup(char* text)
     ui_manager_add(library_page);
   }
 
-  vh_text_activate(libinputfield, 1); // activate text input
-  ui_manager_activate(libinputfield); // set text input as event receiver
+  vh_textinput_activate(libinputfield, 1); // activate text input
+  ui_manager_activate(libinputfield);      // set text input as event receiver
 }
 
 void ui_on_songlistpopup_select(int index)
@@ -576,7 +576,7 @@ void ui_on_songlistpopup_select(int index)
 
 void ui_filter(view_t* view)
 {
-  str_t* text = vh_text_get_text(view);
+  str_t* text = vh_textinput_get_text(view);
 
   callbacks_call("on_filter_songs", text);
 }
@@ -593,7 +593,7 @@ void ui_reload_songlist()
 
 void ui_show_query(char* text)
 {
-  vh_text_set_text(filterbar, text);
+  vh_textinput_set_text(filterbar, text);
 }
 
 void ui_init(float width,
@@ -753,9 +753,9 @@ void ui_init(float width,
   ts.textcolor = 0x000000FF;
   ts.backcolor = 0xFFFFFFFF;
 
-  vh_text_add(filterbar, "", "Search/Filter", ts, NULL);
-  vh_text_set_on_text(filterbar, ui_filter);
-  vh_text_set_on_activate(filterbar, ui_on_filter_activate);
+  vh_textinput_add(filterbar, "", "Search/Filter", ts, NULL);
+  vh_textinput_set_on_text(filterbar, ui_filter);
+  vh_textinput_set_on_activate(filterbar, ui_on_filter_activate);
 
   // song editor
 
@@ -776,7 +776,7 @@ void ui_init(float width,
   ts.backcolor = 0;
 
   tg_text_add(libtextfield);
-  vh_text_add(libinputfield, "/home/youruser/Music", "", ts, NULL);
+  vh_textinput_add(libinputfield, "/home/youruser/Music", "", ts, NULL);
 
   view_remove(baseview, library_page);
 
@@ -802,7 +802,7 @@ void ui_init(float width,
 
   tg_text_add(chlib_pop_tf);
   tg_text_set(chlib_pop_tf, "Use library at", ts);
-  vh_text_add(chlib_pop_if, "/home/youruser/Music", "", ts, NULL);
+  vh_textinput_add(chlib_pop_if, "/home/youruser/Music", "", ts, NULL);
 
   library_popup = view_get_subview(baseview, "library_popup");
 

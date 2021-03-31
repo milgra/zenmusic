@@ -18,7 +18,7 @@ void vh_textfield_add(view_t* view, textstyle_t textstyle);
 
 #include "mtcstring.c"
 #include "tg_text.c"
-#include "vh_text.c"
+#include "vh_textinput.c"
 
 void vh_textfield_evt(view_t* view, ev_t ev)
 {
@@ -54,7 +54,7 @@ void vh_textfield_add(view_t* view, textstyle_t textstyle)
   view_t* ph = view_new(cstr_fromformat("%splaceholder", view->id, NULL), view->frame.local);
 
   tg_text_add(ph);
-  vh_text_add(ti, "start", "place", textstyle, NULL);
+  vh_textinput_add(ti, "start", "place", textstyle, NULL);
 
   data->ti = ti;
   data->ph = ph;
