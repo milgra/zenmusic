@@ -41,6 +41,7 @@ void   vh_textinput_set_on_deactivate(view_t* view, void (*event)(view_t*));
 
 #include "SDL.h"
 #include "mtcstring.c"
+#include "mtgraphics.c"
 #include "mtvector.c"
 #include "tg_css.c"
 #include "tg_text.c"
@@ -60,7 +61,23 @@ void vh_textinput_upd(view_t* view)
   {
     glyph_t g  = glyphs[i];
     view_t* gv = data->glyph_v->data[i];
-    view_set_frame(gv, (r2_t){g.x, g.y, g.w, g.h});
+
+    if (g.w > 0 && g.h > 0)
+    {
+      r2_t f = gv->frame.local;
+      if (f.w == 0 || f.h == 0)
+      {
+        printf("adding texture to glyph\n");
+        bm_t* texture = bm_new(g.w, g.h);
+        //gfx_rect(texture, 0, 0, g.w, g.h, 0xFF0000FF, 0);
+        text_render_glyph(g, data->style, texture);
+        view_set_frame(gv, (r2_t){g.x, g.y, g.w, g.h});
+        view_set_texture_bmp(gv, texture);
+
+        gv->display = 1; // do we have to have 0 as default?!?!
+        view_add(view, gv);
+      }
+    }
   }
 
   // update cursor position
@@ -86,7 +103,7 @@ void vh_textinput_upd(view_t* view)
 
   char* cstr = str_cstring(text_s);
 
-  tg_text_set(view, cstr, data->style);
+  // tg_text_set(view, cstr, data->style);
 
   REL(cstr);
 }
@@ -144,13 +161,9 @@ void vh_textinput_evt(view_t* view, ev_t ev)
 
     char view_id[100];
     snprintf(view_id, 100, "%sglyph%i", view->id, data->glyph_index++);
-    view_t* glyph_view = view_new(view_id, (r2_t){0, 0, 10, 10});
-    tg_text_add(glyph_view);
-    tg_text_set(glyph_view, ev.text, data->style);
+    view_t* glyph_view = view_new(view_id, (r2_t){0, 0, 0, 0});
 
     VADD(data->glyph_v, glyph_view);
-
-    view_add(view, glyph_view);
 
     printf("string length %u glyphs length %u\n", data->text_s->length, data->glyph_v->length);
 
@@ -227,13 +240,9 @@ void vh_textinput_add(view_t*     view,
       str_addcodepoint(charstr, data->text_s->codepoints[i]);
       char view_id[100];
       snprintf(view_id, 100, "%sglyph%i", view->id, data->glyph_index++);
-      view_t* glyph_view = view_new(view_id, (r2_t){0, 0, 10, 10});
-      tg_text_add(glyph_view);
-      tg_text_set(glyph_view, str_cstring(charstr), data->style);
+      view_t* glyph_view = view_new(view_id, (r2_t){0, 0, 0, 0});
 
       VADD(data->glyph_v, glyph_view);
-
-      view_add(view, glyph_view);
 
       REL(charstr);
     }

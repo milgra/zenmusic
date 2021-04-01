@@ -43,6 +43,7 @@ struct _editor_popup_t
 
   view_t*     sel_item;
   textstyle_t textstyle;
+
 } ep = {0};
 
 void editor_popup_input_cell_value_changed(view_t* inputview)
@@ -50,7 +51,7 @@ void editor_popup_input_cell_value_changed(view_t* inputview)
   vh_textinput_t* data = inputview->handler_data;
 
   char* key  = data->userdata;
-  char* text = str_cstring(data->text);
+  char* text = str_cstring(vh_textinput_get_text(inputview));
 
   printf("editor_popup_input_cell_value_changed key %s text %s\n", key, text);
 
@@ -62,7 +63,7 @@ void editor_popup_input_cell_edit_finished(view_t* inputview)
   vh_textinput_t* data = inputview->handler_data;
 
   char* key  = data->userdata;
-  char* text = str_cstring(data->text);
+  char* text = str_cstring(vh_textinput_get_text(inputview));
 
   MPUT(ep.changed, key, text);
 

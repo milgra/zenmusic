@@ -78,6 +78,10 @@ void text_align_glyphs(glyph_t*    glyphs,
                        int         w,
                        int         h);
 
+void text_render_glyph(glyph_t     g,
+                       textstyle_t style,
+                       bm_t*       bitmap);
+
 void text_render_glyphs(glyph_t*    glyphs,
                         int         count,
                         textstyle_t style,
@@ -350,6 +354,53 @@ void text_shift_glyphs(glyph_t*    glyphs,
     glyphs[i].x += x;
     glyphs[i].y += y;
     glyphs[i].base_y += y;
+  }
+}
+
+void text_render_glyph(glyph_t g, textstyle_t style, bm_t* bitmap)
+{
+  if (g.w > 0 && g.h > 0)
+  {
+    gfx_rect(bitmap, 0, 0, bitmap->w, bitmap->h, style.backcolor, 0);
+
+    // get or load font
+    stbtt_fontinfo* font = MGET(fonts, style.font);
+    if (font == NULL)
+    {
+      text_font_load(style.font);
+      font = MGET(fonts, style.font);
+      if (!font) return;
+    }
+
+    int size = g.w * g.h;
+
+    // increase glyph baking bitmap size if needed
+    if (size > gcount)
+    {
+      gcount = size;
+      gbytes = realloc(gbytes, gcount);
+    }
+
+    // bake
+    stbtt_MakeCodepointBitmapSubpixel(font,
+                                      gbytes,
+                                      g.w,       // out widht
+                                      g.h,       // out height
+                                      g.w,       // out stride
+                                      g.x_scale, // scale x
+                                      g.y_scale, // scale y
+                                      g.x_shift, // shift x
+                                      g.y_shift, // shift y
+                                      g.cp);
+
+    // insert to bitmap
+    gfx_blend_8(bitmap,
+                0,
+                0,
+                style.textcolor,
+                gbytes,
+                g.w,
+                g.h);
   }
 }
 
