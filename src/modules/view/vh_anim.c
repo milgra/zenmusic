@@ -89,6 +89,9 @@ void vh_anim_evt(view_t* view, ev_t ev)
           cf.w = sf.w + (ef.w - sf.w) * delta;
           cf.h = sf.h + (ef.h - sf.h) * delta;
         }
+
+        if (vh->step == vh->steps - 1) cf = ef;
+
         view_set_frame(view, cf);
       }
 
@@ -117,6 +120,9 @@ void vh_anim_evt(view_t* view, ev_t ev)
           cr.w = sr.w + (er.w - sr.w) * delta;
           cr.h = sr.h + (er.h - sr.h) * delta;
         }
+
+        if (vh->step == vh->steps - 1) cr = er;
+
         view_set_region(view, cr);
       }
 
@@ -138,6 +144,9 @@ void vh_anim_evt(view_t* view, ev_t ev)
           float delta = (cos(angle) + 1.0) / 2.0;
           ca          = sa + (ea - sa) * delta;
         }
+
+        if (vh->step == vh->steps - 1) ca = ea;
+
         view_set_texture_alpha(view, ca, 1);
       }
 

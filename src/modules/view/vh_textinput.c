@@ -68,7 +68,6 @@ void vh_textinput_upd(view_t* view)
       r2_t nf = (r2_t){g.x, g.y, g.w, g.h};
       if (f.w == 0 || f.h == 0)
       {
-        printf("adding texture to glyph\n");
         bm_t* texture = bm_new(g.w, g.h);
 
         text_render_glyph(g, data->style, texture);
@@ -83,8 +82,15 @@ void vh_textinput_upd(view_t* view)
 
         // open
         r2_t sf = nf;
+        sf.x    = 0.0;
+        sf.y    = 0.0;
+        nf.x    = 0.0;
+        nf.y    = 0.0;
         sf.w    = 0.0;
-        vh_anim_region(gv, sf, nf, 30, AT_LINEAR);
+
+        vh_anim_region(gv, sf, nf, 10, AT_LINEAR);
+
+        view_set_region(gv, sf);
       }
       else
       {
@@ -179,8 +185,6 @@ void vh_textinput_evt(view_t* view, ev_t ev)
 
     VADD(data->glyph_v, glyph_view);
 
-    printf("string length %u glyphs length %u\n", data->text_s->length, data->glyph_v->length);
-
     // append or break-insert new glyph(s)
 
     vh_textinput_upd(view);
@@ -211,8 +215,6 @@ void vh_textinput_add(view_t*     view,
                       textstyle_t textstyle,
                       void*       userdata)
 {
-  printf("vh_textinput_add %s %s\n", view->id, phtext);
-
   char* id_c = cstr_fromformat("%s%s", view->id, "crsr", NULL);
 
   vh_textinput_t* data = mem_calloc(sizeof(vh_textinput_t), "vh_text", NULL, NULL);

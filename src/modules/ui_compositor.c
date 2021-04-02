@@ -39,7 +39,8 @@ void ui_compositor_upd_pos(int index, r2_t frame, float border);
 char ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_t* bm);
 void ui_compositor_upd_vis(int index, char hidden);
 void ui_compositor_upd_alpha(int index, float alpha);
-void ui_compositor_upd_region(int index, r2_t frame, r2_t region);
+void ui_compositor_upd_region(int index, r2_t frame, r2_t region, char* texid);
+
 void ui_compositor_render(uint32_t time, int width, int height, int wpwr, int hpwr);
 
 #endif
@@ -236,8 +237,47 @@ void ui_compositor_upd_pos(int index, r2_t frame, float border)
 
 // show only region of view, modify vertexes and texture coords
 
-void ui_compositor_upd_region(int index, r2_t frame, r2_t region)
+void ui_compositor_upd_region(int index, r2_t frame, r2_t region, char* texid)
 {
+  crect_t* rect = uic.cache->data[index];
+
+  //printf("update region %s %f %f %f %f\n", rect->id, region.x, region.y, region.x + region.w, region.y + region.h);
+
+  r2_t of = frame;
+  of.x += region.x;
+  of.y += region.y;
+  of.w = region.w;
+  of.h = region.h;
+
+  tm_coords_t tc = tm_get(uic.tm, texid);
+  tm_coords_t nc = tc;
+
+  float tw = tc.rbx - tc.ltx; // texcoord x distance
+  float th = tc.rby - tc.lty; // texcoord y distance
+
+  // left top
+  float fx = region.x;
+  float fy = region.y;
+  float rx = fx / frame.w;
+  float ry = fy / frame.h;
+  float cx = tc.ltx + tw * rx;
+  float cy = tc.lty + th * ry;
+
+  // right bottom
+  fx         = region.x + region.w;
+  fy         = region.y + region.h;
+  rx         = fx / frame.w;
+  ry         = fy / frame.h;
+  float rbcx = tc.ltx + tw * rx;
+  float rbcy = tc.lty + th * ry;
+
+  crect_set_frame(rect, of);
+  crect_set_texture(rect, cx, cy, rbcx, rbcy);
+
+  /* printf("update region 1 %s %f %f %f %f\n", rect->id, tc.ltx, tc.lty, tc.rbx, tc.rby); */
+  /* printf("update region 2 %s %f %f %f %f\n", rect->id, cx, cy, rbcx, rbcy); */
+
+  uic.upd_geo = 1;
 }
 
 void ui_compositor_upd_alpha(int index, float alpha)

@@ -212,6 +212,14 @@ void ui_generator_render(uint32_t time)
       /* } */
     }
 
+    if (view->texture.changed)
+    {
+      reset_texmap |= ui_compositor_upd_bmp(i, view->frame.global, view->layout.shadow_blur, view->texture.id, view->texture.bitmap);
+
+      view->frame.dim_changed = 0;
+      view->texture.changed   = 0;
+    }
+
     if (view->frame.pos_changed)
     {
       ui_compositor_upd_pos(i, view->frame.global, view->layout.shadow_blur);
@@ -221,17 +229,9 @@ void ui_generator_render(uint32_t time)
 
     if (view->frame.reg_changed)
     {
-      ui_compositor_upd_region(i, view->frame.global, view->frame.region);
+      ui_compositor_upd_region(i, view->frame.global, view->frame.region, view->texture.id);
 
       view->frame.reg_changed = 0;
-    }
-
-    if (view->texture.changed)
-    {
-      reset_texmap |= ui_compositor_upd_bmp(i, view->frame.global, view->layout.shadow_blur, view->texture.id, view->texture.bitmap);
-
-      view->frame.dim_changed = 0;
-      view->texture.changed   = 0;
     }
 
     if (view->texture.alpha_changed)
