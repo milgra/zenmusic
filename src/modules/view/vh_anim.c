@@ -33,7 +33,21 @@ typedef struct _vh_anim_t
   int steps;
 } vh_anim_t;
 
-void vh_anim_frame(view_t* view, r2_t sf, r2_t ef, int steps, animtype_t type);
+void vh_anim_frame(view_t*    view,
+                   r2_t       sf,
+                   r2_t       ef,
+                   int        steps,
+                   animtype_t type);
+void vh_anim_alpha(view_t*    view,
+                   float      sa,
+                   float      ea,
+                   int        steps,
+                   animtype_t type);
+void vh_anim_region(view_t*    view,
+                    r2_t       sr,
+                    r2_t       er,
+                    int        steps,
+                    animtype_t type);
 void vh_anim_add(view_t* view);
 
 #endif
@@ -143,12 +157,13 @@ void vh_anim_frame(view_t*    view,
                    int        steps,
                    animtype_t type)
 {
-  vh_anim_t* vh = view->handler_data;
-  vh->sf        = sf;
-  vh->ef        = ef;
-  vh->step      = 0;
-  vh->type      = type;
-  vh->steps     = steps;
+  vh_anim_t* vh  = view->handler_data;
+  vh->sf         = sf;
+  vh->ef         = ef;
+  vh->step       = 0;
+  vh->type       = type;
+  vh->steps      = steps;
+  vh->anim_frame = 1;
 }
 
 void vh_anim_region(view_t*    view,
@@ -157,12 +172,13 @@ void vh_anim_region(view_t*    view,
                     int        steps,
                     animtype_t type)
 {
-  vh_anim_t* vh = view->handler_data;
-  vh->sr        = sr;
-  vh->er        = er;
-  vh->step      = 0;
-  vh->type      = type;
-  vh->steps     = steps;
+  vh_anim_t* vh   = view->handler_data;
+  vh->sr          = sr;
+  vh->er          = er;
+  vh->step        = 0;
+  vh->type        = type;
+  vh->steps       = steps;
+  vh->anim_region = 1;
 }
 
 void vh_anim_alpha(view_t*    view,
@@ -171,12 +187,13 @@ void vh_anim_alpha(view_t*    view,
                    int        steps,
                    animtype_t type)
 {
-  vh_anim_t* vh = view->handler_data;
-  vh->sa        = sa;
-  vh->ea        = ea;
-  vh->step      = 0;
-  vh->type      = type;
-  vh->steps     = steps;
+  vh_anim_t* vh  = view->handler_data;
+  vh->sa         = sa;
+  vh->ea         = ea;
+  vh->step       = 0;
+  vh->type       = type;
+  vh->steps      = steps;
+  vh->anim_alpha = 1;
 }
 
 void vh_anim_add(view_t* view)

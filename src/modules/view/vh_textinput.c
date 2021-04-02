@@ -70,17 +70,21 @@ void vh_textinput_upd(view_t* view)
       {
         printf("adding texture to glyph\n");
         bm_t* texture = bm_new(g.w, g.h);
-        //gfx_rect(texture, 0, 0, g.w, g.h, 0xFF0000FF, 0);
+
         text_render_glyph(g, data->style, texture);
+
         view_set_texture_bmp(gv, texture);
 
         gv->display = 1; // do we have to have 0 as default?!?!
+
         view_add(view, gv);
 
-        // fade in
+        view_set_frame(gv, nf);
+
+        // open
         r2_t sf = nf;
         sf.w    = 0.0;
-        vh_anim_frame(gv, nf, nf, 30, AT_LINEAR);
+        vh_anim_region(gv, sf, nf, 30, AT_LINEAR);
       }
       else
       {
