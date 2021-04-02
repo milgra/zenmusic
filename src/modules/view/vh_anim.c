@@ -31,6 +31,9 @@ typedef struct _vh_anim_t
 
   int step;
   int steps;
+
+  void* userdata;
+  void (*on_finish)(view_t*, void*);
 } vh_anim_t;
 
 void vh_anim_frame(view_t*    view,
@@ -38,17 +41,22 @@ void vh_anim_frame(view_t*    view,
                    r2_t       ef,
                    int        steps,
                    animtype_t type);
+
 void vh_anim_alpha(view_t*    view,
                    float      sa,
                    float      ea,
                    int        steps,
                    animtype_t type);
+
 void vh_anim_region(view_t*    view,
                     r2_t       sr,
                     r2_t       er,
                     int        steps,
                     animtype_t type);
+
 void vh_anim_add(view_t* view);
+
+void vh_anim_set_event(view_t* view, void* userdata, void (*on_finish)(view_t*, void*));
 
 #endif
 
@@ -155,6 +163,8 @@ void vh_anim_evt(view_t* view, ev_t ev)
         vh->anim_frame  = 0;
         vh->anim_region = 0;
         vh->anim_alpha  = 0;
+
+        if (vh->on_finish) (*vh->on_finish)(view, vh->userdata);
       }
     }
   }
@@ -211,6 +221,13 @@ void vh_anim_add(view_t* view)
 
   view->handler      = vh_anim_evt;
   view->handler_data = vh;
+}
+
+void vh_anim_set_event(view_t* view, void* userdata, void (*on_finish)(view_t*, void*))
+{
+  vh_anim_t* vh = view->handler_data;
+  vh->userdata  = userdata;
+  vh->on_finish = on_finish;
 }
 
 #endif

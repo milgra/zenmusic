@@ -88,13 +88,13 @@ void vh_textinput_upd(view_t* view)
         nf.y    = 0.0;
         sf.w    = 0.0;
 
-        vh_anim_region(gv, sf, nf, 10, AT_LINEAR);
+        vh_anim_region(gv, sf, nf, 10, AT_EASE);
 
         view_set_region(gv, sf);
       }
       else
       {
-        vh_anim_frame(gv, gv->frame.local, nf, 10, AT_LINEAR);
+        vh_anim_frame(gv, gv->frame.local, nf, 10, AT_EASE);
       }
     }
   }
@@ -110,7 +110,7 @@ void vh_textinput_upd(view_t* view)
   crsr_f.w    = 2;
   crsr_f.h    = last.asc;
 
-  vh_anim_frame(data->cursor_v, data->cursor_v->frame.local, crsr_f, 10, AT_LINEAR);
+  vh_anim_frame(data->cursor_v, data->cursor_v->frame.local, crsr_f, 10, AT_EASE);
 
   // view_set_frame(data->cursor_v, crsr_f);
 
@@ -149,6 +149,12 @@ void vh_textinput_activate(view_t* view, char state)
   }
 
   vh_textinput_upd(view);
+}
+
+void vh_textinput_on_glyph_close(view_t* view, void* userdata)
+{
+  view_t* textview = userdata;
+  view_remove(textview, view);
 }
 
 void vh_textinput_evt(view_t* view, ev_t ev)
@@ -196,6 +202,22 @@ void vh_textinput_evt(view_t* view, ev_t ev)
     if (ev.keycode == SDLK_BACKSPACE && data->text_s->length > 0)
     {
       str_removecodepointatindex(data->text_s, data->text_s->length - 1);
+
+      view_t* glyph_view = vec_tail(data->glyph_v);
+
+      r2_t sf = glyph_view->frame.local;
+      r2_t ef = sf;
+      sf.x    = 0.0;
+      sf.y    = 0.0;
+      ef.x    = 0.0;
+      ef.y    = 0.0;
+      ef.w    = 0.0;
+
+      vh_anim_region(glyph_view, sf, ef, 10, AT_EASE);
+
+      vh_anim_set_event(glyph_view, view, vh_textinput_on_glyph_close);
+
+      // view_remove(view, glyph_view);
 
       vec_rematindex(data->glyph_v, data->glyph_v->length - 1);
 
