@@ -17,12 +17,13 @@ typedef struct _vh_anim_t
   animtype_t type;
   r2_t       sf; // starting frame
   r2_t       ef; // ending frame
-  r2_t       cf; // current frame
+  float      sa; // starting alpha
+  float      ea; // ending alpha
   int        step;
   int        steps;
 } vh_anim_t;
 
-void vh_anim_set(view_t* view, r2_t sf, r2_t ef, int steps, animtype_t type);
+void vh_anim_start(view_t* view, r2_t sf, r2_t ef, float sa, float ea, int steps, animtype_t type);
 void vh_anim_add(view_t* view);
 
 #endif
@@ -43,6 +44,10 @@ void vh_anim_evt(view_t* view, ev_t ev)
       r2_t cf = sf;
       r2_t ef = vh->ef;
 
+      float sa = vh->sa;
+      float ea = vh->ea;
+      float ca = sa;
+
       if (vh->type == AT_LINEAR)
       {
         // just increase current with delta
@@ -50,6 +55,8 @@ void vh_anim_evt(view_t* view, ev_t ev)
         cf.y = sf.y + ((ef.y - sf.y) / vh->steps) * vh->step;
         cf.w = sf.w + ((ef.w - sf.w) / vh->steps) * vh->step;
         cf.h = sf.h + ((ef.h - sf.h) / vh->steps) * vh->step;
+
+        ca = sa + ((ea - sa) / vh->steps) * vh->step;
       }
       else if (vh->type == AT_EASE)
       {
@@ -61,20 +68,29 @@ void vh_anim_evt(view_t* view, ev_t ev)
         cf.y = sf.y + (ef.y - sf.y) * delta;
         cf.w = sf.w + (ef.w - sf.w) * delta;
         cf.h = sf.h + (ef.h - sf.h) * delta;
+
+        ca = sa + (ea - sa) * delta;
       }
 
-      vh->cf = cf;
       view_set_frame(view, cf);
+      view_set_texture_alpha(view, ca, 1);
     }
   }
 }
 
-void vh_anim_set(view_t* view, r2_t sf, r2_t ef, int steps, animtype_t type)
+void vh_anim_start(view_t*    view,
+                   r2_t       sf,
+                   r2_t       ef,
+                   float      sa,
+                   float      ea,
+                   int        steps,
+                   animtype_t type)
 {
   vh_anim_t* vh = view->handler_data;
   vh->sf        = sf;
-  vh->cf        = sf;
   vh->ef        = ef;
+  vh->sa        = sa;
+  vh->ea        = ea;
   vh->step      = 0;
   vh->type      = type;
   vh->steps     = steps;

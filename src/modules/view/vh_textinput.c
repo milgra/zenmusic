@@ -64,18 +64,27 @@ void vh_textinput_upd(view_t* view)
 
     if (g.w > 0 && g.h > 0)
     {
-      r2_t f = gv->frame.local;
+      r2_t f  = gv->frame.local;
+      r2_t nf = (r2_t){g.x, g.y, g.w, g.h};
       if (f.w == 0 || f.h == 0)
       {
         printf("adding texture to glyph\n");
         bm_t* texture = bm_new(g.w, g.h);
         //gfx_rect(texture, 0, 0, g.w, g.h, 0xFF0000FF, 0);
         text_render_glyph(g, data->style, texture);
-        view_set_frame(gv, (r2_t){g.x, g.y, g.w, g.h});
         view_set_texture_bmp(gv, texture);
 
         gv->display = 1; // do we have to have 0 as default?!?!
         view_add(view, gv);
+
+        // fade in
+        r2_t sf = nf;
+        sf.w    = 0.0;
+        vh_anim_start(gv, nf, nf, 0.0, 1.0, 30, AT_LINEAR);
+      }
+      else
+      {
+        vh_anim_start(gv, gv->frame.local, nf, 1.0, 1.0, 10, AT_LINEAR);
       }
     }
   }
@@ -91,7 +100,7 @@ void vh_textinput_upd(view_t* view)
   crsr_f.w    = 2;
   crsr_f.h    = last.asc;
 
-  vh_anim_set(data->cursor_v, data->cursor_v->frame.local, crsr_f, 10, AT_LINEAR);
+  vh_anim_start(data->cursor_v, data->cursor_v->frame.local, crsr_f, 1.0, 1.0, 10, AT_LINEAR);
 
   // view_set_frame(data->cursor_v, crsr_f);
 
@@ -103,7 +112,7 @@ void vh_textinput_upd(view_t* view)
 
   char* cstr = str_cstring(text_s);
 
-  // tg_text_set(view, cstr, data->style);
+  //tg_text_set(view, cstr, data->style);
 
   REL(cstr);
 }
@@ -162,6 +171,7 @@ void vh_textinput_evt(view_t* view, ev_t ev)
     char view_id[100];
     snprintf(view_id, 100, "%sglyph%i", view->id, data->glyph_index++);
     view_t* glyph_view = view_new(view_id, (r2_t){0, 0, 0, 0});
+    vh_anim_add(glyph_view);
 
     VADD(data->glyph_v, glyph_view);
 
@@ -241,6 +251,7 @@ void vh_textinput_add(view_t*     view,
       char view_id[100];
       snprintf(view_id, 100, "%sglyph%i", view->id, data->glyph_index++);
       view_t* glyph_view = view_new(view_id, (r2_t){0, 0, 0, 0});
+      vh_anim_add(glyph_view);
 
       VADD(data->glyph_v, glyph_view);
 
