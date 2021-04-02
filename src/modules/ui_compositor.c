@@ -39,6 +39,7 @@ void ui_compositor_upd_pos(int index, r2_t frame, float border);
 char ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_t* bm);
 void ui_compositor_upd_vis(int index, char hidden);
 void ui_compositor_upd_alpha(int index, float alpha);
+void ui_compositor_upd_region(int index, r2_t frame, r2_t region);
 void ui_compositor_render(uint32_t time, int width, int height, int wpwr, int hpwr);
 
 #endif
@@ -231,6 +232,12 @@ void ui_compositor_upd_pos(int index, r2_t frame, float border)
   crect_set_frame(rect, prevf);
 
   uic.upd_geo = 1;
+}
+
+// show only region of view, modify vertexes and texture coords
+
+void ui_compositor_upd_region(int index, r2_t frame, r2_t region)
+{
 }
 
 void ui_compositor_upd_alpha(int index, float alpha)

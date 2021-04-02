@@ -80,11 +80,11 @@ void vh_textinput_upd(view_t* view)
         // fade in
         r2_t sf = nf;
         sf.w    = 0.0;
-        vh_anim_start(gv, nf, nf, 0.0, 1.0, 30, AT_LINEAR);
+        vh_anim_frame(gv, nf, nf, 30, AT_LINEAR);
       }
       else
       {
-        vh_anim_start(gv, gv->frame.local, nf, 1.0, 1.0, 10, AT_LINEAR);
+        vh_anim_frame(gv, gv->frame.local, nf, 10, AT_LINEAR);
       }
     }
   }
@@ -100,7 +100,7 @@ void vh_textinput_upd(view_t* view)
   crsr_f.w    = 2;
   crsr_f.h    = last.asc;
 
-  vh_anim_start(data->cursor_v, data->cursor_v->frame.local, crsr_f, 1.0, 1.0, 10, AT_LINEAR);
+  vh_anim_frame(data->cursor_v, data->cursor_v->frame.local, crsr_f, 10, AT_LINEAR);
 
   // view_set_frame(data->cursor_v, crsr_f);
 

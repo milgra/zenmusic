@@ -109,10 +109,12 @@ typedef struct _texture_t
 
 typedef struct _frame_t
 {
-  r2_t local;
-  r2_t global;
+  r2_t local;  // local position
+  r2_t global; // global position
+  r2_t region; // region to show
   char pos_changed;
   char dim_changed;
+  char reg_changed;
 } frame_t;
 
 typedef struct _view_t view_t;
@@ -157,6 +159,7 @@ view_t* view_get_subview(view_t* view, char* id);
 void    view_gen_texture(view_t* view);
 
 void view_set_frame(view_t* view, r2_t frame);
+void view_set_region(view_t* view, r2_t frame);
 void view_set_layout(view_t* view, vlayout_t layout);
 void view_set_hidden(view_t* view, char hidden, char recursive);
 void view_set_block_touch(view_t* view, char block, char recursive);
@@ -358,6 +361,12 @@ void view_set_frame(view_t* view, r2_t frame)
 {
   view->frame.local = frame;
   view_calc_global(view);
+}
+
+void view_set_region(view_t* view, r2_t region)
+{
+  view->frame.region      = region;
+  view->frame.reg_changed = 1;
 }
 
 void view_set_hidden(view_t* view, char hidden, char recursive)
