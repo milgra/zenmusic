@@ -274,6 +274,14 @@ void ui_on_mute_button_down(view_t* view)
   player_toggle_mute();
 }
 
+void ui_on_filter_activate(view_t* view)
+{
+  textlist_update(genrelist);
+  textlist_update(artistlist);
+
+  ui_toggle_mainview(filters_popup);
+}
+
 void ui_on_button_down(void* userdata, void* data)
 {
   char* id = ((view_t*)data)->id;
@@ -302,6 +310,7 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "dec_pop_rej_btn") == 0) ui_toggle_mainview(decision_popup);
   if (strcmp(id, "close_sim_pop_btn") == 0) ui_toggle_mainview(simple_popup);
   if (strcmp(id, "close_song_popup_btn") == 0) ui_toggle_mainview(song_popup);
+  if (strcmp(id, "filterbtn") == 0) ui_on_filter_activate(filters_popup);
   if (strcmp(id, "visuright_btn") == 0) ui_change_visu();
   if (strcmp(id, "visuleft_btn") == 0) ui_change_visu();
 }
@@ -313,14 +322,6 @@ void ui_on_color_select(void* userdata, void* data)
   /* char text[10] = {0}; */
   /* snprintf(text, 10, "%.2x%.2x%.2x", r, g, b); */
   /* tg_text_set(set_col_val, text, ts); */
-}
-
-void ui_on_filter_activate(view_t* view)
-{
-  textlist_update(genrelist);
-  textlist_update(artistlist);
-
-  ui_toggle_mainview(filters_popup);
 }
 
 void ui_on_song_edit(int index)
@@ -755,7 +756,7 @@ void ui_init(float width,
 
   vh_textinput_add(filterbar, "", "Search/Filter", ts, NULL);
   vh_textinput_set_on_text(filterbar, ui_filter);
-  vh_textinput_set_on_activate(filterbar, ui_on_filter_activate);
+  // vh_textinput_set_on_activate(filterbar, ui_on_filter_activate);
 
   // song editor
 

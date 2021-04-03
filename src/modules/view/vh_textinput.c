@@ -94,6 +94,10 @@ void vh_textinput_upd(view_t* view)
       }
       else
       {
+        r2_t rf = nf;
+        rf.x    = 0;
+        rf.y    = 0;
+        view_set_region(gv, rf);
         vh_anim_frame(gv, gv->frame.local, nf, 10, AT_EASE);
       }
     }

@@ -54,6 +54,8 @@ freebsd for os
 
 first version
 
+input field delete icon
+genre/artist button
 filter fix
 clear cover art if not available
 set starting volume

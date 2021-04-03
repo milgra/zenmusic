@@ -25,20 +25,26 @@ void view_layout(view_t* view)
 
   if (view->layout.display == LD_FLEX)
   {
-    while ((v = VNXT(view->views)))
+    if (view->layout.flexdir == FD_ROW)
     {
-      if (v->layout.width > 0)
+      while ((v = VNXT(view->views)))
       {
-        rel_w -= v->layout.width;
-        rem_w -= 1;
+        if (v->layout.width > 0)
+        {
+          rel_w -= v->layout.width;
+          rem_w -= 1;
+        }
       }
     }
-    while ((v = VNXT(view->views)))
+    if (view->layout.flexdir == FD_COL)
     {
-      if (v->layout.height > 0)
+      while ((v = VNXT(view->views)))
       {
-        rel_h -= v->layout.height;
-        rem_h -= 1;
+        if (v->layout.height > 0)
+        {
+          rel_h -= v->layout.height;
+          rem_h -= 1;
+        }
       }
     }
   }
@@ -95,6 +101,7 @@ void view_layout(view_t* view)
         rem_h -= 1;
         rel_h -= height;
       }
+
       frame.h = height * v->layout.h_per;
     }
     if (v->layout.margin == INT_MAX || view->layout.cjustify == JC_CENTER)
