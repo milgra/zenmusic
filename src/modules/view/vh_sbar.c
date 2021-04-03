@@ -69,13 +69,13 @@ void vh_sbar_evt(view_t* view, ev_t ev)
 
           if (vh->type == SBAR_V)
           {
-            float radius = view->frame.local.w * ratio * 0.5;
-            gfx_circle(bm, bm->w / 2, vh->pos + vh->size / 2, radius, 1, 0x000000BB);
+            float radius = view->frame.local.w * ratio;
+            gfx_circle(bm, bm->w, vh->pos + vh->size / 2, radius, 1, 0x000000BB);
           }
           else
           {
             float radius = view->frame.local.h * ratio * 0.5;
-            gfx_circle(bm, vh->pos + vh->size / 2, bm->h / 2, radius, 1, 0x000000BB);
+            gfx_circle(bm, vh->pos + vh->size / 2, bm->h, radius, 1, 0x000000BB);
           }
           view->texture.changed = 1;
         }
@@ -90,14 +90,14 @@ void vh_sbar_evt(view_t* view, ev_t ev)
 
           if (vh->type == SBAR_V)
           {
-            gfx_circle(bm, bm->w / 2, pos, bm->w / 2 + 1, 1, 0x000000BB);
-            gfx_circle(bm, bm->w / 2, pos + size, bm->w / 2 + 1, 1, 0x000000BB);
+            gfx_circle(bm, bm->w, pos, bm->w + 1, 1, 0x000000BB);
+            gfx_circle(bm, bm->w, pos + size, bm->w + 1, 1, 0x000000BB);
             gfx_rect(bm, 0, pos, bm->w, size, 0x000000BB, 0);
           }
           else
           {
-            gfx_circle(bm, pos, bm->h / 2, bm->h / 2 + 1, 1, 0x000000BB);
-            gfx_circle(bm, pos + size, bm->h / 2, bm->h / 2 + 1, 1, 0x000000BB);
+            gfx_circle(bm, pos, bm->h, bm->h + 1, 1, 0x000000BB);
+            gfx_circle(bm, pos + size, bm->h, bm->h + 1, 1, 0x000000BB);
             gfx_rect(bm, pos, 0, size, bm->h, 0x000000BB, 0);
           }
           view->texture.changed = 1;
@@ -115,14 +115,14 @@ void vh_sbar_evt(view_t* view, ev_t ev)
       bm_reset(bm);
       if (vh->type == SBAR_V)
       {
-        gfx_circle(bm, bm->w / 2, vh->pos, bm->w / 2 + 1, 1, 0x000000BB);
-        gfx_circle(bm, bm->w / 2, vh->pos + vh->size, bm->w / 2 + 1, 1, 0x000000BB);
+        gfx_circle(bm, bm->w, vh->pos, bm->w + 1, 1, 0x000000BB);
+        gfx_circle(bm, bm->w, vh->pos + vh->size, bm->w + 1, 1, 0x000000BB);
         gfx_rect(bm, 0, vh->pos, bm->w, vh->size, 0x000000BB, 0);
       }
       else
       {
-        gfx_circle(bm, vh->pos, bm->h / 2, bm->h / 2 + 1, 1, 0x000000BB);
-        gfx_circle(bm, vh->pos + vh->size, bm->h / 2, bm->h / 2 + 1, 1, 0x000000BB);
+        gfx_circle(bm, vh->pos, bm->h, bm->h + 1, 1, 0x000000BB);
+        gfx_circle(bm, vh->pos + vh->size, bm->h, bm->h + 1, 1, 0x000000BB);
         gfx_rect(bm, vh->pos, 0, vh->size, bm->h, 0x000000BB, 0);
       }
       view->texture.changed = 1;

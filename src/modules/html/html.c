@@ -195,7 +195,7 @@ uint32_t count_props(char* css)
 
 void analyze_classes(char* css, prop_t* props)
 {
-  int      start = 0;
+  int      start = -1;
   char     in_l  = 0; // in line
   uint32_t index = 0;
   range_t class  = {0};

@@ -448,8 +448,8 @@ void vh_list_add(view_t* view,
   char* vid = cstr_fromformat("%s%s", view->id, "vscr", NULL);
   char* hid = cstr_fromformat("%s%s", view->id, "hscr", NULL);
 
-  view_t* vscr = view_new(vid, (r2_t){view->frame.local.w - 15, 0, 15, view->frame.local.h});
-  view_t* hscr = view_new(hid, (r2_t){0, view->frame.local.h - 15, view->frame.local.w, 15});
+  view_t* vscr = view_new(vid, (r2_t){view->frame.local.w - 11, 0, 11, view->frame.local.h});
+  view_t* hscr = view_new(hid, (r2_t){0, view->frame.local.h - 11, view->frame.local.w, 11});
 
   REL(vid);
   REL(hid);
