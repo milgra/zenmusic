@@ -399,7 +399,7 @@ void ui_compositor_render(uint32_t time, int width, int height, int tex_w, int t
   if (last < index)
   {
     // render remaining
-    gl_draw_vertexes_in_framebuffer(TEX_CTX, last * 6, index * 6, reg_full, reg_full, SH_TEXTURE, 0, tex_w, tex_h);
+    gl_draw_vertexes_in_framebuffer(TEX_CTX, last * 6, index * 6, reg_full, reg_full, SH_TEXTURE, 1, tex_w, tex_h);
   }
 
   if (time > uic.upd_stamp)

@@ -115,6 +115,11 @@
     flex-direction: row;
 }
 
+.popup_page {
+    width: 100%;
+    height: 100%;
+}
+
 .timebck {
     width: 80px;
     height: 30px;
@@ -451,7 +456,6 @@
     margin: 10px;
     border-radius: 10px;
     background-color: #EEEEEEFF;
-    box-shadow: 2px;
 }
 
 #decision_popup {

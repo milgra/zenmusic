@@ -55,6 +55,7 @@ void ui_show_simple_popup(char* text);
 #include "vh_picker.c"
 #include "vh_roll.c"
 #include "vh_textinput.c"
+#include "vh_touch.c"
 #include "view_generator.c"
 #include "view_layout.c"
 #include "wm_connector.c"
@@ -90,7 +91,8 @@ view_t* volknob;
 view_t* mutebtn;
 view_t* simple_popup;
 view_t* sim_pop_txt;
-view_t* song_popup;
+view_t* song_popup_page;
+view_t* song_popup_page_btn;
 view_t* song_popup_list;
 
 view_t* mainview;
@@ -161,6 +163,12 @@ void ui_remove_from_main(void* p)
   if (view->texture.alpha < 1.0) view_remove(mainview, view);
 }
 
+void ui_remove_from_base(void* p)
+{
+  view_t* view = p;
+  if (view->texture.alpha < 1.0) view_remove(baseview, view);
+}
+
 void ui_toggle_mainview(view_t* view)
 {
   if (view->parent)
@@ -176,6 +184,27 @@ void ui_toggle_mainview(view_t* view)
     viewf.y    = (basef.h - viewf.h) / 2;
     view_set_frame(view, viewf);
     view_add(mainview, view);
+
+    view->texture.alpha = 0.0;
+    vh_fade_set(view, 1.0, 20.0, 1);
+  }
+}
+
+void ui_toggle_baseview(view_t* view)
+{
+  if (view->parent)
+  {
+    view->texture.alpha = 1.0;
+    vh_fade_set(view, 0.0, 20.0, 1);
+  }
+  else
+  {
+    r2_t basef = baseview->frame.local;
+    r2_t viewf = view->frame.local;
+    viewf.x    = (basef.w - viewf.w) / 2;
+    viewf.y    = (basef.h - viewf.h) / 2;
+    view_set_frame(view, viewf);
+    view_add(baseview, view);
 
     view->texture.alpha = 0.0;
     vh_fade_set(view, 1.0, 20.0, 1);
@@ -286,6 +315,8 @@ void ui_on_button_down(void* userdata, void* data)
 {
   char* id = ((view_t*)data)->id;
 
+  printf("button down %s\n", id);
+
   if (strcmp(id, "maxbtn") == 0) wm_toggle_fullscreen();
   if (strcmp(id, "app_close_btn") == 0) wm_close();
   if (strcmp(id, "playbtn") == 0) ui_on_play_button_down(NULL);
@@ -309,7 +340,7 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "dec_pop_acc_btn") == 0) ui_set_organize_lib();
   if (strcmp(id, "dec_pop_rej_btn") == 0) ui_toggle_mainview(decision_popup);
   if (strcmp(id, "close_sim_pop_btn") == 0) ui_toggle_mainview(simple_popup);
-  if (strcmp(id, "close_song_popup_btn") == 0) ui_toggle_mainview(song_popup);
+  if (strcmp(id, "song_popup_page_btn") == 0) ui_toggle_baseview(song_popup_page);
   if (strcmp(id, "filterbtn") == 0) ui_on_filter_activate(filters_popup);
   if (strcmp(id, "visuright_btn") == 0) ui_change_visu();
   if (strcmp(id, "visuleft_btn") == 0) ui_change_visu();
@@ -326,7 +357,7 @@ void ui_on_color_select(void* userdata, void* data)
 
 void ui_on_song_edit(int index)
 {
-  ui_toggle_mainview(song_popup);
+  ui_toggle_baseview(song_popup_page);
 }
 
 void ui_on_song_header(char* id)
@@ -558,7 +589,8 @@ void ui_show_libpath_popup(char* text)
 
 void ui_on_songlistpopup_select(int index)
 {
-  ui_toggle_mainview(song_popup);
+  ui_toggle_baseview(song_popup_page);
+
   if (index == 0) songlist_select(index);
   if (index == 1) songlist_select_range(index);
   if (index == 2) songlist_select_all();
@@ -845,15 +877,17 @@ void ui_init(float width,
 
   // song popup
 
-  song_popup      = view_get_subview(baseview, "song_popup");
-  song_popup_list = view_get_subview(baseview, "song_popup_list");
+  song_popup_page     = view_get_subview(baseview, "song_popup_page");
+  song_popup_page_btn = view_get_subview(baseview, "song_popup_page_btn");
+  song_popup_list     = view_get_subview(baseview, "song_popup_list");
 
-  vh_fade_add(song_popup, song_popup, ui_remove_from_main);
+  vh_fade_add(song_popup_page, song_popup_page, ui_remove_from_base);
+  vh_touch_add(song_popup_page_btn, cb_new(ui_on_button_down, NULL));
 
   songlistpopup_attach(song_popup_list, fontpath, ui_on_songlistpopup_select);
   //donatelist_attach(aboutlist, fontpath, ui_show_simple_popup);
 
-  view_remove(main, song_popup);
+  view_remove(baseview, song_popup_page);
 
   // set glossy effect on header
 
