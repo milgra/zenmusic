@@ -425,7 +425,7 @@ void vh_list_refresh(view_t* view)
     view_t* item = vh->items->data[index];
     if (index == 0) vh->head_pos = item->frame.local.y;
     view_remove(view, item);
-    (*vh->item_recycle)(item);
+    if (vh->item_recycle) (*vh->item_recycle)(item);
   }
 
   vec_reset(vh->items);

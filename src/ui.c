@@ -72,7 +72,7 @@ view_t* timeview;
 view_t* lengthview;
 
 view_t* about_popup;
-view_t* editor_popup;
+view_t* editor_popup_page;
 view_t* settings_popup;
 
 view_t* infoview;
@@ -92,11 +92,10 @@ view_t* mutebtn;
 view_t* simple_popup;
 view_t* sim_pop_txt;
 view_t* song_popup_page;
-view_t* song_popup_page_btn;
 view_t* song_popup_list;
 
 view_t* mainview;
-view_t* messages_popup;
+view_t* messages_popup_page;
 view_t* filters_popup;
 view_t* filterbar;
 
@@ -213,7 +212,7 @@ void ui_toggle_baseview(view_t* view)
 
 void ui_editor_accept()
 {
-  ui_toggle_mainview(editor_popup);
+  ui_toggle_baseview(editor_popup_page);
 
   map_t* changed = editor_popup_get_changed();
   vec_t* removed = editor_popup_get_removed();
@@ -327,11 +326,10 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "settingsbtn") == 0) ui_toggle_mainview(settings_popup);
   if (strcmp(id, "closesettingsbtn") == 0) ui_toggle_mainview(settings_popup);
   if (strcmp(id, "aboutbtn") == 0) ui_toggle_mainview(about_popup);
-  if (strcmp(id, "editbtn") == 0) ui_toggle_mainview(editor_popup);
-  if (strcmp(id, "closemessagelistbtn") == 0) ui_toggle_mainview(messages_popup);
-  if (strcmp(id, "info") == 0) ui_toggle_mainview(messages_popup);
+  if (strcmp(id, "editbtn") == 0) ui_toggle_baseview(editor_popup_page);
+  if (strcmp(id, "info") == 0) ui_toggle_baseview(messages_popup_page);
   if (strcmp(id, "closefilterbtn") == 0) ui_toggle_mainview(filters_popup);
-  if (strcmp(id, "closeeditorbtn") == 0) ui_toggle_mainview(editor_popup);
+  if (strcmp(id, "closeeditorbtn") == 0) ui_toggle_baseview(editor_popup_page);
   if (strcmp(id, "accepteditorbtn") == 0) ui_editor_accept();
   if (strcmp(id, "closehomebtn") == 0) ui_toggle_mainview(about_popup);
   if (strcmp(id, "chlib_pop_acc_btn") == 0) ui_change_library();
@@ -340,10 +338,13 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "dec_pop_acc_btn") == 0) ui_set_organize_lib();
   if (strcmp(id, "dec_pop_rej_btn") == 0) ui_toggle_mainview(decision_popup);
   if (strcmp(id, "close_sim_pop_btn") == 0) ui_toggle_mainview(simple_popup);
-  if (strcmp(id, "song_popup_page_btn") == 0) ui_toggle_baseview(song_popup_page);
   if (strcmp(id, "filterbtn") == 0) ui_on_filter_activate(filters_popup);
   if (strcmp(id, "visuright_btn") == 0) ui_change_visu();
   if (strcmp(id, "visuleft_btn") == 0) ui_change_visu();
+
+  if (strcmp(id, "song_popup_page_btn") == 0) ui_toggle_baseview(song_popup_page);
+  if (strcmp(id, "messages_popup_page_btn") == 0) ui_toggle_baseview(messages_popup_page);
+  if (strcmp(id, "ideditor_popup_page_btn") == 0) ui_toggle_baseview(editor_popup_page);
 }
 
 void ui_on_color_select(void* userdata, void* data)
@@ -599,7 +600,7 @@ void ui_on_songlistpopup_select(int index)
     vec_reset(ui.selected);
     songlist_get_selected(ui.selected);
     editor_popup_set_songs(ui.selected, ui_libpath);
-    ui_toggle_mainview(editor_popup);
+    ui_toggle_baseview(editor_popup_page);
   }
   if (index == 4)
   {
@@ -729,12 +730,14 @@ void ui_init(float width,
   ts.align   = TA_LEFT;
   artistlist = textlist_new(view_get_subview(baseview, "artistlist"), filtered_get_artists(), ts, ui_on_artist_select);
 
-  messages_popup      = view_get_subview(baseview, "messages_popup");
-  view_t* messagelist = view_get_subview(baseview, "messagelist");
+  messages_popup_page             = view_get_subview(baseview, "messages_popup_page");
+  view_t* messagelist             = view_get_subview(baseview, "messagelist");
+  view_t* messages_popup_page_btn = view_get_subview(baseview, "messages_popup_page_btn");
 
-  vh_fade_add(messages_popup, messages_popup, ui_remove_from_main);
+  vh_fade_add(messages_popup_page, messages_popup_page, ui_remove_from_base);
+  vh_touch_add(messages_popup_page_btn, cb_new(ui_on_button_down, NULL));
 
-  view_remove(mainview, messages_popup);
+  view_remove(baseview, messages_popup_page);
 
   filters_popup = view_get_subview(baseview, "filters_popup");
 
@@ -792,13 +795,16 @@ void ui_init(float width,
 
   // song editor
 
-  editor_popup = view_get_subview(baseview, "song_editor_popup");
+  editor_popup_page             = view_get_subview(baseview, "ideditor_popup_page");
+  view_t* editor_popup          = view_get_subview(baseview, "song_editor_popup");
+  view_t* editor_popup_page_btn = view_get_subview(baseview, "ideditor_popup_page_btn");
 
   editor_popup_attach(editor_popup, fontpath);
 
-  vh_fade_add(editor_popup, editor_popup, ui_remove_from_main);
+  vh_fade_add(editor_popup_page, editor_popup_page, ui_remove_from_base);
+  vh_touch_add(editor_popup_page_btn, cb_new(ui_on_button_down, NULL));
 
-  view_remove(main, editor_popup);
+  view_remove(baseview, editor_popup_page);
 
   // lib input popup
 
@@ -877,9 +883,9 @@ void ui_init(float width,
 
   // song popup
 
-  song_popup_page     = view_get_subview(baseview, "song_popup_page");
-  song_popup_page_btn = view_get_subview(baseview, "song_popup_page_btn");
-  song_popup_list     = view_get_subview(baseview, "song_popup_list");
+  song_popup_page             = view_get_subview(baseview, "song_popup_page");
+  song_popup_list             = view_get_subview(baseview, "song_popup_list");
+  view_t* song_popup_page_btn = view_get_subview(baseview, "song_popup_page_btn");
 
   vh_fade_add(song_popup_page, song_popup_page, ui_remove_from_base);
   vh_touch_add(song_popup_page_btn, cb_new(ui_on_button_down, NULL));
