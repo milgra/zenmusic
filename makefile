@@ -7,13 +7,14 @@ SOURCES = \
 	$(wildcard src/ui/*.c) \
 	$(wildcard src/mtlib/*.c) \
 	$(wildcard src/modules/*.c) \
-	$(wildcard src/modules/gl/*.c) \
 	$(wildcard src/modules/image/*.c) \
 	$(wildcard src/modules/player/*.c) \
 	$(wildcard src/modules/text/*.c) \
-	$(wildcard src/modules/view/*.c) \
 	$(wildcard src/modules/html/*.c) \
-	$(wildcard src/modules/wm/*.c)
+	$(wildcard src/modules/ui/*.c) \
+	$(wildcard src/modules/ui/gl/*.c) \
+	$(wildcard src/modules/ui/wm/*.c) \
+	$(wildcard src/modules/ui/view/*.c)
 
 CFLAGS = \
 	-I/usr/local/include \
@@ -24,13 +25,14 @@ CFLAGS = \
 	-Isrc/mtlib \
 	-Isrc/views \
 	-Isrc/modules \
-	-Isrc/modules/gl \
-	-Isrc/modules/wm \
 	-Isrc/modules/text \
 	-Isrc/modules/html \
-	-Isrc/modules/view \
 	-Isrc/modules/image \
-	-Isrc/modules/player
+	-Isrc/modules/player \
+	-Isrc/modules/ui \
+	-Isrc/modules/ui/gl \
+	-Isrc/modules/ui/wm \
+	-Isrc/modules/ui/view 
 
 LDFLAGS = \
 	-L/usr/local/lib \

@@ -54,6 +54,7 @@ freebsd for os
 
 first version
 
+fuggoleges osztasos play/mute gomb
 input field delete icon
 genre/artist button
 filter fix
