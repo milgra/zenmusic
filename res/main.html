@@ -102,95 +102,9 @@
 	    </div>
 	  </div>
 	</div>
-	
+
       </div>  
     </div>
-
-    <!-- FILTER LIST POPUP -->
-    
-    <div id="filters_popup">
-	  
-      <div id="filterlistshadow" class="popupshadow">
-	<div id="filterlist">
-	  <div id="genrelist"/>
-	  <div id="artistlist"/>
-	</div>
-      </div>
-      
-      <div id="closefilterbtn" class="closepopupbtn" type="button" onclick="on_button_press">
-	<div id="closefiltericon" class="closeicon"/>
-      </div>
-      
-    </div>
-
-    <!-- ABOUT POPUP -->
-
-    <div id="about_popup">
-      <div id="aboutshadow" class="popupshadow">
-	<div id="aboutlist"/>
-      </div>
-      <div id="closehomebtn" class="closepopupbtn" type="button" onclick="on_button_press">
-	<div id="closehomeicon" class="closeicon"/>
-      </div>
-    </div>
-
-    <!-- SETTINGS POPUP -->
-
-    <div id="settings_popup">
-      <div id="settingsshadow" class="popupshadow">
-	<div id="settingslist"/>
-      </div>
-      <div id="closesettingsbtn" class="closepopupbtn" type="button" onclick="on_button_press">
-	<div id="closesettingsicon" class="closeicon"/>
-      </div>
-    </div>
-
-    <!-- CHANGE LIB POPUP -->
-    
-    <div id="library_popup">
-      <div id="library_popup_shadow" class="popupshadow">
-	<div id="library_popup_content" class="popup_content">
-	  <div id="chlib_pop_tf" class="ch_lib_tf"/>
-	  <div id="chlib_pop_if" class="ch_lib_if"/>
-	  <div id="chlib_pop_acc_btn" class="acceptbtn" type="button" onclick="on_button_press">
-	    <div id="chlib_pop_acc_btn_icn" class="accepticon"/>
-	  </div>
-	</div>
-      </div>
-      <div id="library_popup_close_btn" class="closepopupbtn" type="button" onclick="on_button_press">
-	<div id="library_popup_close_icn" class="closeicon"/>
-      </div>
-    </div>
-        
-    <!-- DECISION POPUP -->
-
-    <div id="decision_popup">
-      <div id="dec_pop_shd" class="popupshadow">
-	<div id="decision_popup_content" class="popup_content">
-	  <div id="dec_pop_tf"/>
-	  <div id="dec_pop_acc_btn" type="button" onclick="on_button_press">
-	    <div id="dec_pop_acc_btn_icn" class="accepticon"/>
-	  </div>
-	</div>
-      </div>
-      <div id="dec_pop_rej_btn" class="closepopupbtn" type="button" onclick="on_button_press">
-	<div id="closesettingsicon" class="closeicon"/>
-      </div>      
-    </div>
-
-    <!-- SIMPLE POPUP -->
-    
-    <div id="simple_popup">
-      <div id="sim_pop_shd" class="popupshadow">
-	<div id="decision_popup_content" class="popup_content">
-	  <div id="sim_pop_txt"/>
-	</div>
-      </div>
-      <div id="close_sim_pop_btn" class="closepopupbtn" type="button" onclick="on_button_press">
-	<div id="close_sim_pop_btn" class="closeicon"/>
-      </div>
-    </div>
-
   </div>
 
   <!-- FOOTER -->
@@ -222,10 +136,12 @@
     </div>
   </div>
 
-  <!-- INITIAL LIBRARY POPUP -->
+  <!-- POPUPS -->
+  
+  <!-- SELECT STARTING LIBRARY POPUP -->
   
   <div id="library_page">
-    <div id="libpopupback">
+    <div id="library_page_back">
       <div id="lib_pop_shd" class="popupshadow">
 	<div id="libtextfield" class="ch_lib_tf"/>
 	<div id="libinputfield" class="ch_lib_if"/>
@@ -235,7 +151,25 @@
       </div>
     </div>
   </div>
-
+  
+  <!-- CHANGE LIB POPUP -->
+    
+  <div id="library_popup_page" class="popup_page">
+    <div id="library_popup_page_btn" class="popup_page">
+      <div id="library_popup">
+	<div id="library_popup_shadow" class="popupshadow">
+	  <div id="library_popup_content" class="popup_content">
+	    <div id="chlib_pop_tf" class="ch_lib_tf"/>
+	    <div id="chlib_pop_if" class="ch_lib_if"/>
+	    <div id="chlib_pop_acc_btn" class="acceptbtn" type="button" onclick="on_button_press">
+	      <div id="chlib_pop_acc_btn_icn" class="accepticon"/>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+        
   <!-- SONG POPUP -->
 
   <div id="song_popup_page" class="popup_page">
@@ -284,6 +218,76 @@
 	    </div>
 	  </div>
 	  
+	</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ABOUT POPUP -->
+
+  <div id="about_popup_page" class="popup_page">
+    <div id="about_popup_page_btn" class="popup_page">
+      <div id="about_popup">
+	<div id="aboutshadow" class="popupshadow">
+	  <div id="aboutlist"/>
+	</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FILTER LIST POPUP -->
+
+  <div id="filters_popup_page" class="popup_page">
+    <div id="filters_popup_page_btn" class="popup_page">
+      <div id="filters_popup">
+	<div id="filterlistshadow" class="popupshadow">
+	  <div id="filterlist">
+	    <div id="genrelist"/>
+	    <div id="artistlist"/>
+	  </div>
+	</div>	
+      </div>
+    </div>
+  </div>
+  
+  <!-- SETTINGS POPUP -->
+  
+  <div id="settings_popup_page" class="popup_page">
+    <div id="settings_popup_page_btn" class="popup_page">
+      <div id="settings_popup">
+	<div id="settingsshadow" class="popupshadow">
+	  <div id="settingslist"/>
+	</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DECISION POPUP -->
+
+  <div id="decision_popup_page" class="popup_page">
+    <div id="decision_popup_page_btn" class="popup_page">
+      <div id="decision_popup">
+	<div id="dec_pop_shd" class="popupshadow">
+	  <div id="decision_popup_content" class="popup_content">
+	    <div id="dec_pop_tf"/>
+	    <div id="dec_pop_acc_btn" type="button" onclick="on_button_press">
+	      <div id="dec_pop_acc_btn_icn" class="accepticon"/>
+	    </div>
+	  </div>
+	</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIMPLE POPUP -->
+
+  <div id="simple_popup_page" class="popup_page">
+    <div id="simple_popup_page_btn" class="popup_page">
+      <div id="simple_popup">
+	<div id="sim_pop_shd" class="popupshadow">
+	  <div id="decision_popup_content" class="popup_content">
+	    <div id="sim_pop_txt"/>
+	  </div>
 	</div>
       </div>
     </div>
