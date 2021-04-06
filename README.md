@@ -54,15 +54,12 @@ freebsd for os
 
 first version
 
-fuggoleges osztasos play/mute gomb
-input field delete icon
-genre/artist button
 filter fix
+gombok kattanjanak
 clear cover art if not available
 set starting volume
 search history popup
 genre/artist popup
-remove google id    
 remove background rendering ( ui renderer? )
 artist-album sort
 search/filter history ( use filters for playlists)
@@ -76,6 +73,8 @@ fix while heaven wept, black lotus
 fix mp4 playing freezes
 rdft ne logaritmikus legyen, alig latszik a kozep tartomany
 text style is cssbol jojjon
+metadata update eseten sulyos leak, a hatterben tortenjen, analyzer kozben is lehessen mar bongeszni
+dupla klikk szarakszik
 
 ideas
 

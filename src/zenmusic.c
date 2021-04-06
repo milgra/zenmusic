@@ -116,7 +116,7 @@ void on_change_organize(void* userdata, void* data)
   config_set("organize_db", newval);
   REL(newval);
 
-  ui_set_org_btn_lbl(organize ? "Disable" : "Enable");
+  // ui_set_org_btn_lbl(organize ? "Disable" : "Enable");
 
   if (organize)
   {
@@ -280,6 +280,10 @@ void render(uint32_t time)
 
     ui_update_visualizer();
     ui_update_video();
+  }
+  else
+  {
+    ui_update_time(0.0, 0.0, 0.0);
   }
 
   ui_manager_render(time);

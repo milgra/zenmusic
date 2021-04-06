@@ -30,13 +30,13 @@ bm_t* editor_get_image(const char* path);
 
 void editor_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop, char* cover)
 {
-  printf("editor update metadata for songs:\n");
-  mem_describe(songs, 0);
-  printf("\ndata:\n");
-  mem_describe(data, 0);
-  printf("\ndrop:\n");
-  mem_describe(drop, 0);
-  printf("\ncover %s\n", cover);
+  /* printf("editor update metadata for songs:\n"); */
+  /* mem_describe(songs, 0); */
+  /* printf("\ndata:\n"); */
+  /* mem_describe(data, 0); */
+  /* printf("\ndrop:\n"); */
+  /* mem_describe(drop, 0); */
+  /* printf("\ncover %s\n", cover); */
 
   for (int index = 0; index < songs->length; index++)
   {
@@ -104,7 +104,7 @@ int editor_get_metadata(const char* path, map_t* map)
   return retv;
 }
 
-void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* drop, char* img_path)
+void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* drop, char* cover_image)
 {
   LOG("editor_update_song_metadata for %s\n", path);
 
@@ -127,50 +127,50 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
   char* oldpath = cstr_fromformat("%s%s", libpath, path, NULL);
   char* newpath = cstr_fromformat("%s%s", libpath, tmp, NULL);
 
-  printf("oldpath %s\n", oldpath);
-  printf("newpath %s\n", newpath);
+  //printf("oldpath %s\n", oldpath);
+  //printf("newpath %s\n", newpath);
 
   // open cover art first
 
   int res;
 
-  AVPacket*          img_pkt      = NULL;
-  AVFormatContext*   img_ctx      = NULL;
-  AVCodecParameters* img_codecpar = NULL;
+  AVPacket*          cover_packet  = NULL;
+  AVFormatContext*   cover_context = NULL;
+  AVCodecParameters* cover_cparam  = NULL;
 
-  if (img_path)
+  if (cover_image)
   {
-    LOG("editor_set_metadata opening image file %s\n", img_path);
+    //LOG("editor_set_metadata opening image file %s\n", cover_image);
 
-    img_ctx = avformat_alloc_context();
-    res     = avformat_open_input(&img_ctx, img_path, 0, 0);
+    cover_context = avformat_alloc_context();
+    res           = avformat_open_input(&cover_context, cover_image, 0, 0);
 
     if (res >= 0)
     {
-      res = avformat_find_stream_info(img_ctx, 0);
+      res = avformat_find_stream_info(cover_context, 0);
 
       if (res >= 0)
       {
 
-        img_pkt       = av_packet_alloc();
-        img_pkt->data = NULL;
-        img_pkt->size = 0;
-        av_init_packet(img_pkt);
+        cover_packet       = av_packet_alloc();
+        cover_packet->data = NULL;
+        cover_packet->size = 0;
+        av_init_packet(cover_packet);
 
-        while (av_read_frame(img_ctx, img_pkt) == 0)
+        while (av_read_frame(cover_context, cover_packet) == 0)
         {
-          if (img_ctx->streams[img_pkt->stream_index]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
+          if (cover_context->streams[cover_packet->stream_index]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
           {
-            img_codecpar = img_ctx->streams[img_pkt->stream_index]->codecpar;
+            cover_cparam = cover_context->streams[cover_packet->stream_index]->codecpar;
             break;
           }
         }
       }
       else
-        LOG("ERROR editor_set_metadata cannot find stream info : %s\n", img_path);
+        LOG("ERROR editor_set_metadata cannot find stream info : %s\n", cover_image);
     }
     else
-      LOG("ERROR editor_set_metadata cannot open image file : %s\n", img_path);
+      LOG("ERROR editor_set_metadata cannot open image file : %s\n", cover_image);
   }
 
   // open source file
@@ -207,7 +207,7 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
         {
           int dispos = src_ctx->streams[i]->disposition;
           // skip if we have new image for cover art and stream is cover art stream
-          char skip = (dispos & AV_DISPOSITION_ATTACHED_PIC) == 1 && img_codecpar;
+          char skip = (dispos & AV_DISPOSITION_ATTACHED_PIC) == 1 && cover_cparam;
 
           if (!skip)
           {
@@ -217,13 +217,13 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
             {
               if (param->codec_type == AVMEDIA_TYPE_VIDEO)
               {
-                printf("Video Codec: resolution %d x %d\n", param->width, param->height);
+                //printf("Video Codec: resolution %d x %d\n", param->width, param->height);
               }
               else if (param->codec_type == AVMEDIA_TYPE_AUDIO)
               {
-                printf("Audio Codec: %d channels, sample rate %d\n", param->channels, param->sample_rate);
+                //printf("Audio Codec: %d channels, sample rate %d\n", param->channels, param->sample_rate);
               }
-              printf("Codec %s ID %d bit_rate %ld\n", codec->long_name, codec->id, param->bit_rate);
+              //printf("Codec %s ID %d bit_rate %ld\n", codec->long_name, codec->id, param->bit_rate);
 
               AVStream* ostream = avformat_new_stream(out_ctx,
                                                       codec);
@@ -236,32 +236,14 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
           }
         }
 
-        // create cover art image stream
-
-        if (img_codecpar)
-        {
-          AVCodec* codec = avcodec_find_encoder(img_codecpar->codec_id);
-          if (codec)
-          {
-            AVStream* ostream = avformat_new_stream(out_ctx,
-                                                    codec);
-
-            printf("creating new stream for new cover, index : %i\n", ostream->index);
-            avcodec_parameters_copy(ostream->codecpar,
-                                    img_codecpar);
-
-            ostream->codecpar->codec_tag = 0;
-            ostream->disposition |= AV_DISPOSITION_ATTACHED_PIC;
-          }
-        }
-
         // copy metadata in old file to new file
 
         av_dict_copy(&out_ctx->metadata, src_ctx->metadata, 0);
 
         AVDictionaryEntry* tag = NULL;
-        printf("existing tags:\n");
-        while ((tag = av_dict_get(out_ctx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) printf("%s : %s\n", tag->key, tag->value);
+
+        // printf("existing tags:\n");
+        // while ((tag = av_dict_get(out_ctx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) printf("%s : %s\n", tag->key, tag->value);
 
         // update metadata in new file
 
@@ -302,6 +284,27 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
           if (res >= 0)
           {
 
+            // create cover art image stream before writing header
+
+            if (cover_cparam)
+            {
+              AVCodec* codec = avcodec_find_encoder(cover_cparam->codec_id);
+              if (codec)
+              {
+                AVStream* ostream = avformat_new_stream(out_ctx,
+                                                        codec);
+
+                cover_packet->stream_index = ostream->index;
+
+                printf("creating new stream for new cover, index : %i\n", ostream->index);
+                avcodec_parameters_copy(ostream->codecpar,
+                                        cover_cparam);
+
+                ostream->codecpar->codec_tag = 0;
+                ostream->disposition |= AV_DISPOSITION_ATTACHED_PIC;
+              }
+            }
+
             res = avformat_write_header(out_ctx,
                                         NULL);
 
@@ -320,7 +323,7 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
 
                 int dispos = src_ctx->streams[src_pkt->stream_index]->disposition;
                 // skip if we have new image for cover art and stream is cover art stream
-                char skip = (dispos & AV_DISPOSITION_ATTACHED_PIC) == 1 && img_codecpar;
+                char skip = (dispos & AV_DISPOSITION_ATTACHED_PIC) == 1 && cover_cparam;
 
                 if (!skip)
                 {
@@ -333,20 +336,18 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
 
               // if no cover art is added during saving, add a new stream
 
-              if (img_codecpar)
+              if (cover_cparam)
               {
                 printf("adding new cover art\n");
-                // TODO check stream index!!!
-                img_pkt->stream_index = 1;
 
-                res = av_write_frame(out_ctx, img_pkt);
+                res = av_write_frame(out_ctx, cover_packet);
 
                 if (res < 0) LOG("ERROR : editor_set_metadata : cannot write cover art image packet\n");
 
                 // cleanup
-                av_packet_free(&img_pkt);
-                avformat_close_input(&img_ctx);
-                avformat_free_context(img_ctx);
+                av_packet_free(&cover_packet);
+                avformat_close_input(&cover_context);
+                avformat_free_context(cover_context);
               }
 
               av_packet_free(&src_pkt);
@@ -356,18 +357,20 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
               avformat_free_context(out_ctx);
               avformat_free_context(src_ctx);
 
-              printf("written file : %s\n", newpath);
-
               // rename new file to old name
 
               if (rename(newpath, oldpath) != 0)
                 LOG("ERROR : editor_set_metadata : cannot rename new file to old name\n");
+              else
+                printf("UPDATE SUCCESS\n");
             }
             else
               LOG("ERROR : editor_set_metadata : cannot write header\n");
           }
           else
             LOG("ERROR : editor_set_metadata : cannot init output\n");
+
+          avio_close(out_ctx->pb);
         }
         else
           LOG("ERROR : editor_set_metadata : avformat needs no file\n");

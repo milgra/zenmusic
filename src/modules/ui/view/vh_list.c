@@ -237,14 +237,14 @@ void vh_list_evt(view_t* view, ev_t ev)
             VREM(vh->items, head);
             vh->head_index += 1;
             view_remove(view, head);
-            (*vh->item_recycle)(head);
+            if (vh->item_recycle) (*vh->item_recycle)(head);
           }
           if (tail->frame.local.y > view->frame.local.h + PRELOAD_DISTANCE && vh->items->length > 1)
           {
             VREM(vh->items, tail);
             vh->tail_index -= 1;
             view_remove(view, tail);
-            (*vh->item_recycle)(tail);
+            if (vh->item_recycle) (*vh->item_recycle)(tail);
           }
         }
       }

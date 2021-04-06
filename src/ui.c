@@ -198,12 +198,16 @@ void ui_toggle_baseview(view_t* view)
   else
   {
     r2_t basef = baseview->frame.local;
-    r2_t viewf = view->frame.local;
+
+    view_t* btnview = view->views->data[0];
+    view_t* popview = btnview->views->data[0];
+
+    r2_t viewf = popview->frame.local;
     viewf.x    = (basef.w - viewf.w) / 2;
     viewf.y    = (basef.h - viewf.h) / 2;
-    view_set_frame(view, viewf);
-    view_add(baseview, view);
+    view_set_frame(popview, viewf);
 
+    view_add(baseview, view);
     view->texture.alpha = 0.0;
     vh_fade_set(view, 1.0, 20.0, 1);
   }
@@ -277,9 +281,10 @@ void ui_set_library()
 
 void ui_set_organize_lib()
 {
-  char* text = tg_text_get(set_org_btn_txt);
+  //char* text = tg_text_get(set_org_btn_txt);
 
-  callbacks_call("on_change_organize", text);
+  // TODO fix
+  callbacks_call("on_change_organize", "Enable");
 }
 
 void ui_change_visu()
@@ -334,7 +339,6 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "acceptlibbtn") == 0) ui_set_library();
   if (strcmp(id, "library_popup_close_btn") == 0) ui_toggle_baseview(library_popup_page);
   if (strcmp(id, "dec_pop_acc_btn") == 0) ui_set_organize_lib();
-  if (strcmp(id, "dec_pop_rej_btn") == 0) ui_toggle_baseview(decision_popup_page);
   if (strcmp(id, "filterbtn") == 0) ui_on_filter_activate(filters_popup_page);
   if (strcmp(id, "visuright_btn") == 0) ui_change_visu();
   if (strcmp(id, "visuleft_btn") == 0) ui_change_visu();
@@ -517,7 +521,7 @@ void ui_update_time(double time, double left, double dur)
   ts.size        = 30.0;
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0;
-  ts.margin_left = 12;
+  ts.margin_left = 17;
 
   char timebuff[20];
 
@@ -832,10 +836,12 @@ void ui_init(float width,
   tg_text_add(dec_pop_tf);
   tg_text_set(dec_pop_tf, "Files will be renamed and moved to different folders based on artist, album, track number and title, are you sure?", ts);
 
-  decision_popup_page    = view_get_subview(baseview, "decision_popup_page");
-  view_t* decision_popup = view_get_subview(baseview, "decision_popup");
+  decision_popup_page             = view_get_subview(baseview, "decision_popup_page");
+  view_t* decision_popup          = view_get_subview(baseview, "decision_popup");
+  view_t* decision_popup_page_btn = view_get_subview(baseview, "decision_popup_page_btn");
 
   vh_fade_add(decision_popup_page, decision_popup_page, ui_remove_from_base);
+  vh_touch_add(decision_popup_page_btn, cb_new(ui_on_button_down, NULL));
 
   view_remove(baseview, decision_popup_page);
 
@@ -850,10 +856,12 @@ void ui_init(float width,
   tg_text_set(chlib_pop_tf, "Use library at", ts);
   vh_textinput_add(chlib_pop_if, "/home/youruser/Music", "", ts, NULL);
 
-  library_popup_page    = view_get_subview(baseview, "library_popup_page");
-  view_t* library_popup = view_get_subview(baseview, "library_popup");
+  library_popup_page             = view_get_subview(baseview, "library_popup_page");
+  view_t* library_popup          = view_get_subview(baseview, "library_popup");
+  view_t* library_popup_page_btn = view_get_subview(baseview, "library_popup_page_btn");
 
   vh_fade_add(library_popup_page, library_popup_page, ui_remove_from_base);
+  vh_touch_add(library_popup_page_btn, cb_new(ui_on_button_down, NULL));
 
   view_remove(baseview, library_popup_page);
 
