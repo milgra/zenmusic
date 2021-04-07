@@ -54,6 +54,7 @@ void ui_show_simple_popup(char* text);
 #include "vh_list_item.c"
 #include "vh_picker.c"
 #include "vh_roll.c"
+#include "vh_textfield.c"
 #include "vh_textinput.c"
 #include "vh_touch.c"
 #include "view_generator.c"
@@ -802,6 +803,8 @@ void ui_init(float width,
   vh_textinput_add(filterbar, "", "Search/Filter", ts, NULL);
   vh_textinput_set_on_text(filterbar, ui_filter);
   // vh_textinput_set_on_activate(filterbar, ui_on_filter_activate);
+
+  //vh_textfield_add(filterbar,ts);
 
   // song editor
 

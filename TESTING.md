@@ -36,8 +36,38 @@
        2. start playing all items in song list
        3. check sound output somehow ( ffmpeg level or sndio )
 
+   2.2 check random functionality
 
-   2.2 check if cover art visible
+   2.3 check play/pause/seek
+   2.4 check mute/umute/volume
+
+
+   2.5 check if cover art visible
+
+
+3. MUSIC FILTERING
+
+   3.1 filtering
+   
+       1. click on search/query
+       2. enter metallica
+       3. check if metallica shows up
+       4. enter lica
+       5. check results
+       6. check artist is metallica
+       7. check artist contains tallica
+       8. check bitrate is smaller than 128
+
+   3.2 column resizing, organizing
+
+       1. swap artist and title columns
+       2. resize artist column
+       3. resize last column somehow
+
+       automate
+
+       1. start zen music with gui call script
+
 
 
 3. ORGANIZATION
@@ -98,6 +128,10 @@
        2. api testing - inject paths, edited, removed metadata into api?
        3. gui testing - inject selection, edition, key events, accept events
 
+
+5. LEAKS
+
+   5.1 somehow log memory usage or use valgrind
 
 AUTOMATED TESTING
 

@@ -56,6 +56,8 @@ void vh_textfield_add(view_t* view, textstyle_t textstyle)
   tg_text_add(ph);
   vh_textinput_add(ti, "start", "place", textstyle, NULL);
 
+  tg_text_set(ph, "place", textstyle);
+
   data->ti = ti;
   data->ph = ph;
 

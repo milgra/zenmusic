@@ -83,6 +83,7 @@ rdft ne logaritmikus legyen, alig latszik a kozep tartomany
 text style is cssbol jojjon
 metadata update eseten sulyos leak, a hatterben tortenjen, analyzer kozben is lehessen mar bongeszni
 dupla klikk szarakszik
+automata frame rate keep - ha 50 fps ala megy, rakja backgroundba a rendert
 
 ideas
 
