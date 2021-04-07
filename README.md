@@ -50,6 +50,14 @@ Inkscape for the icons
 emacs for programming
 freebsd for os
 
+Contribute :
+
+use clang format
+use mtlib (memoty,vector,map) for memory handling
+write a new test for any new feature
+always run all tests before push
+always run valgrind and check for leaks before push
+
 ---
 
 first version
