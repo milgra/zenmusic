@@ -8,9 +8,10 @@
 
 typedef struct _vh_textinput_t
 {
-  str_t*  text_s;
-  vec_t*  glyph_v;
-  view_t* cursor_v;
+  str_t*  text_s;   // text string
+  vec_t*  glyph_v;  // glpyh views
+  view_t* cursor_v; // cursor view
+  view_t* holder_v; // placeholder text view
 
   int         glyph_index;
   textstyle_t style;
@@ -242,6 +243,7 @@ void vh_textinput_add(view_t*     view,
                       void*       userdata)
 {
   char* id_c = cstr_fromformat("%s%s", view->id, "crsr", NULL);
+  char* id_h = cstr_fromformat("%s%s", view->id, "holder", NULL);
 
   vh_textinput_t* data = mem_calloc(sizeof(vh_textinput_t), "vh_text", NULL, NULL);
 
@@ -250,6 +252,7 @@ void vh_textinput_add(view_t*     view,
   data->text_s   = str_new();
   data->glyph_v  = VNEW();
   data->cursor_v = view_new(id_c, (r2_t){50, 12, 2, 0});
+  data->holder_v = view_new(id_h, (r2_t){0, 0, view->frame.local.w, view->frame.local.h});
 
   data->style    = textstyle;
   data->userdata = userdata;
@@ -265,6 +268,11 @@ void vh_textinput_add(view_t*     view,
   data->cursor_v->layout.background_color = 0x666666FF;
   tg_css_add(data->cursor_v);
   vh_anim_add(data->cursor_v);
+
+  // placeholder
+
+  tg_text_add(data->holder_v);
+  tg_text_set(data->holder_v, text, textstyle);
 
   // view setup
 

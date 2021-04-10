@@ -802,9 +802,9 @@ void ui_init(float width,
 
   vh_textinput_add(filterbar, "", "Search/Filter", ts, NULL);
   vh_textinput_set_on_text(filterbar, ui_filter);
-  // vh_textinput_set_on_activate(filterbar, ui_on_filter_activate);
+  //vh_textinput_set_on_activate(filterbar, ui_on_filter_activate);
 
-  //vh_textfield_add(filterbar,ts);
+  // vh_textfield_add(filterbar, ts);
 
   // song editor
 

@@ -62,17 +62,15 @@ always run valgrind and check for leaks before push
 
 first version
 
+placeholder in textinput
 filter fix
+flag non-editable fields in database, show them as grey in editor
 gombok kattanjanak
 clear cover art if not available
 set starting volume
-search history popup
-genre/artist popup
-remove background rendering ( ui renderer? )
 artist-album sort
 search/filter history ( use filters for playlists)
 on mute fade in/out volume with alpha
-select anim
 header resize on hscroll problem
 socketes taviranyitas - 1 byteokkal
 accept input on enter
@@ -156,6 +154,8 @@ tech video
 
 two big parts : ui - glyph, text, view handling, rendering and compositing
 media transcoding : media file decoding, playing, metadata and cover art encoding
+
+testing - record ui events, inject ui events, check result
 
 ui -
 gl-connector layer - the higher layers sending triangles to it with texture ids, renders these triangles with textures
