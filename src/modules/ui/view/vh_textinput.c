@@ -142,6 +142,7 @@ void vh_textinput_activate(view_t* view, char state)
     {
       data->active = 1;
       view_add(view, data->cursor_v);
+      view_remove(view, data->holder_v);
     }
   }
   else
@@ -150,6 +151,7 @@ void vh_textinput_activate(view_t* view, char state)
     {
       data->active = 0;
       view_remove(view, data->cursor_v);
+      view_add(view, data->holder_v);
     }
   }
 
@@ -158,6 +160,7 @@ void vh_textinput_activate(view_t* view, char state)
 
 void vh_textinput_on_glyph_close(view_t* view, void* userdata)
 {
+  printf("on glyph close\n");
   view_t* textview = userdata;
   view_remove(textview, view);
 }
@@ -200,7 +203,7 @@ void vh_textinput_evt(view_t* view, ev_t ev)
 
     vh_textinput_upd(view);
 
-    if (data->on_text) (*data->on_text)(view);
+    // if (data->on_text) (*data->on_text)(view);
   }
   else if (ev.type == EV_KDOWN)
   {
@@ -209,6 +212,7 @@ void vh_textinput_evt(view_t* view, ev_t ev)
       str_removecodepointatindex(data->text_s, data->text_s->length - 1);
 
       view_t* glyph_view = vec_tail(data->glyph_v);
+      VREM(data->glyph_v, glyph_view);
 
       r2_t sf = glyph_view->frame.local;
       r2_t ef = sf;
@@ -219,15 +223,10 @@ void vh_textinput_evt(view_t* view, ev_t ev)
       ef.w    = 0.0;
 
       vh_anim_region(glyph_view, sf, ef, 10, AT_EASE);
-
       vh_anim_set_event(glyph_view, view, vh_textinput_on_glyph_close);
 
-      // view_remove(view, glyph_view);
-
-      vec_rematindex(data->glyph_v, data->glyph_v->length - 1);
-
       vh_textinput_upd(view);
-      if (data->on_text) (*data->on_text)(view);
+      // if (data->on_text) (*data->on_text)(view);
     }
   }
   else if (ev.type == EV_TIME)
@@ -249,10 +248,8 @@ void vh_textinput_add(view_t*     view,
 
   textstyle.backcolor = 0;
 
-  data->text_s   = str_new();
-  data->glyph_v  = VNEW();
-  data->cursor_v = view_new(id_c, (r2_t){50, 12, 2, 0});
-  data->holder_v = view_new(id_h, (r2_t){0, 0, view->frame.local.w, view->frame.local.h});
+  data->text_s  = str_new();
+  data->glyph_v = VNEW();
 
   data->style    = textstyle;
   data->userdata = userdata;
@@ -265,18 +262,27 @@ void vh_textinput_add(view_t*     view,
 
   // cursor
 
+  data->cursor_v                          = view_new(id_c, (r2_t){50, 12, 2, 0});
   data->cursor_v->layout.background_color = 0x666666FF;
   tg_css_add(data->cursor_v);
   vh_anim_add(data->cursor_v);
 
   // placeholder
 
+  textstyle_t phts = textstyle;
+  phts.textcolor   = 0x888888FF;
+  data->holder_v   = view_new(id_h, (r2_t){0, 0, view->frame.local.w, view->frame.local.h});
   tg_text_add(data->holder_v);
-  tg_text_set(data->holder_v, text, textstyle);
+  tg_text_set(data->holder_v, phtext, phts);
+  data->holder_v->blocks_touch = 0;
+
+  view_add(view, data->holder_v);
 
   // view setup
 
   tg_text_add(view);
+
+  // add placeholder view
 
   // text_s setup
 
@@ -298,6 +304,7 @@ void vh_textinput_add(view_t*     view,
       REL(charstr);
     }
   }
+
   // update text
 
   vh_textinput_upd(view);

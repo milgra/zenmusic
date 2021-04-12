@@ -70,8 +70,6 @@ void vh_anim_evt(view_t* view, ev_t ev)
 
     if (vh->step < vh->steps)
     {
-      vh->step += 1;
-
       if (vh->anim_frame)
       {
         r2_t sf = vh->sf;
@@ -158,7 +156,9 @@ void vh_anim_evt(view_t* view, ev_t ev)
         view_set_texture_alpha(view, ca, 1);
       }
 
-      if (vh->step == vh->steps - 1)
+      vh->step += 1;
+
+      if (vh->step == vh->steps)
       {
         vh->anim_frame  = 0;
         vh->anim_region = 0;

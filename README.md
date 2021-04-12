@@ -82,6 +82,7 @@ text style is cssbol jojjon
 metadata update eseten sulyos leak, a hatterben tortenjen, analyzer kozben is lehessen mar bongeszni
 dupla klikk szarakszik
 automata frame rate keep - ha 50 fps ala megy, rakja backgroundba a rendert
+link a youtube videora ami a hasznalatat mutatja be
 
 ideas
 
