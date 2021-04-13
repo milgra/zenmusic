@@ -54,6 +54,8 @@ void vh_anim_region(view_t*    view,
                     int        steps,
                     animtype_t type);
 
+void vh_anim_finish(view_t* view);
+
 void vh_anim_add(view_t* view);
 
 void vh_anim_set_event(view_t* view, void* userdata, void (*on_finish)(view_t*, void*));
@@ -176,13 +178,16 @@ void vh_anim_frame(view_t*    view,
                    int        steps,
                    animtype_t type)
 {
-  vh_anim_t* vh  = view->handler_data;
-  vh->sf         = sf;
-  vh->ef         = ef;
-  vh->step       = 0;
-  vh->type       = type;
-  vh->steps      = steps;
-  vh->anim_frame = 1;
+  vh_anim_t* vh = view->handler_data;
+  if (vh->step == vh->steps)
+  {
+    vh->sf         = sf;
+    vh->ef         = ef;
+    vh->step       = 0;
+    vh->type       = type;
+    vh->steps      = steps;
+    vh->anim_frame = 1;
+  }
 }
 
 void vh_anim_region(view_t*    view,
@@ -191,13 +196,16 @@ void vh_anim_region(view_t*    view,
                     int        steps,
                     animtype_t type)
 {
-  vh_anim_t* vh   = view->handler_data;
-  vh->sr          = sr;
-  vh->er          = er;
-  vh->step        = 0;
-  vh->type        = type;
-  vh->steps       = steps;
-  vh->anim_region = 1;
+  vh_anim_t* vh = view->handler_data;
+  if (vh->step == vh->steps)
+  {
+    vh->sr          = sr;
+    vh->er          = er;
+    vh->step        = 0;
+    vh->type        = type;
+    vh->steps       = steps;
+    vh->anim_region = 1;
+  }
 }
 
 void vh_anim_alpha(view_t*    view,
@@ -206,13 +214,30 @@ void vh_anim_alpha(view_t*    view,
                    int        steps,
                    animtype_t type)
 {
-  vh_anim_t* vh  = view->handler_data;
-  vh->sa         = sa;
-  vh->ea         = ea;
-  vh->step       = 0;
-  vh->type       = type;
-  vh->steps      = steps;
-  vh->anim_alpha = 1;
+  vh_anim_t* vh = view->handler_data;
+  if (vh->step == vh->steps)
+  {
+    vh->sa         = sa;
+    vh->ea         = ea;
+    vh->step       = 0;
+    vh->type       = type;
+    vh->steps      = steps;
+    vh->anim_alpha = 1;
+  }
+}
+
+void vh_anim_finish(view_t* view)
+{
+  vh_anim_t* vh = view->handler_data;
+  vh->step      = vh->steps;
+
+  if (vh->anim_frame) view_set_frame(view, vh->ef);
+  if (vh->anim_region) view_set_region(view, vh->er);
+  if (vh->anim_alpha) view_set_texture_alpha(view, vh->ea, 1);
+
+  vh->anim_frame  = 0;
+  vh->anim_region = 0;
+  vh->anim_alpha  = 0;
 }
 
 void vh_anim_add(view_t* view)

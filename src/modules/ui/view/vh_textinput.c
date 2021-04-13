@@ -54,82 +54,122 @@ void vh_textinput_upd(view_t* view)
   str_t*          text_s = data->text_s;
   r2_t            frame  = view->frame.local;
 
-  glyph_t* glyphs = malloc(sizeof(glyph_t) * text_s->length);
-  for (int i = 0; i < text_s->length; i++) glyphs[i].cp = text_s->codepoints[i];
-  text_layout(glyphs, text_s->length, data->style, frame.w, frame.h);
-
-  for (int i = 0; i < text_s->length; i++)
+  if (text_s->length > 0)
   {
-    glyph_t g  = glyphs[i];
-    view_t* gv = data->glyph_v->data[i];
+    glyph_t* glyphs = malloc(sizeof(glyph_t) * text_s->length);
+    for (int i = 0; i < text_s->length; i++) glyphs[i].cp = text_s->codepoints[i];
+    text_layout(glyphs, text_s->length, data->style, frame.w, frame.h);
 
-    if (g.w > 0 && g.h > 0)
+    for (int i = 0; i < text_s->length; i++)
     {
-      r2_t f  = gv->frame.local;
-      r2_t nf = (r2_t){g.x, g.y, g.w, g.h};
-      if (f.w == 0 || f.h == 0)
+      glyph_t g  = glyphs[i];
+      view_t* gv = data->glyph_v->data[i];
+
+      if (g.w > 0 && g.h > 0)
       {
-        bm_t* texture = bm_new(g.w, g.h);
+        r2_t f  = gv->frame.local;
+        r2_t nf = (r2_t){g.x, g.y, g.w, g.h};
+        if (f.w == 0 || f.h == 0)
+        {
+          bm_t* texture = bm_new(g.w, g.h);
 
-        text_render_glyph(g, data->style, texture);
+          text_render_glyph(g, data->style, texture);
 
-        view_set_texture_bmp(gv, texture);
+          view_set_texture_bmp(gv, texture);
 
-        gv->display = 1; // do we have to have 0 as default?!?!
+          gv->display = 1; // do we have to have 0 as default?!?!
 
-        view_add(view, gv);
+          view_add(view, gv);
 
-        view_set_frame(gv, nf);
+          view_set_frame(gv, nf);
 
-        // open
-        r2_t sf = nf;
-        sf.x    = 0.0;
-        sf.y    = 0.0;
-        nf.x    = 0.0;
-        nf.y    = 0.0;
-        sf.w    = 0.0;
+          // open
+          r2_t sf = nf;
+          sf.x    = 0.0;
+          sf.y    = 0.0;
+          nf.x    = 0.0;
+          nf.y    = 0.0;
+          sf.w    = 0.0;
 
-        vh_anim_region(gv, sf, nf, 10, AT_EASE);
+          vh_anim_region(gv, sf, nf, 10, AT_EASE);
 
-        view_set_region(gv, sf);
-      }
-      else
-      {
-        r2_t rf = nf;
-        rf.x    = 0;
-        rf.y    = 0;
-        view_set_region(gv, rf);
-        vh_anim_frame(gv, gv->frame.local, nf, 10, AT_EASE);
+          view_set_region(gv, sf);
+        }
+        else
+        {
+          r2_t rf = nf;
+          rf.x    = 0;
+          rf.y    = 0;
+          view_set_region(gv, rf);
+          vh_anim_frame(gv, gv->frame.local, nf, 10, AT_EASE);
+        }
       }
     }
+
+    // update cursor position
+
+    glyph_t last = {0};
+    if (text_s->length > 0) last = glyphs[text_s->length - 1];
+
+    r2_t crsr_f = {0};
+    crsr_f.x    = last.x + last.w + 1;
+    crsr_f.y    = last.base_y - last.asc - last.desc / 2.0;
+    crsr_f.w    = 2;
+    crsr_f.h    = last.asc;
+
+    vh_anim_finish(data->cursor_v);
+    vh_anim_frame(data->cursor_v, data->cursor_v->frame.local, crsr_f, 10, AT_EASE);
+
+    // view_set_frame(data->cursor_v, crsr_f);
+
+    free(glyphs);
   }
+  else
+  {
+    // move cursor to starting position based on textstyle
 
-  // update cursor position
+    // get line height
+    glyph_t glyph;
+    glyph.cp = ' ';
+    text_layout(&glyph, 1, data->style, frame.w, frame.h);
 
-  glyph_t last = {0};
-  if (text_s->length > 0) last = glyphs[text_s->length - 1];
+    r2_t crsr_f = {0};
+    crsr_f.w    = 2;
+    crsr_f.h    = glyph.asc;
 
-  r2_t crsr_f = {0};
-  crsr_f.x    = last.x + last.w + 1;
-  crsr_f.y    = last.base_y - last.asc - last.desc / 2.0;
-  crsr_f.w    = 2;
-  crsr_f.h    = last.asc;
+    if (data->style.align == TA_LEFT)
+    {
+      crsr_f.x = data->style.margin_left;
+      crsr_f.y = data->style.margin_top;
+      if (data->style.valign == VA_CENTER) crsr_f.y = frame.h / 2 - crsr_f.h / 2;
+      if (data->style.valign == VA_BOTTOM) crsr_f.y = frame.h - data->style.margin_bottom - crsr_f.h;
+    }
+    if (data->style.align == TA_RIGHT)
+    {
+      crsr_f.x = frame.w - data->style.margin_right - crsr_f.w;
+      crsr_f.y = data->style.margin_top;
+      if (data->style.valign == VA_CENTER) crsr_f.y = frame.h / 2 - crsr_f.h / 2;
+      if (data->style.valign == VA_BOTTOM) crsr_f.y = frame.h - data->style.margin_bottom - crsr_f.h;
+    }
+    if (data->style.align == TA_CENTER)
+    {
+      crsr_f.x = frame.w / 2 - crsr_f.w / 2;
+      crsr_f.y = data->style.margin_top;
+      if (data->style.valign == VA_CENTER) crsr_f.y = frame.h / 2 - crsr_f.h / 2;
+      if (data->style.valign == VA_BOTTOM) crsr_f.y = frame.h - data->style.margin_bottom - crsr_f.h;
+    }
 
-  vh_anim_frame(data->cursor_v, data->cursor_v->frame.local, crsr_f, 10, AT_EASE);
-
-  // view_set_frame(data->cursor_v, crsr_f);
-
-  free(glyphs);
+    view_set_frame(data->cursor_v, crsr_f);
+  }
 
   //textinput_render_glyphs(glyphs, text_s->length, style, bitmap);
   //vh_anim_add(glyphview);
   //vh_anim_set(glyphview, sf, ef, 10, AT_LINEAR);
 
-  char* cstr = str_cstring(text_s);
-
+  // show text as texture
+  //char* cstr = str_cstring(text_s);
   //tg_text_set(view, cstr, data->style);
-
-  REL(cstr);
+  //REL(cstr);
 }
 
 void vh_textinput_activate(view_t* view, char state)
@@ -142,7 +182,9 @@ void vh_textinput_activate(view_t* view, char state)
     {
       data->active = 1;
       view_add(view, data->cursor_v);
-      view_remove(view, data->holder_v);
+
+      vh_anim_alpha(data->holder_v, 1.0, 0.0, 10, AT_LINEAR);
+      // view_remove(view, data->holder_v);
     }
   }
   else
@@ -151,7 +193,9 @@ void vh_textinput_activate(view_t* view, char state)
     {
       data->active = 0;
       view_remove(view, data->cursor_v);
-      view_add(view, data->holder_v);
+
+      vh_anim_alpha(data->holder_v, 0.0, 1.0, 10, AT_LINEAR);
+      //view_add(view, data->holder_v);
     }
   }
 
@@ -270,10 +314,13 @@ void vh_textinput_add(view_t*     view,
   // placeholder
 
   textstyle_t phts = textstyle;
+  phts.align       = TA_CENTER;
   phts.textcolor   = 0x888888FF;
   data->holder_v   = view_new(id_h, (r2_t){0, 0, view->frame.local.w, view->frame.local.h});
   tg_text_add(data->holder_v);
   tg_text_set(data->holder_v, phtext, phts);
+  vh_anim_add(data->holder_v);
+
   data->holder_v->blocks_touch = 0;
 
   view_add(view, data->holder_v);

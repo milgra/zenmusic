@@ -62,7 +62,6 @@ always run valgrind and check for leaks before push
 
 first version
 
-placeholder in textinput
 filter fix
 flag non-editable fields in database, show them as grey in editor
 gombok kattanjanak
@@ -83,6 +82,9 @@ metadata update eseten sulyos leak, a hatterben tortenjen, analyzer kozben is le
 dupla klikk szarakszik
 automata frame rate keep - ha 50 fps ala megy, rakja backgroundba a rendert
 link a youtube videora ami a hasznalatat mutatja be
+UI Recorder - UI player API, -uiscript
+song list ugorjon az aktualisan jatszott szamra
+date added
 
 ideas
 

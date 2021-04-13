@@ -326,6 +326,9 @@ void vh_list_evt(view_t* view, ev_t ev)
 
       if (ev.dy != 0.0)
       {
+        if (ev.dy > 100.0) ev.dy = 100.0;
+        if (ev.dy < -100.0) ev.dy = -100.0;
+
         vh_list_move(view, ev.dy);
         vh->full = 0;
 

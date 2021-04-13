@@ -796,7 +796,7 @@ void ui_init(float width,
   filterbar                          = view_get_subview(baseview, "filterfield");
   filterbar->layout.background_color = 0xFFFFFFFF;
 
-  ts.align     = TA_CENTER;
+  ts.align     = TA_LEFT;
   ts.textcolor = 0x000000FF;
   ts.backcolor = 0xFFFFFFFF;
 
