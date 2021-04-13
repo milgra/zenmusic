@@ -101,6 +101,7 @@ void vh_textinput_upd(view_t* view)
           rf.x    = 0;
           rf.y    = 0;
           view_set_region(gv, rf);
+          vh_anim_finish(gv);
           vh_anim_frame(gv, gv->frame.local, nf, 10, AT_EASE);
         }
       }
@@ -139,8 +140,8 @@ void vh_textinput_upd(view_t* view)
 
     if (data->style.align == TA_LEFT)
     {
-      crsr_f.x = data->style.margin_left;
-      crsr_f.y = data->style.margin_top;
+      crsr_f.x = data->style.margin;
+      crsr_f.y = data->style.margin;
       if (data->style.valign == VA_CENTER) crsr_f.y = frame.h / 2 - crsr_f.h / 2;
       if (data->style.valign == VA_BOTTOM) crsr_f.y = frame.h - data->style.margin_bottom - crsr_f.h;
     }
@@ -366,6 +367,16 @@ void vh_textinput_set_text(view_t* view, char* text)
   vh_textinput_t* data = view->handler_data;
 
   str_reset(data->text_s);
+
+  // remove glyphs
+
+  for (int i = 0; i < data->glyph_v->length; i++)
+  {
+    view_t* gv = data->glyph_v->data[i];
+    view_remove(view, gv);
+  }
+  vec_reset(data->glyph_v);
+
   str_addbytearray(data->text_s, text);
   vh_textinput_upd(view);
 }

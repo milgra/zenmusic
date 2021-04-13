@@ -88,6 +88,7 @@ date added
 
 ideas
 
+textinput autoscroller
 rdft left/right channel
 full screen visualizers
 save small changes to a delta database, add it to the big one at startup

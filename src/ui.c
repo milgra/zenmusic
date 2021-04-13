@@ -54,7 +54,6 @@ void ui_show_simple_popup(char* text);
 #include "vh_list_item.c"
 #include "vh_picker.c"
 #include "vh_roll.c"
-#include "vh_textfield.c"
 #include "vh_textinput.c"
 #include "vh_touch.c"
 #include "view_generator.c"
@@ -315,6 +314,12 @@ void ui_on_filter_activate(view_t* view)
   ui_toggle_baseview(filters_popup_page);
 }
 
+void ui_clear_search()
+{
+  vh_textinput_set_text(filterbar, "");
+  ui_manager_activate(filterbar);
+}
+
 void ui_on_button_down(void* userdata, void* data)
 {
   char* id = ((view_t*)data)->id;
@@ -343,6 +348,7 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "filterbtn") == 0) ui_on_filter_activate(filters_popup_page);
   if (strcmp(id, "visuright_btn") == 0) ui_change_visu();
   if (strcmp(id, "visuleft_btn") == 0) ui_change_visu();
+  if (strcmp(id, "clearbtn") == 0) ui_clear_search();
 
   if (strcmp(id, "song_popup_page_btn") == 0) ui_toggle_baseview(song_popup_page);
   if (strcmp(id, "messages_popup_page_btn") == 0) ui_toggle_baseview(messages_popup_page);
@@ -929,14 +935,14 @@ void ui_init(float width,
 
   // show texture map for debug
 
-  /* view_t* texmap        = view_new("texmap", ((r2_t){0, 0, 300, 300})); */
-  /* texmap->needs_touch   = 0; */
-  /* texmap->display       = 1; */
-  /* texmap->texture.full  = 1; */
-  /* texmap->layout.right  = 1; */
-  /* texmap->layout.bottom = 1; */
+  view_t* texmap        = view_new("texmap", ((r2_t){0, 0, 300, 300}));
+  texmap->needs_touch   = 0;
+  texmap->display       = 1;
+  texmap->texture.full  = 1;
+  texmap->layout.right  = 1;
+  texmap->layout.bottom = 1;
 
-  /* ui_manager_add(texmap); */
+  ui_manager_add(texmap);
 }
 
 #endif
