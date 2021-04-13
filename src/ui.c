@@ -167,27 +167,6 @@ void ui_remove_from_base(void* p)
   if (view->texture.alpha < 1.0) view_remove(baseview, view);
 }
 
-void ui_toggle_mainview(view_t* view)
-{
-  if (view->parent)
-  {
-    view->texture.alpha = 1.0;
-    vh_fade_set(view, 0.0, 20.0, 1);
-  }
-  else
-  {
-    r2_t basef = baseview->frame.local;
-    r2_t viewf = view->frame.local;
-    viewf.x    = (basef.w - viewf.w) / 2;
-    viewf.y    = (basef.h - viewf.h) / 2;
-    view_set_frame(view, viewf);
-    view_add(mainview, view);
-
-    view->texture.alpha = 0.0;
-    vh_fade_set(view, 1.0, 20.0, 1);
-  }
-}
-
 void ui_toggle_baseview(view_t* view)
 {
   if (view->parent)

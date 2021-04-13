@@ -127,6 +127,8 @@ void wm_init(void (*init)(int, int, char*),
 
           while (SDL_PollEvent(&event) != 0)
           {
+            ev.type = EV_EMPTY;
+
             if (event.type == SDL_MOUSEBUTTONDOWN ||
                 event.type == SDL_MOUSEBUTTONUP ||
                 event.type == SDL_MOUSEMOTION)
