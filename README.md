@@ -22,24 +22,30 @@ Video introduction :
 
 # FreeBSD #
 
+```
 git clone https://github.com/milgra/zenmusic.git
 cd zenmusic
 make install
+```
 
 # Linux #
 
+```
 git clone https://github.com/milgra/zenmusic.git
 cd zenmusic
+```
 
 modify include paths in makefile to use your distribution's path
 
+```
 make install
+```
 
 # Windows #
 
-download latest build from here :
-unzip
-start zenmusic exe from extracted folder
+download latest build from here :  
+unzip  
+start zenmusic exe from extracted folder  
 
 
 ## User Guide ##
@@ -54,16 +60,16 @@ Please report issues and add feature requests here on github.
 
 ## Libraries used ##
 
-FFMPEG / media parsing
-SDL2 / window/graphics context handling
-stb_truetype / text generation
+- FFMPEG / media parsing
+- SDL2 / window/graphics context handling
+- stb_truetype / text generation
 
 
 ## Programs used ##
 
-Inkscape for the icons
-GNU Emacs for programming
-FreeBSD for development platform
+- Inkscape for the icons
+- GNU Emacs for programming
+- FreeBSD for development platform
 
 
 ## Contribute ##

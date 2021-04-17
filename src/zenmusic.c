@@ -283,7 +283,7 @@ void render(uint32_t time)
   }
   else
   {
-    ui_update_time(0.0, 0.0, 0.0);
+    //ui_update_time(0.0, 0.0, 0.0);
   }
 
   ui_manager_render(time);
