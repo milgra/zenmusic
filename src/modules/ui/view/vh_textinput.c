@@ -248,7 +248,7 @@ void vh_textinput_evt(view_t* view, ev_t ev)
 
     vh_textinput_upd(view);
 
-    // if (data->on_text) (*data->on_text)(view);
+    if (data->on_text) (*data->on_text)(view);
   }
   else if (ev.type == EV_KDOWN)
   {
@@ -271,7 +271,7 @@ void vh_textinput_evt(view_t* view, ev_t ev)
       vh_anim_set_event(glyph_view, view, vh_textinput_on_glyph_close);
 
       vh_textinput_upd(view);
-      // if (data->on_text) (*data->on_text)(view);
+      if (data->on_text) (*data->on_text)(view);
     }
   }
   else if (ev.type == EV_TIME)
