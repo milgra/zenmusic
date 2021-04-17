@@ -15,12 +15,12 @@ Zen Music is inspired by the golden era iTunes and the tracker module players of
 - library auto-organizing ( if enabled )
 - human readable text-based database for transparency & easy modification
 
-Video introduction :
+Video introduction
 
 
 ## Installation ##
 
-# FreeBSD #
+### FreeBSD ###
 
 ```
 git clone https://github.com/milgra/zenmusic.git
@@ -28,7 +28,7 @@ cd zenmusic
 make install
 ```
 
-# Linux #
+### Linux ###
 
 ```
 git clone https://github.com/milgra/zenmusic.git
@@ -41,7 +41,7 @@ modify include paths in makefile to use your distribution's path
 make install
 ```
 
-# Windows #
+### Windows ###
 
 download latest build from here :  
 unzip  
@@ -76,6 +76,6 @@ Please report issues and add feature requests here on github.
 
 Contributors are welcome!
 
-Technical video introduction :
+Technical video introduction
 
 [Tech Guide](USER.md)

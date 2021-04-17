@@ -1,4 +1,4 @@
-1. INIT
+1. FIRST START
 
    1.1 library popup
 
@@ -72,6 +72,22 @@
 
 3. ORGANIZATION
 
+
+   3.3 check if files are added after restart
+
+       manual    
+
+       1. add new file into music library
+       2. restart zen music
+       3. songs should appear in songlist, they should be playable
+       4. songs should appear in library
+
+       automated
+
+       1. add new file into music library
+       2. start zen music
+       3. check library content
+
    3.1 check if files are moved
 
        manual
@@ -94,21 +110,6 @@
        2. select delete
        3. accept popup
        4. check if file is deleted, removed from library
-
-   3.3 check if files are added after restart
-
-       manual    
-
-       1. add new file into music library
-       2. restart zen music
-       3. songs should appear in songlist, they should be playable
-       4. songs should appear in library
-
-       automated
-
-       1. add new file into music library
-       2. start zen music
-       3. check library content
 
 4. MUSIC EDITING
 
@@ -137,3 +138,16 @@ AUTOMATED TESTING
 
 - player module
 - command line api calls ( library creation - compare with a good result) (playing song, writing waveform, compare) (modifying metadata - compare)?
+
+
+Functional test
+
+// songlist - songlist header
+
+resize header cells
+rearrange header cells
+sort on header cell select
+
+// songlist - query field
+
+sort on query
