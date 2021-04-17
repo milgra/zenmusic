@@ -914,14 +914,14 @@ void ui_init(float width,
 
   // show texture map for debug
 
-  view_t* texmap        = view_new("texmap", ((r2_t){0, 0, 300, 300}));
-  texmap->needs_touch   = 0;
-  texmap->display       = 1;
-  texmap->texture.full  = 1;
-  texmap->layout.right  = 1;
-  texmap->layout.bottom = 1;
+  /* view_t* texmap        = view_new("texmap", ((r2_t){0, 0, 300, 300})); */
+  /* texmap->needs_touch   = 0; */
+  /* texmap->display       = 1; */
+  /* texmap->texture.full  = 1; */
+  /* texmap->layout.right  = 1; */
+  /* texmap->layout.bottom = 1; */
 
-  ui_manager_add(texmap);
+  /* ui_manager_add(texmap); */
 }
 
 #endif

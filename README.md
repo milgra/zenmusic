@@ -1,6 +1,8 @@
 # Zen Music music player and organizer #
 "touch your music"
 
+![alt text](svg/screenshot.jpeg)
+
 Zen Music is inspired by the golden era iTunes and the tracker module players of the early 90's.
 
 
