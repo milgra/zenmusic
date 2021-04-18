@@ -141,8 +141,8 @@ view_t* editor_popup_create_item()
   char       idbuffer[100] = {0};
   snprintf(idbuffer, 100, "editor_popup_item%i", itemcnt++);
 
-  view_t* rowview  = view_new(idbuffer, (r2_t){0, 0, 0, 35});
-  rowview->display = 0;
+  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
+
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, editor_popup_select_item);
 

@@ -1,13 +1,8 @@
 first version
 
 remove texture id
-remove texren from view
 
-filter background error
-filter deactivate
 vh_list set active frame, visualizer overlay
-filter fix
-
 flag non-editable fields in database, show them as grey in editor
 gombok kattanjanak
 clear cover art if not available

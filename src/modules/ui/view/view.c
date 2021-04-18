@@ -65,6 +65,8 @@ struct _vlayout_t
   int         shadow_w;
   int         shadow_blur;
   int         shadow_color;
+
+  char masked; /* view should be used as mask for subviews? OVERFLOW */
 };
 
 typedef enum _texst_t // texture loading state
@@ -114,16 +116,13 @@ typedef struct _frame_t
 typedef struct _view_t view_t;
 struct _view_t
 {
-  char hidden; /* exclude from rendering */
-  char vis_changed;
-  char overflow; /* enable content outside frame */
-  char display;  /* view should be displayed? */
-  char masked;   /* view should be used as mask for subviews? */
+  char exclude; /* view should be displayed? */
 
-  char needs_key;     /* accepts key events */
-  char needs_text;    /* accepts text events */
-  char needs_time;    /* accepts time events */
-  char needs_touch;   /* accepts touch events */
+  char needs_key;   /* accepts key events */
+  char needs_text;  /* accepts text events */
+  char needs_time;  /* accepts time events */
+  char needs_touch; /* accepts touch events */
+
   char blocks_touch;  /* blocks touch events */
   char blocks_scroll; /* blocks scroll events */
 
@@ -155,7 +154,6 @@ void    view_gen_texture(view_t* view);
 void view_set_frame(view_t* view, r2_t frame);
 void view_set_region(view_t* view, r2_t frame);
 void view_set_layout(view_t* view, vlayout_t layout);
-void view_set_hidden(view_t* view, char hidden, char recursive);
 void view_set_block_touch(view_t* view, char block, char recursive);
 void view_set_texture_bmp(view_t* view, bm_t* tex);
 void view_set_texture_id(view_t* view, char* id);
@@ -203,7 +201,7 @@ view_t* view_new(char* id, r2_t frame)
   view->texture.resizable = 1;
   view->needs_touch       = 1;
   view->blocks_touch      = 1;
-  view->display           = 0; // by default no display, tex generators will set this to 1
+  view->exclude           = 1;
 
   // reset margins
 
@@ -222,7 +220,7 @@ view_t* view_new(char* id, r2_t frame)
 
 void view_set_masked(view_t* view, char masked)
 {
-  view->masked = 1;
+  view->layout.masked = 1;
   for (int i = 0; i < view->views->length; i++)
   {
     view_t* sview = view->views->data[i];
@@ -247,7 +245,7 @@ void view_add(view_t* view, view_t* subview)
   VADD(view->views, subview);
   subview->parent = view;
 
-  if (view->masked) view_set_masked(subview, 1);
+  if (view->layout.masked) view_set_masked(subview, 1);
 
   view_calc_global(view);
 }
@@ -269,7 +267,7 @@ void view_insert(view_t* view, view_t* subview, uint32_t index)
   vec_ins(view->views, subview, index);
   subview->parent = view;
 
-  if (view->masked) view_set_masked(subview, 1);
+  if (view->layout.masked) view_set_masked(subview, 1);
 
   view_calc_global(view);
 }
@@ -368,18 +366,6 @@ void view_set_region(view_t* view, r2_t region)
 {
   view->frame.region      = region;
   view->frame.reg_changed = 1;
-}
-
-void view_set_hidden(view_t* view, char hidden, char recursive)
-{
-  view->hidden      = hidden;
-  view->vis_changed = 1;
-
-  if (recursive)
-  {
-    view_t* v;
-    while ((v = VNXT(view->views))) view_set_hidden(v, hidden, recursive);
-  }
 }
 
 void view_set_block_touch(view_t* view, char block, char recursive)

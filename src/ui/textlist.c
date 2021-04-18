@@ -66,8 +66,7 @@ view_t* textlist_create_item(textlist_t* tl)
   char       idbuffer[100] = {0};
   snprintf(idbuffer, 100, "textlist_item%i", item_cnt++);
 
-  view_t* rowview  = view_new(idbuffer, (r2_t){0, 0, 0, 35});
-  rowview->display = 0;
+  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
 
   vh_litem_add(rowview, tl);
   vh_litem_set_on_select(rowview, on_textitem_select);

@@ -179,7 +179,7 @@ void ui_manager_activate(view_t* view)
 
 void ui_manager_collect(view_t* view, vec_t* views)
 {
-  if (view->display) VADD(views, view);
+  if (!view->exclude) VADD(views, view);
   vec_t* vec = view->views;
   for (int i = 0; i < vec->length; i++) ui_manager_collect(vec->data[i], views);
 }

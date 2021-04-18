@@ -57,7 +57,7 @@ void tg_text_add(view_t* view)
 
   view->tex_gen_data = gen;
   view->tex_gen      = tg_text_gen;
-  view->display      = 1;
+  view->exclude      = 0;
 }
 
 void tg_text_set(view_t* view, char* text, textstyle_t style)

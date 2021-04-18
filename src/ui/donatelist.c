@@ -141,7 +141,6 @@ view_t* donateitem_create(int index)
   float height = index == 0 ? 150 : 50;
 
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 460, height});
-  rowview->hidden = 1;
 
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, donatelist_on_item_select);

@@ -149,7 +149,6 @@ view_t* settingsitem_create()
   snprintf(idbuffer, 100, "setlist_item%i", item_cnt++);
 
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 640, 50});
-  rowview->hidden = 1;
 
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, settingslist_on_item_select);

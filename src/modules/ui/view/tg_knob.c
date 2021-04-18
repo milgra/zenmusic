@@ -137,7 +137,7 @@ void tg_knob_add(view_t* view)
 
   view->tex_gen_data = tg;
   view->tex_gen      = tg_knob_gen;
-  view->display      = 1;
+  view->exclude      = 0;
 }
 
 void tg_knob_set_angle(view_t* view, float angle)

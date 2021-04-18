@@ -25,7 +25,6 @@ void ui_compositor_resize_texture(int page, int width, int height);
 void ui_compositor_rewind();
 void ui_compositor_add(char* id,
                        char  masked,
-                       char  hidden,
                        r2_t  frame,
                        float border, // view border
                        float alpha,
@@ -37,7 +36,6 @@ void ui_compositor_add(char* id,
                        int   tex_h); // texture id
 void ui_compositor_upd_pos(int index, r2_t frame, float border);
 char ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_t* bm);
-void ui_compositor_upd_vis(int index, char hidden);
 void ui_compositor_upd_alpha(int index, float alpha);
 void ui_compositor_upd_region(int index, r2_t frame, r2_t region, char* texid);
 
@@ -61,7 +59,6 @@ typedef struct _crect_t
   char* id;
   char* tex_id;
   float data[36];
-  char  hidden;
   char  masked;
   r2_t  frame;
 } crect_t;
@@ -70,7 +67,6 @@ crect_t* crect_new();
 void     crect_del(void* rect);
 void     crect_desc(crect_t* rect);
 void     crect_set_id(crect_t* rect, char* id);
-void     crect_set_hidden(crect_t* r, char hidden);
 void     crect_set_masked(crect_t* r, char masked);
 void     crect_set_page(crect_t* rect, uint32_t page);
 void     crect_set_alpha(crect_t* r, float alpha);
@@ -131,7 +127,6 @@ void ui_compositor_resize_texture(int page, int width, int height)
 
 void ui_compositor_add(char* id,
                        char  masked,
-                       char  hidden,
                        r2_t  frame,
                        float border, // view border
                        float alpha,
@@ -155,9 +150,6 @@ void ui_compositor_add(char* id,
 
   // set id
   crect_set_id(rect, id);
-
-  // set hidden
-  crect_set_hidden(rect, hidden);
 
   // set masked
   crect_set_masked(rect, masked);
@@ -215,12 +207,6 @@ void ui_compositor_add(char* id,
   // increase cache index
   uic.cache_ind++;
   uic.upd_geo = 1;
-}
-
-void ui_compositor_upd_vis(int index, char hidden)
-{
-  crect_t* rect = uic.cache->data[index];
-  rect->hidden  = hidden;
 }
 
 void ui_compositor_upd_pos(int index, r2_t frame, float border)
@@ -337,7 +323,7 @@ void ui_compositor_render(uint32_t time, int width, int height, int tex_w, int t
     for (int i = 0; i < uic.cache_ind; i++)
     {
       crect_t* rect = uic.cache->data[i];
-      if (!rect->hidden) fb_add(uic.fb, rect->data, 36);
+      fb_add(uic.fb, rect->data, 36);
     }
 
     gl_upload_vertexes(uic.fb);
@@ -392,7 +378,7 @@ void ui_compositor_render(uint32_t time, int width, int height, int tex_w, int t
       last = index;
     }
 
-    if (!rect->hidden) index += 1;
+    index += 1;
   }
 
   // draw remaining buffer
@@ -498,11 +484,6 @@ void crect_del(void* pointer)
 void crect_set_id(crect_t* r, char* id)
 {
   r->id = id;
-}
-
-void crect_set_hidden(crect_t* r, char hidden)
-{
-  r->hidden = hidden;
 }
 
 void crect_set_masked(crect_t* r, char masked)

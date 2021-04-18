@@ -916,7 +916,7 @@ void ui_init(float width,
 
   /* view_t* texmap        = view_new("texmap", ((r2_t){0, 0, 300, 300})); */
   /* texmap->needs_touch   = 0; */
-  /* texmap->display       = 1; */
+  /* texmap->exclude       = 0; */
   /* texmap->texture.full  = 1; */
   /* texmap->layout.right  = 1; */
   /* texmap->layout.bottom = 1; */

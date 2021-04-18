@@ -123,7 +123,6 @@ view_t* songlistpopupitem_create(int index)
   snprintf(idbuffer, 100, "slpist_item%i", item_cnt++);
 
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 460, 50});
-  rowview->hidden = 1;
 
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, songlistpopup_on_item_select);

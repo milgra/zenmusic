@@ -89,15 +89,15 @@ void view_gen_apply_style(view_t* view, map_t* style, char* respath)
       if (strcmp(val, "flex") == 0)
       {
         view->layout.display = LD_FLEX;
-        view->display        = 0;
+        view->exclude        = 1;
       }
       if (strcmp(val, "none") == 0)
-        view->display = 0;
+        view->exclude = 1;
     }
     else if (strcmp(key, "overflow") == 0)
     {
       if (strcmp(val, "hidden") == 0)
-        view->masked = 1;
+        view->layout.masked = 1;
     }
     else if (strcmp(key, "flex-direction") == 0)
     {

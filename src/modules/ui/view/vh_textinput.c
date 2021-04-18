@@ -77,7 +77,7 @@ void vh_textinput_upd(view_t* view)
 
           view_set_texture_bmp(gv, texture);
 
-          gv->display = 1; // do we have to have 0 as default?!?!
+          gv->exclude = 0; // do we have to have 0 as default?!?!
 
           view_add(view, gv);
 
@@ -183,7 +183,10 @@ void vh_textinput_activate(view_t* view, char state)
     {
       data->active = 1;
 
-      vh_anim_alpha(data->holder_v, 1.0, 0.0, 10, AT_LINEAR);
+      if (data->text_s->length == 0)
+      {
+        vh_anim_alpha(data->holder_v, 1.0, 0.0, 10, AT_LINEAR);
+      }
       vh_anim_alpha(data->cursor_v, 0.0, 1.0, 10, AT_LINEAR);
     }
   }
@@ -193,7 +196,10 @@ void vh_textinput_activate(view_t* view, char state)
     {
       data->active = 0;
 
-      vh_anim_alpha(data->holder_v, 0.0, 1.0, 10, AT_LINEAR);
+      if (data->text_s->length == 0)
+      {
+        vh_anim_alpha(data->holder_v, 0.0, 1.0, 10, AT_LINEAR);
+      }
       vh_anim_alpha(data->cursor_v, 1.0, 0.0, 10, AT_LINEAR);
     }
   }

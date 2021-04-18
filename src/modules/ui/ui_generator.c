@@ -110,8 +110,7 @@ void ui_generator_resend_views()
     }
 
     ui_compositor_add(view->id,
-                      view->masked,
-                      view->hidden,
+                      view->layout.masked,
                       view->frame.global,       // frame
                       view->layout.shadow_blur, // view border
                       view->texture.alpha,
@@ -239,12 +238,6 @@ void ui_generator_render(uint32_t time)
       ui_compositor_upd_alpha(i, view->texture.alpha);
 
       view->texture.alpha_changed = 0;
-    }
-
-    if (view->vis_changed)
-    {
-      ui_compositor_upd_vis(i, view->hidden);
-      view->vis_changed = 0;
     }
   }
 
