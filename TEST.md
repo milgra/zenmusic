@@ -151,3 +151,5 @@ sort on header cell select
 // songlist - query field
 
 sort on query
+
+test texture resize and reset, texture overflow and reset
