@@ -4,6 +4,8 @@ remove texture id
 
 flag non-editable fields in database, show them as grey in editor
 gombok kattanjanak
+double click problema
+filtering queue - artist, album, songs
 clear cover art if not available
 set starting volume
 artist-album sort

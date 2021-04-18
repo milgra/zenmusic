@@ -147,11 +147,14 @@ int analyzer_thread(void* chptr)
     if (!curr)
     {
       // create actual song entry
-      curr       = MNEW();
+      curr = MNEW();
+
       char* path = vec_tail(rem_db);
       char* size = MGET(lib_db, path);
+
       MPUT(curr, "path", path);
       MPUT(curr, "size", size);
+
       char* real = cstr_fromformat("%s%s", lib_path, path, NULL);
 
       int res = editor_get_metadata(real, curr);

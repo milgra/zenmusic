@@ -204,7 +204,7 @@ void donatelist_attach(view_t* view, char* fontpath, void (*popup)(char* text))
   // add list handler to view
 
   vh_list_add(donl.view,
-              ((vh_list_inset_t){0, 10, 0, 10}),
+              ((vh_list_inset_t){0, 0, 0, 0}),
               donatelist_item_for_index, NULL, NULL);
 
   // create items

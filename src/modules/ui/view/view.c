@@ -349,9 +349,6 @@ void view_set_frame(view_t* view, r2_t frame)
     {
       if (view->texture.type == TT_MANAGED && view->texture.resizable == 1)
       {
-#ifdef DEBUG
-        printf("dimension change, requesting texture regen for %s\n", view->id);
-#endif
         view->texture.state = TS_BLANK;
       }
     }
