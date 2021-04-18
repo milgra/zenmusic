@@ -136,7 +136,7 @@ void ui_play_index(int index)
 
     ui_show_song_info(lastindex);
     map_t* songmap = ui.songs->data[lastindex];
-    char*  path    = cstr_fromformat("%s%s", ui_libpath, MGET(songmap, "path"), NULL);
+    char*  path    = cstr_fromformat("%s%s", ui_libpath, MGET(songmap, "file/path"), NULL);
     player_play(path);
     REL(path);
   }
@@ -451,11 +451,13 @@ void ui_show_song_info(int index)
 
   map_t* songmap = ui.songs->data[index];
 
-  char* infostr = cstr_fromformat("%s\n%s\n%s %s",
-                                  (char*)MGET(songmap, "title"),
-                                  (char*)MGET(songmap, "artist"),
-                                  (char*)MGET(songmap, "genre"),
-                                  "192Kb/s",
+  char* infostr = cstr_fromformat("%s\n%s\n%s %s %s %s",
+                                  (char*)MGET(songmap, "meta/title"),
+                                  (char*)MGET(songmap, "meta/artist"),
+                                  (char*)MGET(songmap, "meta/genre"),
+                                  (char*)MGET(songmap, "meta/samplerate"),
+                                  (char*)MGET(songmap, "meta/bitrate"),
+                                  (char*)MGET(songmap, "meta/channels"),
                                   NULL);
 
   tg_text_set(infoview, infostr, ts);

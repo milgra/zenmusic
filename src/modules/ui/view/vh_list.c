@@ -384,29 +384,6 @@ void vh_list_lock_scroll(view_t* view, char state)
   vh->lock_scroll = state;
 }
 
-// cleanup all items, prepare for new content
-
-void vh_list_reset(view_t* view)
-{
-  vh_list_t* vh = view->handler_data;
-
-  // remove all items from view
-
-  for (int index = 0; index < vh->items->length; index++)
-  {
-    view_t* item = vh->items->data[index];
-    view_remove(view, item);
-    if (vh->item_recycle) (*vh->item_recycle)(item);
-  }
-
-  vec_reset(vh->items);
-
-  vh->head_index = 0;
-  vh->tail_index = 0;
-  vh->item_count = 0;
-  vh->full       = 0;
-}
-
 void vh_list_scroll_v(view_t* view, void* userdata, float ratio)
 {
   view_t*    listview  = userdata;
@@ -428,6 +405,25 @@ void vh_list_scroll_h(view_t* view, void* userdata, float ratio)
   vh->item_pos        = -vh->item_wth * ratio;
 
   vh_list_move(listview, 0);
+}
+
+void vh_list_reset(view_t* view)
+{
+  vh_list_t* vh = view->handler_data;
+
+  for (int index = 0; index < vh->items->length; index++)
+  {
+    view_t* item = vh->items->data[index];
+    view_remove(view, item);
+    if (vh->item_recycle) (*vh->item_recycle)(item);
+  }
+
+  vec_reset(vh->items);
+
+  vh->head_index = 0;
+  vh->tail_index = 0;
+  vh->item_count = 0;
+  vh->full       = 0;
 }
 
 void vh_list_refresh(view_t* view)

@@ -28,6 +28,7 @@ int  lib_mkpath(char* file_path, mode_t mode);
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <time.h>
 
 map_t* lib_db;
 vec_t* rem_db;
@@ -137,35 +138,49 @@ void lib_remove_duplicates(map_t* db)
 
 int analyzer_thread(void* chptr)
 {
+  printf("ananlyzer thread %zx\n", (size_t)chptr);
+
   ch_t*    channel = chptr;
-  map_t*   curr    = NULL;
+  map_t*   song    = NULL;
   uint32_t total   = rem_db->length;
   int      ratio   = -1;
 
   while (rem_db->length > 0)
   {
-    if (!curr)
+    if (!song)
     {
-      // create actual song entry
-      curr = MNEW();
+      song = MNEW();
 
       char* path = vec_tail(rem_db);
       char* size = MGET(lib_db, path);
 
-      MPUT(curr, "path", path);
-      MPUT(curr, "size", size);
+      char* time_str = mem_calloc(10, "char*", NULL, NULL);
+      snprintf(time_str, 20, "%lu", time(NULL));
+
+      // add file data
+
+      MPUT(song, "file/path", path);
+      MPUT(song, "file/size", size);
+      MPUT(song, "file/added", time_str);
+      MPUT(song, "file/last_played", time_str);
+      MPUT(song, "file/last_skipped", time_str);
+      MPUT(song, "file/play_count", cstr_fromcstring("0"));
+      MPUT(song, "file/skip_count", cstr_fromcstring("0"));
 
       char* real = cstr_fromformat("%s%s", lib_path, path, NULL);
 
-      int res = editor_get_metadata(real, curr);
-      REL(real);
+      // read and add file and meta data
+
+      int res = editor_get_metadata(real, song);
 
       if (res == 0)
       {
-        if (MGET(curr, "artist") == NULL) MPUT(curr, "artist", cstr_fromcstring("Unknown"));
-        if (MGET(curr, "album") == NULL) MPUT(curr, "album", cstr_fromcstring("Unknown"));
-        if (MGET(curr, "title") == NULL)
+        if (MGET(song, "meta/artist") == NULL) MPUT(song, "meta/artist", cstr_fromcstring("Unknown"));
+        if (MGET(song, "meta/album") == NULL) MPUT(song, "meta/album", cstr_fromcstring("Unknown"));
+        if (MGET(song, "meta/title") == NULL)
         {
+          // if no title present use file name
+
           int dotindex;
           for (dotindex = strlen(path) - 1; dotindex > -1; --dotindex)
           {
@@ -188,20 +203,29 @@ int analyzer_thread(void* chptr)
             char* title = mem_calloc(len + 1, "char*", NULL, NULL);
             memcpy(title, path + slashindex, len);
 
-            MPUT(curr, "title", title);
+            MPUT(song, "meta/title", title);
           }
           else
-            MPUT(curr, "title", path);
+          {
+            // use path if nothing works
+
+            MPUT(song, "meta/title", path);
+          }
         }
+
         // try to send it to main thread
-        if (ch_send(channel, curr)) curr = NULL;
+        if (ch_send(channel, song)) song = NULL;
       }
       else
       {
         // file is not a media file readable by ffmpeg, we skip it
-        REL(curr);
-        curr = NULL;
+        REL(song);
+        song = NULL;
       }
+
+      // cleanup
+      REL(real);
+
       // remove entry from remaining
       vec_rematindex(rem_db, rem_db->length - 1);
     }
@@ -209,7 +233,7 @@ int analyzer_thread(void* chptr)
     {
       // wait for main thread to process new entries
       SDL_Delay(5);
-      if (ch_send(channel, curr)) curr = NULL;
+      if (ch_send(channel, song)) song = NULL;
     }
 
     // show progress
@@ -221,9 +245,9 @@ int analyzer_thread(void* chptr)
     }
   }
 
-  curr = MNEW();
-  MPUT(curr, "path", cstr_fromcstring("//////")); // impossible path
-  ch_send(channel, curr);                         // send finishing entry
+  song = MNEW();
+  MPUT(song, "file/path", cstr_fromcstring("//////")); // impossible path
+  ch_send(channel, song);                              // send finishing entry
 
   lock_db = 0;
   return 0;
@@ -241,6 +265,8 @@ void lib_analyze(ch_t* channel)
 
   rem_db = VNEW();
   map_keys(lib_db, rem_db);
+
+  printf("START THREAD %zx\n", (size_t)channel);
 
   SDL_CreateThread(analyzer_thread, "analyzer", channel);
 }
@@ -281,11 +307,11 @@ int lib_organize_entry(char* libpath, map_t* db, map_t* entry)
 {
   int changed = 0;
 
-  char* path   = MGET(entry, "path");
-  char* artist = MGET(entry, "artist");
-  char* album  = MGET(entry, "album");
-  char* title  = MGET(entry, "title");
-  char* track  = MGET(entry, "track");
+  char* path   = MGET(entry, "file/path");
+  char* artist = MGET(entry, "meta/artist");
+  char* album  = MGET(entry, "meta/album");
+  char* title  = MGET(entry, "meta/title");
+  char* track  = MGET(entry, "meta/track");
 
   // remove slashes before directory creation
 
@@ -340,7 +366,7 @@ int lib_organize_entry(char* libpath, map_t* db, map_t* entry)
       if (error == 0)
       {
         LOG("updating path in db,\n");
-        MPUT(entry, "path", new_path_rel);
+        MPUT(entry, "file/path", new_path_rel);
         MPUT(db, new_path_rel, entry);
         MDEL(db, path);
         changed = 1;

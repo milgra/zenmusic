@@ -41,7 +41,7 @@ void editor_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* dro
   for (int index = 0; index < songs->length; index++)
   {
     map_t* song = songs->data[index];
-    char*  path = MGET(song, "path");
+    char*  path = MGET(song, "file/path");
     editor_update_song_metadata(libpath, path, data, drop, cover);
   }
 }
@@ -72,7 +72,8 @@ int editor_get_metadata(const char* path, map_t* map)
       while ((tag = av_dict_get(pFormatCtx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
       {
         char* value = cstr_fromcstring(tag->value);
-        MPUT(map, tag->key, value);
+        char* key   = cstr_fromformat("%s/%s", "meta", tag->key, NULL);
+        MPUT(map, key, value);
         REL(value);
       }
 
@@ -84,22 +85,49 @@ int editor_get_metadata(const char* path, map_t* map)
         int   dur   = pFormatCtx->duration / 1000000;
         char* dur_s = mem_calloc(10, "char*", NULL, NULL);
         snprintf(dur_s, 10, "%i:%.2i", (int)dur / 60, dur - (int)(dur / 60) * 60);
-        MPUT(map, "duration", dur_s);
+        MPUT(map, "file/duration", dur_s);
         REL(dur_s);
       }
       else
       {
         printf("editor_get_metadata no stream information found!!!\n");
-        MPUT(map, "duration", cstr_fromcstring("0"));
+        MPUT(map, "file/duration", cstr_fromcstring("0"));
+      }
+
+      for (unsigned i = 0; i < pFormatCtx->nb_streams; i++)
+      {
+        AVCodecParameters* param = pFormatCtx->streams[i]->codecpar;
+        const AVCodec*     codec = avcodec_find_encoder(pFormatCtx->streams[i]->codecpar->codec_id);
+        if (codec)
+        {
+          if (param->codec_type == AVMEDIA_TYPE_AUDIO)
+          {
+            char* channels   = mem_calloc(10, "char*", NULL, NULL);
+            char* samplerate = mem_calloc(10, "char*", NULL, NULL);
+
+            snprintf(channels, 10, "%i", param->channels);
+            snprintf(samplerate, 10, "%i", param->sample_rate);
+            MPUT(map, "file/channels", channels);
+            MPUT(map, "file/samplerate", samplerate);
+          }
+          char* bitrate = mem_calloc(10, "char*", NULL, NULL);
+
+          snprintf(bitrate, 10, "%li", param->bit_rate);
+          MPUT(map, "file/bitrate", bitrate);
+        }
       }
     }
     else
+    {
       printf("editor_get_metadata no media context for %s\n", path);
+    }
 
     avformat_close_input(&pFormatCtx);
   }
   else
+  {
     printf("editor_get_metadata cannot open input %s\n", path);
+  }
 
   return retv;
 }

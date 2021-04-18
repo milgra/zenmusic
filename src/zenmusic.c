@@ -135,7 +135,7 @@ void load_library()
   lib_remove_duplicates(db_get_db());     // remove existing
   if (lib_entries() > 0) lib_analyze(ch); // start analyzing new entries
 
-  filtered_set_sortfield("artist", 0);
+  filtered_set_sortfield("meta/artist", 0);
 }
 
 void init(int width, int height, char* respath)
@@ -192,73 +192,80 @@ void update(ev_t ev)
     }
   }
 
+  if (ev.type == EV_TIME)
+  {
+    // get analyzed song entries
+
+    map_t* entry;
+    while ((entry = ch_recv(ch)))
+    {
+      char* path = MGET(entry, "file/path");
+
+      if (strcmp(path, "//////") != 0)
+      {
+        db_add_entry(path, entry);
+        //MPUT(db, path, entry); // store entry
+        //VADD(songs, entry);
+        if (db_count() % 100 == 0)
+        {
+          filtered_set_sortfield("meta/artist", 0);
+          ui_refresh_songlist();
+        }
+      }
+      else
+      {
+        // analyzing is finished, sort and store database
+
+        db_write(libpath);
+
+        /* if (organize) */
+        /* { */
+        /*   int succ = lib_organize(libpath, db_get_db()); */
+        /*   if (succ == 0) db_write(libpath); */
+        /* } */
+
+        filtered_set_sortfield("meta/artist", 0);
+        ui_refresh_songlist();
+      }
+      // cleanup, ownership was passed with the channel from analyzer
+      REL(entry);
+    }
+
+    // update player
+
+    int finished = player_refresh();
+
+    if (finished)
+    {
+      // increase play count of song
+      char*  path  = player_get_path();
+      map_t* entry = MGET(db_get_db(), path);
+
+      if (entry)
+      {
+        char* play_count_s = MGET(entry, "file/play_count");
+        int   play_count_i = 0;
+        if (play_count_s != NULL) play_count_i = atoi(play_count_s);
+
+        play_count_i += 1;
+        char* new_play_count = mem_calloc(10, "char*", NULL, NULL);
+        snprintf(new_play_count, 10, "%i", play_count_i);
+        MPUT(entry, "file/play_count", new_play_count);
+        REL(new_play_count);
+
+        db_write(libpath);
+      }
+
+      // play next song
+      ui_play_next();
+    }
+  }
+
   ui_manager_event(ev);
 }
 
 void render(uint32_t time)
 {
-  // get analyzed song entries
-
-  map_t* entry;
-  while ((entry = ch_recv(ch)))
-  {
-    char* path = MGET(entry, "path");
-
-    if (strcmp(path, "//////") != 0)
-    {
-      db_add_entry(path, entry);
-      //MPUT(db, path, entry); // store entry
-      //VADD(songs, entry);
-      if (db_count() % 100 == 0) ui_refresh_songlist();
-    }
-    else
-    {
-      // analyzing is finished, sort and store database
-
-      db_write(libpath);
-
-      if (organize)
-      {
-        int succ = lib_organize(libpath, db_get_db());
-        if (succ == 0) db_write(libpath);
-      }
-
-      filtered_set_sortfield("artist", 0);
-      ui_refresh_songlist();
-    }
-    // cleanup, ownership was passed with the channel from analyzer
-    REL(entry);
-  }
-
-  // update player
-
-  int finished = player_refresh();
-
-  if (finished)
-  {
-    // increase play count of song
-    char*  path  = player_get_path();
-    map_t* entry = MGET(db_get_db(), path);
-
-    if (entry)
-    {
-      char* play_count_s = MGET(entry, "play count");
-      int   play_count_i = 0;
-      if (play_count_s != NULL)
-      {
-        play_count_i = atoi(play_count_s);
-      }
-      play_count_i += 1;
-      char* new_play_count = mem_calloc(10, "char*", NULL, NULL);
-      snprintf(new_play_count, 10, "%i", play_count_i);
-      MPUT(entry, "play count", new_play_count);
-      REL(new_play_count);
-      db_write(libpath);
-    }
-
-    // play next song
-    ui_play_next();
-  }
 
   // update ui
 

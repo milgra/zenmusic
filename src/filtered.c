@@ -49,7 +49,7 @@ void filtered_init()
   flt.tmp2 = VNEW();
 
   flt.filter     = NULL;
-  flt.sort_field = "artist";
+  flt.sort_field = "meta/artist";
 }
 
 map_t* filtered_song_at_index(int index)
@@ -107,7 +107,7 @@ void filtered_gen_genres()
        ei++)
   {
     map_t* entry = flt.songs->data[ei];
-    char*  genre = MGET(entry, "genre");
+    char*  genre = MGET(entry, "meta/genre");
 
     if (genre)
     {
@@ -139,7 +139,7 @@ void filtered_gen_artists()
        ei++)
   {
     map_t* entry  = flt.songs->data[ei];
-    char*  artist = MGET(entry, "artist");
+    char*  artist = MGET(entry, "meta/artist");
 
     if (artist) MPUT(artists, artist, artist);
   }

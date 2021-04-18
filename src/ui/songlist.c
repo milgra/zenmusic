@@ -74,7 +74,6 @@ void songlist_update()
 
 void songlist_refresh()
 {
-  printf("songlist refresh %i\n", filtered_song_count());
   vh_list_refresh(sl.view);
 }
 
@@ -318,18 +317,18 @@ void songlist_attach(view_t* base,
   // create fields
 
   VADD(sl.fields, sl_cell_new("index", 50, 0));
-  VADD(sl.fields, sl_cell_new("artist", 300, 1));
-  VADD(sl.fields, sl_cell_new("album", 200, 2));
-  VADD(sl.fields, sl_cell_new("title", 300, 3));
-  VADD(sl.fields, sl_cell_new("date", 150, 4));
-  VADD(sl.fields, sl_cell_new("genre", 150, 5));
-  VADD(sl.fields, sl_cell_new("duration", 100, 5));
-  VADD(sl.fields, sl_cell_new("track", 150, 6));
-  VADD(sl.fields, sl_cell_new("disc", 150, 7));
-  VADD(sl.fields, sl_cell_new("plays", 150, 8));
-  VADD(sl.fields, sl_cell_new("added", 150, 9));
-  VADD(sl.fields, sl_cell_new("last played", 150, 10));
-  VADD(sl.fields, sl_cell_new("last skipped", 150, 11));
+  VADD(sl.fields, sl_cell_new("meta/artist", 300, 1));
+  VADD(sl.fields, sl_cell_new("meta/album", 200, 2));
+  VADD(sl.fields, sl_cell_new("meta/title", 300, 3));
+  VADD(sl.fields, sl_cell_new("meta/date", 150, 4));
+  VADD(sl.fields, sl_cell_new("meta/genre", 150, 5));
+  VADD(sl.fields, sl_cell_new("meta/track", 150, 6));
+  VADD(sl.fields, sl_cell_new("meta/disc", 150, 7));
+  VADD(sl.fields, sl_cell_new("file/duration", 100, 8));
+  VADD(sl.fields, sl_cell_new("file/plays", 150, 9));
+  VADD(sl.fields, sl_cell_new("file/added", 150, 10));
+  VADD(sl.fields, sl_cell_new("file/last played", 150, 11));
+  VADD(sl.fields, sl_cell_new("file/last skipped", 150, 12));
 
   vec_dec_retcount(sl.fields);
 

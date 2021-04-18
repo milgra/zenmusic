@@ -209,15 +209,15 @@ void editor_popup_set_song()
   // sort fields
   vec_sort(ep.fields, VSD_ASC, editor_popup_comp_text);
 
-  editor_popup_remove_str(ep.fields, "artist");
-  editor_popup_remove_str(ep.fields, "album");
-  editor_popup_remove_str(ep.fields, "title");
-  editor_popup_remove_str(ep.fields, "path");
+  editor_popup_remove_str(ep.fields, "meta/artist");
+  editor_popup_remove_str(ep.fields, "meta/album");
+  editor_popup_remove_str(ep.fields, "meta/title");
+  editor_popup_remove_str(ep.fields, "meta/path");
 
-  vec_ins(ep.fields, cstr_fromcstring("title"), 0);
-  vec_ins(ep.fields, cstr_fromcstring("album"), 0);
-  vec_ins(ep.fields, cstr_fromcstring("artist"), 0);
-  vec_add(ep.fields, cstr_fromcstring("path"));
+  vec_ins(ep.fields, cstr_fromcstring("meta/title"), 0);
+  vec_ins(ep.fields, cstr_fromcstring("meta/album"), 0);
+  vec_ins(ep.fields, cstr_fromcstring("meta/artist"), 0);
+  vec_add(ep.fields, cstr_fromcstring("metea/path"));
 
   // reset list handler
   vh_list_reset(ep.listview);
@@ -359,7 +359,7 @@ void editor_popup_set_songs(vec_t* vec, char* libpath)
   {
 
     map_t* song = vec->data[0];
-    char*  path = MGET(song, "path");
+    char*  path = MGET(song, "file/path");
     char*  file = cstr_fromformat("%s%s", libpath, path, NULL);
 
     editor_get_album(file, ep.coverview->texture.bitmap);

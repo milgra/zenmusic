@@ -53,7 +53,7 @@ void db_read(char* libpath)
 
   LOG("reading db %s", dbpath);
 
-  kvlist_read(dbpath, db.data, "path");
+  kvlist_read(dbpath, db.data, "file/path");
   REL(dbpath);
 
   LOG("database loaded, entries : %i", db.data->count);
