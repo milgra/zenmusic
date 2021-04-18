@@ -358,7 +358,11 @@ void songlist_attach(view_t* base,
 
   // add list handler to view
 
-  vh_list_add(sl.view, songlist_item_for_index, songlist_item_recycle, NULL);
+  vh_list_add(sl.view,
+              ((vh_list_inset_t){30, 200, 0, 10}),
+              songlist_item_for_index,
+              songlist_item_recycle,
+              NULL);
   vh_list_set_header(sl.view, header);
 }
 

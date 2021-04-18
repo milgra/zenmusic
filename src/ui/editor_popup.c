@@ -254,7 +254,9 @@ void editor_popup_attach(view_t* view, char* fontpath)
   view_t* headview  = view_get_subview(view, "ideditorheader");
   view_t* coverview = view_get_subview(view, "coverview");
 
-  vh_list_add(listview, editor_popup_item_for_index, NULL, NULL);
+  vh_list_add(listview,
+              ((vh_list_inset_t){0, 10, 0, 10}),
+              editor_popup_item_for_index, NULL, NULL);
 
   textstyle_t ts = {0};
   ts.font        = fontpath;

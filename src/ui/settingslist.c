@@ -243,7 +243,9 @@ void settingslist_attach(view_t* view,
 
   // add list handler to view
 
-  vh_list_add(setl.view, settingslist_item_for_index, NULL, NULL);
+  vh_list_add(setl.view,
+              ((vh_list_inset_t){0, 10, 0, 10}),
+              settingslist_item_for_index, NULL, NULL);
   vh_list_set_header(setl.view, header);
 
   // create items

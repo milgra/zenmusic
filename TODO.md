@@ -2,7 +2,6 @@ first version
 
 remove texture id
 
-vh_list set active frame, visualizer overlay
 flag non-editable fields in database, show them as grey in editor
 gombok kattanjanak
 clear cover art if not available

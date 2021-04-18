@@ -5,6 +5,14 @@
 #include "view.c"
 #include "wm_event.c"
 
+typedef struct _vh_list_inset_t
+{
+  float t;
+  float b;
+  float l;
+  float r;
+} vh_list_inset_t;
+
 typedef struct _vh_list_t
 {
   void* userdata;
@@ -29,7 +37,8 @@ typedef struct _vh_list_t
   view_t* vscr;   // vertical scroller
   view_t* hscr;   // horizontal scroller
   view_t* header; // header view
-  float   header_size;
+
+  vh_list_inset_t inset; // scroll inset
 
   uint32_t vtimeout; // vertical scroller timeout
   uint32_t htimeout; // horizontal scroller timeout
@@ -38,7 +47,8 @@ typedef struct _vh_list_t
   void (*item_recycle)(view_t* item);
 } vh_list_t;
 
-void    vh_list_add(view_t* view,
+void    vh_list_add(view_t*         view,
+                    vh_list_inset_t inset,
                     view_t* (*item_for_index)(int index, void* userdata, view_t* listview, int* item_count),
                     void (*item_recycle)(view_t* item),
                     void* userdata);
@@ -261,11 +271,11 @@ void vh_list_evt(view_t* view, ev_t ev)
       {
         vh->item_pos += -vh->item_pos / 5.0;
       }
-      else if (vh->item_pos + vh->item_wth < view->frame.local.w - vh->vscr->frame.local.w)
+      else if (vh->item_pos + vh->item_wth < view->frame.local.w - vh->inset.r)
       {
-        if (vh->item_wth > view->frame.local.w - vh->vscr->frame.local.w)
+        if (vh->item_wth > view->frame.local.w - vh->inset.r)
         {
-          vh->item_pos += (view->frame.local.w - vh->vscr->frame.local.w - vh->item_wth - vh->item_pos) / 5.0;
+          vh->item_pos += (view->frame.local.w - vh->inset.r - vh->item_wth - vh->item_pos) / 5.0;
         }
         else if (vh->item_pos < -0.0001)
         {
@@ -275,15 +285,15 @@ void vh_list_evt(view_t* view, ev_t ev)
 
       // vertical bounce
 
-      if (head->frame.local.y > vh->header_size + 0.001)
+      if (head->frame.local.y > vh->inset.t + 0.001)
       {
-        vh_list_move(view, (vh->header_size - head->frame.local.y) / 5.0);
+        vh_list_move(view, (vh->inset.t - head->frame.local.y) / 5.0);
       }
-      else if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h - 0.001 - vh->hscr->frame.local.h)
+      else if (tail->frame.local.y + tail->frame.local.h < view->frame.local.h - 0.001 - vh->inset.b)
       {
-        if (tail->frame.local.y + tail->frame.local.h - head->frame.local.y > view->frame.local.h - vh->hscr->frame.local.h)
+        if (tail->frame.local.y + tail->frame.local.h - head->frame.local.y > view->frame.local.h - vh->inset.b)
         {
-          vh_list_move(view, (view->frame.local.h - vh->hscr->frame.local.h - (tail->frame.local.y + tail->frame.local.h)) / 5.0);
+          vh_list_move(view, (view->frame.local.h - vh->inset.b - (tail->frame.local.y + tail->frame.local.h)) / 5.0);
         }
         else if (head->frame.local.y < -0.001)
         {
@@ -438,7 +448,8 @@ void vh_list_refresh(view_t* view)
   vh->tail_index = vh->head_index;
 }
 
-void vh_list_add(view_t* view,
+void vh_list_add(view_t*         view,
+                 vh_list_inset_t inset,
                  view_t* (*item_for_index)(int index, void* userdata, view_t* listview, int* item_count),
                  void (*item_recycle)(view_t* item),
                  void* userdata)
@@ -448,6 +459,7 @@ void vh_list_add(view_t* view,
   vh->items          = VNEW();
   vh->item_for_index = item_for_index;
   vh->item_recycle   = item_recycle;
+  vh->inset          = inset;
 
   char* vid = cstr_fromformat("%s%s", view->id, "vscr", NULL);
   char* hid = cstr_fromformat("%s%s", view->id, "hscr", NULL);
@@ -511,14 +523,14 @@ void vh_list_set_header(view_t* view, view_t* headerview)
 
   // add as subview
   view_add(view, headerview);
-  vh->header_size = headerview->frame.local.h;
-  vh->head_pos    = vh->header_size;
+
+  vh->head_pos = headerview->frame.local.h;
 
   if (vh->vscr)
   {
     r2_t frame = vh->vscr->frame.local;
-    frame.y    = vh->header_size;
-    frame.h    = frame.h - vh->header_size;
+    frame.y    = vh->head_pos;
+    frame.h    = frame.h - vh->head_pos;
     view_set_frame(vh->vscr, frame);
   }
 }

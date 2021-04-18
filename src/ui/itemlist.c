@@ -46,7 +46,9 @@ itemlist_t* itemlist_new(view_t* view, vec_t* items)
   il->view       = view;
   il->items      = items;
 
-  vh_list_add(view, itemlist_item_for_index, NULL, il);
+  vh_list_add(view,
+              ((vh_list_inset_t){0, 10, 0, 10}),
+              itemlist_item_for_index, NULL, il);
 
   return il;
 }

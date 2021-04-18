@@ -43,7 +43,9 @@ textlist_t* textlist_new(view_t* view, vec_t* items, textstyle_t textstyle, void
   tl->textstyle = textstyle;
   tl->on_select = on_select;
 
-  vh_list_add(view, textlist_item_for_index, NULL, tl);
+  vh_list_add(view,
+              ((vh_list_inset_t){0, 10, 0, 10}),
+              textlist_item_for_index, NULL, tl);
 
   return tl;
 }
