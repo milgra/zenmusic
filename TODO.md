@@ -1,5 +1,8 @@
 first version
 
+remove texture id
+remove texren from view
+
 filter background error
 filter deactivate
 vh_list set active frame, visualizer overlay

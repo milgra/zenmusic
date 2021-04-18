@@ -80,18 +80,12 @@ typedef enum _textype_t
   TT_EXTERNAL
 } textype_t;
 
-typedef enum _rentype_t
-{
-  RT_BACKGROUND,
-  RT_IMMEDIATE
-} rentype_t;
-
 typedef struct _texture_t
 {
-  textype_t type;    /* managed or external */
-  uint32_t  page;    /* texture page */
-  rentype_t rentype; /* background or immediate rendering */
+  textype_t type; /* managed or external */
+  uint32_t  page; /* texture page */
   float     alpha;
+  char      resizable; /* if view is resized initiate texture re-rendering */
 
   // internal texture
 
@@ -198,17 +192,18 @@ void view_del(void* pointer)
 
 view_t* view_new(char* id, r2_t frame)
 {
-  view_t* view        = mem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
-  view->id            = cstr_fromcstring(id);
-  view->views         = VNEW();
-  view->frame.local   = frame;
-  view->frame.global  = frame;
-  view->texture.page  = -1;
-  view->texture.id    = cstr_fromcstring(id);
-  view->texture.alpha = 1.0;
-  view->needs_touch   = 1;
-  view->blocks_touch  = 1;
-  view->display       = 0; // by default no display, tex generators will set this to 1
+  view_t* view            = mem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
+  view->id                = cstr_fromcstring(id);
+  view->views             = VNEW();
+  view->frame.local       = frame;
+  view->frame.global      = frame;
+  view->texture.page      = -1;
+  view->texture.id        = cstr_fromcstring(id);
+  view->texture.alpha     = 1.0;
+  view->texture.resizable = 1;
+  view->needs_touch       = 1;
+  view->blocks_touch      = 1;
+  view->display           = 0; // by default no display, tex generators will set this to 1
 
   // reset margins
 
@@ -330,26 +325,13 @@ void view_calc_global(view_t* view)
   r2_t frame_parent = {0};
   if (view->parent != NULL) frame_parent = view->parent->frame.global;
 
-  r2_t frame_local  = view->frame.local;
-  r2_t frame_global = frame_local;
+  r2_t frame_global = view->frame.local;
+  r2_t old_global   = view->frame.global;
 
-  frame_global.x = roundf(frame_parent.x) + roundf(view->frame.local.x);
-  frame_global.y = roundf(frame_parent.y) + roundf(view->frame.local.y);
+  frame_global.x = roundf(frame_parent.x) + roundf(frame_global.x);
+  frame_global.y = roundf(frame_parent.y) + roundf(frame_global.y);
 
-  r2_t old_global = view->frame.global;
-
-  if (frame_global.w != old_global.w ||
-      frame_global.h != old_global.h)
-  {
-    view->frame.dim_changed = 1;
-    if (frame_global.w >= 1.0 &&
-        frame_global.h >= 1.0)
-    {
-      if (view->texture.type == TT_MANAGED) view->texture.state = TS_BLANK;
-    }
-  }
-  else
-    view->frame.pos_changed = 1;
+  if (frame_global.x != old_global.x || frame_global.y != old_global.y) view->frame.pos_changed = 1;
 
   view->frame.global = frame_global;
 
@@ -359,7 +341,26 @@ void view_calc_global(view_t* view)
 
 void view_set_frame(view_t* view, r2_t frame)
 {
+  // check if texture needs rerendering
+
+  if (view->frame.local.w != frame.w ||
+      view->frame.local.h != frame.h)
+  {
+    view->frame.dim_changed = 1;
+    if (frame.w >= 1.0 && frame.h >= 1.0)
+    {
+      if (view->texture.type == TT_MANAGED && view->texture.resizable == 1)
+      {
+#ifdef DEBUG
+        printf("dimension change, requesting texture regen for %s\n", view->id);
+#endif
+        view->texture.state = TS_BLANK;
+      }
+    }
+  }
+
   view->frame.local = frame;
+
   view_calc_global(view);
 }
 

@@ -384,8 +384,9 @@ void vh_list_reset(view_t* view)
 
   for (int index = 0; index < vh->items->length; index++)
   {
-    view_t* sview = vh->items->data[index];
-    view_remove(view, sview);
+    view_t* item = vh->items->data[index];
+    view_remove(view, item);
+    if (vh->item_recycle) (*vh->item_recycle)(item);
   }
 
   vec_reset(vh->items);
