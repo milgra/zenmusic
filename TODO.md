@@ -1,6 +1,5 @@
 first version
 
-gombok kattanjanak
 double click problema
 filtering queue - artist, album, songs
 clear cover art if not available

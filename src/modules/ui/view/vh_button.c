@@ -35,7 +35,23 @@ void vh_button_set_state(view_t* view, vh_button_state_t state);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "vh_fade.c"
+#include "vh_anim.c"
+
+void vh_button_anim_end(view_t* view, void* userdata)
+{
+  view_t*      btnview = (view_t*)userdata;
+  vh_button_t* vh      = btnview->handler_data;
+
+  // if offview alpha is 0 and state is released
+  if (vh->offview)
+  {
+    if (vh->offview->texture.alpha < 0.0001 && vh->state == VH_BUTTON_UP)
+    {
+      if (vh->offview) vh_anim_alpha(vh->offview, 0.0, 1.0, 10, AT_LINEAR);
+      if (vh->onview) vh_anim_alpha(vh->onview, 0.0, 1.0, 10, AT_LINEAR);
+    }
+  }
+}
 
 void vh_button_evt(view_t* view, ev_t ev)
 {
@@ -48,12 +64,14 @@ void vh_button_evt(view_t* view, ev_t ev)
       if (view->views->length > 0)
       {
         vh->offview = view->views->data[0];
-        vh_fade_add(vh->offview, NULL, NULL);
+        vh_anim_add(vh->offview);
+        vh_anim_set_event(vh->offview, view, vh_button_anim_end);
       }
       if (view->views->length > 1)
       {
         vh->onview = view->views->data[1];
-        vh_fade_add(vh->onview, NULL, NULL);
+        vh_anim_add(vh->onview);
+        vh_anim_set_event(vh->onview, view, vh_button_anim_end);
       }
 
       if (vh->offview) view_set_texture_alpha(vh->offview, 1.0, 0);
@@ -66,8 +84,10 @@ void vh_button_evt(view_t* view, ev_t ev)
 
     if (vh->type == VH_BUTTON_NORMAL)
     {
-      if (vh->offview) vh_fade_set(vh->offview, 0.0, 10.0, 0);
-      if (vh->onview) vh_fade_set(vh->onview, 1.0, 10.0, 0);
+      vh->state = VH_BUTTON_DOWN;
+
+      if (vh->offview) vh_anim_alpha(vh->offview, 1.0, 0.0, 10, AT_LINEAR);
+      if (vh->onview) vh_anim_alpha(vh->onview, 0.0, 1.0, 10, AT_LINEAR);
     }
   }
   else if (ev.type == EV_MUP)
@@ -79,22 +99,24 @@ void vh_button_evt(view_t* view, ev_t ev)
       if (vh->state == VH_BUTTON_UP)
       {
         vh->state = VH_BUTTON_DOWN;
-        if (vh->offview) vh_fade_set(vh->offview, 0.0, 10.0, 0);
-        if (vh->onview) vh_fade_set(vh->onview, 1.0, 10.0, 0);
+        if (vh->offview) vh_anim_alpha(vh->offview, 0.0, 1.0, 10, AT_LINEAR);
+        if (vh->onview) vh_anim_alpha(vh->onview, 1.0, 0.0, 10, AT_LINEAR);
       }
       else
       {
         vh->state = VH_BUTTON_UP;
-        if (vh->offview) vh_fade_set(vh->offview, 1.0, 10.0, 0);
-        if (vh->onview) vh_fade_set(vh->onview, 0.0, 10.0, 0);
+        if (vh->offview) vh_anim_alpha(vh->offview, 1.0, 0.0, 10, AT_LINEAR);
+        if (vh->onview) vh_anim_alpha(vh->onview, 0.0, 1.0, 10, AT_LINEAR);
       }
       if (vh->event) (*vh->event->fp)(vh->event->userdata, view);
     }
     else
     {
+      vh->state = VH_BUTTON_UP;
+
       if (vh->event) (*vh->event->fp)(vh->event->userdata, view);
-      if (vh->offview) vh_fade_set(vh->offview, 1.0, 10.0, 0);
-      if (vh->onview) vh_fade_set(vh->onview, 0.0, 10.0, 0);
+      if (vh->offview) vh_anim_alpha(vh->offview, 1.0, 0.0, 10, AT_LINEAR);
+      if (vh->onview) vh_anim_alpha(vh->onview, 0.0, 1.0, 10, AT_LINEAR);
     }
   }
 }

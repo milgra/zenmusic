@@ -48,8 +48,8 @@ void ui_show_simple_popup(char* text);
 #include "tg_knob.c"
 #include "tg_picker.c"
 #include "tg_text.c"
+#include "vh_anim.c"
 #include "vh_button.c"
-#include "vh_fade.c"
 #include "vh_knob.c"
 #include "vh_list_item.c"
 #include "vh_picker.c"
@@ -163,9 +163,8 @@ void ui_remove_from_main(void* p)
   if (view->texture.alpha < 1.0) view_remove(mainview, view);
 }
 
-void ui_remove_from_base(void* p)
+void ui_remove_from_base(view_t* view, void* userdata)
 {
-  view_t* view = p;
   if (view->texture.alpha < 1.0) view_remove(baseview, view);
 }
 
@@ -174,7 +173,7 @@ void ui_toggle_baseview(view_t* view)
   if (view->parent)
   {
     view->texture.alpha = 1.0;
-    vh_fade_set(view, 0.0, 20.0, 1);
+    vh_anim_alpha(view, 1.0, 0.0, 20, AT_LINEAR);
   }
   else
   {
@@ -190,7 +189,7 @@ void ui_toggle_baseview(view_t* view)
 
     view_add(baseview, view);
     view->texture.alpha = 0.0;
-    vh_fade_set(view, 1.0, 20.0, 1);
+    vh_anim_alpha(view, 0.0, 1.0, 20, AT_LINEAR);
   }
 }
 
@@ -411,14 +410,14 @@ void ui_on_volume_change(view_t* view, float angle)
 
 void ui_on_roll_in_visu(void* userdata, void* data)
 {
-  vh_fade_set(visuleftbtnbck, 1.0, 10.0, 1);
-  vh_fade_set(visurightbtnbck, 1.0, 10.0, 1);
+  vh_anim_alpha(visuleftbtnbck, 0.0, 1.0, 10, AT_LINEAR);
+  vh_anim_alpha(visurightbtnbck, 1.0, 0.0, 10, AT_LINEAR);
 }
 
 void ui_on_roll_out_visu(void* userdata, void* data)
 {
-  vh_fade_set(visuleftbtnbck, 0.0, 10.0, 1);
-  vh_fade_set(visurightbtnbck, 0.0, 10.0, 1);
+  vh_anim_alpha(visuleftbtnbck, 1.0, 0.0, 10, AT_LINEAR);
+  vh_anim_alpha(visurightbtnbck, 1.0, 0.0, 10, AT_LINEAR);
 }
 
 // api functions
@@ -706,8 +705,8 @@ void ui_init(float width,
   visuleftbtnbck  = view_get_subview(visuleft, "visuleft_btn_bck");
   visurightbtnbck = view_get_subview(visuright, "visuright_btn_bck");
 
-  vh_fade_add(visuleftbtnbck, NULL, NULL);
-  vh_fade_add(visurightbtnbck, NULL, NULL);
+  vh_anim_add(visuleftbtnbck);
+  vh_anim_add(visurightbtnbck);
 
   /* view_remove(visuleft, visuleftbtn); */
   /* view_remove(visuright, visurightbtn); */
@@ -720,8 +719,8 @@ void ui_init(float width,
   vh_roll_add(visuleft, cb_roll_in_visu, cb_roll_out_visu);
   vh_roll_add(visuright, cb_roll_in_visu, cb_roll_out_visu);
 
-  vh_fade_set(visuleftbtnbck, 0.0, 10.0, 1);
-  vh_fade_set(visurightbtnbck, 0.0, 10.0, 1);
+  vh_anim_alpha(visuleftbtnbck, 1.0, 0.0, 10, AT_LINEAR);
+  vh_anim_alpha(visurightbtnbck, 1.0, 0.0, 10, AT_LINEAR);
 
   // list setup
 
@@ -739,7 +738,8 @@ void ui_init(float width,
   view_t* messagelist             = view_get_subview(baseview, "messagelist");
   view_t* messages_popup_page_btn = view_get_subview(baseview, "messages_popup_page_btn");
 
-  vh_fade_add(messages_popup_page, messages_popup_page, ui_remove_from_base);
+  vh_anim_add(messages_popup_page);
+  vh_anim_set_event(messages_popup_page, messages_popup_page, ui_remove_from_base);
   vh_touch_add(messages_popup_page_btn, cb_new(ui_on_button_down, NULL));
 
   view_remove(baseview, messages_popup_page);
@@ -748,7 +748,8 @@ void ui_init(float width,
   view_t* filters_popup          = view_get_subview(baseview, "filters_popup");
   view_t* filters_popup_page_btn = view_get_subview(baseview, "filters_popup_page_btn");
 
-  vh_fade_add(filters_popup_page, filters_popup_page, ui_remove_from_base);
+  vh_anim_add(filters_popup_page);
+  vh_anim_set_event(filters_popup_page, filters_popup_page, ui_remove_from_base);
   vh_touch_add(filters_popup_page_btn, cb_new(ui_on_button_down, NULL));
 
   view_remove(baseview, filters_popup_page);
@@ -811,7 +812,8 @@ void ui_init(float width,
 
   editor_popup_attach(editor_popup, fontpath);
 
-  vh_fade_add(editor_popup_page, editor_popup_page, ui_remove_from_base);
+  vh_anim_add(editor_popup_page);
+  vh_anim_set_event(editor_popup_page, editor_popup_page, ui_remove_from_base);
   vh_touch_add(editor_popup_page_btn, cb_new(ui_on_button_down, NULL));
 
   view_remove(baseview, editor_popup_page);
@@ -840,7 +842,8 @@ void ui_init(float width,
   view_t* decision_popup          = view_get_subview(baseview, "decision_popup");
   view_t* decision_popup_page_btn = view_get_subview(baseview, "decision_popup_page_btn");
 
-  vh_fade_add(decision_popup_page, decision_popup_page, ui_remove_from_base);
+  vh_anim_add(decision_popup_page);
+  vh_anim_set_event(decision_popup_page, decision_popup_page, ui_remove_from_base);
   vh_touch_add(decision_popup_page_btn, cb_new(ui_on_button_down, NULL));
 
   view_remove(baseview, decision_popup_page);
@@ -860,7 +863,8 @@ void ui_init(float width,
   view_t* library_popup          = view_get_subview(baseview, "library_popup");
   view_t* library_popup_page_btn = view_get_subview(baseview, "library_popup_page_btn");
 
-  vh_fade_add(library_popup_page, library_popup_page, ui_remove_from_base);
+  vh_anim_add(library_popup_page);
+  vh_anim_set_event(library_popup_page, library_popup_page, ui_remove_from_base);
   vh_touch_add(library_popup_page_btn, cb_new(ui_on_button_down, NULL));
 
   view_remove(baseview, library_popup_page);
@@ -872,7 +876,8 @@ void ui_init(float width,
   sim_pop_txt                   = view_get_subview(baseview, "sim_pop_txt");
   view_t* simple_popup_page_btn = view_get_subview(baseview, "simple_popup_page_btn");
 
-  vh_fade_add(simple_popup_page, simple_popup_page, ui_remove_from_base);
+  vh_anim_add(simple_popup_page);
+  vh_anim_set_event(simple_popup_page, simple_popup_page, ui_remove_from_base);
   vh_touch_add(simple_popup_page_btn, cb_new(ui_on_button_down, NULL));
 
   tg_text_add(sim_pop_txt);
@@ -883,7 +888,8 @@ void ui_init(float width,
   settings_popup_page             = view_get_subview(baseview, "settings_popup_page");
   view_t* settings_popup_page_btn = view_get_subview(baseview, "settings_popup_page_btn");
 
-  vh_fade_add(settings_popup_page, settings_popup_page, ui_remove_from_base);
+  vh_anim_add(settings_popup_page);
+  vh_anim_set_event(settings_popup_page, settings_popup_page, ui_remove_from_base);
   vh_touch_add(settings_popup_page_btn, cb_new(ui_on_button_down, NULL));
 
   view_t* settingslist = view_get_subview(baseview, "settingslist");
@@ -897,7 +903,8 @@ void ui_init(float width,
   view_t* aboutlist            = view_get_subview(baseview, "aboutlist");
   view_t* about_popup_page_btn = view_get_subview(baseview, "about_popup_page_btn");
 
-  vh_fade_add(about_popup_page, about_popup_page, ui_remove_from_base);
+  vh_anim_add(about_popup_page);
+  vh_anim_set_event(about_popup_page, about_popup_page, ui_remove_from_base);
   vh_touch_add(about_popup_page_btn, cb_new(ui_on_button_down, NULL));
 
   donatelist_attach(aboutlist, fontpath, ui_show_simple_popup);
@@ -910,7 +917,8 @@ void ui_init(float width,
   song_popup_list             = view_get_subview(baseview, "song_popup_list");
   view_t* song_popup_page_btn = view_get_subview(baseview, "song_popup_page_btn");
 
-  vh_fade_add(song_popup_page, song_popup_page, ui_remove_from_base);
+  vh_anim_add(song_popup_page);
+  vh_anim_set_event(song_popup_page, song_popup_page, ui_remove_from_base);
   vh_touch_add(song_popup_page_btn, cb_new(ui_on_button_down, NULL));
 
   songlistpopup_attach(song_popup_list, fontpath, ui_on_songlistpopup_select);
