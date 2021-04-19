@@ -31,13 +31,12 @@ void ui_compositor_add(char* id,
                        int   page, // texture pagev
                        int   full, // needs full texture
                        int   ext,  // external texture
-                       char* texid,
                        int   tex_w,
                        int   tex_h); // texture id
 void ui_compositor_upd_pos(int index, r2_t frame, float border);
-char ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_t* bm);
+char ui_compositor_upd_bmp(int index, r2_t frame, float border, bm_t* bm);
 void ui_compositor_upd_alpha(int index, float alpha);
-void ui_compositor_upd_region(int index, r2_t frame, r2_t region, char* texid);
+void ui_compositor_upd_region(int index, r2_t frame, r2_t region);
 
 void ui_compositor_render(uint32_t time, int width, int height, int wpwr, int hpwr);
 
@@ -57,21 +56,19 @@ void ui_compositor_render(uint32_t time, int width, int height, int wpwr, int hp
 typedef struct _crect_t
 {
   char* id;
-  char* tex_id;
   float data[36];
   char  masked;
   r2_t  frame;
 } crect_t;
 
-crect_t* crect_new();
-void     crect_del(void* rect);
-void     crect_desc(crect_t* rect);
-void     crect_set_id(crect_t* rect, char* id);
-void     crect_set_masked(crect_t* r, char masked);
-void     crect_set_page(crect_t* rect, uint32_t page);
-void     crect_set_alpha(crect_t* r, float alpha);
-void     crect_set_frame(crect_t* rect, r2_t uirect);
-void     crect_set_texture(crect_t* rect, float tlx, float tly, float brx, float bry);
+void crect_del(void* rect);
+void crect_desc(crect_t* rect);
+void crect_set_id(crect_t* rect, char* id);
+void crect_set_masked(crect_t* r, char masked);
+void crect_set_page(crect_t* rect, uint32_t page);
+void crect_set_alpha(crect_t* r, float alpha);
+void crect_set_frame(crect_t* rect, r2_t uirect);
+void crect_set_texture(crect_t* rect, float tlx, float tly, float brx, float bry);
 
 struct uic_t
 {
@@ -133,16 +130,15 @@ void ui_compositor_add(char* id,
                        int   page, // texture page
                        int   full, // needs full texture
                        int   ext,  // external texture
-                       char* texid,
                        int   tex_w,
-                       int   tex_h) // texture id
+                       int   tex_h)
 {
   // printf("ui_compositor_add %s %f %f %f %f masked %i\n", id, frame.x, frame.y, frame.w, frame.h, masked);
 
   // fill up cache if needed
   if (uic.cache_ind + 1 > uic.cache->length)
   {
-    crect_t* rect = crect_new();
+    crect_t* rect = mem_calloc(sizeof(crect_t), "crect_t", crect_del, NULL);
     VADD(uic.cache, rect);
   }
   // get cached rect
@@ -183,7 +179,7 @@ void ui_compositor_add(char* id,
   else
   {
     // prepare texmap
-    tm_coords_t tc = tm_get(uic.tm, texid);
+    tm_coords_t tc = tm_get(uic.tm, id);
 
     if (tc.w > 0 && tc.h > 0)
     {
@@ -191,12 +187,12 @@ void ui_compositor_add(char* id,
       if ((int)frame.w != tc.w || (int)frame.h != tc.h)
       {
         // texture doesn't exist or size mismatch
-        int success = tm_put(uic.tm, texid, frame.w, frame.h);
+        int success = tm_put(uic.tm, id, frame.w, frame.h);
         // TODO reset main texture, maybe all views?
         if (success < 0) printf("TEXTURE FULL, NEEDS RESET\n");
 
         // update tex coords
-        tc = tm_get(uic.tm, texid);
+        tc = tm_get(uic.tm, id);
       }
 
       // set texture coords
@@ -223,7 +219,7 @@ void ui_compositor_upd_pos(int index, r2_t frame, float border)
 
 // show only region of view, modify vertexes and texture coords
 
-void ui_compositor_upd_region(int index, r2_t frame, r2_t region, char* texid)
+void ui_compositor_upd_region(int index, r2_t frame, r2_t region)
 {
   crect_t* rect = uic.cache->data[index];
 
@@ -235,7 +231,7 @@ void ui_compositor_upd_region(int index, r2_t frame, r2_t region, char* texid)
   of.w = region.w;
   of.h = region.h;
 
-  tm_coords_t tc = tm_get(uic.tm, texid);
+  tm_coords_t tc = tm_get(uic.tm, rect->id);
   tm_coords_t nc = tc;
 
   float tw = tc.rbx - tc.ltx; // texcoord x distance
@@ -273,7 +269,7 @@ void ui_compositor_upd_alpha(int index, float alpha)
   uic.upd_geo = 1;
 }
 
-char ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_t* bm)
+char ui_compositor_upd_bmp(int index, r2_t frame, float border, bm_t* bm)
 {
   crect_t* rect = uic.cache->data[index];
 
@@ -283,13 +279,13 @@ char ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_
   if (border > 0.0) frame = r2_expand(frame, border);
   crect_set_frame(rect, frame);
 
-  tm_coords_t tc = tm_get(uic.tm, texid);
+  tm_coords_t tc = tm_get(uic.tm, rect->id);
 
   // TODO store texture size in texture id so older sizes can be reused on fullscreen switches?
   if (bm->w != tc.w || bm->h != tc.h)
   {
     // texture doesn't exist or size mismatch
-    int success = tm_put(uic.tm, texid, frame.w, frame.h);
+    int success = tm_put(uic.tm, rect->id, frame.w, frame.h);
     // TODO reset main texture, maybe all views?
     if (success < 0)
     {
@@ -298,7 +294,7 @@ char ui_compositor_upd_bmp(int index, r2_t frame, float border, char* texid, bm_
     }
 
     // update tex coords
-    tc = tm_get(uic.tm, texid);
+    tc = tm_get(uic.tm, rect->id);
 
     // set new texture coords
     crect_set_texture(rect, tc.ltx, tc.lty, tc.rbx, tc.rby);
@@ -467,13 +463,6 @@ void ui_compositor_render(uint32_t time, int width, int height, int tex_w, int t
 //
 // Compositor Rect
 //
-
-crect_t* crect_new(char* id, char* texid, uint32_t index)
-{
-  crect_t* r = mem_calloc(sizeof(crect_t), "crect_t", crect_del, NULL);
-
-  return r;
-}
 
 void crect_del(void* pointer)
 {

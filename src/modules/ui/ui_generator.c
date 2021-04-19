@@ -117,7 +117,6 @@ void ui_generator_resend_views()
                       view->texture.page,     // texture page
                       view->texture.full,     // needs full texture
                       view->texture.page > 0, // external texture
-                      view->texture.id,       // texture id
                       uig.wpwr,
                       uig.hpwr);
 
@@ -132,7 +131,6 @@ void ui_generator_resend_views()
       resize_texmap |= ui_compositor_upd_bmp(index,
                                              view->frame.global,
                                              view->layout.shadow_blur,
-                                             view->texture.id,
                                              view->texture.bitmap);
     }
   }
@@ -213,7 +211,7 @@ void ui_generator_render(uint32_t time)
 
     if (view->texture.changed)
     {
-      reset_texmap |= ui_compositor_upd_bmp(i, view->frame.global, view->layout.shadow_blur, view->texture.id, view->texture.bitmap);
+      reset_texmap |= ui_compositor_upd_bmp(i, view->frame.global, view->layout.shadow_blur, view->texture.bitmap);
 
       view->frame.dim_changed = 0;
       view->texture.changed   = 0;
@@ -228,7 +226,7 @@ void ui_generator_render(uint32_t time)
 
     if (view->frame.reg_changed)
     {
-      ui_compositor_upd_region(i, view->frame.global, view->frame.region, view->texture.id);
+      ui_compositor_upd_region(i, view->frame.global, view->frame.region);
 
       view->frame.reg_changed = 0;
     }

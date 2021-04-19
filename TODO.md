@@ -1,7 +1,5 @@
 first version
 
-song list ugorjon az aktualisan jatszott szamra
-remove texture id
 gombok kattanjanak
 double click problema
 filtering queue - artist, album, songs

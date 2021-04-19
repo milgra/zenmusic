@@ -148,6 +148,8 @@ void ui_play_next()
     ui_play_index(rand() % filtered_song_count());
   else
     ui_play_index(lastindex + 1);
+
+  songlist_select_and_show(lastindex);
 }
 
 void ui_toggle_shuffle()

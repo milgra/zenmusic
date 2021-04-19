@@ -60,6 +60,7 @@ void    vh_list_reset(view_t* view);
 void    vh_list_refresh(view_t* view);
 view_t* vh_list_item_for_index(view_t* view, int index);
 void    vh_list_lock_scroll(view_t* view, char state);
+void    vh_list_scroll_to_index(view_t* view, int index);
 
 #endif
 
@@ -405,6 +406,19 @@ void vh_list_scroll_h(view_t* view, void* userdata, float ratio)
   vh->item_pos        = -vh->item_wth * ratio;
 
   vh_list_move(listview, 0);
+}
+
+void vh_list_scroll_to_index(view_t* view, int index)
+{
+  vh_list_t* vh = view->handler_data;
+
+  if (index < vh->item_count)
+  {
+    vh->head_index = index;
+    vh_list_refresh(view);
+    vh->head_pos = vh->header ? vh->header->frame.local.h : 0;
+    vh_list_update_scrollbars(view);
+  }
 }
 
 void vh_list_reset(view_t* view)

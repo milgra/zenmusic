@@ -16,6 +16,7 @@ void songlist_attach(view_t* base, char* fontpath, void (*on_select)(int), void 
 void songlist_update();
 void songlist_refresh();
 void songlist_toggle_pause(int state);
+void songlist_select_and_show(int index);
 
 #endif
 
@@ -163,6 +164,13 @@ void songlist_get_selected(vec_t* vec)
   // if selection is empty, select current index
   if (selected_cnt() < 2) selected_add(sl.index_s);
   selected_add_selected(filtered_get_songs(), vec);
+}
+
+void songlist_select_and_show(int index)
+{
+  selected_res();
+  selected_add(index);
+  vh_list_scroll_to_index(sl.view, index);
 }
 
 // items
