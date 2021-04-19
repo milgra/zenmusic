@@ -273,6 +273,8 @@ char ui_compositor_upd_bmp(int index, r2_t frame, float border, bm_t* bm)
 {
   crect_t* rect = uic.cache->data[index];
 
+  // printf("ui_compositor_upd_bmp %s w %i h %i\n", rect->id, bm->w, bm->h);
+
   frame.w = bm->w - 2 * border;
   frame.h = bm->h - 2 * border;
 

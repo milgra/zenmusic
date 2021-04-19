@@ -25,6 +25,7 @@ char* tg_text_get(view_t* view);
 
 #include "mtbitmap.c"
 #include "mtcstring.c"
+#include "mtgraphics.c"
 #include "mtstring.c"
 #include "tg_css.c"
 
@@ -33,19 +34,25 @@ int tg_text_index = 0;
 void tg_text_gen(view_t* view)
 {
   tg_text_t* gen = view->tex_gen_data;
-  if (view->frame.local.w > 0 && view->frame.local.h > 0 && gen->text)
+  if (view->frame.local.w > 0 && view->frame.local.h > 0)
   {
-    str_t* str = str_new();
-    str_addbytearray(str, gen->text);
+    bm_t*       fontmap = bm_new((int)view->frame.local.w, (int)view->frame.local.h);
+    textstyle_t style   = gen->style;
 
-    bm_t* fontmap = bm_new((int)view->frame.local.w, (int)view->frame.local.h);
+    if (gen->text)
+    {
+      str_t* str = str_new();
+      str_addbytearray(str, gen->text);
 
-    textstyle_t style = gen->style;
-
-    text_render(
-        str,
-        style,
-        fontmap);
+      text_render(
+          str,
+          style,
+          fontmap);
+    }
+    else
+    {
+      gfx_rect(fontmap, 0, 0, fontmap->w, fontmap->h, style.backcolor, 0);
+    }
 
     view_set_texture_bmp(view, fontmap);
   }
