@@ -1,7 +1,5 @@
 first version
 
-
-flag non-editable fields in database, show them as grey in editor
 accept input on enter
 song list ugorjon az aktualisan jatszott szamra
 remove texture id

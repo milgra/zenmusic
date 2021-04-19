@@ -207,17 +207,15 @@ void editor_popup_set_song()
   map_keys(ep.data, ep.fields);
 
   // sort fields
-  vec_sort(ep.fields, VSD_ASC, editor_popup_comp_text);
+  vec_sort(ep.fields, VSD_DSC, editor_popup_comp_text);
 
   editor_popup_remove_str(ep.fields, "meta/artist");
   editor_popup_remove_str(ep.fields, "meta/album");
   editor_popup_remove_str(ep.fields, "meta/title");
-  editor_popup_remove_str(ep.fields, "meta/path");
 
   vec_ins(ep.fields, cstr_fromcstring("meta/title"), 0);
   vec_ins(ep.fields, cstr_fromcstring("meta/album"), 0);
   vec_ins(ep.fields, cstr_fromcstring("meta/artist"), 0);
-  vec_add(ep.fields, cstr_fromcstring("metea/path"));
 
   // reset list handler
   vh_list_reset(ep.listview);
@@ -231,18 +229,26 @@ void editor_popup_set_song()
     char* key   = ep.fields->data[index];
     char* value = MGET(ep.data, key);
 
-    uint32_t color1        = (index % 2 == 0) ? 0xFEFEFEFF : 0xEFEFEFFF;
+    uint32_t color1 = (index % 2 == 0) ? 0xFEFEFEFF : 0xEFEFEFFF;
+
+    // "file" fields are non-editable
+    if (key[0] == 'f') color1 &= 0xFFDDDDFF;
+
     ep.textstyle.backcolor = color1;
 
     vh_litem_upd_index(item, index);
-    tg_text_set(vh_litem_get_cell(item, "key"), key, ep.textstyle);
+    tg_text_set(vh_litem_get_cell(item, "key"), key + 5, ep.textstyle); // show last key name component
 
-    uint32_t color2        = (index % 2 == 0) ? 0xF8F8F8FF : 0xE8E8E8FF;
+    uint32_t color2 = (index % 2 == 0) ? 0xF8F8F8FF : 0xE8E8E8FF;
+
+    // "file" fields are non-editable
+    if (key[0] == 'f') color2 &= 0xFFDDDDFF;
+
     ep.textstyle.backcolor = color2;
 
     tg_text_set(vh_litem_get_cell(item, "val"), value, ep.textstyle);
 
-    tg_text_set(vh_litem_get_cell(item, "del"), "Remove", ep.textstyle);
+    if (key[0] != 'f') tg_text_set(vh_litem_get_cell(item, "del"), "Remove", ep.textstyle);
 
     VADD(ep.items, item);
   }
