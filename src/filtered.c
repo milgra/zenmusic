@@ -85,6 +85,33 @@ int filtered_comp_entry(void* left, void* right)
   char* la = MGET(l, flt.sort_field);
   char* ra = MGET(r, flt.sort_field);
 
+  if (strcmp(la, ra) == 0)
+  {
+    // todo make this controllable from header fields
+    char* nla = MGET(l, "meta/album");
+    char* nra = MGET(r, "meta/album");
+
+    if (nla && nra)
+    {
+      if (strcmp(nla, nra) == 0)
+      {
+        nla = MGET(l, "meta/track");
+        nra = MGET(r, "meta/track");
+
+        if (nla && nra)
+        {
+          la = nla;
+          ra = nra;
+        }
+      }
+      else
+      {
+        la = nla;
+        ra = nra;
+      }
+    }
+  }
+
   return strcmp(la, ra);
 }
 
