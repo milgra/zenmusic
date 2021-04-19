@@ -1,6 +1,5 @@
 first version
 
-accept input on enter
 song list ugorjon az aktualisan jatszott szamra
 remove texture id
 gombok kattanjanak

@@ -282,6 +282,11 @@ void vh_textinput_evt(view_t* view, ev_t ev)
       vh_textinput_upd(view);
       if (data->on_text) (*data->on_text)(view);
     }
+    if (ev.keycode == SDLK_RETURN)
+    {
+      vh_textinput_activate(view, 0);
+      if (data->on_deactivate) (*data->on_deactivate)(view);
+    }
   }
   else if (ev.type == EV_TIME)
   {
