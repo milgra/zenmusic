@@ -23,6 +23,7 @@ double lasttime = 0.0;
 char*  libpath  = NULL;
 int    organize = 0;
 ch_t*  ch; // library channel
+char   ui_cleared = 0;
 
 void load_library();
 
@@ -287,10 +288,16 @@ void render(uint32_t time)
 
     ui_update_visualizer();
     ui_update_video();
+
+    ui_cleared = 0;
   }
   else
   {
-    //ui_update_time(0.0, 0.0, 0.0);
+    if (ui_cleared == 0)
+    {
+      ui_update_time(0.0, 0.0, 0.0);
+      ui_cleared = 1;
+    }
   }
 
   ui_manager_render(time);

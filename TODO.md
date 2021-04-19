@@ -1,7 +1,6 @@
 first version
 
 filtering queue - artist, album, songs
-clear cover art if not available
 set starting volume
 on mute fade in/out volume with alpha
 header resize on hscroll problem

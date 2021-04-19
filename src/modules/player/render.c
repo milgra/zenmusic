@@ -563,6 +563,10 @@ void video_show(void* opaque, int index, int w, int h, bm_t* bitmap, int edge)
     video_image_display(is, index, w, h, bitmap, edge);
     //SDL_RenderPresent(renderer);
   }
+  else
+  {
+    gfx_rect(bitmap, 0, 0, bitmap->w, bitmap->h, 0x000000FF, 1);
+  }
 }
 
 void render_draw_waves(void* opaque, int index, bm_t* bitmap, int edge)
