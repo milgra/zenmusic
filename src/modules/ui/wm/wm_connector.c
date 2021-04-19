@@ -128,6 +128,7 @@ void wm_init(void (*init)(int, int, char*),
           while (SDL_PollEvent(&event) != 0)
           {
             ev.type = EV_EMPTY;
+            ev.time = SDL_GetTicks();
 
             if (event.type == SDL_MOUSEBUTTONDOWN ||
                 event.type == SDL_MOUSEBUTTONUP ||
@@ -143,18 +144,12 @@ void wm_init(void (*init)(int, int, char*),
                 ev.type   = EV_MDOWN;
                 ev.button = event.button.button;
                 ev.drag   = 1;
+                ev.dclick = 0;
 
-                if (lastclick == 0)
-                {
-                  lastclick = ev.time;
-                  ev.dclick = 0;
-                }
-                else
-                {
-                  uint32_t delta = ev.time - lastclick;
-                  if (delta < 1000) ev.dclick = 1;
-                  lastclick = 0;
-                }
+                if (lastclick == 0) lastclick = ev.time;
+                uint32_t delta = ev.time - lastclick;
+                lastclick      = ev.time;
+                if (delta < 500) ev.dclick = 1;
               }
               else if (event.type == SDL_MOUSEBUTTONUP)
               {
