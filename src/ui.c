@@ -138,6 +138,7 @@ void ui_play_index(int index)
     map_t* songmap = ui.songs->data[lastindex];
     char*  path    = cstr_fromformat("%s%s", ui_libpath, MGET(songmap, "file/path"), NULL);
     player_play(path);
+    player_set_volume(0.9);
     REL(path);
   }
 }

@@ -267,9 +267,6 @@ void update(ev_t ev)
 
 void render(uint32_t time)
 {
-
-  // update ui
-
   double phead = player_time();
   if (phead > 0.0)
   {
@@ -296,6 +293,7 @@ void render(uint32_t time)
     if (ui_cleared == 0)
     {
       ui_update_time(0.0, 0.0, 0.0);
+      ui_update_volume(0.9);
       ui_cleared = 1;
     }
   }

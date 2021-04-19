@@ -1,22 +1,20 @@
 first version
 
 filtering queue - artist, album, songs
-set starting volume
-on mute fade in/out volume with alpha
 header resize on hscroll problem
 socketes taviranyitas - 1 byteokkal - send 0 for play/pause, 1 for prev song, 2 for next song to localhost:732 in readme
 fix leaks
 fix while heaven wept, black lotus
 fix mp4 playing freezes
-text style is cssbol jojjon
 metadata update eseten sulyos leak, a hatterben tortenjen, analyzer kozben is lehessen mar bongeszni
 UI Recorder - UI player API, -uiscript
 testing - record ui events, inject ui events, check result
-mtmem retain/release mindig csekkolja hogy volt-e mem_alloc, debug modban
-cstr_fromformat-tal csinalj valamit
 
 ideas
 
+mtmem retain/release mindig csekkolja hogy volt-e mem_alloc, debug modban
+cstr_fromformat-tal csinalj valamit
+text style is cssbol jojjon
 rdft ne logaritmikus legyen, alig latszik a kozep tartomany
 search/filter history ( use filters for playlists)
 leghallgatottabb szamok
@@ -38,6 +36,7 @@ glossy effekt
 scroll-ra lehessen novelni/csokkenteni visuals meretet
 statisztikak - top 10 leghallgatottabb, milyen genre-t hallgatsz foleg elmult 1 honap, stb
 cortex as visualizer - level gen based on freq, LEFT/DOWN!!!
+on mute fade in/out volume with alpha
 volume fade in/out, cover arton is
 only update vertexes when frame change
 only update shadow/blur when frame change
