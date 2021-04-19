@@ -89,7 +89,7 @@ void vh_lhead_evt(view_t* view, ev_t ev)
     for (int i = 0; i < vh->cells->length; i++)
     {
       vh_lcell_t* cell = vh->cells->data[i];
-      r2_t        f    = cell->view->frame.local;
+      r2_t        f    = cell->view->frame.global;
       if (f.x < ev.x && f.x + f.w + 1 > ev.x)
       {
         if (ev.x > f.x + f.w - 10)
@@ -117,18 +117,22 @@ void vh_lhead_evt(view_t* view, ev_t ev)
 
       if (vh->resized_cell)
       {
-        r2_t f = vh->resized_cell->view->frame.local;
-        f.w    = ev.x - f.x;
-        view_set_frame(vh->resized_cell->view, f);
+        r2_t fg = vh->resized_cell->view->frame.global;
+        r2_t fl = vh->resized_cell->view->frame.local;
+        fl.w    = ev.x - fg.x;
+        view_set_frame(vh->resized_cell->view, fl);
         vh_lcell_arrange(vh->cells);
         vh_lhead_resize(view);
       }
       else if (vh->dragged_cell)
       {
         vh->dragged_flag = 1;
-        r2_t f           = vh->dragged_cell->view->frame.local;
-        f.x              = ev.x - vh->dragged_pos;
-        view_set_frame(vh->dragged_cell->view, f);
+        r2_t fg          = vh->dragged_cell->view->frame.global;
+        r2_t fl          = vh->dragged_cell->view->frame.local;
+        // todo mouse event should contain local coordinates also
+        fg.x = ev.x - vh->dragged_pos - view->frame.global.x;
+        fg.y = 0;
+        view_set_frame(vh->dragged_cell->view, fg);
       }
     }
   }
@@ -139,7 +143,7 @@ void vh_lhead_evt(view_t* view, ev_t ev)
     {
       if (vh->resized_cell)
       {
-        (*vh->on_resize)(view, vh->resized_cell->id, vh->resized_cell->view->frame.local.w);
+        (*vh->on_resize)(view, vh->resized_cell->id, vh->resized_cell->view->frame.global.w);
       }
       else if (vh->dragged_cell)
       {
@@ -151,7 +155,7 @@ void vh_lhead_evt(view_t* view, ev_t ev)
       for (int i = 0; i < vh->cells->length; i++)
       {
         vh_lcell_t* cell = vh->cells->data[i];
-        r2_t        f    = cell->view->frame.local;
+        r2_t        f    = cell->view->frame.global;
         if (f.x < ev.x && f.x + f.w > ev.x && cell != vh->dragged_cell)
         {
           vh_lcell_ins(vh->cells, vh->dragged_ind, i);

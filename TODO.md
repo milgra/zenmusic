@@ -1,6 +1,5 @@
 first version
 
-header resize on hscroll problem
 socketes taviranyitas - 1 byteokkal - send 0 for play/pause, 1 for prev song, 2 for next song to localhost:732 in readme
 fix leaks
 fix while heaven wept, black lotus
