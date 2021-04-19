@@ -325,10 +325,14 @@ void songlist_attach(view_t* base,
   VADD(sl.fields, sl_cell_new("meta/track", 150, 6));
   VADD(sl.fields, sl_cell_new("meta/disc", 150, 7));
   VADD(sl.fields, sl_cell_new("file/duration", 100, 8));
-  VADD(sl.fields, sl_cell_new("file/plays", 150, 9));
-  VADD(sl.fields, sl_cell_new("file/added", 150, 10));
-  VADD(sl.fields, sl_cell_new("file/last played", 150, 11));
-  VADD(sl.fields, sl_cell_new("file/last skipped", 150, 12));
+  VADD(sl.fields, sl_cell_new("file/channels", 100, 9));
+  VADD(sl.fields, sl_cell_new("file/bit_rate", 100, 10));
+  VADD(sl.fields, sl_cell_new("file/sample_rate", 100, 11));
+  VADD(sl.fields, sl_cell_new("file/play_count", 150, 12));
+  VADD(sl.fields, sl_cell_new("file/skip_count", 150, 13));
+  VADD(sl.fields, sl_cell_new("file/added", 150, 14));
+  VADD(sl.fields, sl_cell_new("file/last_played", 150, 15));
+  VADD(sl.fields, sl_cell_new("file/last_skipped", 150, 16));
 
   vec_dec_retcount(sl.fields);
 

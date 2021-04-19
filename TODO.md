@@ -20,6 +20,8 @@ text style is cssbol jojjon
 metadata update eseten sulyos leak, a hatterben tortenjen, analyzer kozben is lehessen mar bongeszni
 UI Recorder - UI player API, -uiscript
 testing - record ui events, inject ui events, check result
+mtmem retain/release mindig csekkolja hogy volt-e alloc debug modban
+cstr_fromformat-tal csinalj valamit
 
 ideas
 

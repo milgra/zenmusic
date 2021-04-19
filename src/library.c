@@ -154,8 +154,13 @@ int analyzer_thread(void* chptr)
       char* path = vec_tail(rem_db);
       char* size = MGET(lib_db, path);
 
-      char* time_str = mem_calloc(10, "char*", NULL, NULL);
-      snprintf(time_str, 20, "%lu", time(NULL));
+      char* time_str = mem_calloc(80, "char*", NULL, NULL);
+      // snprintf(time_str, 20, "%lu", time(NULL));
+
+      time_t now;
+      time(&now);
+      struct tm ts = *localtime(&now);
+      strftime(time_str, 80, "%Y-%m-%d %H:%M:%S", &ts);
 
       // add file data
 

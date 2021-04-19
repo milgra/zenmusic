@@ -103,17 +103,16 @@ int editor_get_metadata(const char* path, map_t* map)
           if (param->codec_type == AVMEDIA_TYPE_AUDIO)
           {
             char* channels   = mem_calloc(10, "char*", NULL, NULL);
+            char* bitrate    = mem_calloc(10, "char*", NULL, NULL);
             char* samplerate = mem_calloc(10, "char*", NULL, NULL);
 
             snprintf(channels, 10, "%i", param->channels);
+            snprintf(bitrate, 10, "%li", param->bit_rate);
             snprintf(samplerate, 10, "%i", param->sample_rate);
             MPUT(map, "file/channels", channels);
-            MPUT(map, "file/samplerate", samplerate);
+            MPUT(map, "file/bit_rate", bitrate);
+            MPUT(map, "file/sample_rate", samplerate);
           }
-          char* bitrate = mem_calloc(10, "char*", NULL, NULL);
-
-          snprintf(bitrate, 10, "%li", param->bit_rate);
-          MPUT(map, "file/bitrate", bitrate);
         }
       }
     }

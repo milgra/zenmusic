@@ -451,14 +451,22 @@ void ui_show_song_info(int index)
 
   map_t* songmap = ui.songs->data[index];
 
-  char* infostr = cstr_fromformat("%s\n%s\n%s %s %s %s",
-                                  (char*)MGET(songmap, "meta/title"),
-                                  (char*)MGET(songmap, "meta/artist"),
-                                  (char*)MGET(songmap, "meta/genre"),
-                                  (char*)MGET(songmap, "meta/samplerate"),
-                                  (char*)MGET(songmap, "meta/bitrate"),
-                                  (char*)MGET(songmap, "meta/channels"),
-                                  NULL);
+  char* sample = MGET(songmap, "file/sample_rate");
+  char* bit    = MGET(songmap, "file/bit_rate");
+  int   sr     = atoi(sample);
+  int   br     = atoi(bit);
+
+  printf("sr br %i %i\n", sr, br);
+
+  char* infostr = mem_calloc(100, "char*", NULL, NULL);
+
+  snprintf(infostr, 100, "%s\n%s\n%s/%iKHz/%iKbit/%s channels",
+           (char*)MGET(songmap, "meta/title"),
+           (char*)MGET(songmap, "meta/artist"),
+           (char*)MGET(songmap, "meta/genre"),
+           sr / 1000,
+           br / 1000,
+           (char*)MGET(songmap, "file/channels"));
 
   tg_text_set(infoview, infostr, ts);
 }
