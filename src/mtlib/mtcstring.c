@@ -51,6 +51,26 @@ uint32_t cstr_color_from_cstring(char* string)
   return result;
 }
 
+char* cstr_concat(char* format, ...)
+{
+  va_list ap;
+  char*   text;
+  size_t  length = strlen(format);
+
+  va_start(ap, format);
+  for (text = format; text != NULL; text = va_arg(ap, char*))
+    length += strlen(text);
+  length += 1;
+  va_end(ap);
+
+  char* result = mem_calloc(sizeof(char) * length, "char*", NULL, cstr_describe);
+  va_start(ap, format);
+  vsnprintf(result, length, format, ap);
+  va_end(ap);
+
+  return result;
+}
+
 char* cstr_fromformat(int size, char* format, ...)
 {
   char*   result = mem_calloc(sizeof(char) * size, "char*", NULL, cstr_describe);
