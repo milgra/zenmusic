@@ -221,10 +221,12 @@ view_t* songitem_create()
   sl_cell_t* cell;
   while ((cell = VNXT(sl.fields)))
   {
-    view_t* cellview = view_new(cstr_fromformat("%s%s", rowview->id, cell->id, NULL), (r2_t){0, 0, cell->size, 35});
+    char*   id       = cstr_fromformat(100, "%s%s", rowview->id, cell->id);
+    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 35});
     tg_text_add(cellview);
 
     vh_litem_add_cell(rowview, cell->id, cell->size, cellview);
+    REL(id);
   }
 
   return rowview;
@@ -360,11 +362,14 @@ void songlist_attach(view_t* base,
   sl_cell_t* cell;
   while ((cell = VNXT(sl.fields)))
   {
-    view_t* cellview = view_new(cstr_fromformat("%s%s", header->id, cell->id, NULL), (r2_t){0, 0, cell->size, 30});
+    char*   id       = cstr_fromformat(100, "%s%s", header->id, cell->id);
+    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
     tg_text_add(cellview);
     tg_text_set(cellview, cell->id, sl.textstyle);
 
     vh_lhead_add_cell(header, cell->id, cell->size, cellview);
+
+    REL(id);
   }
 
   // add list handler to view

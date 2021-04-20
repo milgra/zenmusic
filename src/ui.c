@@ -136,7 +136,7 @@ void ui_play_index(int index)
 
     ui_show_song_info(lastindex);
     map_t* songmap = ui.songs->data[lastindex];
-    char*  path    = cstr_fromformat("%s%s", ui_libpath, MGET(songmap, "file/path"), NULL);
+    char*  path    = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", ui_libpath, MGET(songmap, "file/path"));
     player_play(path);
     player_set_volume(0.9);
     REL(path);
@@ -648,7 +648,7 @@ void ui_init(float width,
 
   text_init();
 
-  fontpath = cstr_fromformat("%s/Baloo.ttf", respath, NULL);
+  fontpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/Baloo.ttf", respath);
 
   textstyle_t ts  = {0};
   ts.font         = fontpath;
@@ -664,8 +664,8 @@ void ui_init(float width,
 
   // view setup
 
-  char* csspath  = cstr_fromformat("%s/main.css", respath, NULL);
-  char* htmlpath = cstr_fromformat("%s/main.html", respath, NULL);
+  char* csspath  = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/main.css", respath);
+  char* htmlpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/main.html", respath);
 
   vec_t* views = view_gen_load(htmlpath, csspath, respath, callbacks_get_data());
 

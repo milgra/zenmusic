@@ -471,8 +471,8 @@ void vh_list_add(view_t*         view,
   vh->item_recycle   = item_recycle;
   vh->inset          = inset;
 
-  char* vid = cstr_fromformat("%s%s", view->id, "vscr", NULL);
-  char* hid = cstr_fromformat("%s%s", view->id, "hscr", NULL);
+  char* vid = cstr_fromformat(100, "%s%s", view->id, "vscr");
+  char* hid = cstr_fromformat(100, "%s%s", view->id, "hscr");
 
   view_t* vscr = view_new(vid, (r2_t){view->frame.local.w - 11, 0, 11, view->frame.local.h});
   view_t* hscr = view_new(hid, (r2_t){0, view->frame.local.h - 11, view->frame.local.w, 11});

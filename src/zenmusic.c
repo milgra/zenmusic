@@ -15,6 +15,7 @@
 #include "wm_connector.c"
 #include "wm_event.c"
 #include <SDL.h>
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -60,7 +61,7 @@ void on_filter_songs(void* userdata, void* data)
 void on_genre_select(void* userdata, void* data)
 {
   char* genre = data;
-  char* query = cstr_fromformat("genre is %s", genre, NULL);
+  char* query = cstr_fromformat(100, "genre is %s", genre);
 
   // genre select should narrow artist selector
 
@@ -72,7 +73,7 @@ void on_genre_select(void* userdata, void* data)
 void on_artist_select(void* userdata, void* data)
 {
   char* artist = data;
-  char* query  = cstr_fromformat("artist is %s", artist, NULL);
+  char* query  = cstr_fromformat(100, "artist is %s", artist);
 
   filtered_set_filter(query);
   ui_reload_songlist();
@@ -86,12 +87,12 @@ void on_change_library(void* userdata, void* data)
   if (libpath) REL(libpath);
 
   if (path[0] == '~')
-    libpath = cstr_fromformat("%s%s", getenv("HOME"), path + 1, NULL); // replace tilde's with home
+    libpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", getenv("HOME"), path + 1); // replace tilde's with home
   else
     libpath = cstr_fromcstring(path);
 
   if (path[strlen(path) - 1] != '/')
-    libpath = cstr_fromformat("%s/", path, NULL); // add closing slash
+    libpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/", path); // add closing slash
 
   if (lib_exists(libpath))
   {
@@ -163,7 +164,7 @@ void init(int width, int height, char* respath)
 #ifndef DEBUG
   respath = "/usr/local/share/zenmusic";
 #else
-  respath = cstr_fromformat("%s/../res", respath, NULL);
+  respath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/../res", respath);
 #endif
   libpath = config_get("library_path");
 

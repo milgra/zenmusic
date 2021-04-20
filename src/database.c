@@ -21,6 +21,7 @@ void     db_reset();
 #include "mtlog.c"
 #include "mtvector.c"
 #include <ctype.h>
+#include <limits.h>
 
 struct _db_t
 {
@@ -49,7 +50,7 @@ uint32_t db_count()
 
 void db_read(char* libpath)
 {
-  char* dbpath = cstr_fromformat("%s/zenmusic.kvl", libpath, NULL);
+  char* dbpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/zenmusic.kvl", libpath);
 
   LOG("reading db %s", dbpath);
 
@@ -61,7 +62,7 @@ void db_read(char* libpath)
 
 void db_write(char* libpath)
 {
-  char* dbpath = cstr_fromformat("%s/zenmusic.kvl", libpath, NULL);
+  char* dbpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/zenmusic.kvl", libpath);
 
   LOG("writing db to %s", dbpath);
 

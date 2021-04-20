@@ -130,7 +130,10 @@ view_t* songlistpopupitem_create(int index)
   sl_cell_t* cell;
   while ((cell = VNXT(slp.fields)))
   {
-    view_t* cellview = view_new(cstr_fromformat("%s%s", rowview->id, cell->id, NULL), (r2_t){0, 0, cell->size, 50});
+    char*   id       = cstr_fromformat(100, "%s%s", rowview->id, cell->id);
+    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 50});
+    REL(id);
+
     tg_text_add(cellview);
 
     vh_litem_add_cell(rowview, cell->id, cell->size, cellview);

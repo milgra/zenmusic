@@ -300,8 +300,8 @@ void vh_textinput_add(view_t*     view,
                       textstyle_t textstyle,
                       void*       userdata)
 {
-  char* id_c = cstr_fromformat("%s%s", view->id, "crsr", NULL);
-  char* id_h = cstr_fromformat("%s%s", view->id, "holder", NULL);
+  char* id_c = cstr_fromformat(100, "%s%s", view->id, "crsr");
+  char* id_h = cstr_fromformat(100, "%s%s", view->id, "holder");
 
   vh_textinput_t* data = mem_calloc(sizeof(vh_textinput_t), "vh_text", NULL, NULL);
 
@@ -378,6 +378,7 @@ void vh_textinput_add(view_t*     view,
   // cleanup
 
   REL(id_c);
+  REL(id_h);
 }
 
 void vh_textinput_set_text(view_t* view, char* text)

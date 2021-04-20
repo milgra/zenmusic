@@ -27,6 +27,7 @@ bm_t* editor_get_image(const char* path);
 #include "mtgraphics.c"
 #include "mtlog.c"
 #include "mtmemory.c"
+#include <limits.h>
 
 void editor_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop, char* cover)
 {
@@ -72,8 +73,9 @@ int editor_get_metadata(const char* path, map_t* map)
       while ((tag = av_dict_get(pFormatCtx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
       {
         char* value = cstr_fromcstring(tag->value);
-        char* key   = cstr_fromformat("%s/%s", "meta", tag->key, NULL);
+        char* key   = cstr_fromformat(100, "%s/%s", "meta", tag->key);
         MPUT(map, key, value);
+        REL(key);
         REL(value);
       }
 
@@ -144,15 +146,15 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
     int   length = dot - path;
     char* name   = mem_calloc(length, "char*", NULL, NULL);
     memcpy(name, path, length);
-    tmp = cstr_fromformat("%s_tmp%s", name, dot, NULL);
+    tmp = cstr_fromformat(PATH_MAX + NAME_MAX, "%s_tmp%s", name, dot);
   }
   else
   {
-    tmp = cstr_fromformat("%s_tmp", path, NULL);
+    tmp = cstr_fromformat(100, "%s_tmp", path);
   }
 
-  char* oldpath = cstr_fromformat("%s%s", libpath, path, NULL);
-  char* newpath = cstr_fromformat("%s%s", libpath, tmp, NULL);
+  char* oldpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", libpath, path);
+  char* newpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", libpath, tmp);
 
   //printf("oldpath %s\n", oldpath);
   //printf("newpath %s\n", newpath);
@@ -410,6 +412,10 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
   }
   else
     LOG("ERROR : editor_set_metadata : cannot open input file\n");
+
+  REL(tmp);
+  REL(oldpath);
+  REL(newpath);
 }
 
 void editor_get_album(const char* path, bm_t* bitmap)

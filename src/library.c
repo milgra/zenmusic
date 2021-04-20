@@ -172,7 +172,7 @@ int analyzer_thread(void* chptr)
       MPUT(song, "file/play_count", cstr_fromcstring("0"));
       MPUT(song, "file/skip_count", cstr_fromcstring("0"));
 
-      char* real = cstr_fromformat("%s%s", lib_path, path, NULL);
+      char* real = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", lib_path, path);
 
       // read and add file and meta data
 
@@ -339,8 +339,8 @@ int lib_organize_entry(char* libpath, map_t* db, map_t* entry)
   char* ext = mem_calloc(len + 1, "char*", NULL, NULL);
   memcpy(ext, path + index, len);
 
-  char* old_path     = cstr_fromformat("%s%s", libpath, path, NULL);
-  char* new_dirs     = cstr_fromformat("%s%s/%s/", libpath, artist, album, NULL);
+  char* old_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", libpath, path);
+  char* new_dirs     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s/%s/", libpath, artist, album);
   char* new_path     = NULL;
   char* new_path_rel = NULL;
 
@@ -349,13 +349,13 @@ int lib_organize_entry(char* libpath, map_t* db, map_t* entry)
     int  trackno    = atoi(track);
     char trackst[5] = {0};
     snprintf(trackst, 5, "%.3i", trackno);
-    new_path     = cstr_fromformat("%s%s/%s/%s %s.%s", libpath, artist, album, trackst, title, ext, NULL);
-    new_path_rel = cstr_fromformat("%s/%s/%s %s.%s", artist, album, trackst, title, ext, NULL);
+    new_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s/%s/%s %s.%s", libpath, artist, album, trackst, title, ext);
+    new_path_rel = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s %s.%s", artist, album, trackst, title, ext);
   }
   else
   {
-    new_path     = cstr_fromformat("%s%s/%s/%s.%s", libpath, artist, album, title, ext, NULL);
-    new_path_rel = cstr_fromformat("%s/%s/%s.%s", artist, album, title, ext, NULL);
+    new_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s/%s/%s.%s", libpath, artist, album, title, ext);
+    new_path_rel = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s.%s", artist, album, title, ext);
   }
 
   if (strcmp(old_path, new_path) != 0)

@@ -17,6 +17,7 @@ char* config_get(char* key);
 #include "library.c"
 #include "mtcstring.c"
 #include "mtlog.c"
+#include <limits.h>
 
 struct _cfg_t
 {
@@ -36,7 +37,7 @@ void config_init()
 // TODO rework kvlist, entries should contain a key field which is a hierarchical path so multi-level maps can be stored
 void config_read()
 {
-  char* path = cstr_fromformat("%s/.config/zenmusic/config.kvl", getenv("HOME"), NULL);
+  char* path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/.config/zenmusic/config.kvl", getenv("HOME"));
 
   map_t* container = MNEW();
   kvlist_read(path, container, "id");
@@ -67,8 +68,8 @@ void config_write()
   MPUT(cfg.data, "id", cstr_fromcstring("config"));
   MPUT(container, "id", cfg.data);
 
-  char* dirpath = cstr_fromformat("%s/.config/zenmusic/", getenv("HOME"), NULL);
-  char* cfgpath = cstr_fromformat("%s/.config/zenmusic/config.kvl", getenv("HOME"), NULL);
+  char* dirpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/.config/zenmusic/", getenv("HOME"));
+  char* cfgpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/.config/zenmusic/config.kvl", getenv("HOME"));
 
   // TODO move mkpath to some other namespace
   int error = lib_mkpath(dirpath, 0777);

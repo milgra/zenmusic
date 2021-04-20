@@ -19,6 +19,7 @@
 
 struct mem_head
 {
+  char id[2]; // starting bytes for mtmem managed memory ranges to detect invalid object during retain/release
   char type[10];
   void (*destructor)(void*);
   void (*descriptor)(void*, int);
@@ -54,6 +55,8 @@ void* mem_alloc(size_t size,                    /* size of data to store */
 
   struct mem_head* head = (struct mem_head*)bytes;
 
+  head->id[0] = 'm';
+  head->id[1] = 't';
   memcpy(head->type, type, 9);
   head->destructor  = destructor;
   head->descriptor  = descriptor;
@@ -73,6 +76,8 @@ void* mem_calloc(size_t size,                    /* size of data to store */
 
   struct mem_head* head = (struct mem_head*)bytes;
 
+  head->id[0] = 'm';
+  head->id[1] = 't';
   memcpy(head->type, type, 9);
   head->destructor  = destructor;
   head->descriptor  = descriptor;
@@ -113,6 +118,9 @@ void* mem_retain(void* pointer)
   bytes -= sizeof(struct mem_head);
   struct mem_head* head = (struct mem_head*)bytes;
 
+  // check memory range id
+  assert(head->id[0] == 'm' && head->id[1] == 't');
+
   head->retaincount += 1;
   if (head->retaincount == SIZE_MAX) mem_exit("Maximum retain count reached \\(o)_/ for", head->type);
 
@@ -126,6 +134,9 @@ char mem_release(void* pointer)
   uint8_t* bytes = (uint8_t*)pointer;
   bytes -= sizeof(struct mem_head);
   struct mem_head* head = (struct mem_head*)bytes;
+
+  // check memory range id
+  assert(head->id[0] == 'm' && head->id[1] == 't');
 
   if (head->retaincount == 0) mem_exit("Tried to release already released memory for", head->type);
 
@@ -163,6 +174,9 @@ size_t mem_retaincount(void* pointer)
   bytes -= sizeof(struct mem_head);
   struct mem_head* head = (struct mem_head*)bytes;
 
+  // check memory range id
+  assert(head->id[0] == 'm' && head->id[1] == 't');
+
   return head->retaincount;
 }
 
@@ -180,6 +194,9 @@ void mem_describe(void* pointer, int level)
   uint8_t* bytes = (uint8_t*)pointer;
   bytes -= sizeof(struct mem_head);
   struct mem_head* head = (struct mem_head*)bytes;
+
+  // check memory range id
+  assert(head->id[0] == 'm' && head->id[1] == 't');
 
   if (head->descriptor != NULL)
   {

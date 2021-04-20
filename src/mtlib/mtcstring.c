@@ -9,7 +9,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-char*    cstr_fromformat(char* format, ...);
+char*    cstr_fromformat(int size, char* format, ...);
 char*    cstr_fromcstring(char* string);
 char*    cstr_fromfile(char* path);
 uint32_t cstr_color_from_cstring(char* string);
@@ -51,26 +51,14 @@ uint32_t cstr_color_from_cstring(char* string)
   return result;
 }
 
-/* creates string from utf8 bytearray */
-/* PARAMETER LIST MUST END WITH NULL!!! */
-/* TODO do something with this, should be fully fprintf capable without NULL */
-
-char* cstr_fromformat(char* format, ...)
+char* cstr_fromformat(int size, char* format, ...)
 {
-  va_list ap;
-  char*   text;
-  size_t  length = strlen(format);
+  char*   result = mem_calloc(sizeof(char) * size, "char*", NULL, cstr_describe);
+  va_list args;
 
-  va_start(ap, format);
-  for (text = format; text != NULL; text = va_arg(ap, char*))
-    length += strlen(text);
-  length += 1;
-  va_end(ap);
-
-  char* result = mem_calloc(sizeof(char) * length, "char*", NULL, cstr_describe);
-  va_start(ap, format);
-  vsnprintf(result, length, format, ap);
-  va_end(ap);
+  va_start(args, format);
+  vsnprintf(result, size, format, args);
+  va_end(args);
 
   return result;
 }

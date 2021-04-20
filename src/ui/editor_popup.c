@@ -70,8 +70,11 @@ void editor_popup_input_cell_edit_finished(view_t* inputview)
   printf("editor_popup_input_cell_edit_finished key %s text %s\n", key, text);
 
   // remove text view handler
+  char* id = cstr_fromformat(100, "%s%s", ep.sel_item->id, "val");
 
-  view_t* textcell = view_new(cstr_fromformat("%s%s", ep.sel_item->id, "val", NULL), inputview->frame.local);
+  view_t* textcell = view_new(id, inputview->frame.local);
+  REL(id);
+
   tg_text_add(textcell);
   tg_text_set(textcell, text, ep.textstyle);
   textcell->blocks_touch = 0;
@@ -103,7 +106,11 @@ void editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, ev_
     ep.textstyle.backcolor = color1;
     ep.sel_item            = itemview;
 
-    view_t* inputcell = view_new(cstr_fromformat("%s%s%s", itemview->id, key, "edit", NULL), cell->view->frame.local);
+    char* id = cstr_fromformat(100, "%s%s%s", itemview->id, key, "edit");
+
+    view_t* inputcell = view_new(id, cell->view->frame.local);
+    REL(id);
+
     vh_textinput_add(inputcell, "", value, ep.textstyle, key);                        // add text handler with key as userdata
     vh_textinput_set_on_text(inputcell, editor_popup_input_cell_value_changed);       // listen for text change
     vh_textinput_set_on_deactivate(inputcell, editor_popup_input_cell_edit_finished); // listen for text editing finish
@@ -146,14 +153,27 @@ view_t* editor_popup_create_item()
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, editor_popup_select_item);
 
+  char* id = cstr_fromformat(100, "%s%s", rowview->id, "key");
   // first cell is a simple text cell
-  view_t* keycell = view_new(cstr_fromformat("%s%s", rowview->id, "key", NULL), (r2_t){0, 0, 100, 35});
+  view_t* keycell = view_new(id, (r2_t){0, 0, 100, 35});
+  REL(id);
+
   tg_text_add(keycell);
 
-  view_t* valcell = view_new(cstr_fromformat("%s%s", rowview->id, "val", NULL), (r2_t){0, 0, 300, 35});
+  id = cstr_fromformat(100, "%s%s", rowview->id, "val");
+
+  view_t* valcell = view_new(id, (r2_t){0, 0, 300, 35});
+
+  REL(id);
+
   tg_text_add(valcell);
 
-  view_t* delcell = view_new(cstr_fromformat("%s%s", rowview->id, "del", NULL), (r2_t){0, 0, 110, 35});
+  id = cstr_fromformat(100, "%s%s", rowview->id, "del");
+
+  view_t* delcell = view_new(id, (r2_t){0, 0, 110, 35});
+
+  REL(id);
+
   tg_text_add(delcell);
 
   vh_litem_add_cell(rowview, "key", 200, keycell);
@@ -366,9 +386,11 @@ void editor_popup_set_songs(vec_t* vec, char* libpath)
 
     map_t* song = vec->data[0];
     char*  path = MGET(song, "file/path");
-    char*  file = cstr_fromformat("%s%s", libpath, path, NULL);
+    char*  file = cstr_fromformat(100, "%s%s", libpath, path);
 
     editor_get_album(file, ep.coverview->texture.bitmap);
+
+    REL(file);
     ep.coverview->texture.changed = 1;
   }
 }

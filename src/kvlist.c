@@ -12,6 +12,7 @@ int kvlist_write(char* libpath, map_t* db);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "mtcstring.c"
+#include <limits.h>
 
 int kvlist_read(char* libpath, map_t* db, char* keyfield)
 {
@@ -67,7 +68,7 @@ int kvlist_write(char* libpath, map_t* db)
   printf("kvlist write %s\n", libpath);
 
   int   retv = -1;
-  char* path = cstr_fromformat("%snew", libpath, NULL);
+  char* path = cstr_fromformat(PATH_MAX + NAME_MAX, "%snew", libpath);
   FILE* file = fopen(path, "w");
 
   if (file)
