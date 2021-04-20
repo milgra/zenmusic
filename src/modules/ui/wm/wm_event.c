@@ -38,7 +38,11 @@ typedef struct _ev_t
   int         dclick;
   int         ctrl_down;
   int         shift_down;
+#ifdef __linux__
+  SDL_Keycode keycode;
+#else
   SDL_KeyCode keycode;
+#endif
 } ev_t;
 
 #endif
