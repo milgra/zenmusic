@@ -10,6 +10,7 @@
 #include "mtmap.c"
 #include "mtstring.c"
 #include "player.c"
+#include "remote.c"
 #include "ui.c"
 #include "ui_manager.c"
 #include "wm_connector.c"
@@ -23,7 +24,8 @@
 double lasttime = 0.0;
 char*  libpath  = NULL;
 int    organize = 0;
-ch_t*  ch; // library channel
+ch_t*  ch;     // library channel
+ch_t*  rem_ch; // remote channel
 char   ui_cleared = 0;
 
 void load_library();
@@ -144,7 +146,10 @@ void init(int width, int height, char* respath)
 {
   srand((unsigned int)time(NULL));
 
-  ch = ch_new(100); // comm channel for library entries
+  ch     = ch_new(100); // comm channel for library entries
+  rem_ch = ch_new(10);  // remote channel
+
+  remote_listen(rem_ch);
 
   db_init();
   player_init();
@@ -231,6 +236,14 @@ void update(ev_t ev)
       }
       // cleanup, ownership was passed with the channel from analyzer
       REL(entry);
+    }
+
+    char* buffer = NULL;
+    if ((buffer = ch_recv(rem_ch)))
+    {
+      if (buffer[0] == '0') ui_play_pause();
+      if (buffer[0] == '1') ui_play_next();
+      if (buffer[0] == '2') ui_play_prev();
     }
 
     // update player

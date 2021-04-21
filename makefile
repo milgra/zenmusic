@@ -46,7 +46,8 @@ LDFLAGS = \
 	-lavformat \
 	-lavfilter \
 	-lswresample \
-	-lswscale
+	-lswscale \
+	-lpthread
 
 OBJECTSDEV := $(addprefix $(OBJDIRDEV)/,$(SOURCES:.c=.o))
 OBJECTSREL := $(addprefix $(OBJDIRREL)/,$(SOURCES:.c=.o))

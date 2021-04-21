@@ -20,6 +20,8 @@ void ui_refresh_songlist();
 void ui_reload_songlist();
 void ui_show_query(char* text);
 void ui_play_next();
+void ui_play_prev();
+void ui_play_pause();
 void ui_set_libpath(char* libpath);
 void ui_set_org_btn_lbl(char* text);
 void ui_show_simple_popup(char* text);
@@ -151,6 +153,21 @@ void ui_play_next()
     ui_play_index(lastindex + 1);
 
   songlist_select_and_show(lastindex);
+}
+
+void ui_play_prev()
+{
+  if (ui.shuffle)
+    ui_play_index(rand() % filtered_song_count());
+  else
+    ui_play_index(lastindex - 1);
+
+  songlist_select_and_show(lastindex);
+}
+
+void ui_play_pause()
+{
+  player_toggle_pause();
 }
 
 void ui_toggle_shuffle()

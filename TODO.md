@@ -1,17 +1,16 @@
 first version
 
-socketes taviranyitas - 1 byteokkal - send 0 for play/pause, 1 for prev song, 2 for next song to localhost:732 in readme
 fix leaks
 fix while heaven wept, black lotus
 fix mp4 playing freezes
 metadata update eseten sulyos leak, a hatterben tortenjen, analyzer kozben is lehessen mar bongeszni
+index col resize problem
 UI Recorder - UI player API, -uiscript
 testing - record ui events, inject ui events, check result
 
 ideas
 
-mtmem retain/release mindig csekkolja hogy volt-e mem_alloc, debug modban
-cstr_fromformat-tal csinalj valamit
+cstr_concat-ot hasznald fromformat helyett path-ok eseten memoria miatt
 text style is cssbol jojjon
 rdft ne logaritmikus legyen, alig latszik a kozep tartomany
 search/filter history ( use filters for playlists)
