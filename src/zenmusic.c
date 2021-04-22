@@ -242,8 +242,8 @@ void update(ev_t ev)
     if ((buffer = ch_recv(rem_ch)))
     {
       if (buffer[0] == '0') ui_play_pause();
-      if (buffer[0] == '1') ui_play_next();
-      if (buffer[0] == '2') ui_play_prev();
+      if (buffer[0] == '1') ui_play_prev();
+      if (buffer[0] == '2') ui_play_next();
     }
 
     // update player

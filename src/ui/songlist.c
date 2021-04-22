@@ -343,6 +343,8 @@ void songlist_attach(view_t* base,
   VADD(sl.fields, sl_cell_new("file/added", 150, 14));
   VADD(sl.fields, sl_cell_new("file/last_played", 150, 15));
   VADD(sl.fields, sl_cell_new("file/last_skipped", 150, 16));
+  VADD(sl.fields, sl_cell_new("file/media_type", 150, 17));
+  VADD(sl.fields, sl_cell_new("file/container", 150, 18));
 
   vec_dec_retcount(sl.fields);
 

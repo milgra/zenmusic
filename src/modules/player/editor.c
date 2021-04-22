@@ -66,6 +66,26 @@ int editor_get_metadata(const char* path, map_t* map)
     {
       retv = 0;
 
+      AVOutputFormat* format = av_guess_format(NULL, path, NULL);
+      if (format)
+      {
+        char* slash = strstr(format->mime_type, "/");
+
+        if (slash)
+        {
+          char* media_type = mem_calloc(strlen(format->mime_type), "char*", NULL, NULL);
+          char* container  = mem_calloc(strlen(format->mime_type), "char*", NULL, NULL);
+
+          memcpy(media_type, format->mime_type, slash - format->mime_type);
+          memcpy(container, slash + 1, strlen(format->mime_type) - (slash - format->mime_type));
+
+          MPUT(map, "file/media_type", media_type);
+          MPUT(map, "file/container", container);
+          REL(media_type);
+          REL(container);
+        }
+      }
+
       av_dict_set(&format_opts, "scan_all_pmts", NULL, AV_DICT_MATCH_CASE);
 
       AVDictionaryEntry* tag = NULL;
