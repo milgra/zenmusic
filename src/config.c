@@ -8,6 +8,8 @@ void  config_read();
 void  config_write();
 void  config_set(char* key, char* value);
 char* config_get(char* key);
+int   config_get_bool(char* key);
+void  config_set_bool(char* key, int val);
 
 #endif
 
@@ -95,6 +97,29 @@ void config_set(char* key, char* value)
 char* config_get(char* key)
 {
   return MGET(cfg.data, key);
+}
+
+int config_get_bool(char* key)
+{
+  char* val = MGET(cfg.data, key);
+  if (val && strcmp(val, "true"))
+    return 1;
+  else
+    return 0;
+}
+
+void config_set_bool(char* key, int val)
+{
+  if (val)
+  {
+    char* str = cstr_fromcstring("true");
+    MPUT(cfg.data, key, str);
+  }
+  else
+  {
+    char* str = cstr_fromcstring("false");
+    MPUT(cfg.data, key, str);
+  }
 }
 
 #endif

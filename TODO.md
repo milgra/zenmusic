@@ -1,8 +1,7 @@
 first version
 
 fix leaks
-fix while heaven wept, black lotus
-fix mp4 playing freezes
+fix space problem, case sensitiveness in search
 metadata update eseten sulyos leak, a hatterben tortenjen, analyzer kozben is lehessen mar bongeszni
 index col resize problem
 UI Recorder - UI player API, -uiscript

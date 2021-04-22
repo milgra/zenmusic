@@ -21,14 +21,15 @@
 #include <stdlib.h>
 #include <time.h>
 
-double lasttime = 0.0;
-char*  libpath  = NULL;
-int    organize = 0;
-ch_t*  ch;     // library channel
-ch_t*  rem_ch; // remote channel
-char   ui_cleared = 0;
-
-void load_library();
+struct
+{
+  double last_step;
+  char*  lib_path;
+  ch_t*  lib_ch; // library channel
+  ch_t*  rem_ch; // remote channel
+  char   ui_cleared;
+} zm = {0};
+vv void load_library();
 
 void on_save_entry(void* userdata, void* data)
 {
@@ -37,10 +38,10 @@ void on_save_entry(void* userdata, void* data)
   //editor_set_metadata(entry, "king.jpg");
 
   // move song to new place if needed
-  //lib_organize_entry(libpath, db_get_db(), entry);
+  //lib_organize_entry(zm.lib_path, db_get_db(), entry);
 
   // save database
-  //db_write(libpath);
+  //db_write(zm.lib_path);
 }
 
 void on_song_header(void* userdata, void* data)
@@ -86,25 +87,25 @@ void on_change_library(void* userdata, void* data)
 {
   char* path = data;
 
-  if (libpath) REL(libpath);
+  if (zm.lib_path) REL(zm.lib_path);
 
   if (path[0] == '~')
-    libpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", getenv("HOME"), path + 1); // replace tilde's with home
+    zm.lib_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", getenv("HOME"), path + 1); // replace tilde's with home
   else
-    libpath = cstr_fromcstring(path);
+    zm.lib_path = cstr_fromcstring(path);
 
   if (path[strlen(path) - 1] != '/')
-    libpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/", path); // add closing slash
+    zm.lib_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/", path); // add closing slash
 
-  if (lib_exists(libpath))
+  if (lib_exists(zm.lib_path))
   {
-    printf("CHANGE LIBRARY %s\n", libpath);
-    config_set("library_path", libpath);
+    printf("CHANGE LIBRARY %s\n", zm.lib_path);
+    config_set("library_path", zm.lib_path);
     config_write();
 
-    libpath = config_get("library_path");
+    zm.lib_path = config_get("library_path");
     load_library();
-    ui_set_libpath(libpath);
+    ui_set_libpath(zm.lib_path);
     ui_hide_libpath_popup();
   }
   else
@@ -114,18 +115,16 @@ void on_change_library(void* userdata, void* data)
 void on_change_organize(void* userdata, void* data)
 {
   char* value = data;
-  organize    = strcmp(value, "Enable") == 0;
+  char  flag  = strcmp(value, "Enable") == 0;
 
-  char* newval = cstr_fromcstring(organize ? "true" : "false");
-  config_set("organize_db", newval);
-  REL(newval);
+  config_set_bool("organize_db", flag);
 
   // ui_set_org_btn_lbl(organize ? "Disable" : "Enable");
 
-  if (organize)
+  if (config_get_bool("organize_db"))
   {
-    int succ = lib_organize(libpath, db_get_db());
-    if (succ == 0) db_write(libpath);
+    int succ = lib_organize(zm.lib_path, db_get_db());
+    if (succ == 0) db_write(zm.lib_path);
     ui_refresh_songlist();
   }
 }
@@ -134,10 +133,10 @@ void load_library()
 {
   db_reset();
 
-  db_read(libpath);                       // read db
-  lib_read(libpath);                      // read library
-  lib_remove_duplicates(db_get_db());     // remove existing
-  if (lib_entries() > 0) lib_analyze(ch); // start analyzing new entries
+  db_read(zm.lib_path);                          // read db
+  lib_read(zm.lib_path);                         // read library
+  lib_remove_duplicates(db_get_db());            // remove existing
+  if (lib_entries() > 0) lib_analyze(zm.lib_ch); // start analyzing new entries
 
   filtered_set_sortfield("meta/artist", 0);
 }
@@ -146,10 +145,10 @@ void init(int width, int height, char* respath)
 {
   srand((unsigned int)time(NULL));
 
-  ch     = ch_new(100); // comm channel for library entries
-  rem_ch = ch_new(10);  // remote channel
+  zm.lib_ch = ch_new(100); // comm channel for library entries
+  zm.rem_ch = ch_new(10);  // remote channel
 
-  remote_listen(rem_ch);
+  remote_listen(zm.rem_ch);
 
   db_init();
   player_init();
@@ -171,14 +170,13 @@ void init(int width, int height, char* respath)
 #else
   respath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/../res", respath);
 #endif
-  libpath = config_get("library_path");
+  zm.lib_path = config_get("library_path");
 
   char* orgstr = config_get("organize_db");
-  organize     = strcmp(orgstr, "true") == 0;
 
-  ui_init(width, height, respath, libpath);
+  ui_init(width, height, respath, zm.lib_path);
 
-  if (!libpath)
+  if (!zm.lib_path)
   {
     ui_show_libpath_popup("Please enter the location of your music library folder.");
   }
@@ -204,7 +202,7 @@ void update(ev_t ev)
     // get analyzed song entries
 
     map_t* entry;
-    while ((entry = ch_recv(ch)))
+    while ((entry = ch_recv(zm.lib_ch)))
     {
       char* path = MGET(entry, "file/path");
 
@@ -223,12 +221,12 @@ void update(ev_t ev)
       {
         // analyzing is finished, sort and store database
 
-        db_write(libpath);
+        db_write(zm.lib_path);
 
-        /* if (organize) */
+        /* if (config_get_bool("organize_db")) */
         /* { */
-        /*   int succ = lib_organize(libpath, db_get_db()); */
-        /*   if (succ == 0) db_write(libpath); */
+        /*   int succ = lib_organize(zm.lib_path, db_get_db()); */
+        /*   if (succ == 0) db_write(zm.lib_path); */
         /* } */
 
         filtered_set_sortfield("meta/artist", 0);
@@ -239,7 +237,7 @@ void update(ev_t ev)
     }
 
     char* buffer = NULL;
-    if ((buffer = ch_recv(rem_ch)))
+    if ((buffer = ch_recv(zm.rem_ch)))
     {
       if (buffer[0] == '0') ui_play_pause();
       if (buffer[0] == '1') ui_play_prev();
@@ -268,7 +266,7 @@ void update(ev_t ev)
         MPUT(entry, "file/play_count", new_play_count);
         REL(new_play_count);
 
-        db_write(libpath);
+        db_write(zm.lib_path);
       }
 
       // play next song
@@ -285,14 +283,14 @@ void render(uint32_t time)
   if (phead > 0.0)
   {
     // update timer
-    if (floor(phead) != lasttime)
+    if (floor(phead) != zm.last_step)
     {
-      lasttime = floor(phead);
+      zm.last_step = floor(phead);
 
       double posratio = phead / player_duration();
       double volratio = player_volume();
 
-      ui_update_time(lasttime, player_duration() - lasttime, player_duration());
+      ui_update_time(zm.last_step, player_duration() - zm.last_step, player_duration());
       ui_update_position(posratio);
       ui_update_volume(volratio);
     }
@@ -300,15 +298,15 @@ void render(uint32_t time)
     ui_update_visualizer();
     ui_update_video();
 
-    ui_cleared = 0;
+    zm.ui_cleared = 0;
   }
   else
   {
-    if (ui_cleared == 0)
+    if (zm.ui_cleared == 0)
     {
       ui_update_time(0.0, 0.0, 0.0);
       ui_update_volume(0.9);
-      ui_cleared = 1;
+      zm.ui_cleared = 1;
     }
   }
 
