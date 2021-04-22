@@ -3,7 +3,7 @@
 
 #include "mtmap.c"
 
-void  config_init();
+void  config_init(char* respath);
 void  config_read();
 void  config_write();
 void  config_set(char* key, char* value);
@@ -26,12 +26,22 @@ struct _cfg_t
   map_t* data;
 } cfg = {0};
 
-void config_init()
+void config_init(char* respath)
 {
   cfg.data = MNEW();
 
   MPUT(cfg.data, "organize_db", cstr_fromcstring("false"));
   MPUT(cfg.data, "ui_color", cstr_fromcstring("0xEEEEEEFF"));
+
+#ifndef DEBUG
+  respath = "/usr/local/share/zenmusic";
+#else
+  respath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/../res", respath);
+#endif
+
+  // TODO MPUTVAL
+  // TODO LEAK!!!
+  MPUT(cfg.data, "respath", cstr_fromcstring(respath));
 
   // we won't release values this time, config map will stay in memory during runtime
 }

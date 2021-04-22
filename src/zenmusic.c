@@ -24,10 +24,9 @@
 struct
 {
   double last_step;
-  char*  lib_path;
-  ch_t*  lib_ch; // library channel
-  ch_t*  rem_ch; // remote channel
-  char   ui_cleared;
+  char*  lib_path; // library path
+  ch_t*  lib_ch;   // library channel
+  ch_t*  rem_ch;   // remote channel
 } zm = {0};
 
 void load_library();
@@ -153,7 +152,7 @@ void init(int width, int height, char* respath)
 
   db_init();
   player_init();
-  config_init();
+  config_init(respath);
   config_read();
   filtered_init();
 
@@ -166,16 +165,11 @@ void init(int width, int height, char* respath)
   callbacks_set("on_genre_selected", cb_new(on_genre_select, NULL));
   callbacks_set("on_artist_selected", cb_new(on_artist_select, NULL));
 
-#ifndef DEBUG
-  respath = "/usr/local/share/zenmusic";
-#else
-  respath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/../res", respath);
-#endif
   zm.lib_path = config_get("library_path");
 
   char* orgstr = config_get("organize_db");
 
-  ui_init(width, height, respath, zm.lib_path);
+  ui_init(width, height, config_get("respath"), zm.lib_path);
 
   if (!zm.lib_path)
   {
@@ -184,6 +178,8 @@ void init(int width, int height, char* respath)
   else
     load_library();
 }
+
+// update by event, is called multiple times per frame
 
 void update(ev_t ev)
 {
@@ -278,6 +274,8 @@ void update(ev_t ev)
   ui_manager_event(ev);
 }
 
+// render, called once per frame
+
 void render(uint32_t time)
 {
   double phead = player_time();
@@ -298,16 +296,15 @@ void render(uint32_t time)
 
     ui_update_visualizer();
     ui_update_video();
-
-    zm.ui_cleared = 0;
   }
   else
   {
-    if (zm.ui_cleared == 0)
+    if (zm.last_step < time)
     {
+      zm.last_step = time + 1000;
+
       ui_update_time(0.0, 0.0, 0.0);
       ui_update_volume(0.9);
-      zm.ui_cleared = 1;
     }
   }
 
