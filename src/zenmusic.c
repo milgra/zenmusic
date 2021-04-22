@@ -29,7 +29,8 @@ struct
   ch_t*  rem_ch; // remote channel
   char   ui_cleared;
 } zm = {0};
-vv void load_library();
+
+void load_library();
 
 void on_save_entry(void* userdata, void* data)
 {
