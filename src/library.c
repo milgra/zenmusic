@@ -11,7 +11,6 @@ int  lib_organize_entry(char* libpath, map_t* db, map_t* entry);
 int  lib_organize(char* libpath, map_t* db);
 int  lib_entries();
 int  lib_exists(char* path);
-int  lib_mkpath(char* file_path, mode_t mode);
 
 #endif
 
@@ -21,13 +20,12 @@ int  lib_mkpath(char* file_path, mode_t mode);
 #include <ftw.h>
 
 #include "editor.c"
+#include "files.c"
 #include "mtcstring.c"
 #include "mtlog.c"
 #include <errno.h>
 #include <limits.h>
 #include <stdio.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <time.h>
 
 map_t* lib_db;
@@ -276,27 +274,6 @@ void lib_analyze(ch_t* channel)
   SDL_CreateThread(analyzer_thread, "analyzer", channel);
 }
 
-int lib_mkpath(char* file_path, mode_t mode)
-{
-  assert(file_path && *file_path);
-  for (char* p = strchr(file_path + 1, '/');
-       p;
-       p = strchr(p + 1, '/'))
-  {
-    *p = '\0';
-    if (mkdir(file_path, mode) == -1)
-    {
-      if (errno != EEXIST)
-      {
-        *p = '/';
-        return -1;
-      }
-    }
-    *p = '/';
-  }
-  return 0;
-}
-
 char* lib_replace_char(char* str, char find, char replace)
 {
   char* current_pos = strchr(str, find);
@@ -362,7 +339,7 @@ int lib_organize_entry(char* libpath, map_t* db, map_t* entry)
   {
     LOG("moving %s to %s\n", old_path, new_path);
 
-    int error = lib_mkpath(new_dirs, 0777);
+    int error = files_mkpath(new_dirs, 0777);
 
     if (error == 0)
     {

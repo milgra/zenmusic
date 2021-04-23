@@ -11,6 +11,7 @@
 
 #define MNEW() map_alloc()
 #define MPUT(MAP, ID, OBJ) map_put(MAP, ID, OBJ)
+#define MPUTR(MAP, ID, OBJ) map_put_rel(MAP, ID, OBJ)
 #define MGET(MAP, ID) map_get(MAP, ID)
 #define MDEL(MAP, OBJ) map_del(MAP, OBJ)
 
@@ -40,6 +41,7 @@ map_t* map_alloc(void);
 void   map_dealloc(void* pointer);
 void   map_reset(map_t* map);
 int    map_put(map_t* map, const char* key, void* value);
+int    map_put_rel(map_t* map, const char* key, void* value);
 void*  map_get(map_t* map, const char* key);
 void   map_del(map_t* map, const char* key);
 void   map_keys(map_t* map, vec_t* res);
@@ -267,6 +269,15 @@ int map_put(map_t* map, const char* key, void* value)
   if (map->count == map->count_real) map_resize(map);
 
   return 1;
+}
+
+/* puts in and releases value with key for inline use*/
+
+int map_put_rel(map_t* map, const char* key, void* value)
+{
+  int res = map_put(map, key, value);
+  REL(value);
+  return res;
 }
 
 /* returns value for key */

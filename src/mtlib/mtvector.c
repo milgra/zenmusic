@@ -13,6 +13,7 @@
 
 #define VNEW() vec_alloc()
 #define VADD(VEC, OBJ) vec_add(VEC, OBJ)
+#define VADDR(VEC, OBJ) vec_add_rel(VEC, OBJ)
 #define VREM(VEC, OBJ) vec_rem(VEC, OBJ)
 #define VNXT(VEC) vec_next(VEC)
 
@@ -39,6 +40,7 @@ void     vec_dealloc(void* vector);
 void     vec_reset(vec_t* vector);
 void     vec_dec_retcount(vec_t* vector);
 void     vec_add(vec_t* vector, void* data);
+void     vec_add_rel(vec_t* vector, void* data);
 void     vec_ins(vec_t* vector, void* data, size_t index);
 void*    vec_next(vec_t* vector);
 void     vec_addinvector(vec_t* vec_a, vec_t* vec_b);
@@ -135,6 +137,14 @@ void vec_add(vec_t* vector, void* data)
   vec_expand(vector);
   vector->data[vector->length] = data;
   vector->length += 1;
+}
+
+/* adds and releases single data, for inline use */
+
+void vec_add_rel(vec_t* vector, void* data)
+{
+  vec_add(vector, data);
+  REL(data);
 }
 
 /* adds data at given index */
