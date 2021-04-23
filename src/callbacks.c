@@ -16,29 +16,26 @@ map_t* callbacks_get_data();
 #include "mtlog.c"
 #include "mtmap.c"
 
-struct _callbacks_t
-{
-  map_t* data;
-} callbacks = {0};
+map_t* callbacks;
 
 void callbacks_init()
 {
-  callbacks.data = MNEW();
+  callbacks = MNEW();
 }
 
 void callbacks_set(char* id, cb_t* cb)
 {
-  MPUT(callbacks.data, id, cb);
+  MPUT(callbacks, id, cb);
 }
 
 cb_t* callbacks_get(char* id)
 {
-  return MGET(callbacks.data, id);
+  return MGET(callbacks, id);
 }
 
 void callbacks_call(char* id, void* data)
 {
-  cb_t* cb = MGET(callbacks.data, id);
+  cb_t* cb = MGET(callbacks, id);
   if (cb)
     (*cb->fp)(cb->userdata, data);
   else
@@ -47,7 +44,7 @@ void callbacks_call(char* id, void* data)
 
 map_t* callbacks_get_data()
 {
-  return callbacks.data;
+  return callbacks;
 }
 
 #endif

@@ -53,13 +53,8 @@ static int lib_file_data(const char* fpath, const struct stat* sb, int tflag, st
     // TODO use macro for database name
     if (strstr(fpath, "zenmusic") == NULL)
     {
-      char sizestr[20] = {0};
-      snprintf(sizestr, 20, "%li", sb->st_size);
-      char* size = cstr_fromcstring(sizestr);
-
-      // printf("file %s\n", fpath + strlen(lib_path));
-
-      MPUT(lib_db, fpath + strlen(lib_path), size);
+      char* size = cstr_fromformat(20, "%li", sb->st_size);
+      MPUT(lib_db, fpath + strlen(lib_path), size); // use relative path as path
       REL(size);
     }
   }
@@ -84,10 +79,12 @@ void lib_read(char* libpath)
   if (lib_path) REL(lib_path);
   if (lib_db) REL(lib_db);
 
-  lib_path  = cstr_fromcstring(libpath);
-  lib_db    = MNEW();
+  lib_path = cstr_fromcstring(libpath);
+  lib_db   = MNEW();
+
   int flags = 0;
   int id    = 0;
+
   //flags |= FTW_DEPTH;
   flags |= FTW_PHYS;
 

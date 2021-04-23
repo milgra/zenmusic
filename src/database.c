@@ -23,29 +23,26 @@ void     db_reset();
 #include <ctype.h>
 #include <limits.h>
 
-struct _db_t
-{
-  map_t* data;
-} db = {0};
+map_t* db;
 
 void db_init()
 {
-  db.data = MNEW();
+  db = MNEW();
 }
 
 void db_reset()
 {
-  map_reset(db.data);
+  map_reset(db);
 }
 
 map_t* db_get_db()
 {
-  return db.data;
+  return db;
 }
 
 uint32_t db_count()
 {
-  return db.data->count;
+  return db->count;
 }
 
 void db_read(char* libpath)
@@ -54,10 +51,11 @@ void db_read(char* libpath)
 
   LOG("reading db %s", dbpath);
 
-  kvlist_read(dbpath, db.data, "file/path");
-  REL(dbpath);
+  kvlist_read(dbpath, db, "file/path");
 
-  LOG("database loaded, entries : %i", db.data->count);
+  LOG("database loaded, entries : %i", db->count);
+
+  REL(dbpath);
 }
 
 void db_write(char* libpath)
@@ -66,17 +64,18 @@ void db_write(char* libpath)
 
   LOG("writing db to %s", dbpath);
 
-  int res = kvlist_write(dbpath, db.data);
-  REL(dbpath);
+  int res = kvlist_write(dbpath, db);
 
   if (res < 0) LOG("ERROR db_write cannot write database %s\n", dbpath);
 
   LOG("db written");
+
+  REL(dbpath);
 }
 
 void db_add_entry(char* path, map_t* entry)
 {
-  MPUT(db.data, path, entry);
+  MPUT(db, path, entry);
 }
 
 #endif

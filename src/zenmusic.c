@@ -23,10 +23,10 @@
 
 struct
 {
-  double last_step;
-  char*  lib_path; // library path
-  ch_t*  lib_ch;   // library channel
-  ch_t*  rem_ch;   // remote channel
+  double last_step; // last timestep
+  char*  lib_path;  // library path
+  ch_t*  lib_ch;    // library channel
+  ch_t*  rem_ch;    // remote channel
 } zm = {0};
 
 void load_library();

@@ -68,21 +68,22 @@ void config_read()
 
 void config_write()
 {
-  printf("config_write\n");
+  map_t* data    = MNEW();
+  char*  dirpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/.config/zenmusic/", getenv("HOME"));
+  char*  cfgpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/.config/zenmusic/config.kvl", getenv("HOME"));
 
-  map_t* data = MNEW();
-  MPUT(confmap, "id", cstr_fromcstring("config"));
-  MPUT(data, "id", confmap);
-
-  char* dirpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/.config/zenmusic/", getenv("HOME"));
-  char* cfgpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/.config/zenmusic/config.kvl", getenv("HOME"));
+  MPUT(confmap, "id", cstr_fromcstring("config")); // put id in config db
+  MPUT(data, "id", confmap);                       // put config db in final data with same id
 
   int error = files_mkpath(dirpath, 0777);
 
   if (error == 0)
   {
     int res = kvlist_write(cfgpath, data);
-    if (res < 0) LOG("ERROR config_write cannot write config\n");
+    if (res < 0)
+      LOG("ERROR config_write cannot write config\n");
+    else
+      LOG("config written");
   }
   else
     LOG("ERROR config_write cannot create config path\n");
