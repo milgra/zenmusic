@@ -85,7 +85,9 @@ void config_write()
 
 void config_set(char* key, char* value)
 {
-  MPUT(confmap, key, value);
+  char* str = cstr_fromcstring(value);
+  MPUT(confmap, key, str);
+  REL(str);
 }
 
 char* config_get(char* key)

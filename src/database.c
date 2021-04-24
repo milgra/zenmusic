@@ -34,7 +34,7 @@ void db_read(char* libpath)
 {
   assert(libpath != NULL);
 
-  char* dbpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/zenmusic.kvl", libpath);
+  char* dbpath = cstr_fromformat(PATH_MAX + NAME_MAX, "/%s/zenmusic.kvl", libpath);
 
   LOG("reading db %s", dbpath);
 
@@ -49,7 +49,7 @@ void db_write(char* libpath)
 {
   assert(libpath != NULL);
 
-  char* dbpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/zenmusic.kvl", libpath);
+  char* dbpath = cstr_fromformat(PATH_MAX + NAME_MAX, "/%s/zenmusic.kvl", libpath);
 
   LOG("writing db to %s", dbpath);
 

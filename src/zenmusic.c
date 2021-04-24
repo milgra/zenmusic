@@ -29,9 +29,9 @@ void destroy();
 
 void load_library();
 
+void on_change_library(void* userdata, void* data);
 void on_save_entry(void* userdata, void* data);
 void on_song_header(void* userdata, void* data);
-void on_change_library(void* userdata, void* data);
 void on_change_organize(void* userdata, void* data);
 void on_genre_select(void* userdata, void* data);
 void on_artist_select(void* userdata, void* data);
@@ -83,9 +83,9 @@ void init(int width, int height, char* path)
   char* res_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/../res", path);
 #endif
 
-  // leak!!!
-  config_set("organize_db", cstr_fromcstring("false"));
-  config_set("ui_color", cstr_fromcstring("0xEEEEEEFF"));
+  config_set("organize_db", "false");
+  config_set("remote_enabled", "false");
+  config_set("ui_color", "0xEEEEEEFF");
   config_set("res_path", res_path);
 
   // read config, it overwrites defaults if exists
@@ -103,10 +103,15 @@ void init(int width, int height, char* path)
   else
     load_library();
 
-  remote_listen(zm.rem_ch);
-}
+  // start listening for remote control events if set
 
-// update by event, is called multiple times per frame
+  if (config_get("remote_enabled"))
+  {
+    if (config_get_bool("remote_enabled")) remote_listen(zm.rem_ch);
+  }
+
+  REL(res_path);
+}
 
 void update(ev_t ev)
 {
@@ -243,6 +248,52 @@ void destroy()
   printf("zenmusic destroy\n");
 }
 
+void load_library()
+{
+  assert(config_get("lib_path") != NULL);
+
+  db_reset();
+  db_read(config_get("lib_path")); // read db
+
+  lib_read(config_get("lib_path"));   // read library
+  lib_remove_duplicates(db_get_db()); // remove existing
+
+  if (lib_entries() > 0) lib_analyze(zm.lib_ch); // start analyzing new entries
+
+  filtered_set_sortfield("meta/artist", 0);
+}
+
+void on_change_library(void* userdata, void* data)
+{
+  char* new_path = data;
+  char* lib_path = NULL;
+
+  if (new_path[0] == '~')
+    lib_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", getenv("HOME"), new_path + 1); // replace tilde's with home
+  else
+    lib_path = cstr_fromcstring(new_path);
+
+  // remove slash if needed
+
+  if (lib_path[strlen(lib_path) - 1] == '/') lib_path[strlen(lib_path) - 1] = '\0';
+
+  if (files_path_exists(lib_path))
+  {
+    printf("CHANGING LIBRARY %s\n", lib_path);
+
+    config_set("lib_path", lib_path);
+    config_write();
+
+    load_library();
+    ui_set_libpath(lib_path);
+    ui_hide_libpath_popup();
+  }
+  else
+    ui_show_libpath_popup("Location doesn't exists, please enter valid location.");
+
+  REL(lib_path);
+}
+
 void on_save_entry(void* userdata, void* data)
 {
   map_t* entry = data;
@@ -295,34 +346,6 @@ void on_artist_select(void* userdata, void* data)
   ui_show_query(query);
 }
 
-void on_change_library(void* userdata, void* data)
-{
-  char* new_path = data;
-  char* lib_path = NULL;
-
-  if (new_path[0] == '~')
-    lib_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", getenv("HOME"), new_path + 1); // replace tilde's with home
-  else
-    lib_path = cstr_fromcstring(new_path);
-
-  if (new_path[strlen(new_path) - 1] != '/')
-    lib_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/", new_path); // add closing slash
-
-  if (files_path_exists(lib_path))
-  {
-    printf("CHANGING LIBRARY %s\n", lib_path);
-
-    config_set("lib_path", lib_path);
-    config_write();
-
-    load_library();
-    ui_set_libpath(lib_path);
-    ui_hide_libpath_popup();
-  }
-  else
-    ui_show_libpath_popup("Location doesn't exists, please enter valid location.");
-}
-
 void on_change_organize(void* userdata, void* data)
 {
   char* value = data;
@@ -338,16 +361,4 @@ void on_change_organize(void* userdata, void* data)
     if (succ == 0) db_write(config_get("lib_path"));
     ui_refresh_songlist();
   }
-}
-
-void load_library()
-{
-  db_reset();
-
-  db_read(config_get("lib_path"));               // read db
-  lib_read(config_get("lib_path"));              // read library
-  lib_remove_duplicates(db_get_db());            // remove existing
-  if (lib_entries() > 0) lib_analyze(zm.lib_ch); // start analyzing new entries
-
-  filtered_set_sortfield("meta/artist", 0);
 }
