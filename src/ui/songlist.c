@@ -23,7 +23,7 @@ void songlist_select_and_show(int index);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "filtered.c"
-#include "selected.c"
+#include "selection.c"
 #include "tg_css.c"
 #include "tg_text.c"
 #include "vh_button.c"
@@ -140,36 +140,36 @@ void on_header_field_resize(view_t* view, char* id, int size)
 
 void songlist_select(int index)
 {
-  selected_res();
-  selected_add(sl.index_s);
+  selection_res();
+  selection_add(sl.index_s);
   vh_list_refresh(sl.view);
 }
 
 void songlist_select_range(int index)
 {
-  selected_rng(sl.index_s);
+  selection_rng(sl.index_s);
   vh_list_refresh(sl.view);
 }
 
 void songlist_select_all()
 {
-  selected_res();
-  selected_add(0);
-  selected_rng(filtered_song_count());
+  selection_res();
+  selection_add(0);
+  selection_rng(filtered_song_count());
   vh_list_refresh(sl.view);
 }
 
 void songlist_get_selected(vec_t* vec)
 {
   // if selection is empty, select current index
-  if (selected_cnt() < 2) selected_add(sl.index_s);
-  selected_add_selected(filtered_get_songs(), vec);
+  if (selection_cnt() < 2) selection_add(sl.index_s);
+  selection_add_selection(filtered_get_songs(), vec);
 }
 
 void songlist_select_and_show(int index)
 {
-  selected_res();
-  selected_add(index);
+  selection_res();
+  selection_add(index);
   vh_list_scroll_to_index(sl.view, index);
 }
 
@@ -180,15 +180,15 @@ void songlist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t
   sl.index_s = index;
   if (ev.button == 1)
   {
-    if (!ev.ctrl_down && !ev.shift_down) selected_res();
+    if (!ev.ctrl_down && !ev.shift_down) selection_res();
 
     if (ev.shift_down)
     {
-      selected_rng(index);
+      selection_rng(index);
     }
     else
     {
-      selected_add(index);
+      selection_add(index);
     }
     printf("%i %i\n", index, ev.dclick);
     if (ev.dclick && sl.on_select) (*sl.on_select)(index);
@@ -198,10 +198,10 @@ void songlist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t
   else if (ev.button == 3)
   {
     if (sl.on_edit) (*sl.on_edit)(index);
-    if (selected_cnt() < 2)
+    if (selection_cnt() < 2)
     {
-      selected_res();
-      selected_add(index);
+      selection_res();
+      selection_add(index);
       vh_list_refresh(sl.view);
     }
   }
@@ -283,7 +283,7 @@ view_t* songlist_item_for_index(int index, void* userdata, view_t* listview, int
 
   VREM(sl.cache, item);
 
-  if (selected_has(index))
+  if (selection_has(index))
   {
     songitem_update_row(item, index, filtered_song_at_index(index), sl.color_s);
   }

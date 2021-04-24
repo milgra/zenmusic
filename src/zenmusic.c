@@ -22,6 +22,21 @@
 #include <stdlib.h>
 #include <time.h>
 
+void init(int width, int height, char* path);
+void update(ev_t ev);
+void render(uint32_t time);
+void destroy();
+
+void load_library();
+
+void on_save_entry(void* userdata, void* data);
+void on_song_header(void* userdata, void* data);
+void on_change_library(void* userdata, void* data);
+void on_change_organize(void* userdata, void* data);
+void on_genre_select(void* userdata, void* data);
+void on_artist_select(void* userdata, void* data);
+void on_filter_songs(void* userdata, void* data);
+
 struct
 {
   double last_step; // last timestep
@@ -29,115 +44,11 @@ struct
   ch_t*  rem_ch;    // remote channel
 } zm = {0};
 
-void load_library();
-
-void on_save_entry(void* userdata, void* data)
+int main(int argc, char* args[])
 {
-  map_t* entry = data;
-  // update metadata in file
-  //editor_set_metadata(entry, "king.jpg");
+  wm_init(init, update, render, destroy);
 
-  // move song to new place if needed
-  //lib_organize_entry(zm.lib_path, db_get_db(), entry);
-
-  // save database
-  //db_write(zm.lib_path);
-}
-
-void on_song_header(void* userdata, void* data)
-{
-  char* id = data;
-
-  filtered_set_sortfield(id, 1);
-  // todo filtered should notify ui
-  ui_refresh_songlist();
-}
-
-void on_filter_songs(void* userdata, void* data)
-{
-  char* text = str_cstring((str_t*)data);
-
-  filtered_set_filter(text);
-  ui_reload_songlist();
-}
-
-void on_genre_select(void* userdata, void* data)
-{
-  char* genre = data;
-  char* query = cstr_fromformat(100, "genre is %s", genre);
-
-  // genre select should narrow artist selector
-
-  filtered_set_filter(query);
-  ui_reload_songlist();
-  ui_show_query(query);
-}
-
-void on_artist_select(void* userdata, void* data)
-{
-  char* artist = data;
-  char* query  = cstr_fromformat(100, "artist is %s", artist);
-
-  filtered_set_filter(query);
-  ui_reload_songlist();
-  ui_show_query(query);
-}
-
-void on_change_library(void* userdata, void* data)
-{
-  char* new_path = data;
-  char* lib_path = NULL;
-
-  if (new_path[0] == '~')
-    lib_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", getenv("HOME"), new_path + 1); // replace tilde's with home
-  else
-    lib_path = cstr_fromcstring(new_path);
-
-  if (new_path[strlen(new_path) - 1] != '/')
-    lib_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/", new_path); // add closing slash
-
-  if (files_path_exists(lib_path))
-  {
-    printf("CHANGING LIBRARY %s\n", lib_path);
-
-    config_set("lib_path", lib_path);
-    config_write();
-
-    load_library();
-    ui_set_libpath(lib_path);
-    ui_hide_libpath_popup();
-  }
-  else
-    ui_show_libpath_popup("Location doesn't exists, please enter valid location.");
-}
-
-void on_change_organize(void* userdata, void* data)
-{
-  char* value = data;
-  char  flag  = strcmp(value, "Enable") == 0;
-
-  config_set_bool("organize_db", flag);
-
-  // ui_set_org_btn_lbl(organize ? "Disable" : "Enable");
-
-  if (config_get_bool("organize_db"))
-  {
-    int succ = lib_organize(config_get("lib_path"), db_get_db());
-    if (succ == 0) db_write(config_get("lib_path"));
-    ui_refresh_songlist();
-  }
-}
-
-void load_library()
-{
-  db_reset();
-
-  db_read(config_get("lib_path"));               // read db
-  lib_read(config_get("lib_path"));              // read library
-  lib_remove_duplicates(db_get_db());            // remove existing
-  if (lib_entries() > 0) lib_analyze(zm.lib_ch); // start analyzing new entries
-
-  filtered_set_sortfield("meta/artist", 0);
+  return 0;
 }
 
 void init(int width, int height, char* path)
@@ -332,9 +243,111 @@ void destroy()
   printf("zenmusic destroy\n");
 }
 
-int main(int argc, char* args[])
+void on_save_entry(void* userdata, void* data)
 {
-  wm_init(init, update, render, destroy);
+  map_t* entry = data;
+  // update metadata in file
+  //editor_set_metadata(entry, "king.jpg");
 
-  return 0;
+  // move song to new place if needed
+  //lib_organize_entry(zm.lib_path, db_get_db(), entry);
+
+  // save database
+  //db_write(zm.lib_path);
+}
+
+void on_song_header(void* userdata, void* data)
+{
+  char* id = data;
+
+  filtered_set_sortfield(id, 1);
+  // todo filtered should notify ui
+  ui_refresh_songlist();
+}
+
+void on_filter_songs(void* userdata, void* data)
+{
+  char* text = str_cstring((str_t*)data);
+
+  filtered_set_filter(text);
+  ui_reload_songlist();
+}
+
+void on_genre_select(void* userdata, void* data)
+{
+  char* genre = data;
+  char* query = cstr_fromformat(100, "genre is %s", genre);
+
+  // genre select should narrow artist selector
+
+  filtered_set_filter(query);
+  ui_reload_songlist();
+  ui_show_query(query);
+}
+
+void on_artist_select(void* userdata, void* data)
+{
+  char* artist = data;
+  char* query  = cstr_fromformat(100, "artist is %s", artist);
+
+  filtered_set_filter(query);
+  ui_reload_songlist();
+  ui_show_query(query);
+}
+
+void on_change_library(void* userdata, void* data)
+{
+  char* new_path = data;
+  char* lib_path = NULL;
+
+  if (new_path[0] == '~')
+    lib_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", getenv("HOME"), new_path + 1); // replace tilde's with home
+  else
+    lib_path = cstr_fromcstring(new_path);
+
+  if (new_path[strlen(new_path) - 1] != '/')
+    lib_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/", new_path); // add closing slash
+
+  if (files_path_exists(lib_path))
+  {
+    printf("CHANGING LIBRARY %s\n", lib_path);
+
+    config_set("lib_path", lib_path);
+    config_write();
+
+    load_library();
+    ui_set_libpath(lib_path);
+    ui_hide_libpath_popup();
+  }
+  else
+    ui_show_libpath_popup("Location doesn't exists, please enter valid location.");
+}
+
+void on_change_organize(void* userdata, void* data)
+{
+  char* value = data;
+  char  flag  = strcmp(value, "Enable") == 0;
+
+  config_set_bool("organize_db", flag);
+
+  // ui_set_org_btn_lbl(organize ? "Disable" : "Enable");
+
+  if (config_get_bool("organize_db"))
+  {
+    int succ = lib_organize(config_get("lib_path"), db_get_db());
+    if (succ == 0) db_write(config_get("lib_path"));
+    ui_refresh_songlist();
+  }
+}
+
+void load_library()
+{
+  db_reset();
+
+  db_read(config_get("lib_path"));               // read db
+  lib_read(config_get("lib_path"));              // read library
+  lib_remove_duplicates(db_get_db());            // remove existing
+  if (lib_entries() > 0) lib_analyze(zm.lib_ch); // start analyzing new entries
+
+  filtered_set_sortfield("meta/artist", 0);
 }

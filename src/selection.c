@@ -3,19 +3,19 @@
   does batch edit/conversion on songs
  */
 
-#ifndef selected_h
-#define selected_h
+#ifndef selection_h
+#define selection_h
 
 #include "mtvector.c"
 
-void selected_attach();
-void selected_add(int i);
-void selected_rem(int i);
-void selected_rng(int i);
-void selected_res();
-int  selected_has(int i);
-int  selected_cnt();
-void selected_add_selected(vec_t* vec, vec_t* res);
+void selection_attach();
+void selection_add(int i);
+void selection_rem(int i);
+void selection_rng(int i);
+void selection_res();
+int  selection_has(int i);
+int  selection_cnt();
+void selection_add_selection(vec_t* vec, vec_t* res);
 
 #endif
 
@@ -29,13 +29,13 @@ typedef struct _sel_rng_t
   int e;
 } sel_rng_t;
 
-struct _selected_t
+struct _selection_t
 {
   sel_rng_t ranges[100];
   int       length;
 } sel = {0};
 
-void selected_add(int i)
+void selection_add(int i)
 {
   // check if song is in a range
   for (int index = 0; index < sel.length; index++)
@@ -49,7 +49,7 @@ void selected_add(int i)
   sel.length++;
 }
 
-void selected_rem(int i)
+void selection_rem(int i)
 {
   // find songs range
   for (int index = 0; index < sel.length; index++)
@@ -83,7 +83,7 @@ void selected_rem(int i)
   }
 }
 
-void selected_rng(int i)
+void selection_rng(int i)
 {
   // extend last range
   if (i > sel.ranges[sel.length - 1].s)
@@ -92,12 +92,12 @@ void selected_rng(int i)
     sel.ranges[sel.length - 1].s = i;
 }
 
-void selected_res()
+void selection_res()
 {
   sel.length = 0;
 }
 
-int selected_has(int i)
+int selection_has(int i)
 {
   // check if song is in a range
   for (int index = 0; index < sel.length; index++)
@@ -108,7 +108,7 @@ int selected_has(int i)
   return 0;
 }
 
-int selected_cnt()
+int selection_cnt()
 {
   int cnt = 0;
   for (int index = 0; index < sel.length; index++)
@@ -122,7 +122,7 @@ int selected_cnt()
   return cnt;
 }
 
-void selected_add_selected(vec_t* vec, vec_t* res)
+void selection_add_selection(vec_t* vec, vec_t* res)
 {
   for (int index = 0; index < sel.length; index++)
   {
@@ -132,7 +132,7 @@ void selected_add_selected(vec_t* vec, vec_t* res)
       printf("range %i %i\n", rng.s, rng.e);
       if (r >= 0 && r < vec->length)
       {
-        printf("SELECTED ADDING %i TO RES\n", r);
+        printf("SELECTION ADDING %i TO RES\n", r);
         VADD(res, vec->data[r]);
       }
     }
