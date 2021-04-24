@@ -3,7 +3,7 @@
 
 #include "mtmap.c"
 
-void  config_init(char* respath);
+void  config_init();
 void  config_read();
 void  config_write();
 void  config_set(char* key, char* value);
@@ -24,19 +24,9 @@ void  config_set_bool(char* key, int val);
 
 map_t* confmap;
 
-void config_init(char* respath)
+void config_init()
 {
-#ifndef DEBUG
-  respath = cstr_fromstring("/usr/local/share/zenmusic");
-#else
-  respath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/../res", respath);
-#endif
-
   confmap = MNEW();
-
-  MPUTR(confmap, "organize_db", cstr_fromcstring("false"));
-  MPUTR(confmap, "ui_color", cstr_fromcstring("0xEEEEEEFF"));
-  MPUTR(confmap, "respath", respath);
 }
 
 void config_read()

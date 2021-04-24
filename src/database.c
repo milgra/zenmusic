@@ -30,23 +30,10 @@ void db_init()
   db = MNEW();
 }
 
-void db_reset()
-{
-  map_reset(db);
-}
-
-map_t* db_get_db()
-{
-  return db;
-}
-
-uint32_t db_count()
-{
-  return db->count;
-}
-
 void db_read(char* libpath)
 {
+  assert(libpath != NULL);
+
   char* dbpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/zenmusic.kvl", libpath);
 
   LOG("reading db %s", dbpath);
@@ -60,6 +47,8 @@ void db_read(char* libpath)
 
 void db_write(char* libpath)
 {
+  assert(libpath != NULL);
+
   char* dbpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/zenmusic.kvl", libpath);
 
   LOG("writing db to %s", dbpath);
@@ -76,6 +65,21 @@ void db_write(char* libpath)
 void db_add_entry(char* path, map_t* entry)
 {
   MPUT(db, path, entry);
+}
+
+void db_reset()
+{
+  map_reset(db);
+}
+
+map_t* db_get_db()
+{
+  return db;
+}
+
+uint32_t db_count()
+{
+  return db->count;
 }
 
 #endif

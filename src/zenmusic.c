@@ -2,6 +2,7 @@
 #include "config.c"
 #include "database.c"
 #include "editor.c"
+#include "files.c"
 #include "filtered.c"
 #include "library.c"
 #include "mtcallback.c"
@@ -24,7 +25,6 @@
 struct
 {
   double last_step; // last timestep
-  char*  lib_path;  // library path
   ch_t*  lib_ch;    // library channel
   ch_t*  rem_ch;    // remote channel
 } zm = {0};
@@ -85,27 +85,26 @@ void on_artist_select(void* userdata, void* data)
 
 void on_change_library(void* userdata, void* data)
 {
-  char* path = data;
+  char* new_path = data;
+  char* lib_path = NULL;
 
-  if (zm.lib_path) REL(zm.lib_path);
-
-  if (path[0] == '~')
-    zm.lib_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", getenv("HOME"), path + 1); // replace tilde's with home
+  if (new_path[0] == '~')
+    lib_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", getenv("HOME"), new_path + 1); // replace tilde's with home
   else
-    zm.lib_path = cstr_fromcstring(path);
+    lib_path = cstr_fromcstring(new_path);
 
-  if (path[strlen(path) - 1] != '/')
-    zm.lib_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/", path); // add closing slash
+  if (new_path[strlen(new_path) - 1] != '/')
+    lib_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/", new_path); // add closing slash
 
-  if (lib_exists(zm.lib_path))
+  if (files_path_exists(lib_path))
   {
-    printf("CHANGE LIBRARY %s\n", zm.lib_path);
-    config_set("library_path", zm.lib_path);
+    printf("CHANGING LIBRARY %s\n", lib_path);
+
+    config_set("lib_path", lib_path);
     config_write();
 
-    zm.lib_path = config_get("library_path");
     load_library();
-    ui_set_libpath(zm.lib_path);
+    ui_set_libpath(lib_path);
     ui_hide_libpath_popup();
   }
   else
@@ -123,8 +122,8 @@ void on_change_organize(void* userdata, void* data)
 
   if (config_get_bool("organize_db"))
   {
-    int succ = lib_organize(zm.lib_path, db_get_db());
-    if (succ == 0) db_write(zm.lib_path);
+    int succ = lib_organize(config_get("lib_path"), db_get_db());
+    if (succ == 0) db_write(config_get("lib_path"));
     ui_refresh_songlist();
   }
 }
@@ -133,30 +132,30 @@ void load_library()
 {
   db_reset();
 
-  db_read(zm.lib_path);                          // read db
-  lib_read(zm.lib_path);                         // read library
+  db_read(config_get("lib_path"));               // read db
+  lib_read(config_get("lib_path"));              // read library
   lib_remove_duplicates(db_get_db());            // remove existing
   if (lib_entries() > 0) lib_analyze(zm.lib_ch); // start analyzing new entries
 
   filtered_set_sortfield("meta/artist", 0);
 }
 
-void init(int width, int height, char* respath)
+void init(int width, int height, char* path)
 {
   srand((unsigned int)time(NULL));
 
   zm.lib_ch = ch_new(100); // comm channel for library entries
   zm.rem_ch = ch_new(10);  // remote channel
 
-  remote_listen(zm.rem_ch);
-
   db_init();
+  ui_init();
+  config_init();
   player_init();
-  config_init(respath);
-  config_read();
   filtered_init();
-
   callbacks_init();
+
+  // init callbacks
+
   callbacks_set("om_save_entry", cb_new(on_save_entry, NULL));
   callbacks_set("on_song_header", cb_new(on_song_header, NULL));
   callbacks_set("on_change_library", cb_new(on_change_library, NULL));
@@ -165,18 +164,35 @@ void init(int width, int height, char* respath)
   callbacks_set("on_genre_selected", cb_new(on_genre_select, NULL));
   callbacks_set("on_artist_selected", cb_new(on_artist_select, NULL));
 
-  zm.lib_path = config_get("library_path");
+  // init config
 
-  char* orgstr = config_get("organize_db");
+#ifndef DEBUG
+  char* res_path = cstr_fromstring("/usr/local/share/zenmusic");
+#else
+  char* res_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/../res", path);
+#endif
 
-  ui_init(width, height, config_get("respath"), zm.lib_path);
+  // leak!!!
+  config_set("organize_db", cstr_fromcstring("false"));
+  config_set("ui_color", cstr_fromcstring("0xEEEEEEFF"));
+  config_set("res_path", res_path);
 
-  if (!zm.lib_path)
-  {
+  // read config, it overwrites defaults if exists
+
+  config_read();
+
+  // load ui from descriptors
+
+  ui_load(width, height, config_get("res_path"), config_get("lib_path"));
+
+  // show library popup if no lib path is saved yet or load library
+
+  if (config_get("lib_path") == NULL)
     ui_show_libpath_popup("Please enter the location of your music library folder.");
-  }
   else
     load_library();
+
+  remote_listen(zm.rem_ch);
 }
 
 // update by event, is called multiple times per frame
@@ -218,7 +234,7 @@ void update(ev_t ev)
       {
         // analyzing is finished, sort and store database
 
-        db_write(zm.lib_path);
+        db_write(config_get("lib_path"));
 
         /* if (config_get_bool("organize_db")) */
         /* { */
@@ -263,7 +279,7 @@ void update(ev_t ev)
         MPUT(entry, "file/play_count", new_play_count);
         REL(new_play_count);
 
-        db_write(zm.lib_path);
+        db_write(config_get("lib_path"));
       }
 
       // play next song

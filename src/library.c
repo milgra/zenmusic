@@ -62,16 +62,6 @@ static int lib_file_data(const char* fpath, const struct stat* sb, int tflag, st
   return 0; /* To tell nftw() to continue */
 }
 
-int lib_exists(char* path)
-{
-  struct stat sb;
-
-  if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode))
-    return 1;
-  else
-    return 0;
-}
-
 void lib_read(char* libpath)
 {
   if (lock_db) return;
@@ -284,6 +274,8 @@ char* lib_replace_char(char* str, char find, char replace)
 
 int lib_organize_entry(char* libpath, map_t* db, map_t* entry)
 {
+  assert(libpath != NULL);
+
   int changed = 0;
 
   char* path   = MGET(entry, "file/path");

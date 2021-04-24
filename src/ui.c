@@ -4,7 +4,8 @@
 #include "mtmap.c"
 #include "view.c"
 
-void ui_init(float width,
+void ui_init();
+void ui_load(float width,
              float height,
              char* respath,
              char* libpath);
@@ -221,7 +222,7 @@ void ui_editor_accept()
 
   // ui_show_simple_popup("ARE YOU SURE?");
 
-  char* libpath = config_get("library_path");
+  char* libpath = config_get("lib_path");
 
   editor_update_metadata(libpath, ui.selected, changed, removed, cover);
 
@@ -652,7 +653,11 @@ void ui_show_query(char* text)
   vh_textinput_set_text(filterbar, text);
 }
 
-void ui_init(float width,
+void ui_init()
+{
+}
+
+void ui_load(float width,
              float height,
              char* respath,
              char* libpath)

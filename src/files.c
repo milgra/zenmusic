@@ -4,6 +4,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+int files_path_exists(char* path);
 int files_mkpath(char* file_path, mode_t mode);
 
 #endif
@@ -14,6 +15,16 @@ int files_mkpath(char* file_path, mode_t mode);
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+
+int files_path_exists(char* path)
+{
+  struct stat sb;
+
+  if (stat(path, &sb) == 0 && S_ISDIR(sb.st_mode))
+    return 1;
+  else
+    return 0;
+}
 
 int files_mkpath(char* file_path, mode_t mode)
 {
