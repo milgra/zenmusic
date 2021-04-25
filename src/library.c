@@ -328,25 +328,25 @@ int lib_organize_entry(char* libpath, map_t* db, map_t* entry)
   {
     LOG("moving %s to %s\n", old_path, new_path);
 
-    int error = files_mkpath(new_dirs, 0777);
+    /* int error = files_mkpath(new_dirs, 0777); */
 
-    if (error == 0)
-    {
-      error = rename(old_path, new_path);
+    /* if (error == 0) */
+    /* { */
+    /*   error = rename(old_path, new_path); */
 
-      if (error == 0)
-      {
-        LOG("updating path in db,\n");
-        MPUT(entry, "file/path", new_path_rel);
-        MPUT(db, new_path_rel, entry);
-        MDEL(db, path);
-        changed = 1;
-      }
-      else
-        LOG("cannot rename file %s %s %s\n", old_path, new_path, strerror(errno));
-    }
-    else
-      LOG("cannot create path %s\n", new_path);
+    /*   if (error == 0) */
+    /*   { */
+    /*     LOG("updating path in db,\n"); */
+    /*     MPUT(entry, "file/path", new_path_rel); */
+    /*     MPUT(db, new_path_rel, entry); */
+    /*     MDEL(db, path); */
+    /*     changed = 1; */
+    /*   } */
+    /*   else */
+    /*     LOG("cannot rename file %s %s %s\n", old_path, new_path, strerror(errno)); */
+    /* } */
+    /* else */
+    /*   LOG("cannot create path %s\n", new_path); */
   }
 
   REL(new_dirs);

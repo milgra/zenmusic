@@ -205,8 +205,6 @@ void render(uint32_t time)
 
   if (phead > 0.0)
   {
-    // update timer
-
     if (floor(phead) != zm.last_step)
     {
       zm.last_step = floor(phead);
@@ -275,8 +273,6 @@ void on_change_library(void* userdata, void* data)
 
   if (files_path_exists(lib_path))
   {
-    printf("CHANGING LIBRARY %s\n", lib_path);
-
     config_set("lib_path", lib_path);
     config_write();
 
