@@ -30,9 +30,8 @@ void destroy();
 void load_library();
 
 void on_change_library(void* userdata, void* data);
-void on_save_entry(void* userdata, void* data);
-void on_song_header(void* userdata, void* data);
 void on_change_organize(void* userdata, void* data);
+void on_song_header(void* userdata, void* data);
 void on_genre_select(void* userdata, void* data);
 void on_artist_select(void* userdata, void* data);
 void on_filter_songs(void* userdata, void* data);
@@ -67,7 +66,6 @@ void init(int width, int height, char* path)
 
   // init callbacks
 
-  callbacks_set("om_save_entry", cb_new(on_save_entry, NULL));
   callbacks_set("on_song_header", cb_new(on_song_header, NULL));
   callbacks_set("on_change_library", cb_new(on_change_library, NULL));
   callbacks_set("on_change_organize", cb_new(on_change_organize, NULL));
@@ -117,42 +115,50 @@ void update(ev_t ev)
 {
   if (ev.type == EV_TIME)
   {
+    map_t* entry;
+
     // get analyzed song entries
 
-    map_t* entry;
     while ((entry = ch_recv(zm.lib_ch)))
     {
       char* path = MGET(entry, "file/path");
 
       if (strcmp(path, "//////") != 0)
       {
+        // store entry in db
+
         db_add_entry(path, entry);
-        //MPUT(db, path, entry); // store entry
-        //VADD(songs, entry);
+
         if (db_count() % 100 == 0)
         {
+          // filter and sort current db and show in ui partial analysis result
+
           filtered_set_sortfield("meta/artist", 0);
           ui_refresh_songlist();
         }
       }
       else
       {
-        // analyzing is finished, sort and store database
-
         db_write(config_get("lib_path"));
 
-        /* if (config_get_bool("organize_db")) */
-        /* { */
-        /*   int succ = lib_organize(zm.lib_path, db_get_db()); */
-        /*   if (succ == 0) db_write(zm.lib_path); */
-        /* } */
+        if (config_get_bool("organize_db"))
+        {
+          // organize db if needed
+
+          int succ = lib_organize(config_get("lib_path"), db_get_db());
+          if (succ == 0) db_write(config_get("lib_path"));
+        }
 
         filtered_set_sortfield("meta/artist", 0);
         ui_refresh_songlist();
       }
+
       // cleanup, ownership was passed with the channel from analyzer
+
       REL(entry);
     }
+
+    // get remote events
 
     char* buffer = NULL;
     if ((buffer = ch_recv(zm.rem_ch)))
@@ -169,6 +175,7 @@ void update(ev_t ev)
     if (finished)
     {
       // increase play count of song
+
       char*  path  = player_get_path();
       map_t* entry = MGET(db_get_db(), path);
 
@@ -176,18 +183,13 @@ void update(ev_t ev)
       {
         char* play_count_s = MGET(entry, "file/play_count");
         int   play_count_i = 0;
+
         if (play_count_s != NULL) play_count_i = atoi(play_count_s);
-
         play_count_i += 1;
-        char* new_play_count = mem_calloc(10, "char*", NULL, NULL);
-        snprintf(new_play_count, 10, "%i", play_count_i);
-        MPUT(entry, "file/play_count", new_play_count);
-        REL(new_play_count);
-
+        MPUTR(entry, "file/play_count", cstr_fromformat(10, "%i", play_count_i));
         db_write(config_get("lib_path"));
       }
 
-      // play next song
       ui_play_next();
     }
   }
@@ -200,9 +202,11 @@ void update(ev_t ev)
 void render(uint32_t time)
 {
   double phead = player_time();
+
   if (phead > 0.0)
   {
     // update timer
+
     if (floor(phead) != zm.last_step)
     {
       zm.last_step = floor(phead);
@@ -234,7 +238,6 @@ void render(uint32_t time)
 
 void destroy()
 {
-  printf("zenmusic destroy\n");
 }
 
 void load_library()
@@ -242,10 +245,10 @@ void load_library()
   assert(config_get("lib_path") != NULL);
 
   db_reset();
-  db_read(config_get("lib_path")); // read db
+  db_read(config_get("lib_path"));
 
-  lib_read(config_get("lib_path"));   // read library
-  lib_remove_duplicates(db_get_db()); // remove existing
+  lib_read(config_get("lib_path"));
+  lib_remove_duplicates(db_get_db());
 
   if (lib_entries() > 0) lib_analyze(zm.lib_ch); // start analyzing new entries
 
@@ -257,6 +260,8 @@ void on_change_library(void* userdata, void* data)
   char* new_path = data;
   char* lib_path = NULL;
 
+  // construct path if needed
+
   if (new_path[0] == '~')
     lib_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", getenv("HOME"), new_path + 1); // replace tilde's with home
   else
@@ -266,6 +271,8 @@ void on_change_library(void* userdata, void* data)
 
   if (lib_path[strlen(lib_path) - 1] == '/') lib_path[strlen(lib_path) - 1] = '\0';
 
+  // change library if exists
+
   if (files_path_exists(lib_path))
   {
     printf("CHANGING LIBRARY %s\n", lib_path);
@@ -274,6 +281,7 @@ void on_change_library(void* userdata, void* data)
     config_write();
 
     load_library();
+
     ui_set_libpath(lib_path);
     ui_hide_libpath_popup();
   }
@@ -283,17 +291,21 @@ void on_change_library(void* userdata, void* data)
   REL(lib_path);
 }
 
-void on_save_entry(void* userdata, void* data)
+void on_change_organize(void* userdata, void* data)
 {
-  map_t* entry = data;
-  // update metadata in file
-  //editor_set_metadata(entry, "king.jpg");
+  char* value = data;
+  char  flag  = strcmp(value, "Enable") == 0;
 
-  // move song to new place if needed
-  //lib_organize_entry(zm.lib_path, db_get_db(), entry);
+  config_set_bool("organize_db", flag);
 
-  // save database
-  //db_write(zm.lib_path);
+  ui_set_org_btn_lbl(flag ? "Disable" : "Enable");
+
+  if (config_get_bool("organize_db"))
+  {
+    int succ = lib_organize(config_get("lib_path"), db_get_db());
+    if (succ == 0) db_write(config_get("lib_path"));
+    ui_refresh_songlist();
+  }
 }
 
 void on_song_header(void* userdata, void* data)
@@ -301,7 +313,6 @@ void on_song_header(void* userdata, void* data)
   char* id = data;
 
   filtered_set_sortfield(id, 1);
-  // todo filtered should notify ui
   ui_refresh_songlist();
 }
 
@@ -318,8 +329,6 @@ void on_genre_select(void* userdata, void* data)
   char* genre = data;
   char* query = cstr_fromformat(100, "genre is %s", genre);
 
-  // genre select should narrow artist selector
-
   filtered_set_filter(query);
   ui_reload_songlist();
   ui_show_query(query);
@@ -333,21 +342,4 @@ void on_artist_select(void* userdata, void* data)
   filtered_set_filter(query);
   ui_reload_songlist();
   ui_show_query(query);
-}
-
-void on_change_organize(void* userdata, void* data)
-{
-  char* value = data;
-  char  flag  = strcmp(value, "Enable") == 0;
-
-  config_set_bool("organize_db", flag);
-
-  // ui_set_org_btn_lbl(organize ? "Disable" : "Enable");
-
-  if (config_get_bool("organize_db"))
-  {
-    int succ = lib_organize(config_get("lib_path"), db_get_db());
-    if (succ == 0) db_write(config_get("lib_path"));
-    ui_refresh_songlist();
-  }
 }

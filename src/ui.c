@@ -221,11 +221,11 @@ void ui_editor_accept()
   vec_t* removed = editor_popup_get_removed();
   char*  cover   = editor_popup_get_cover();
 
-  // ui_show_simple_popup("ARE YOU SURE?");
+  ui_show_simple_popup("ARE YOU SURE?");
 
-  char* libpath = config_get("lib_path");
+  /* char* libpath = config_get("lib_path"); */
 
-  editor_update_metadata(libpath, ui.selected, changed, removed, cover);
+  /* editor_update_metadata(libpath, ui.selected, changed, removed, cover); */
 
   // update metadata in media files
 

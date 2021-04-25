@@ -1,19 +1,18 @@
 first version
 
+check organiz, save entries
 fix leaks
 fix space problem, case sensitiveness in search
 metadata update eseten sulyos leak, a hatterben tortenjen, analyzer kozben is lehessen mar bongeszni
-index col resize problem
+index col resize problem scorllkor
 UI Recorder - UI player API, -uiscript
 testing - record ui events, inject ui events, check result
 
 ideas
 
-cstr_concat-ot hasznald fromformat helyett path-ok eseten memoria miatt
 text style is cssbol jojjon
 rdft ne logaritmikus legyen, alig latszik a kozep tartomany
 search/filter history ( use filters for playlists)
-leghallgatottabb szamok
 songs from one year ago this day
 textinput autoscroller
 rdft left/right channel
@@ -32,11 +31,7 @@ glossy effekt
 scroll-ra lehessen novelni/csokkenteni visuals meretet
 statisztikak - top 10 leghallgatottabb, milyen genre-t hallgatsz foleg elmult 1 honap, stb
 cortex as visualizer - level gen based on freq, LEFT/DOWN!!!
-on mute fade in/out volume with alpha
-volume fade in/out, cover arton is
-only update vertexes when frame change
-only update shadow/blur when frame change
-only update visu bitmaps when needed
+volume fade in/out, cover arton is mute/play next eseten
 
 
 **********************************
