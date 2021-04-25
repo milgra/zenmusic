@@ -7,8 +7,7 @@
 void ui_init();
 void ui_load(float width,
              float height,
-             char* respath,
-             char* libpath);
+             char* respath);
 void ui_update_position(float ratio);
 void ui_update_volume(float ratio);
 void ui_update_visualizer();
@@ -23,7 +22,6 @@ void ui_show_query(char* text);
 void ui_play_next();
 void ui_play_prev();
 void ui_play_pause();
-void ui_set_libpath(char* libpath);
 void ui_set_org_btn_lbl(char* text);
 void ui_show_simple_popup(char* text);
 
@@ -160,10 +158,8 @@ void ui_init()
 
 void ui_load(float width,
              float height,
-             char* respath,
-             char* libpath)
+             char* respath)
 {
-  ui.libpath  = cstr_fromcstring(libpath);
   ui.songs    = filtered_get_songs();
   ui.selected = VNEW();
 
@@ -480,7 +476,7 @@ void ui_play_index(int index)
 
     ui_show_song_info(ui.lastindex);
     map_t* songmap = ui.songs->data[ui.lastindex];
-    char*  path    = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", ui.libpath, MGET(songmap, "file/path"));
+    char*  path    = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", config_get("lib_path"), MGET(songmap, "file/path"));
     player_play(path);
     player_set_volume(0.9);
     REL(path);
@@ -787,14 +783,6 @@ void ui_on_roll_out_visu(void* userdata, void* data)
   vh_anim_alpha(ui.visurightbtnbck, 1.0, 0.0, 10, AT_LINEAR);
 }
 
-// api functions
-
-void ui_set_libpath(char* libpath)
-{
-  if (ui.libpath) REL(ui.libpath);
-  ui.libpath = cstr_fromcstring(libpath);
-}
-
 void ui_set_org_btn_lbl(char* text)
 {
   // TODO get style from css
@@ -970,7 +958,7 @@ void ui_on_songlistpopup_select(int index)
   {
     vec_reset(ui.selected);
     songlist_get_selected(ui.selected);
-    editor_popup_set_songs(ui.selected, ui.libpath);
+    editor_popup_set_songs(ui.selected, config_get("lib_path"));
     ui_toggle_baseview(ui.editor_popup_page);
   }
   if (index == 4)

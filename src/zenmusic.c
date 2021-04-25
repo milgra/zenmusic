@@ -92,7 +92,7 @@ void init(int width, int height, char* path)
 
   // load ui from descriptors
 
-  ui_load(width, height, config_get("res_path"), config_get("lib_path"));
+  ui_load(width, height, config_get("res_path"));
 
   // show library popup if no lib path is saved yet or load library
 
@@ -278,7 +278,6 @@ void on_change_library(void* userdata, void* data)
 
     load_library();
 
-    ui_set_libpath(lib_path);
     ui_hide_libpath_popup();
   }
   else
