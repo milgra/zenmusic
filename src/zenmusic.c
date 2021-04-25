@@ -115,17 +115,6 @@ void init(int width, int height, char* path)
 
 void update(ev_t ev)
 {
-  // get key events
-
-  if (ev.type == EV_KDOWN)
-  {
-    if (ev.keycode == SDLK_SPACE)
-    {
-      int state = player_toggle_pause();
-      ui_toggle_pause(state);
-    }
-  }
-
   if (ev.type == EV_TIME)
   {
     // get analyzed song entries

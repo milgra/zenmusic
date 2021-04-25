@@ -139,14 +139,15 @@ void ui_manager_event(ev_t ev)
   else if (ev.type == EV_KDOWN || ev.type == EV_KUP)
   {
     for (int i = uim.explqueue->length - 1; i > -1; i--)
-    {
-      view_t* v = uim.explqueue->data[i];
-      if (v->needs_key)
+      `
       {
-        if (v->handler) (*v->handler)(v, ev);
-        break;
+        view_t* v = uim.explqueue->data[i];
+        if (v->needs_key)
+        {
+          if (v->handler) (*v->handler)(v, ev);
+          break;
+        }
       }
-    }
   }
   else if (ev.type == EV_TEXT)
   {

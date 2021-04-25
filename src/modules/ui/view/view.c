@@ -122,6 +122,7 @@ struct _view_t
   char needs_time;  /* accepts time events */
   char needs_touch; /* accepts touch events */
 
+  char blocks_key;    /* blocks key events */
   char blocks_touch;  /* blocks touch events */
   char blocks_scroll; /* blocks scroll events */
 

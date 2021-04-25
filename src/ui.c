@@ -53,6 +53,7 @@ void ui_show_simple_popup(char* text);
 #include "tg_text.c"
 #include "vh_anim.c"
 #include "vh_button.c"
+#include "vh_key.c"
 #include "vh_knob.c"
 #include "vh_list_item.c"
 #include "vh_picker.c"
@@ -317,6 +318,19 @@ void ui_clear_search()
 {
   vh_textinput_set_text(filterbar, "");
   ui_manager_activate(filterbar);
+}
+
+void ui_on_key_down(void* userdata, void* data)
+{
+  if (userdata == baseview)
+  {
+    ev_t* ev = (ev_t*)data;
+    if (ev->keycode == SDLK_SPACE)
+    {
+      int state = player_toggle_pause();
+      ui_toggle_pause(state);
+    }
+  }
 }
 
 void ui_on_button_down(void* userdata, void* data)
@@ -692,6 +706,10 @@ void ui_load(float width,
   vec_t* views = view_gen_load(htmlpath, csspath, respath, callbacks_get_data());
 
   baseview = vec_head(views);
+
+  cb_t* key_cb = cb_new(ui_on_key_down, baseview);
+
+  vh_key_add(baseview, key_cb);
 
   view_set_frame(baseview, (r2_t){0.0, 0.0, (float)width, (float)height});
   view_layout(baseview);
