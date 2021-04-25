@@ -77,23 +77,53 @@ struct _ui_t
   char*  fontpath;
   char*  libpath;
 
-  view_t* baseview;
-  view_t* infoview;
-  view_t* mainview;
-  view_t* filterbar;
-  view_t* leftview;
-  view_t* timeview;
-  view_t* lengthview;
+  view_t* songlist_filter_bar;
 
+  view_t* sim_pop_txt;
+  view_t* song_popup_list;
+
+  view_t* set_col_val;
+  view_t* chlib_pop_if;
+  view_t* set_org_btn_txt;
+
+  textlist_t* artistlist;
+  textlist_t* genrelist;
+
+  view_t* baseview; // root view
+
+  // set library popup fields
+
+  view_t* slibpopup_textfield_view;
+  view_t* slibpopup_inputfield_view;
+
+  // play info views
+
+  view_t* song_info_view;
+  view_t* song_remaining_view;
+  view_t* song_time_view;
+  view_t* song_length_view;
+
+  // controls
+
+  view_t* playbtn;
+  view_t* mutebtn;
+  view_t* volknob;
+  view_t* seekknob;
+
+  // popup pages
+
+  view_t* library_page;
+  view_t* song_popup_page;
   view_t* about_popup_page;
   view_t* editor_popup_page;
-  view_t* settings_popup_page;
   view_t* simple_popup_page;
-  view_t* messages_popup_page;
-  view_t* filters_popup_page;
-  view_t* decision_popup_page;
   view_t* library_popup_page;
-  view_t* song_popup_page;
+  view_t* filters_popup_page;
+  view_t* messages_popup_page;
+  view_t* decision_popup_page;
+  view_t* settings_popup_page;
+
+  // visualizer views
 
   view_t* visuleft;
   view_t* visuright;
@@ -102,24 +132,6 @@ struct _ui_t
   view_t* visurightbtn;
   view_t* visuleftbtnbck;
   view_t* visurightbtnbck;
-
-  view_t* seekknob;
-  view_t* playbtn;
-  view_t* volknob;
-  view_t* mutebtn;
-  view_t* sim_pop_txt;
-  view_t* song_popup_list;
-
-  view_t* library_page;
-  view_t* libtextfield;
-  view_t* libinputfield;
-
-  view_t* set_col_val;
-  view_t* chlib_pop_if;
-  view_t* set_org_btn_txt;
-
-  textlist_t* artistlist;
-  textlist_t* genrelist;
 } ui = {0};
 
 void ui_on_button_down(void* userdata, void* data);
@@ -191,8 +203,6 @@ void ui_load(float width,
 
   ui_manager_init(width, height);
   ui_manager_add(ui.baseview);
-
-  ui.mainview = view_get_subview(ui.baseview, "main");
 
   // buttons
 
@@ -272,13 +282,13 @@ void ui_load(float width,
 
   // display views
 
-  ui.timeview   = view_get_subview(ui.baseview, "time");
-  ui.leftview   = view_get_subview(ui.baseview, "left");
-  ui.lengthview = view_get_subview(ui.baseview, "length");
+  ui.song_time_view      = view_get_subview(ui.baseview, "time");
+  ui.song_remaining_view = view_get_subview(ui.baseview, "left");
+  ui.song_length_view    = view_get_subview(ui.baseview, "length");
 
-  tg_text_add(ui.timeview);
-  tg_text_add(ui.leftview);
-  tg_text_add(ui.lengthview);
+  tg_text_add(ui.song_time_view);
+  tg_text_add(ui.song_remaining_view);
+  tg_text_add(ui.song_length_view);
 
   ts.margin_right = 0;
   ts.textcolor    = 0x000000FF;
@@ -286,39 +296,39 @@ void ui_load(float width,
 
   ts.align = TA_LEFT;
 
-  ui.infoview = view_get_subview(ui.baseview, "info");
+  ui.song_info_view = view_get_subview(ui.baseview, "info");
 
-  tg_text_add(ui.infoview);
-  tg_text_set(ui.infoview, "-", ts);
+  tg_text_add(ui.song_info_view);
+  tg_text_set(ui.song_info_view, "-", ts);
 
   ts.align  = TA_LEFT;
   ts.margin = 10.0;
 
   cb_t* msg_show_cb = cb_new(ui_on_button_down, NULL);
-  vh_button_add(ui.infoview, VH_BUTTON_NORMAL, msg_show_cb);
+  vh_button_add(ui.song_info_view, VH_BUTTON_NORMAL, msg_show_cb);
 
   // init activity
 
   activity_init();
-  activity_attach(messagelist, ui.infoview, ts);
+  activity_attach(messagelist, ui.song_info_view, ts);
 
   // query field
 
   view_t* main      = view_get_subview(ui.baseview, "main");
   main->needs_touch = 0;
 
-  ui.filterbar                          = view_get_subview(ui.baseview, "filterfield");
-  ui.filterbar->layout.background_color = 0xFFFFFFFF;
+  ui.songlist_filter_bar                          = view_get_subview(ui.baseview, "filterfield");
+  ui.songlist_filter_bar->layout.background_color = 0xFFFFFFFF;
 
   ts.align     = TA_LEFT;
   ts.textcolor = 0x000000FF;
   ts.backcolor = 0xFFFFFFFF;
 
-  vh_textinput_add(ui.filterbar, "", "Search/Filter", ts, NULL);
-  vh_textinput_set_on_text(ui.filterbar, ui_filter);
-  //vh_textinput_set_on_activate(ui.filterbar, ui_on_filter_activate);
+  vh_textinput_add(ui.songlist_filter_bar, "", "Search/Filter", ts, NULL);
+  vh_textinput_set_on_text(ui.songlist_filter_bar, ui_filter);
+  //vh_textinput_set_on_activate(ui.songlist_filter_bar, ui_on_filter_activate);
 
-  // vh_textfield_add(ui.filterbar, ts);
+  // vh_textfield_add(ui.songlist_filter_bar, ts);
 
   // song editor
 
@@ -336,14 +346,14 @@ void ui_load(float width,
 
   // lib input popup
 
-  ui.library_page  = view_get_subview(ui.baseview, "library_page");
-  ui.libtextfield  = view_get_subview(ui.baseview, "libtextfield");
-  ui.libinputfield = view_get_subview(ui.baseview, "libinputfield");
+  ui.library_page              = view_get_subview(ui.baseview, "library_page");
+  ui.slibpopup_textfield_view  = view_get_subview(ui.baseview, "libtextfield");
+  ui.slibpopup_inputfield_view = view_get_subview(ui.baseview, "libinputfield");
 
   ts.backcolor = 0;
 
-  tg_text_add(ui.libtextfield);
-  vh_textinput_add(ui.libinputfield, "/home/youruser/Music", "", ts, NULL);
+  tg_text_add(ui.slibpopup_textfield_view);
+  vh_textinput_add(ui.slibpopup_inputfield_view, "/home/youruser/Music", "", ts, NULL);
 
   view_remove(ui.baseview, ui.library_page);
 
@@ -507,12 +517,6 @@ void ui_toggle_shuffle()
   ui.shuffle = !ui.shuffle;
 }
 
-void ui_remove_from_main(void* p)
-{
-  view_t* view = p;
-  if (view->texture.alpha < 1.0) view_remove(ui.mainview, view);
-}
-
 void ui_remove_from_base(view_t* view, void* userdata)
 {
   if (view->texture.alpha < 1.0) view_remove(ui.baseview, view);
@@ -602,7 +606,7 @@ void ui_change_library()
 void ui_set_library()
 {
   // get path string
-  str_t* path    = vh_textinput_get_text(ui.libinputfield);
+  str_t* path    = vh_textinput_get_text(ui.slibpopup_inputfield_view);
   char*  path_ch = str_cstring(path);
 
   callbacks_call("on_change_library", path_ch);
@@ -646,8 +650,8 @@ void ui_on_filter_activate(view_t* view)
 
 void ui_clear_search()
 {
-  vh_textinput_set_text(ui.filterbar, "");
-  ui_manager_activate(ui.filterbar);
+  vh_textinput_set_text(ui.songlist_filter_bar, "");
+  ui_manager_activate(ui.songlist_filter_bar);
 }
 
 void ui_on_key_down(void* userdata, void* data)
@@ -832,7 +836,7 @@ void ui_show_song_info(int index)
            br / 1000,
            (char*)MGET(songmap, "file/channels"));
 
-  tg_text_set(ui.infoview, infostr, ts);
+  tg_text_set(ui.song_info_view, infostr, ts);
 }
 
 void ui_toggle_pause(int state)
@@ -894,11 +898,11 @@ void ui_update_time(double time, double left, double dur)
 
   ts.align = TA_LEFT;
   snprintf(timebuff, 20, "%.2i:%.2i", dmin, dsec);
-  tg_text_set(ui.lengthview, timebuff, ts);
+  tg_text_set(ui.song_length_view, timebuff, ts);
   snprintf(timebuff, 20, "%.2i:%.2i", tmin, tsec);
-  tg_text_set(ui.timeview, timebuff, ts);
+  tg_text_set(ui.song_time_view, timebuff, ts);
   snprintf(timebuff, 20, "%.2i:%.2i", lmin, lsec);
-  tg_text_set(ui.leftview, timebuff, ts);
+  tg_text_set(ui.song_remaining_view, timebuff, ts);
 }
 
 void ui_hide_libpath_popup()
@@ -943,7 +947,7 @@ void ui_show_libpath_popup(char* text)
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0;
 
-  tg_text_set(ui.libtextfield, text, ts);
+  tg_text_set(ui.slibpopup_textfield_view, text, ts);
 
   if (!ui.library_page->parent)
   {
@@ -951,8 +955,8 @@ void ui_show_libpath_popup(char* text)
     ui_manager_add(ui.library_page);
   }
 
-  vh_textinput_activate(ui.libinputfield, 1); // activate text input
-  ui_manager_activate(ui.libinputfield);      // set text input as event receiver
+  vh_textinput_activate(ui.slibpopup_inputfield_view, 1); // activate text input
+  ui_manager_activate(ui.slibpopup_inputfield_view);      // set text input as event receiver
 }
 
 void ui_on_songlistpopup_select(int index)
@@ -994,7 +998,7 @@ void ui_reload_songlist()
 
 void ui_show_query(char* text)
 {
-  vh_textinput_set_text(ui.filterbar, text);
+  vh_textinput_set_text(ui.songlist_filter_bar, text);
 }
 
 #endif
