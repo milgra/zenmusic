@@ -20,7 +20,6 @@ void settingslist_toggle_pause(int state);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "filtered.c"
 #include "selection.c"
 #include "tg_css.c"
 #include "tg_text.c"

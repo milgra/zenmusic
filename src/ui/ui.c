@@ -36,7 +36,6 @@ void ui_show_simple_popup(char* text);
 #include "donatelist.c"
 #include "editor.c"
 #include "editor_popup.c"
-#include "filtered.c"
 #include "itemlist.c"
 #include "mtcstring.c"
 #include "mtnumber.c"
@@ -61,6 +60,7 @@ void ui_show_simple_popup(char* text);
 #include "vh_touch.c"
 #include "view_generator.c"
 #include "view_layout.c"
+#include "visible.c"
 #include "wm_connector.c"
 #include <limits.h>
 
@@ -69,17 +69,13 @@ struct _ui_t
   vec_t* songs;
   int    visu;
   char   shuffle;
-  vec_t* selected;
-
+  vec_t* selected; // selected songs from songlist
+  char*  fontpath; // font path
   size_t lastindex;
-  char*  fontpath;
-  char*  libpath;
 
   view_t* songlist_filter_bar;
-
   view_t* sim_pop_txt;
   view_t* song_popup_list;
-
   view_t* set_col_val;
   view_t* chlib_pop_if;
   view_t* set_org_btn_txt;
@@ -160,7 +156,7 @@ void ui_load(float width,
              float height,
              char* respath)
 {
-  ui.songs    = filtered_get_songs();
+  ui.songs    = visible_get_songs();
   ui.selected = VNEW();
 
   // init text
@@ -251,10 +247,10 @@ void ui_load(float width,
   ts.align        = TA_RIGHT;
   ts.margin_right = 20;
 
-  ui.genrelist = textlist_new(view_get_subview(ui.baseview, "genrelist"), filtered_get_genres(), ts, ui_on_genre_select);
+  ui.genrelist = textlist_new(view_get_subview(ui.baseview, "genrelist"), visible_get_genres(), ts, ui_on_genre_select);
 
   ts.align      = TA_LEFT;
-  ui.artistlist = textlist_new(view_get_subview(ui.baseview, "artistlist"), filtered_get_artists(), ts, ui_on_artist_select);
+  ui.artistlist = textlist_new(view_get_subview(ui.baseview, "artistlist"), visible_get_artists(), ts, ui_on_artist_select);
 
   ui.messages_popup_page          = view_get_subview(ui.baseview, "messages_popup_page");
   view_t* messagelist             = view_get_subview(ui.baseview, "messagelist");
@@ -470,7 +466,7 @@ void ui_play_index(int index)
 {
   ui.lastindex = index;
   if (ui.lastindex < 0) ui.lastindex = 0;
-  if (ui.lastindex < filtered_song_count())
+  if (ui.lastindex < visible_song_count())
   {
     vh_button_set_state(ui.playbtn, VH_BUTTON_DOWN);
 
@@ -486,7 +482,7 @@ void ui_play_index(int index)
 void ui_play_next()
 {
   if (ui.shuffle)
-    ui_play_index(rand() % filtered_song_count());
+    ui_play_index(rand() % visible_song_count());
   else
     ui_play_index(ui.lastindex + 1);
 
@@ -496,7 +492,7 @@ void ui_play_next()
 void ui_play_prev()
 {
   if (ui.shuffle)
-    ui_play_index(rand() % filtered_song_count());
+    ui_play_index(rand() % visible_song_count());
   else
     ui_play_index(ui.lastindex - 1);
 
@@ -727,7 +723,7 @@ void ui_on_genre_select(int index)
 {
   printf("on genre select %i\n", index);
 
-  vec_t* genres = filtered_get_genres();
+  vec_t* genres = visible_get_genres();
   char*  genre  = genres->data[index];
   callbacks_call("on_genre_selected", genre);
 }
@@ -736,7 +732,7 @@ void ui_on_artist_select(int index)
 {
   printf("on artist select %i\n", index);
 
-  vec_t* artists = filtered_get_artists();
+  vec_t* artists = visible_get_artists();
   char*  artist  = artists->data[index];
   callbacks_call("on_artist_selected", artist);
 }

@@ -1,6 +1,8 @@
 first version
 
-check organiz, save entries
+popup_page-ek map-bol generalodjanak, ui_play_controls, ui_song_infos, etc
+check organize, save entries
+save shuffle state, last played song, last played position
 fix leaks
 fix space problem, case sensitiveness in search
 metadata update eseten sulyos leak, a hatterben tortenjen, analyzer kozben is lehessen mar bongeszni

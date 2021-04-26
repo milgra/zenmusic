@@ -22,7 +22,6 @@ void songlist_select_and_show(int index);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "filtered.c"
 #include "selection.c"
 #include "tg_css.c"
 #include "tg_text.c"
@@ -30,6 +29,7 @@ void songlist_select_and_show(int index);
 #include "vh_list.c"
 #include "vh_list_head.c"
 #include "vh_list_item.c"
+#include "visible.c"
 
 void on_header_field_select(view_t* view, char* id, ev_t ev);
 void on_header_field_insert(view_t* view, int src, int tgt);
@@ -155,7 +155,7 @@ void songlist_select_all()
 {
   selection_res();
   selection_add(0);
-  selection_rng(filtered_song_count());
+  selection_rng(visible_song_count());
   vh_list_refresh(sl.view);
 }
 
@@ -163,7 +163,7 @@ void songlist_get_selected(vec_t* vec)
 {
   // if selection is empty, select current index
   if (selection_cnt() < 2) selection_add(sl.index_s);
-  selection_add_selection(filtered_get_songs(), vec);
+  selection_add_selection(visible_get_songs(), vec);
 }
 
 void songlist_select_and_show(int index)
@@ -270,10 +270,10 @@ view_t* songlist_item_for_index(int index, void* userdata, view_t* listview, int
 {
   if (index < 0)
     return NULL; // no items before 0
-  if (index >= filtered_song_count())
+  if (index >= visible_song_count())
     return NULL; // no more items
 
-  *item_count = filtered_song_count();
+  *item_count = visible_song_count();
 
   view_t* item;
   if (sl.cache->length > 0)
@@ -285,14 +285,14 @@ view_t* songlist_item_for_index(int index, void* userdata, view_t* listview, int
 
   if (selection_has(index))
   {
-    songitem_update_row(item, index, filtered_song_at_index(index), sl.color_s);
+    songitem_update_row(item, index, visible_song_at_index(index), sl.color_s);
   }
   else
   {
     uint32_t color1 = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
     uint32_t color2 = (index % 2 == 0) ? 0xE5E5E5FF : 0xEFEFEFFF;
 
-    songitem_update_row(item, index, filtered_song_at_index(index), color1);
+    songitem_update_row(item, index, visible_song_at_index(index), color1);
   }
 
   return item;

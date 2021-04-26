@@ -3,7 +3,6 @@
 #include "database.c"
 #include "editor.c"
 #include "files.c"
-#include "filtered.c"
 #include "library.c"
 #include "mtcallback.c"
 #include "mtchannel.c"
@@ -14,6 +13,7 @@
 #include "remote.c"
 #include "ui.c"
 #include "ui_manager.c"
+#include "visible.c"
 #include "wm_connector.c"
 #include "wm_event.c"
 #include <SDL.h>
@@ -61,7 +61,7 @@ void init(int width, int height, char* path)
   ui_init();
   config_init();
   player_init();
-  filtered_init();
+  visible_init();
   callbacks_init();
 
   // init callbacks
@@ -133,7 +133,7 @@ void update(ev_t ev)
         {
           // filter and sort current db and show in ui partial analysis result
 
-          filtered_set_sortfield("meta/artist", 0);
+          visible_set_sortfield("meta/artist", 0);
           ui_refresh_songlist();
         }
       }
@@ -149,7 +149,7 @@ void update(ev_t ev)
           if (succ == 0) db_write(config_get("lib_path"));
         }
 
-        filtered_set_sortfield("meta/artist", 0);
+        visible_set_sortfield("meta/artist", 0);
         ui_refresh_songlist();
       }
 
@@ -250,7 +250,7 @@ void load_library()
 
   if (lib_entries() > 0) lib_analyze(zm.lib_ch); // start analyzing new entries
 
-  filtered_set_sortfield("meta/artist", 0);
+  visible_set_sortfield("meta/artist", 0);
 }
 
 void on_change_library(void* userdata, void* data)
@@ -307,7 +307,7 @@ void on_song_header(void* userdata, void* data)
 {
   char* id = data;
 
-  filtered_set_sortfield(id, 1);
+  visible_set_sortfield(id, 1);
   ui_refresh_songlist();
 }
 
@@ -315,7 +315,7 @@ void on_filter_songs(void* userdata, void* data)
 {
   char* text = str_cstring((str_t*)data);
 
-  filtered_set_filter(text);
+  visible_set_filter(text);
   ui_reload_songlist();
 }
 
@@ -324,7 +324,7 @@ void on_genre_select(void* userdata, void* data)
   char* genre = data;
   char* query = cstr_fromformat(100, "genre is %s", genre);
 
-  filtered_set_filter(query);
+  visible_set_filter(query);
   ui_reload_songlist();
   ui_show_query(query);
 }
@@ -334,7 +334,7 @@ void on_artist_select(void* userdata, void* data)
   char* artist = data;
   char* query  = cstr_fromformat(100, "artist is %s", artist);
 
-  filtered_set_filter(query);
+  visible_set_filter(query);
   ui_reload_songlist();
   ui_show_query(query);
 }

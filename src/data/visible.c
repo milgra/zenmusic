@@ -1,21 +1,19 @@
-// stores filteres and sorted song entries for use for songlist
-
-#ifndef filtered_h
-#define filtered_h
+#ifndef visible_h
+#define visible_h
 
 #include "mtmap.c"
 
-void filtered_init();
+void visible_init();
 
-map_t* filtered_song_at_index(int index);
-int    filtered_song_count();
+map_t* visible_song_at_index(int index);
+int    visible_song_count();
 
-vec_t* filtered_get_songs();
-vec_t* filtered_get_genres();
-vec_t* filtered_get_artists();
+vec_t* visible_get_songs();
+vec_t* visible_get_genres();
+vec_t* visible_get_artists();
 
-void filtered_set_sortfield(char* field, int toggle);
-void filtered_set_filter(char* text);
+void visible_set_sortfield(char* field, int toggle);
+void visible_set_filter(char* text);
 
 #endif
 
@@ -24,7 +22,7 @@ void filtered_set_filter(char* text);
 #include "database.c"
 #include "mtcstring.c"
 
-struct _filtered_t
+struct _visible_t
 {
   vec_t* songs;
   vec_t* genres;
@@ -37,53 +35,53 @@ struct _filtered_t
   vec_t* tmp1;
   vec_t* tmp2;
 
-} flt = {0};
+} vis = {0};
 
-void filtered_init()
+void visible_init()
 {
-  flt.songs   = VNEW();
-  flt.genres  = VNEW();
-  flt.artists = VNEW();
+  vis.songs   = VNEW();
+  vis.genres  = VNEW();
+  vis.artists = VNEW();
 
-  flt.tmp1 = VNEW();
-  flt.tmp2 = VNEW();
+  vis.tmp1 = VNEW();
+  vis.tmp2 = VNEW();
 
-  flt.filter     = NULL;
-  flt.sort_field = "meta/artist";
+  vis.filter     = NULL;
+  vis.sort_field = "meta/artist";
 }
 
-map_t* filtered_song_at_index(int index)
+map_t* visible_song_at_index(int index)
 {
-  return flt.songs->data[index];
+  return vis.songs->data[index];
 }
 
-int filtered_song_count()
+int visible_song_count()
 {
-  return flt.songs->length;
+  return vis.songs->length;
 }
 
-vec_t* filtered_get_songs()
+vec_t* visible_get_songs()
 {
-  return flt.songs;
+  return vis.songs;
 }
 
-vec_t* filtered_get_genres()
+vec_t* visible_get_genres()
 {
-  return flt.genres;
+  return vis.genres;
 }
 
-vec_t* filtered_get_artists()
+vec_t* visible_get_artists()
 {
-  return flt.artists;
+  return vis.artists;
 }
 
-int filtered_comp_entry(void* left, void* right)
+int visible_comp_entry(void* left, void* right)
 {
   map_t* l = left;
   map_t* r = right;
 
-  char* la = MGET(l, flt.sort_field);
-  char* ra = MGET(r, flt.sort_field);
+  char* la = MGET(l, vis.sort_field);
+  char* ra = MGET(r, vis.sort_field);
 
   if (strcmp(la, ra) == 0)
   {
@@ -115,7 +113,7 @@ int filtered_comp_entry(void* left, void* right)
   return strcmp(la, ra);
 }
 
-int filtered_comp_text(void* left, void* right)
+int visible_comp_text(void* left, void* right)
 {
   char* la = left;
   char* ra = right;
@@ -123,61 +121,61 @@ int filtered_comp_text(void* left, void* right)
   return strcmp(la, ra);
 }
 
-void filtered_gen_genres()
+void visible_gen_genres()
 {
   int ei, gi; // entry, genre index
 
-  vec_reset(flt.genres);
+  vec_reset(vis.genres);
 
   for (ei = 0;
-       ei < flt.songs->length;
+       ei < vis.songs->length;
        ei++)
   {
-    map_t* entry = flt.songs->data[ei];
+    map_t* entry = vis.songs->data[ei];
     char*  genre = MGET(entry, "meta/genre");
 
     if (genre)
     {
       char found = 0;
-      for (gi = 0; gi < flt.genres->length; gi++)
+      for (gi = 0; gi < vis.genres->length; gi++)
       {
-        char* act_genre = flt.genres->data[gi];
+        char* act_genre = vis.genres->data[gi];
         if (strcmp(genre, act_genre) == 0)
         {
           found = 1;
           break;
         }
       }
-      if (!found) VADD(flt.genres, genre);
+      if (!found) VADD(vis.genres, genre);
     }
   }
 }
 
-void filtered_gen_artists()
+void visible_gen_artists()
 {
   int ei;
 
-  vec_reset(flt.artists);
+  vec_reset(vis.artists);
 
   map_t* artists = MNEW();
 
   for (ei = 0;
-       ei < flt.songs->length;
+       ei < vis.songs->length;
        ei++)
   {
-    map_t* entry  = flt.songs->data[ei];
+    map_t* entry  = vis.songs->data[ei];
     char*  artist = MGET(entry, "meta/artist");
 
     if (artist) MPUT(artists, artist, artist);
   }
 
-  map_values(artists, flt.artists);
-  vec_sort(flt.artists, VSD_ASC, filtered_comp_text);
+  map_values(artists, vis.artists);
+  vec_sort(vis.artists, VSD_ASC, visible_comp_text);
 
   REL(artists);
 }
 
-int filtered_nextword(char* text, char* part)
+int visible_nextword(char* text, char* part)
 {
   if (strlen(part) < strlen(text))
   {
@@ -190,7 +188,7 @@ int filtered_nextword(char* text, char* part)
   return 0;
 }
 
-map_t* filtered_query_fields(char* text)
+map_t* visible_query_fields(char* text)
 {
   if (strstr(text, " "))
   {
@@ -202,7 +200,7 @@ map_t* filtered_query_fields(char* text)
 
     for (i = 0; i < strlen(text); i++)
     {
-      if (filtered_nextword(text + i, " is") && key == NULL)
+      if (visible_nextword(text + i, " is") && key == NULL)
       {
         key = mem_calloc(i - last + 1, "char", NULL, NULL);
         memcpy(key, text + last, i - last);
@@ -211,7 +209,7 @@ map_t* filtered_query_fields(char* text)
         printf("key %s\n", key);
       }
 
-      if (filtered_nextword(text + i, " and") && val == NULL)
+      if (visible_nextword(text + i, " and") && val == NULL)
       {
         val = mem_calloc(i - last + 1, "char", NULL, NULL);
         memcpy(val, text + last, i - last);
@@ -246,44 +244,44 @@ map_t* filtered_query_fields(char* text)
   return NULL;
 }
 
-void filtered_filter()
+void visible_filter()
 {
   int ei, ki; // entry, key index
 
-  map_t* fields = filtered_query_fields(flt.filter);
+  map_t* fields = visible_query_fields(vis.filter);
   char*  value  = NULL;
   char*  query  = NULL;
 
-  vec_reset(flt.songs);
+  vec_reset(vis.songs);
 
-  vec_reset(flt.tmp1);
-  vec_reset(flt.tmp2);
+  vec_reset(vis.tmp1);
+  vec_reset(vis.tmp2);
 
-  map_values(db_get_db(), flt.tmp1);
+  map_values(db_get_db(), vis.tmp1);
 
   for (ei = 0;
-       ei < flt.tmp1->length;
+       ei < vis.tmp1->length;
        ei++)
   {
-    map_t* entry = flt.tmp1->data[ei];
-    vec_reset(flt.tmp2);
+    map_t* entry = vis.tmp1->data[ei];
+    vec_reset(vis.tmp2);
 
     if (fields)
     {
       // use query fields
-      map_keys(fields, flt.tmp2);
+      map_keys(fields, vis.tmp2);
     }
     else
     {
       // use all fields
-      map_keys(entry, flt.tmp2);
+      map_keys(entry, vis.tmp2);
     }
 
     for (ki = 0;
-         ki < flt.tmp2->length;
+         ki < vis.tmp2->length;
          ki++)
     {
-      char* field = flt.tmp2->data[ki];
+      char* field = vis.tmp2->data[ki];
       value       = MGET(entry, field);
 
       if (value)
@@ -291,11 +289,11 @@ void filtered_filter()
         if (fields)
           query = MGET(fields, field);
         else
-          query = flt.filter;
+          query = vis.filter;
 
         if (strstr(value, query))
         {
-          vec_add(flt.songs, entry);
+          vec_add(vis.songs, entry);
           break;
         }
       }
@@ -310,50 +308,50 @@ void filtered_filter()
 
   if (fields) REL(fields);
 
-  filtered_gen_genres();
-  filtered_gen_artists();
+  visible_gen_genres();
+  visible_gen_artists();
 }
 
-void filtered_update()
+void visible_update()
 {
-  if (flt.filter)
-    filtered_filter();
+  if (vis.filter)
+    visible_filter();
   else
   {
-    vec_reset(flt.songs);
-    map_values(db_get_db(), flt.songs);
-    filtered_gen_genres();
-    filtered_gen_artists();
+    vec_reset(vis.songs);
+    map_values(db_get_db(), vis.songs);
+    visible_gen_genres();
+    visible_gen_artists();
   }
 
-  vec_sort(flt.songs, flt.sort_dir, filtered_comp_entry);
+  vec_sort(vis.songs, vis.sort_dir, visible_comp_entry);
 }
 
-void filtered_set_sortfield(char* field, int toggle)
+void visible_set_sortfield(char* field, int toggle)
 {
   if (field != NULL)
   {
-    if (toggle == 1 && flt.sort_field != NULL && strcmp(field, flt.sort_field) == 0)
+    if (toggle == 1 && vis.sort_field != NULL && strcmp(field, vis.sort_field) == 0)
     {
-      if (flt.sort_dir == VSD_ASC)
-        flt.sort_dir = VSD_DSC;
+      if (vis.sort_dir == VSD_ASC)
+        vis.sort_dir = VSD_DSC;
       else
-        flt.sort_dir = VSD_ASC;
+        vis.sort_dir = VSD_ASC;
     }
     else
     {
-      flt.sort_dir = VSD_ASC;
+      vis.sort_dir = VSD_ASC;
     }
 
-    flt.sort_field = field;
-    filtered_update();
+    vis.sort_field = field;
+    visible_update();
   }
 }
 
-void filtered_set_filter(char* text)
+void visible_set_filter(char* text)
 {
-  flt.filter = text;
-  filtered_update();
+  vis.filter = text;
+  visible_update();
 }
 
 #endif

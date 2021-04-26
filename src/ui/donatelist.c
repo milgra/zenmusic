@@ -13,7 +13,6 @@ void donatelist_toggle_pause(int state);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "filtered.c"
 #include "selection.c"
 #include "tg_css.c"
 #include "tg_text.c"
@@ -21,6 +20,7 @@ void donatelist_toggle_pause(int state);
 #include "vh_list.c"
 #include "vh_list_head.c"
 #include "vh_list_item.c"
+#include "visible.c"
 
 void donatelist_on_header_field_select(view_t* view, char* id, ev_t ev);
 void donatelist_on_header_field_insert(view_t* view, int src, int tgt);

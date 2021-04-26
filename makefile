@@ -5,12 +5,14 @@ OBJDIRREL = bin/obj/rel
 SOURCES = \
 	$(wildcard src/*.c) \
 	$(wildcard src/ui/*.c) \
+	$(wildcard src/data/*.c) \
 	$(wildcard src/mtlib/*.c) \
 	$(wildcard src/modules/*.c) \
 	$(wildcard src/modules/image/*.c) \
 	$(wildcard src/modules/player/*.c) \
 	$(wildcard src/modules/text/*.c) \
 	$(wildcard src/modules/html/*.c) \
+	$(wildcard src/modules/net/*.c) \
 	$(wildcard src/modules/ui/*.c) \
 	$(wildcard src/modules/ui/gl/*.c) \
 	$(wildcard src/modules/ui/wm/*.c) \
@@ -22,9 +24,11 @@ CFLAGS = \
 	-I/usr/local/include/SDL2 \
 	-Isrc \
 	-Isrc/ui \
+	-Isrc/data \
 	-Isrc/mtlib \
 	-Isrc/views \
 	-Isrc/modules \
+	-Isrc/modules/net \
 	-Isrc/modules/text \
 	-Isrc/modules/html \
 	-Isrc/modules/image \
