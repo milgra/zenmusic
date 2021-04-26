@@ -19,9 +19,6 @@ void ui_hide_libpath_popup();
 void ui_refresh_songlist();
 void ui_reload_songlist();
 void ui_show_query(char* text);
-void ui_play_next();
-void ui_play_prev();
-void ui_play_pause();
 void ui_set_org_btn_lbl(char* text);
 void ui_show_simple_popup(char* text);
 
@@ -45,10 +42,10 @@ void ui_show_simple_popup(char* text);
 #include "songlistpopup.c"
 #include "textlist.c"
 #include "tg_css.c"
-#include "tg_knob.c"
 #include "tg_picker.c"
 #include "tg_text.c"
 #include "ui_manager.c"
+#include "ui_play_controls.c"
 #include "vh_anim.c"
 #include "vh_button.c"
 #include "vh_key.c"
@@ -68,7 +65,6 @@ struct _ui_t
 {
   vec_t* songs;
   int    visu;
-  char   shuffle;
   vec_t* selected; // selected songs from songlist
   char*  fontpath; // font path
   size_t lastindex;
@@ -99,13 +95,6 @@ struct _ui_t
   view_t* song_time_view;
   view_t* song_length_view;
 
-  // controls
-
-  view_t* playbtn;
-  view_t* mutebtn;
-  view_t* volknob;
-  view_t* seekknob;
-
   // popup pages
 
   view_t* library_page;
@@ -122,13 +111,8 @@ struct _ui_t
 } ui = {0};
 
 void ui_on_button_down(void* userdata, void* data);
-void ui_on_play_button_down(view_t* view);
-void ui_on_mute_button_down(view_t* view);
-void ui_on_position_change(view_t* view, float angle);
-void ui_on_volume_change(view_t* view, float angle);
 void ui_on_roll_in_visu(void* userdata, void* data);
 void ui_on_roll_out_visu(void* userdata, void* data);
-void ui_play_index(int index);
 void ui_on_song_edit(int index);
 void ui_remove_from_base(view_t* view, void* userdata);
 void ui_show_song_info(int index);
@@ -170,6 +154,8 @@ void ui_load(float width,
 
   callbacks_set("on_button_press", cb_new(ui_on_button_down, NULL));
 
+  ui_play_controls_init();
+
   // view setup
 
   char* csspath  = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/main.css", respath);
@@ -178,6 +164,8 @@ void ui_load(float width,
   vec_t* views = view_gen_load(htmlpath, csspath, respath, callbacks_get_data());
 
   ui.baseview = vec_head(views);
+
+  ui_play_controls_attach(ui.baseview);
 
   cb_t* key_cb = cb_new(ui_on_key_down, ui.baseview);
 
@@ -188,23 +176,6 @@ void ui_load(float width,
 
   ui_manager_init(width, height);
   ui_manager_add(ui.baseview);
-
-  // buttons
-
-  ui.seekknob = view_get_subview(ui.baseview, "seekknob");
-  ui.playbtn  = view_get_subview(ui.baseview, "playbtn");
-  ui.volknob  = view_get_subview(ui.baseview, "volknob");
-  ui.mutebtn  = view_get_subview(ui.baseview, "mutebtn");
-
-  tg_knob_add(ui.seekknob);
-  vh_knob_add(ui.seekknob, ui_on_position_change, ui_on_play_button_down);
-
-  tg_knob_add(ui.volknob);
-  vh_knob_add(ui.volknob, ui_on_volume_change, ui_on_mute_button_down);
-
-  cb_t* msg_play_pause_cb = cb_new(ui_on_button_down, NULL);
-  vh_button_add(ui.playbtn, VH_BUTTON_TOGGLE, msg_play_pause_cb);
-  vh_button_add(ui.mutebtn, VH_BUTTON_TOGGLE, msg_play_pause_cb);
 
   // get visualizer views
 
@@ -330,7 +301,7 @@ void ui_load(float width,
   tg_text_set(chlib_pop_tf, "Use library at", ts);
   vh_textinput_add(ui.chlib_pop_if, "/home/youruser/Music", "", ts, NULL);
 
-  // simple popup
+  // simple popup text
 
   ui.sim_pop_txt = view_get_subview(ui.baseview, "sim_pop_txt");
   tg_text_add(ui.sim_pop_txt);
@@ -351,6 +322,7 @@ void ui_load(float width,
 
   ui.popup_names = VNEW();
   ui.popup_views = MNEW();
+
   VADDR(ui.popup_names, cstr_fromcstring("library_popup_page"));
   VADDR(ui.popup_names, cstr_fromcstring("song_popup_page"));
   VADDR(ui.popup_names, cstr_fromcstring("messages_popup_page"));
@@ -394,53 +366,6 @@ void ui_load(float width,
   /* texmap->layout.bottom = 1; */
 
   /* ui_manager_add(texmap); */
-}
-
-void ui_play_index(int index)
-{
-  ui.lastindex = index;
-  if (ui.lastindex < 0) ui.lastindex = 0;
-  if (ui.lastindex < visible_song_count())
-  {
-    vh_button_set_state(ui.playbtn, VH_BUTTON_DOWN);
-
-    ui_show_song_info(ui.lastindex);
-    map_t* songmap = ui.songs->data[ui.lastindex];
-    char*  path    = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", config_get("lib_path"), MGET(songmap, "file/path"));
-    player_play(path);
-    player_set_volume(0.9);
-    REL(path);
-  }
-}
-
-void ui_play_next()
-{
-  if (ui.shuffle)
-    ui_play_index(rand() % visible_song_count());
-  else
-    ui_play_index(ui.lastindex + 1);
-
-  songlist_select_and_show(ui.lastindex);
-}
-
-void ui_play_prev()
-{
-  if (ui.shuffle)
-    ui_play_index(rand() % visible_song_count());
-  else
-    ui_play_index(ui.lastindex - 1);
-
-  songlist_select_and_show(ui.lastindex);
-}
-
-void ui_play_pause()
-{
-  player_toggle_pause();
-}
-
-void ui_toggle_shuffle()
-{
-  ui.shuffle = !ui.shuffle;
 }
 
 void ui_remove_from_base(view_t* view, void* userdata)
@@ -552,20 +477,6 @@ void ui_change_visu()
   ui.visu = 1 - ui.visu;
 }
 
-void ui_on_play_button_down(view_t* view)
-{
-  if (player_toggle_pause() < 0)
-  {
-    ui_play_index(0);
-  }
-  //ui_toggle_pause();
-}
-
-void ui_on_mute_button_down(view_t* view)
-{
-  player_toggle_mute();
-}
-
 void ui_on_filter_activate(view_t* view)
 {
   textlist_update(ui.genrelist);
@@ -601,11 +512,6 @@ void ui_on_button_down(void* userdata, void* data)
 
   if (strcmp(id, "maxbtn") == 0) wm_toggle_fullscreen();
   if (strcmp(id, "app_close_btn") == 0) wm_close();
-  if (strcmp(id, "playbtn") == 0) ui_on_play_button_down(NULL);
-  if (strcmp(id, "mutebtn") == 0) ui_on_mute_button_down(NULL);
-  if (strcmp(id, "nextbtn") == 0) ui_play_next();
-  if (strcmp(id, "shufflebtn") == 0) ui_toggle_shuffle();
-  if (strcmp(id, "prevbtn") == 0) ui_play_index(ui.lastindex - 1);
   if (strcmp(id, "settingsbtn") == 0) ui_toggle_baseview(MGET(ui.popup_views, "settings_popup_page"));
   if (strcmp(id, "closesettingsbtn") == 0) ui_toggle_baseview(MGET(ui.popup_views, "settings_popup_page"));
   if (strcmp(id, "aboutbtn") == 0) ui_toggle_baseview(MGET(ui.popup_views, "about_popup_page"));
@@ -671,36 +577,6 @@ void ui_on_artist_select(int index)
   callbacks_call("on_artist_selected", artist);
 }
 
-void ui_on_position_change(view_t* view, float angle)
-{
-  float ratio = 0.0;
-  if (angle > 0 && angle < 3.14 * 3 / 2)
-  {
-    ratio = angle / 6.28 + 0.25;
-  }
-  else if (angle > 3.14 * 3 / 2)
-  {
-    ratio = (angle - (3.14 * 3 / 2)) / 6.28;
-  }
-
-  player_set_position(ratio);
-}
-
-void ui_on_volume_change(view_t* view, float angle)
-{
-  float ratio = 0.0;
-  if (angle > 0 && angle < 3.14 * 3 / 2)
-  {
-    ratio = angle / 6.28 + 0.25;
-  }
-  else if (angle > 3.14 * 3 / 2)
-  {
-    ratio = (angle - (3.14 * 3 / 2)) / 6.28;
-  }
-
-  player_set_volume(ratio);
-}
-
 void ui_on_roll_in_visu(void* userdata, void* data)
 {
   vh_anim_alpha(ui.visuleftbtnbck, 0.0, 1.0, 10, AT_LINEAR);
@@ -760,16 +636,6 @@ void ui_show_song_info(int index)
 void ui_toggle_pause(int state)
 {
   songlist_toggle_pause(state);
-}
-
-void ui_update_position(float ratio)
-{
-  tg_knob_set_angle(ui.seekknob, ratio * 6.28 - 3.14 / 2.0);
-}
-
-void ui_update_volume(float ratio)
-{
-  tg_knob_set_angle(ui.volknob, ratio * 6.28 - 3.14 / 2.0);
 }
 
 void ui_update_visualizer()

@@ -13,6 +13,7 @@
 #include "remote.c"
 #include "ui.c"
 #include "ui_manager.c"
+#include "ui_play_controls.c"
 #include "visible.c"
 #include "wm_connector.c"
 #include "wm_event.c"
@@ -213,8 +214,8 @@ void render(uint32_t time)
       double volratio = player_volume();
 
       ui_update_time(zm.last_step, player_duration() - zm.last_step, player_duration());
-      ui_update_position(posratio);
-      ui_update_volume(volratio);
+      ui_play_update_position(posratio);
+      ui_play_update_volume(volratio);
     }
 
     ui_update_visualizer();
@@ -227,7 +228,7 @@ void render(uint32_t time)
       zm.last_step = time + 1000;
 
       ui_update_time(0.0, 0.0, 0.0);
-      ui_update_volume(0.9);
+      ui_play_update_volume(0.9);
     }
   }
 

@@ -145,6 +145,8 @@ char mem_release(void* pointer)
   if (head->retaincount == 0)
   {
     if (head->destructor != NULL) head->destructor(pointer);
+    // zero out bytes that will be deallocated so it will be easier to detect re-using of released mtmem areas
+    memset(bytes, 0, sizeof(struct mem_head));
     free(bytes);
     return 1;
   }
