@@ -43,10 +43,10 @@ void ui_song_infos_attach(view_t* baseview, char* fontpath)
 
   uisi.fontpath            = fontpath;
   uisi.textstyle           = ts;
-  uisi.song_info_view      = view_get_subview(baseview, "info");
-  uisi.song_time_view      = view_get_subview(baseview, "time");
-  uisi.song_length_view    = view_get_subview(baseview, "length");
-  uisi.song_remaining_view = view_get_subview(baseview, "left");
+  uisi.song_info_view      = view_get_subview(baseview, "song_info");
+  uisi.song_time_view      = view_get_subview(baseview, "song_info_time");
+  uisi.song_length_view    = view_get_subview(baseview, "song_info_length");
+  uisi.song_remaining_view = view_get_subview(baseview, "song_info_remaining");
 
   tg_text_add(uisi.song_info_view);
   tg_text_set(uisi.song_info_view, "-", ts);
