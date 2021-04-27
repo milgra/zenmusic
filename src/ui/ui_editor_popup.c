@@ -1,14 +1,14 @@
-#ifndef editor_popup_h
-#define editor_popup_h
+#ifndef ui_editor_popup_h
+#define ui_editor_popup_h
 
 #include "mtmap.c"
 #include "view.c"
 
-void   editor_popup_attach(view_t* view, char* fontpath);
-void   editor_popup_set_songs(vec_t* vec, char* libpath);
-map_t* editor_popup_get_changed();
-vec_t* editor_popup_get_removed();
-char*  editor_popup_get_cover();
+void   ui_editor_popup_attach(view_t* view, char* fontpath);
+void   ui_editor_popup_set_songs(vec_t* vec, char* libpath);
+map_t* ui_editor_popup_get_changed();
+vec_t* ui_editor_popup_get_removed();
+char*  ui_editor_popup_get_cover();
 
 #endif
 
@@ -25,7 +25,7 @@ char*  editor_popup_get_cover();
 #include "vh_textinput.c"
 #include <string.h>
 
-struct _editor_popup_t
+struct _ui_editor_popup_t
 {
   view_t* listview;
   view_t* headview;
@@ -46,19 +46,19 @@ struct _editor_popup_t
 
 } ep = {0};
 
-void editor_popup_input_cell_value_changed(view_t* inputview)
+void ui_editor_popup_input_cell_value_changed(view_t* inputview)
 {
   vh_textinput_t* data = inputview->handler_data;
 
   char* key  = data->userdata;
   char* text = str_cstring(vh_textinput_get_text(inputview));
 
-  printf("editor_popup_input_cell_value_changed key %s text %s\n", key, text);
+  printf("ui_editor_popup_input_cell_value_changed key %s text %s\n", key, text);
 
   MPUT(ep.temp, key, text);
 }
 
-void editor_popup_input_cell_edit_finished(view_t* inputview)
+void ui_editor_popup_input_cell_edit_finished(view_t* inputview)
 {
   vh_textinput_t* data = inputview->handler_data;
 
@@ -67,7 +67,7 @@ void editor_popup_input_cell_edit_finished(view_t* inputview)
 
   MPUT(ep.changed, key, text);
 
-  printf("editor_popup_input_cell_edit_finished key %s text %s\n", key, text);
+  printf("ui_editor_popup_input_cell_edit_finished key %s text %s\n", key, text);
 
   // remove text view handler
   char* id = cstr_fromformat(100, "%s%s", ep.sel_item->id, "val");
@@ -89,9 +89,9 @@ void editor_popup_input_cell_edit_finished(view_t* inputview)
   vh_list_lock_scroll(ep.listview, 0);
 }
 
-void editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
+void ui_editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
-  printf("editor_popup_select_item %s index %i cell id %s\n", itemview->id, index, cell->id);
+  printf("ui_editor_popup_select_item %s index %i cell id %s\n", itemview->id, index, cell->id);
 
   char* key   = ep.fields->data[index];
   char* value = MGET(ep.data, key);
@@ -111,13 +111,13 @@ void editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, ev_
     view_t* inputcell = view_new(id, cell->view->frame.local);
     REL(id);
 
-    vh_textinput_add(inputcell, "", value, ep.textstyle, key);                        // add text handler with key as userdata
-    vh_textinput_set_on_text(inputcell, editor_popup_input_cell_value_changed);       // listen for text change
-    vh_textinput_set_on_deactivate(inputcell, editor_popup_input_cell_edit_finished); // listen for text editing finish
-    vh_textinput_activate(inputcell, 1);                                              // activate text input
-    ui_manager_activate(inputcell);                                                   // set text input as event receiver
-    vh_list_lock_scroll(ep.listview, 1);                                              // lock scrolling of list to avoid going out screen
-    vh_litem_rpl_cell(itemview, cell->id, inputcell);                                 // replacing simple text cell with input cell
+    vh_textinput_add(inputcell, "", value, ep.textstyle, key);                           // add text handler with key as userdata
+    vh_textinput_set_on_text(inputcell, ui_editor_popup_input_cell_value_changed);       // listen for text change
+    vh_textinput_set_on_deactivate(inputcell, ui_editor_popup_input_cell_edit_finished); // listen for text editing finish
+    vh_textinput_activate(inputcell, 1);                                                 // activate text input
+    ui_manager_activate(inputcell);                                                      // set text input as event receiver
+    vh_list_lock_scroll(ep.listview, 1);                                                 // lock scrolling of list to avoid going out screen
+    vh_litem_rpl_cell(itemview, cell->id, inputcell);                                    // replacing simple text cell with input cell
 
     // TODO check if previous cell gets released
 
@@ -142,7 +142,7 @@ void editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, ev_
   }
 }
 
-view_t* editor_popup_create_item()
+view_t* ui_editor_popup_create_item()
 {
   static int itemcnt;
   char       idbuffer[100] = {0};
@@ -151,7 +151,7 @@ view_t* editor_popup_create_item()
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
 
   vh_litem_add(rowview, NULL);
-  vh_litem_set_on_select(rowview, editor_popup_select_item);
+  vh_litem_set_on_select(rowview, ui_editor_popup_select_item);
 
   char* id = cstr_fromformat(100, "%s%s", rowview->id, "key");
   // first cell is a simple text cell
@@ -183,7 +183,7 @@ view_t* editor_popup_create_item()
   return rowview;
 }
 
-view_t* editor_popup_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
+view_t* ui_editor_popup_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
 {
   if (index < 0)
     return NULL; // no items before 0
@@ -195,7 +195,7 @@ view_t* editor_popup_item_for_index(int index, void* userdata, view_t* listview,
   return ep.items->data[index];
 }
 
-int editor_popup_comp_text(void* left, void* right)
+int ui_editor_popup_comp_text(void* left, void* right)
 {
   char* la = left;
   char* ra = right;
@@ -203,7 +203,7 @@ int editor_popup_comp_text(void* left, void* right)
   return strcmp(la, ra);
 }
 
-void editor_popup_remove_str(vec_t* vec, char* str)
+void ui_editor_popup_remove_str(vec_t* vec, char* str)
 {
   for (int index = 0; index < vec->length; index++)
   {
@@ -216,7 +216,7 @@ void editor_popup_remove_str(vec_t* vec, char* str)
   }
 }
 
-void editor_popup_set_song()
+void ui_editor_popup_set_song()
 {
   // reset temporary fields containers
   map_reset(ep.temp);
@@ -227,11 +227,11 @@ void editor_popup_set_song()
   map_keys(ep.data, ep.fields);
 
   // sort fields
-  vec_sort(ep.fields, VSD_DSC, editor_popup_comp_text);
+  vec_sort(ep.fields, VSD_DSC, ui_editor_popup_comp_text);
 
-  editor_popup_remove_str(ep.fields, "meta/artist");
-  editor_popup_remove_str(ep.fields, "meta/album");
-  editor_popup_remove_str(ep.fields, "meta/title");
+  ui_editor_popup_remove_str(ep.fields, "meta/artist");
+  ui_editor_popup_remove_str(ep.fields, "meta/album");
+  ui_editor_popup_remove_str(ep.fields, "meta/title");
 
   vec_ins(ep.fields, cstr_fromcstring("meta/title"), 0);
   vec_ins(ep.fields, cstr_fromcstring("meta/album"), 0);
@@ -244,7 +244,7 @@ void editor_popup_set_song()
 
   for (int index = 0; index < ep.fields->length; index++)
   {
-    view_t* item = editor_popup_create_item();
+    view_t* item = ui_editor_popup_create_item();
 
     char* key   = ep.fields->data[index];
     char* value = MGET(ep.data, key);
@@ -274,7 +274,7 @@ void editor_popup_set_song()
   }
 }
 
-void editor_popup_attach(view_t* view, char* fontpath)
+void ui_editor_popup_attach(view_t* view, char* fontpath)
 {
   view_t* listview  = view_get_subview(view, "editorlist");
   view_t* headview  = view_get_subview(view, "ideditorheader");
@@ -282,7 +282,7 @@ void editor_popup_attach(view_t* view, char* fontpath)
 
   vh_list_add(listview,
               ((vh_list_inset_t){0, 10, 0, 10}),
-              editor_popup_item_for_index, NULL, NULL);
+              ui_editor_popup_item_for_index, NULL, NULL);
 
   textstyle_t ts = {0};
   ts.font        = fontpath;
@@ -319,22 +319,22 @@ void editor_popup_attach(view_t* view, char* fontpath)
   tg_text_set(headview, "Editing 1 data", ts);
 }
 
-map_t* editor_popup_get_changed()
+map_t* ui_editor_popup_get_changed()
 {
   return ep.changed;
 }
 
-vec_t* editor_popup_get_removed()
+vec_t* ui_editor_popup_get_removed()
 {
   return ep.removed;
 }
 
-char* editor_popup_get_cover()
+char* ui_editor_popup_get_cover()
 {
   return ep.cover;
 }
 
-void editor_popup_set_songs(vec_t* vec, char* libpath)
+void ui_editor_popup_set_songs(vec_t* vec, char* libpath)
 {
   if (vec->length > 0)
   {
@@ -368,7 +368,7 @@ void editor_popup_set_songs(vec_t* vec, char* libpath)
         }
       }
     }
-    editor_popup_set_song();
+    ui_editor_popup_set_song();
 
     REL(fields);
     REL(values);

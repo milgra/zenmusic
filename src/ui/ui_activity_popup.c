@@ -1,11 +1,11 @@
-#ifndef activity_h
-#define activity_h
+#ifndef ui_activity_popup_h
+#define ui_activity_popup_h
 
 #include "text.c"
 #include "view.c"
 
-void activity_init();
-void activity_attach(view_t* logview, view_t* notifview, textstyle_t style);
+void ui_activity_popup_init();
+void ui_activity_popup_attach(view_t* logview, view_t* notifview, textstyle_t style);
 
 #endif
 
@@ -16,7 +16,7 @@ void activity_attach(view_t* logview, view_t* notifview, textstyle_t style);
 #include "tg_text.c"
 #include <pthread.h>
 
-struct _activity_t
+struct _ui_activity_popup_t
 {
   vec_t*          logs;
   int             ind;
@@ -26,12 +26,12 @@ struct _activity_t
   textstyle_t     style;
 } act = {0};
 
-void activity_select(int index)
+void ui_activity_popup_select(int index)
 {
-  printf("on_activityitem_select\n");
+  printf("on_ui_activity_popupitem_select\n");
 }
 
-void activity_log(char* log)
+void ui_activity_popup_log(char* log)
 {
   pthread_mutex_lock(&act.lock); // have to be thread safe
 
@@ -57,16 +57,16 @@ void activity_log(char* log)
   pthread_mutex_unlock(&act.lock);
 }
 
-void activity_init()
+void ui_activity_popup_init()
 {
   act.logs = VNEW();
-  log_set_proxy(activity_log);
+  log_set_proxy(ui_activity_popup_log);
 }
 
-void activity_attach(view_t* logview, view_t* notifview, textstyle_t style)
+void ui_activity_popup_attach(view_t* logview, view_t* notifview, textstyle_t style)
 {
   act.style = style;
-  act.list  = textlist_new(logview, act.logs, style, activity_select);
+  act.list  = textlist_new(logview, act.logs, style, ui_activity_popup_select);
   act.info  = notifview;
 
   act.style.align = TA_CENTER;

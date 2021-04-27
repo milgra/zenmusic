@@ -1,13 +1,13 @@
-#ifndef songlistpopup_h
-#define songlistpopup_h
+#ifndef ui_song_menu_popup_h
+#define ui_song_menu_popup_h
 
 #include "mtmap.c"
 #include "view.c"
 
-void songlistpopup_attach(view_t* view, char* fontpath, void (*on_select)(int));
-void songlistpopup_update();
-void songlistpopup_refresh();
-void songlistpopup_toggle_pause(int state);
+void ui_song_menu_popup_attach(view_t* view, char* fontpath, void (*on_select)(int));
+void ui_song_menu_popup_update();
+void ui_song_menu_popup_refresh();
+void ui_song_menu_popup_toggle_pause(int state);
 
 #endif
 
@@ -21,11 +21,11 @@ void songlistpopup_toggle_pause(int state);
 #include "vh_list_head.c"
 #include "vh_list_item.c"
 
-void songlistpopup_on_header_field_select(view_t* view, char* id, ev_t ev);
-void songlistpopup_on_header_field_insert(view_t* view, int src, int tgt);
-void songlistpopup_on_header_field_resize(view_t* view, char* id, int size);
+void ui_song_menu_popup_on_header_field_select(view_t* view, char* id, ev_t ev);
+void ui_song_menu_popup_on_header_field_insert(view_t* view, int src, int tgt);
+void ui_song_menu_popup_on_header_field_resize(view_t* view, char* id, int size);
 
-struct songlistpopup_t
+struct ui_song_menu_popup_t
 {
   view_t*     view;   // table view
   vec_t*      fields; // fileds in table
@@ -52,22 +52,22 @@ sl_cell_t* slp_cell_new(char* id, int size, int index)
   return cell;
 }
 
-void songlistpopup_update()
+void ui_song_menu_popup_update()
 {
   vh_list_reset(slp.view);
 }
 
-void songlistpopup_refresh()
+void ui_song_menu_popup_refresh()
 {
   vh_list_refresh(slp.view);
 }
 
-void songlistpopup_on_header_field_select(view_t* view, char* id, ev_t ev)
+void ui_song_menu_popup_on_header_field_select(view_t* view, char* id, ev_t ev)
 {
   // (*slp.on_header_select)(id);
 }
 
-void songlistpopup_on_header_field_insert(view_t* view, int src, int tgt)
+void ui_song_menu_popup_on_header_field_insert(view_t* view, int src, int tgt)
 {
   // update in fields so new items will use updated order
   sl_cell_t* cell = slp.fields->data[src];
@@ -86,7 +86,7 @@ void songlistpopup_on_header_field_insert(view_t* view, int src, int tgt)
   }
 }
 
-void songlistpopup_on_header_field_resize(view_t* view, char* id, int size)
+void ui_song_menu_popup_on_header_field_resize(view_t* view, char* id, int size)
 {
   // update in fields so new items will use updated size
   for (int i = 0; i < slp.fields->length; i++)
@@ -110,12 +110,12 @@ void songlistpopup_on_header_field_resize(view_t* view, char* id, int size)
 
 // items
 
-void songlistpopup_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
+void ui_song_menu_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
   if (slp.on_select) (*slp.on_select)(index);
 }
 
-view_t* songlistpopupitem_create(int index)
+view_t* ui_song_menu_popupitem_create(int index)
 {
   static int item_cnt      = 0;
   char       idbuffer[100] = {0};
@@ -124,7 +124,7 @@ view_t* songlistpopupitem_create(int index)
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 460, 50});
 
   vh_litem_add(rowview, NULL);
-  vh_litem_set_on_select(rowview, songlistpopup_on_item_select);
+  vh_litem_set_on_select(rowview, ui_song_menu_popup_on_item_select);
 
   sl_cell_t* cell;
   while ((cell = VNXT(slp.fields)))
@@ -141,7 +141,7 @@ view_t* songlistpopupitem_create(int index)
   return rowview;
 }
 
-void songlistpopupitem_update_row(view_t* rowview, int index, char* field)
+void ui_song_menu_popupitem_update_row(view_t* rowview, int index, char* field)
 {
   uint32_t color1         = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
   slp.textstyle.backcolor = color1;
@@ -151,7 +151,7 @@ void songlistpopupitem_update_row(view_t* rowview, int index, char* field)
   tg_text_set(vh_litem_get_cell(rowview, "field"), field, slp.textstyle);
 }
 
-view_t* songlistpopup_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
+view_t* ui_song_menu_popup_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
 {
   if (index < 0)
     return NULL; // no items before 0
@@ -163,7 +163,7 @@ view_t* songlistpopup_item_for_index(int index, void* userdata, view_t* listview
   return slp.items->data[index];
 }
 
-void songlistpopup_attach(view_t* view, char* fontpath, void (*on_select)(int))
+void ui_song_menu_popup_attach(view_t* view, char* fontpath, void (*on_select)(int))
 {
   assert(fontpath != NULL);
 
@@ -189,21 +189,21 @@ void songlistpopup_attach(view_t* view, char* fontpath, void (*on_select)(int))
 
   vh_list_add(slp.view,
               ((vh_list_inset_t){0, 10, 0, 10}),
-              songlistpopup_item_for_index, NULL, NULL);
+              ui_song_menu_popup_item_for_index, NULL, NULL);
 
   // create items
 
-  VADD(slp.items, songlistpopupitem_create(0));
-  VADD(slp.items, songlistpopupitem_create(1));
-  VADD(slp.items, songlistpopupitem_create(2));
-  VADD(slp.items, songlistpopupitem_create(3));
-  VADD(slp.items, songlistpopupitem_create(4));
+  VADD(slp.items, ui_song_menu_popupitem_create(0));
+  VADD(slp.items, ui_song_menu_popupitem_create(1));
+  VADD(slp.items, ui_song_menu_popupitem_create(2));
+  VADD(slp.items, ui_song_menu_popupitem_create(3));
+  VADD(slp.items, ui_song_menu_popupitem_create(4));
 
-  songlistpopupitem_update_row(slp.items->data[0], 0, "Select/Deselect");
-  songlistpopupitem_update_row(slp.items->data[1], 1, "Select Range");
-  songlistpopupitem_update_row(slp.items->data[2], 2, "Select All");
-  songlistpopupitem_update_row(slp.items->data[3], 3, "Edit Song Info");
-  songlistpopupitem_update_row(slp.items->data[4], 4, "Delete Song");
+  ui_song_menu_popupitem_update_row(slp.items->data[0], 0, "Select/Deselect");
+  ui_song_menu_popupitem_update_row(slp.items->data[1], 1, "Select Range");
+  ui_song_menu_popupitem_update_row(slp.items->data[2], 2, "Select All");
+  ui_song_menu_popupitem_update_row(slp.items->data[3], 3, "Edit Song Info");
+  ui_song_menu_popupitem_update_row(slp.items->data[4], 4, "Delete Song");
 }
 
 #endif

@@ -1,20 +1,16 @@
-/*
-  settingslist table and events handler
- */
-#ifndef settingslist_h
-#define settingslist_h
+#ifndef ui_settings_popup_h
+#define ui_settings_popup_h
 
 #include "mtmap.c"
 #include "view.c"
 
-void settingslist_attach(view_t* view,
-                         char*   fontpath,
-                         void (*libpath_popup)(char* text),
-                         void (*liborg_popup)(char* text),
-                         void (*info_popup)(char* text));
-void settingslist_update();
-void settingslist_refresh();
-void settingslist_toggle_pause(int state);
+void ui_settings_popup_attach(view_t* view,
+                              char*   fontpath,
+                              void (*libpath_popup)(char* text),
+                              void (*liborg_popup)(char* text),
+                              void (*info_popup)(char* text));
+void ui_settings_popup_update();
+void ui_settings_popup_refresh();
 
 #endif
 
@@ -28,11 +24,11 @@ void settingslist_toggle_pause(int state);
 #include "vh_list_head.c"
 #include "vh_list_item.c"
 
-void settingslist_on_header_field_select(view_t* view, char* id, ev_t ev);
-void settingslist_on_header_field_insert(view_t* view, int src, int tgt);
-void settingslist_on_header_field_resize(view_t* view, char* id, int size);
+void ui_settings_popup_on_header_field_select(view_t* view, char* id, ev_t ev);
+void ui_settings_popup_on_header_field_insert(view_t* view, int src, int tgt);
+void ui_settings_popup_on_header_field_resize(view_t* view, char* id, int size);
 
-struct settingslist_t
+struct ui_settings_popup_t
 {
   view_t*     view;   // table view
   vec_t*      fields; // fileds in table
@@ -62,22 +58,22 @@ sl_cell_t* setl_cell_new(char* id, int size, int index)
   return cell;
 }
 
-void settingslist_update()
+void ui_settings_popup_update()
 {
   vh_list_reset(setl.view);
 }
 
-void settingslist_refresh()
+void ui_settings_popup_refresh()
 {
   vh_list_refresh(setl.view);
 }
 
-void settingslist_on_header_field_select(view_t* view, char* id, ev_t ev)
+void ui_settings_popup_on_header_field_select(view_t* view, char* id, ev_t ev)
 {
   // (*setl.on_header_select)(id);
 }
 
-void settingslist_on_header_field_insert(view_t* view, int src, int tgt)
+void ui_settings_popup_on_header_field_insert(view_t* view, int src, int tgt)
 {
   // update in fields so new items will use updated order
   sl_cell_t* cell = setl.fields->data[src];
@@ -96,7 +92,7 @@ void settingslist_on_header_field_insert(view_t* view, int src, int tgt)
   }
 }
 
-void settingslist_on_header_field_resize(view_t* view, char* id, int size)
+void ui_settings_popup_on_header_field_resize(view_t* view, char* id, int size)
 {
   // update in fields so new items will use updated size
   for (int i = 0; i < setl.fields->length; i++)
@@ -120,7 +116,7 @@ void settingslist_on_header_field_resize(view_t* view, char* id, int size)
 
 // items
 
-void settingslist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
+void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
   printf("item select %i\n", index);
 
@@ -150,7 +146,7 @@ view_t* settingsitem_create()
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 640, 50});
 
   vh_litem_add(rowview, NULL);
-  vh_litem_set_on_select(rowview, settingslist_on_item_select);
+  vh_litem_set_on_select(rowview, ui_settings_popup_on_item_select);
 
   sl_cell_t* cell;
   while ((cell = VNXT(setl.fields)))
@@ -178,7 +174,7 @@ void settingsitem_update_row(view_t* rowview, int index, char* field, char* valu
   tg_text_set(vh_litem_get_cell(rowview, "value"), value, setl.textstyle);
 }
 
-view_t* settingslist_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
+view_t* ui_settings_popup_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
 {
   if (index < 0)
     return NULL; // no items before 0
@@ -190,11 +186,11 @@ view_t* settingslist_item_for_index(int index, void* userdata, view_t* listview,
   return setl.items->data[index];
 }
 
-void settingslist_attach(view_t* view,
-                         char*   fontpath,
-                         void (*libpath_popup)(char* text),
-                         void (*liborg_popup)(char* text),
-                         void (*info_popup)(char* text))
+void ui_settings_popup_attach(view_t* view,
+                              char*   fontpath,
+                              void (*libpath_popup)(char* text),
+                              void (*liborg_popup)(char* text),
+                              void (*info_popup)(char* text))
 {
   assert(fontpath != NULL);
 
@@ -229,9 +225,9 @@ void settingslist_attach(view_t* view,
   tg_css_add(header);
 
   vh_lhead_add(header);
-  vh_lhead_set_on_select(header, settingslist_on_header_field_select);
-  vh_lhead_set_on_insert(header, settingslist_on_header_field_insert);
-  vh_lhead_set_on_resize(header, settingslist_on_header_field_resize);
+  vh_lhead_set_on_select(header, ui_settings_popup_on_header_field_select);
+  vh_lhead_set_on_insert(header, ui_settings_popup_on_header_field_insert);
+  vh_lhead_set_on_resize(header, ui_settings_popup_on_header_field_resize);
 
   sl_cell_t* cell;
   while ((cell = VNXT(setl.fields)))
@@ -250,7 +246,7 @@ void settingslist_attach(view_t* view,
 
   vh_list_add(setl.view,
               ((vh_list_inset_t){30, 0, 0, 0}),
-              settingslist_item_for_index, NULL, NULL);
+              ui_settings_popup_item_for_index, NULL, NULL);
   vh_list_set_header(setl.view, header);
 
   // create items

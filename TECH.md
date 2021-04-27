@@ -20,6 +20,9 @@ ui_compositor - collects view rectangles, puts view textures into texture maps, 
 ui_generator - collects views, sets up texture channels, renders view bitmaps in background thread
 ui_manager - it has the root view for the ui, resends views to generator when add/remove happened
 
+modules - components isolated from each other
+mtlib - core library for memory management, containers
+ui - ui handlers/components
 
 ## 2. Development ##
 

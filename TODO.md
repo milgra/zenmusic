@@ -1,5 +1,6 @@
 first version
 
+fontpath configba
 check organize, save entries
 save shuffle state, last played song, last played position
 fix leaks

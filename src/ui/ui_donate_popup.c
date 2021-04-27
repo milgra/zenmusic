@@ -7,7 +7,6 @@
 void ui_donate_popup_attach(view_t* base, char* fontpath, void (*popup)(char* text));
 void ui_donate_popup_update();
 void ui_donate_popup_refresh();
-void ui_donate_popup_toggle_pause(int state);
 
 #endif
 
