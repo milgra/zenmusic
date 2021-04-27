@@ -36,7 +36,6 @@ void ui_toggle_baseview(view_t* view); // shows/hides subview on baseview
 #include "ui_song_menu_popup.c"
 #include "ui_songlist.c"
 #include "ui_visualizer.c"
-#include "vh_anim.c"
 #include "vh_button.c"
 #include "vh_key.c"
 #include "vh_textinput.c"
@@ -49,12 +48,9 @@ void ui_toggle_baseview(view_t* view); // shows/hides subview on baseview
 
 struct _ui_t
 {
-  view_t* baseview;
-
+  view_t*     baseview;
   char*       fontpath;
   view_t*     songlist_filter_bar;
-  view_t*     set_col_val;
-  view_t*     set_org_btn_txt;
   textlist_t* artistlist;
   textlist_t* genrelist;
 } ui = {0};
@@ -68,10 +64,7 @@ void ui_on_song_header(char* id);
 void ui_on_genre_select(int index);
 void ui_on_artist_select(int index);
 void ui_filter(view_t* view);
-
 void ui_show_liborg_popup(char* text);
-
-void ui_on_songlistpopup_select(int index);
 
 void ui_init()
 {
@@ -207,7 +200,7 @@ void ui_load(float width,
 
   // attach songlistpopup to song_popup_list view
 
-  ui_song_menu_popup_attach(view_get_subview(ui.baseview, "song_popup_list"), ui.fontpath, ui_on_songlistpopup_select);
+  ui_song_menu_popup_attach(view_get_subview(ui.baseview, "song_popup_list"), ui.fontpath, NULL);
 
   // popup setup, it removes views so it has to be the last command
 
@@ -335,15 +328,6 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "library_popup_close_btn") == 0) ui_popup_switcher_toggle("library_popup_page");
 }
 
-void ui_on_color_select(void* userdata, void* data)
-{
-  num_t* val = data;
-
-  /* char text[10] = {0}; */
-  /* snprintf(text, 10, "%.2x%.2x%.2x", r, g, b); */
-  /* tg_text_set(ui.set_col_val, text, ts); */
-}
-
 void ui_on_song_edit(int index)
 {
   ui_popup_switcher_toggle("song_popup_page");
@@ -374,15 +358,6 @@ void ui_on_artist_select(int index)
 
 void ui_set_org_btn_lbl(char* text)
 {
-  // TODO get style from css
-  textstyle_t ts = {0};
-  ts.font        = ui.fontpath;
-  ts.align       = TA_CENTER;
-  ts.size        = 25.0;
-  ts.textcolor   = 0x333333FF;
-  ts.backcolor   = 0;
-
-  tg_text_set(ui.set_org_btn_txt, text, ts);
 }
 
 void ui_toggle_pause(int state)
@@ -398,27 +373,6 @@ void ui_show_libpath_popup1(char* text)
 void ui_show_liborg_popup(char* text)
 {
   ui_popup_switcher_toggle("decision_popup_page");
-}
-
-void ui_on_songlistpopup_select(int index)
-{
-  ui_popup_switcher_toggle("song_popup_page");
-
-  if (index == 0) ui_songlist_select(index);
-  if (index == 1) ui_songlist_select_range(index);
-  if (index == 2) ui_songlist_select_all();
-  if (index == 3)
-  {
-    vec_t* selected = VNEW();
-    ui_songlist_get_selected(selected);
-    ui_editor_popup_set_songs(selected, config_get("lib_path"));
-    ui_popup_switcher_toggle("ideditor_popup_page");
-    REL(selected);
-  }
-  if (index == 4)
-  {
-    ui_alert_popup_show("Are you sure you want to delete x items?");
-  }
 }
 
 void ui_filter(view_t* view)

@@ -13,9 +13,14 @@ void ui_song_menu_popup_toggle_pause(int state);
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "config.c"
 #include "selection.c"
 #include "tg_css.c"
 #include "tg_text.c"
+#include "ui_alert_popup.c"
+#include "ui_editor_popup.c"
+#include "ui_popup_switcher.c"
+#include "ui_songlist.c"
 #include "vh_button.c"
 #include "vh_list.c"
 #include "vh_list_head.c"
@@ -31,7 +36,6 @@ struct ui_song_menu_popup_t
   vec_t*      fields; // fileds in table
   vec_t*      items;
   textstyle_t textstyle;
-  void (*on_select)(int index);
 } slp = {0};
 
 typedef struct _sl_cell_t
@@ -112,7 +116,23 @@ void ui_song_menu_popup_on_header_field_resize(view_t* view, char* id, int size)
 
 void ui_song_menu_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
-  if (slp.on_select) (*slp.on_select)(index);
+  ui_popup_switcher_toggle("song_popup_page");
+
+  if (index == 0) ui_songlist_select(index);
+  if (index == 1) ui_songlist_select_range(index);
+  if (index == 2) ui_songlist_select_all();
+  if (index == 3)
+  {
+    vec_t* selected = VNEW();
+    ui_songlist_get_selected(selected);
+    ui_editor_popup_set_songs(selected, config_get("lib_path"));
+    ui_popup_switcher_toggle("ideditor_popup_page");
+    REL(selected);
+  }
+  if (index == 4)
+  {
+    ui_alert_popup_show("Are you sure you want to delete x items?");
+  }
 }
 
 view_t* ui_song_menu_popupitem_create(int index)
@@ -167,10 +187,9 @@ void ui_song_menu_popup_attach(view_t* view, char* fontpath, void (*on_select)(i
 {
   assert(fontpath != NULL);
 
-  slp.view      = view;
-  slp.fields    = VNEW();
-  slp.items     = VNEW();
-  slp.on_select = on_select;
+  slp.view   = view;
+  slp.fields = VNEW();
+  slp.items  = VNEW();
 
   slp.textstyle.font      = fontpath;
   slp.textstyle.align     = TA_CENTER;
