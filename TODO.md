@@ -1,6 +1,5 @@
 first version
 
-popup_page-ek map-bol generalodjanak, ui_play_controls, ui_song_infos, etc
 check organize, save entries
 save shuffle state, last played song, last played position
 fix leaks

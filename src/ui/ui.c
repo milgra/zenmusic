@@ -12,7 +12,6 @@ void ui_update_position(float ratio);
 void ui_update_volume(float ratio);
 void ui_update_visualizer();
 void ui_update_video();
-void ui_update_time(double time, double left, double duration);
 void ui_toggle_pause(int state);
 void ui_show_libpath_popup(char* message);
 void ui_hide_libpath_popup();
@@ -46,6 +45,7 @@ void ui_show_simple_popup(char* text);
 #include "tg_text.c"
 #include "ui_manager.c"
 #include "ui_play_controls.c"
+#include "ui_song_infos.c"
 #include "vh_anim.c"
 #include "vh_button.c"
 #include "vh_key.c"
@@ -67,7 +67,6 @@ struct _ui_t
   int    visu;
   vec_t* selected; // selected songs from songlist
   char*  fontpath; // font path
-  size_t lastindex;
 
   view_t* songlist_filter_bar;
   view_t* sim_pop_txt;
@@ -87,13 +86,6 @@ struct _ui_t
 
   view_t* slibpopup_textfield_view;
   view_t* slibpopup_inputfield_view;
-
-  // play info views
-
-  view_t* song_info_view;
-  view_t* song_remaining_view;
-  view_t* song_time_view;
-  view_t* song_length_view;
 
   // popup pages
 
@@ -115,7 +107,6 @@ void ui_on_roll_in_visu(void* userdata, void* data);
 void ui_on_roll_out_visu(void* userdata, void* data);
 void ui_on_song_edit(int index);
 void ui_remove_from_base(view_t* view, void* userdata);
-void ui_show_song_info(int index);
 void ui_on_key_down(void* userdata, void* data);
 void ui_on_song_header(char* id);
 void ui_on_genre_select(int index);
@@ -166,6 +157,8 @@ void ui_load(float width,
   ui.baseview = vec_head(views);
 
   ui_play_controls_attach(ui.baseview);
+
+  ui_song_infos_attach(ui.baseview, ui.fontpath);
 
   cb_t* key_cb = cb_new(ui_on_key_down, ui.baseview);
 
@@ -218,35 +211,19 @@ void ui_load(float width,
 
   // display views
 
-  ui.song_time_view      = view_get_subview(ui.baseview, "time");
-  ui.song_remaining_view = view_get_subview(ui.baseview, "left");
-  ui.song_length_view    = view_get_subview(ui.baseview, "length");
-
-  tg_text_add(ui.song_time_view);
-  tg_text_add(ui.song_remaining_view);
-  tg_text_add(ui.song_length_view);
-
   ts.margin_right = 0;
   ts.textcolor    = 0x000000FF;
   ts.backcolor    = 0x0;
 
   ts.align = TA_LEFT;
 
-  ui.song_info_view = view_get_subview(ui.baseview, "info");
-
-  tg_text_add(ui.song_info_view);
-  tg_text_set(ui.song_info_view, "-", ts);
-
   ts.align  = TA_LEFT;
   ts.margin = 10.0;
-
-  cb_t* msg_show_cb = cb_new(ui_on_button_down, NULL);
-  vh_button_add(ui.song_info_view, VH_BUTTON_NORMAL, msg_show_cb);
 
   // init activity
 
   activity_init();
-  activity_attach(view_get_subview(ui.baseview, "messagelist"), ui.song_info_view, ts);
+  //activity_attach(view_get_subview(ui.baseview, "messagelist"), ui.song_info_view, ts);
 
   // query field
 
@@ -602,37 +579,6 @@ void ui_set_org_btn_lbl(char* text)
   tg_text_set(ui.set_org_btn_txt, text, ts);
 }
 
-void ui_show_song_info(int index)
-{
-  textstyle_t ts = {0};
-  ts.font        = ui.fontpath;
-  ts.align       = TA_CENTER;
-  ts.size        = 28.0;
-  ts.textcolor   = 0x000000FF;
-  ts.backcolor   = 0;
-
-  map_t* songmap = ui.songs->data[index];
-
-  char* sample = MGET(songmap, "file/sample_rate");
-  char* bit    = MGET(songmap, "file/bit_rate");
-  int   sr     = atoi(sample);
-  int   br     = atoi(bit);
-
-  printf("sr br %i %i\n", sr, br);
-
-  char* infostr = mem_calloc(100, "char*", NULL, NULL);
-
-  snprintf(infostr, 100, "%s\n%s\n%s/%iKHz/%iKbit/%s channels",
-           (char*)MGET(songmap, "meta/title"),
-           (char*)MGET(songmap, "meta/artist"),
-           (char*)MGET(songmap, "meta/genre"),
-           sr / 1000,
-           br / 1000,
-           (char*)MGET(songmap, "file/channels"));
-
-  tg_text_set(ui.song_info_view, infostr, ts);
-}
-
 void ui_toggle_pause(int state)
 {
   songlist_toggle_pause(state);
@@ -659,34 +605,6 @@ void ui_update_video()
 {
   player_draw_video(ui.visuvideo->texture.bitmap, 3);
   ui.visuvideo->texture.changed = 1;
-}
-
-void ui_update_time(double time, double left, double dur)
-{
-  textstyle_t ts = {0};
-  ts.font        = ui.fontpath;
-  ts.align       = TA_RIGHT;
-  ts.size        = 30.0;
-  ts.textcolor   = 0x000000FF;
-  ts.backcolor   = 0;
-  ts.margin_left = 17;
-
-  char timebuff[20];
-
-  int tmin = (int)floor(time / 60.0);
-  int tsec = (int)time % 60;
-  int lmin = (int)floor(left / 60.0);
-  int lsec = (int)left % 60;
-  int dmin = (int)floor(dur / 60.0);
-  int dsec = (int)dur % 60;
-
-  ts.align = TA_LEFT;
-  snprintf(timebuff, 20, "%.2i:%.2i", dmin, dsec);
-  tg_text_set(ui.song_length_view, timebuff, ts);
-  snprintf(timebuff, 20, "%.2i:%.2i", tmin, tsec);
-  tg_text_set(ui.song_time_view, timebuff, ts);
-  snprintf(timebuff, 20, "%.2i:%.2i", lmin, lsec);
-  tg_text_set(ui.song_remaining_view, timebuff, ts);
 }
 
 void ui_hide_libpath_popup()

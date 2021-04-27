@@ -24,6 +24,7 @@ void ui_play_update_volume(float ratio);
 #include "player.c"
 #include "songlist.c"
 #include "tg_knob.c"
+#include "ui_song_infos.c"
 #include "vh_button.c"
 #include "vh_knob.c"
 #include "visible.c"
@@ -67,6 +68,8 @@ void ui_play_controls_attach(view_t* baseview)
 
   vh_button_add(uipc.playbtn, VH_BUTTON_TOGGLE, msg_play_pause_cb);
   vh_button_add(uipc.mutebtn, VH_BUTTON_TOGGLE, msg_play_pause_cb);
+
+  ui_play_update_volume(0.9);
 }
 
 void ui_play_update_position(float ratio)
@@ -82,18 +85,19 @@ void ui_play_update_volume(float ratio)
 void ui_play_index(int index)
 {
   uipc.lastindex = index;
-  /* if (uipc.lastindex < 0) uipc.lastindex = 0; */
-  /* if (uipc.lastindex < visible_song_count()) */
-  /* { */
-  /*   vh_button_set_state(uipc.playbtn, VH_BUTTON_DOWN); */
+  if (uipc.lastindex < 0) uipc.lastindex = 0;
+  if (uipc.lastindex < visible_song_count())
+  {
+    vh_button_set_state(uipc.playbtn, VH_BUTTON_DOWN);
 
-  /*   ui_show_song_info(uipc.lastindex); */
-  /*   map_t* songmap = uipc.songs->data[uipc.lastindex]; */
-  /*   char*  path    = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", config_get("lib_path"), MGET(songmap, "file/path")); */
-  /*   player_play(path); */
-  /*   player_set_volume(0.9); */
-  /*   REL(path); */
-  /* } */
+    ui_song_infos_show(uipc.lastindex);
+    vec_t* songs   = visible_get_songs();
+    map_t* songmap = songs->data[uipc.lastindex];
+    char*  path    = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", config_get("lib_path"), MGET(songmap, "file/path"));
+    player_play(path);
+    player_set_volume(0.9);
+    REL(path);
+  }
 }
 
 void ui_play_next()

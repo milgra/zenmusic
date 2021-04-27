@@ -14,6 +14,7 @@
 #include "ui.c"
 #include "ui_manager.c"
 #include "ui_play_controls.c"
+#include "ui_song_infos.c"
 #include "visible.c"
 #include "wm_connector.c"
 #include "wm_event.c"
@@ -213,23 +214,13 @@ void render(uint32_t time)
       double posratio = phead / player_duration();
       double volratio = player_volume();
 
-      ui_update_time(zm.last_step, player_duration() - zm.last_step, player_duration());
+      ui_song_infos_update_time(zm.last_step, player_duration() - zm.last_step, player_duration());
       ui_play_update_position(posratio);
       ui_play_update_volume(volratio);
     }
 
     ui_update_visualizer();
     ui_update_video();
-  }
-  else
-  {
-    if (zm.last_step < time)
-    {
-      zm.last_step = time + 1000;
-
-      ui_update_time(0.0, 0.0, 0.0);
-      ui_play_update_volume(0.9);
-    }
   }
 
   ui_manager_render(time);
