@@ -12,6 +12,7 @@
 #include "player.c"
 #include "remote.c"
 #include "ui.c"
+#include "ui_lib_init_popup.c"
 #include "ui_manager.c"
 #include "ui_play_controls.c"
 #include "ui_song_infos.c"
@@ -101,7 +102,7 @@ void init(int width, int height, char* path)
   // show library popup if no lib path is saved yet or load library
 
   if (config_get("lib_path") == NULL)
-    ui_show_libpath_popup("Please enter the location of your music library folder.");
+    ui_lib_init_popup_show("Please enter the location of your music library folder.");
   else
     load_library();
 
@@ -272,10 +273,10 @@ void on_change_library(void* userdata, void* data)
 
     load_library();
 
-    ui_hide_libpath_popup();
+    ui_lib_init_popup_hide();
   }
   else
-    ui_show_libpath_popup("Location doesn't exists, please enter valid location.");
+    ui_lib_init_popup_show("Location doesn't exists, please enter valid location.");
 
   REL(lib_path);
 }

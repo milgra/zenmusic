@@ -6,11 +6,9 @@
 
 void ui_init();
 void ui_load(float width, float height, char* respath);
-void ui_show_libpath_popup(char* message); // request library path
-void ui_hide_libpath_popup();              // hide library path popup
-void ui_show_query(char* text);            // show query in search/query field
-void ui_set_org_btn_lbl(char* text);       // sets label of organize library button
-void ui_toggle_baseview(view_t* view);     // shows/hides subview on baseview
+void ui_show_query(char* text);        // show query in search/query field
+void ui_set_org_btn_lbl(char* text);   // sets label of organize library button
+void ui_toggle_baseview(view_t* view); // shows/hides subview on baseview
 
 #endif
 
@@ -28,6 +26,8 @@ void ui_toggle_baseview(view_t* view);     // shows/hides subview on baseview
 #include "ui_alert_popup.c"
 #include "ui_donate_popup.c"
 #include "ui_editor_popup.c"
+#include "ui_lib_change_popup.c"
+#include "ui_lib_init_popup.c"
 #include "ui_manager.c"
 #include "ui_play_controls.c"
 #include "ui_popup_switcher.c"
@@ -56,9 +56,6 @@ struct _ui_t
   view_t*     set_col_val;
   view_t*     chlib_pop_if;
   view_t*     set_org_btn_txt;
-  view_t*     slibpopup_textfield_view;
-  view_t*     slibpopup_inputfield_view;
-  view_t*     library_page;
   textlist_t* artistlist;
   textlist_t* genrelist;
 } ui = {0};
@@ -72,8 +69,10 @@ void ui_on_song_header(char* id);
 void ui_on_genre_select(int index);
 void ui_on_artist_select(int index);
 void ui_filter(view_t* view);
+
 void ui_show_libpath_popup1(char* text);
 void ui_show_liborg_popup(char* text);
+
 void ui_on_songlistpopup_select(int index);
 
 void ui_init()
@@ -107,6 +106,8 @@ void ui_load(float width,
   ui_visualizer_init();
   ui_alert_popup_init();
   ui_popup_switcher_init();
+  ui_lib_init_popup_init();
+  ui_lib_change_popup_init();
 
   // view setup with inited callbacks
 
@@ -121,6 +122,8 @@ void ui_load(float width,
   ui_song_infos_attach(ui.baseview, ui.fontpath);
   ui_visualizer_attach(ui.baseview);
   ui_alert_popup_attach(ui.baseview, ui.fontpath);
+  ui_lib_init_popup_attach(ui.baseview, ui.fontpath);
+  ui_lib_change_popup_attach(ui.baseview, ui.fontpath);
 
   cb_t* key_cb = cb_new(ui_on_key_down, ui.baseview);
 
@@ -187,17 +190,6 @@ void ui_load(float width,
 
   // lib input popup
 
-  ui.library_page              = view_get_subview(ui.baseview, "library_page");
-  ui.slibpopup_textfield_view  = view_get_subview(ui.baseview, "libtextfield");
-  ui.slibpopup_inputfield_view = view_get_subview(ui.baseview, "libinputfield");
-
-  ts.backcolor = 0;
-
-  tg_text_add(ui.slibpopup_textfield_view);
-  vh_textinput_add(ui.slibpopup_inputfield_view, "/home/youruser/Music", "", ts, NULL);
-
-  view_remove(ui.baseview, ui.library_page);
-
   // decision popup
 
   ts.multiline       = 1;
@@ -220,7 +212,7 @@ void ui_load(float width,
 
   // settings
 
-  ui_settings_popup_attach(view_get_subview(ui.baseview, "settingslist"), ui.fontpath, ui_show_libpath_popup1, ui_show_liborg_popup, NULL);
+  ui_settings_popup_attach(view_get_subview(ui.baseview, "settingslist"), ui.fontpath, NULL, ui_show_liborg_popup, NULL);
 
   // about view
 
@@ -308,16 +300,6 @@ void ui_change_library()
   REL(path_ch);
 }
 
-void ui_set_library()
-{
-  // get path string
-  str_t* path    = vh_textinput_get_text(ui.slibpopup_inputfield_view);
-  char*  path_ch = str_cstring(path);
-
-  callbacks_call("on_change_library", path_ch);
-  REL(path_ch);
-}
-
 void ui_set_organize_lib()
 {
   //char* text = tg_text_get(ui.set_org_btn_txt);
@@ -364,7 +346,6 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "clearbtn") == 0) ui_clear_search();
   if (strcmp(id, "accepteditorbtn") == 0) ui_editor_accept();
   if (strcmp(id, "chlib_pop_acc_btn") == 0) ui_change_library();
-  if (strcmp(id, "acceptlibbtn") == 0) ui_set_library();
 
   // if (strcmp(id, "filterbtn") == 0) ui_on_filter_activate(MGET(ui.popup_views, "filters_popup_page"));
 
@@ -433,15 +414,6 @@ void ui_toggle_pause(int state)
   ui_songlist_toggle_pause(state);
 }
 
-void ui_hide_libpath_popup()
-{
-  if (ui.library_page->parent)
-  {
-    ui_manager_remove(ui.library_page);
-    ui_manager_add(ui.baseview);
-  }
-}
-
 void ui_show_libpath_popup1(char* text)
 {
   ui_popup_switcher_toggle("library_popup_page");
@@ -450,27 +422,6 @@ void ui_show_libpath_popup1(char* text)
 void ui_show_liborg_popup(char* text)
 {
   ui_popup_switcher_toggle("decision_popup_page");
-}
-
-void ui_show_libpath_popup(char* text)
-{
-  textstyle_t ts = {0};
-  ts.font        = ui.fontpath;
-  ts.align       = TA_CENTER;
-  ts.size        = 30.0;
-  ts.textcolor   = 0x000000FF;
-  ts.backcolor   = 0;
-
-  tg_text_set(ui.slibpopup_textfield_view, text, ts);
-
-  if (!ui.library_page->parent)
-  {
-    ui_manager_remove(ui.baseview);
-    ui_manager_add(ui.library_page);
-  }
-
-  vh_textinput_activate(ui.slibpopup_inputfield_view, 1); // activate text input
-  ui_manager_activate(ui.slibpopup_inputfield_view);      // set text input as event receiver
 }
 
 void ui_on_songlistpopup_select(int index)
