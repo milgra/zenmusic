@@ -39,9 +39,9 @@ void ui_lib_init_popup_attach(view_t* baseview, char* fontpath)
 {
   ulip.fontpath                 = fontpath;
   ulip.baseview                 = baseview;
-  ulip.lib_init_popup           = view_get_subview(baseview, "library_page");
-  ulip.lib_init_textfield_view  = view_get_subview(baseview, "libtextfield");
-  ulip.lib_init_inputfield_view = view_get_subview(baseview, "libinputfield");
+  ulip.lib_init_popup           = view_get_subview(baseview, "lib_init_page");
+  ulip.lib_init_textfield_view  = view_get_subview(baseview, "lib_init_textfield");
+  ulip.lib_init_inputfield_view = view_get_subview(baseview, "lib_init_inputfield");
 
   textstyle_t ts  = {0};
   ts.font         = fontpath;

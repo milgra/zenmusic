@@ -54,7 +54,6 @@ struct _ui_t
   char*       fontpath;
   view_t*     songlist_filter_bar;
   view_t*     set_col_val;
-  view_t*     chlib_pop_if;
   view_t*     set_org_btn_txt;
   textlist_t* artistlist;
   textlist_t* genrelist;
@@ -70,7 +69,6 @@ void ui_on_genre_select(int index);
 void ui_on_artist_select(int index);
 void ui_filter(view_t* view);
 
-void ui_show_libpath_popup1(char* text);
 void ui_show_liborg_popup(char* text);
 
 void ui_on_songlistpopup_select(int index);
@@ -197,17 +195,6 @@ void ui_load(float width,
   tg_text_add(dec_pop_tf);
   tg_text_set(dec_pop_tf, "Files will be renamed and moved to different folders based on artist, album, track number and title, are you sure?", ts);
 
-  // change lib popup
-
-  view_t* chlib_pop_tf = view_get_subview(ui.baseview, "chlib_pop_tf");
-  ui.chlib_pop_if      = view_get_subview(ui.baseview, "chlib_pop_if");
-
-  ts.backcolor = 0;
-
-  tg_text_add(chlib_pop_tf);
-  tg_text_set(chlib_pop_tf, "Use library at", ts);
-  vh_textinput_add(ui.chlib_pop_if, "/home/youruser/Music", "", ts, NULL);
-
   // simple popup text
 
   // settings
@@ -290,16 +277,6 @@ void ui_editor_accept()
   /* ui_songlist_refresh(); */
 }
 
-void ui_change_library()
-{
-  // get path string
-  str_t* path    = vh_textinput_get_text(ui.chlib_pop_if);
-  char*  path_ch = str_cstring(path);
-
-  callbacks_call("on_change_library", path_ch);
-  REL(path_ch);
-}
-
 void ui_set_organize_lib()
 {
   //char* text = tg_text_get(ui.set_org_btn_txt);
@@ -345,7 +322,6 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "dec_pop_acc_btn") == 0) ui_set_organize_lib();
   if (strcmp(id, "clearbtn") == 0) ui_clear_search();
   if (strcmp(id, "accepteditorbtn") == 0) ui_editor_accept();
-  if (strcmp(id, "chlib_pop_acc_btn") == 0) ui_change_library();
 
   // if (strcmp(id, "filterbtn") == 0) ui_on_filter_activate(MGET(ui.popup_views, "filters_popup_page"));
 

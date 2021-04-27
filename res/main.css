@@ -647,14 +647,14 @@
     box-shadow: 3px;
 }
 
-#library_page {
+#lib_init_page {
     width: 100%;
     height: 100%;
     display: none;
     align-items: center;
 }
 
-#library_page_back {
+#lib_init_page_back {
     width: 500px;
     height: 150px;
     margin: auto;
@@ -841,7 +841,7 @@
     border-radius: 14px;
 }
 
-#library_popup {
+#lib_change_popup {
     width: 500px;
     height: 180px;
     margin: auto;

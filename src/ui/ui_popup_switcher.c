@@ -37,7 +37,7 @@ void ui_popup_switcher_attach(view_t* baseview)
   ups.popup_names = VNEW();
   ups.popup_views = MNEW();
 
-  VADDR(ups.popup_names, cstr_fromcstring("library_popup_page"));
+  VADDR(ups.popup_names, cstr_fromcstring("lib_change_popup_page"));
   VADDR(ups.popup_names, cstr_fromcstring("song_popup_page"));
   VADDR(ups.popup_names, cstr_fromcstring("messages_popup_page"));
   VADDR(ups.popup_names, cstr_fromcstring("ideditor_popup_page"));
