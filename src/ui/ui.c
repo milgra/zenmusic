@@ -223,7 +223,10 @@ void ui_load(float width,
   // init activity
 
   activity_init();
-  //activity_attach(view_get_subview(ui.baseview, "messagelist"), ui.song_info_view, ts);
+  activity_attach(view_get_subview(ui.baseview, "messagelist"), view_get_subview(ui.baseview, "info"), ts);
+
+  cb_t* msg_show_cb = cb_new(ui_on_button_down, NULL);
+  vh_button_add(view_get_subview(ui.baseview, "info"), VH_BUTTON_NORMAL, msg_show_cb);
 
   // query field
 
@@ -493,7 +496,9 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "closesettingsbtn") == 0) ui_toggle_baseview(MGET(ui.popup_views, "settings_popup_page"));
   if (strcmp(id, "aboutbtn") == 0) ui_toggle_baseview(MGET(ui.popup_views, "about_popup_page"));
   if (strcmp(id, "editbtn") == 0) ui_toggle_baseview(MGET(ui.popup_views, "ideditor_popup_page"));
+
   if (strcmp(id, "info") == 0) ui_toggle_baseview(MGET(ui.popup_views, "messages_popup_page"));
+
   if (strcmp(id, "closefilterbtn") == 0) ui_toggle_baseview(MGET(ui.popup_views, "filters_popup_page"));
   if (strcmp(id, "closeeditorbtn") == 0) ui_toggle_baseview(MGET(ui.popup_views, "ideditor_popup_page"));
   if (strcmp(id, "accepteditorbtn") == 0) ui_editor_accept();

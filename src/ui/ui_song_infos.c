@@ -55,10 +55,6 @@ void ui_song_infos_attach(view_t* baseview, char* fontpath)
   tg_text_add(uisi.song_remaining_view);
 
   ui_song_infos_update_time(0.0, 0.0, 0.0);
-
-  // cb_t* msg_show_cb = cb_new(ui_on_button_down, NULL);
-
-  // vh_button_add(uisi.song_info_view, VH_BUTTON_NORMAL, msg_show_cb);
 }
 
 void ui_song_infos_update_time(double time, double left, double dur)
