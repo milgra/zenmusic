@@ -15,6 +15,7 @@
 #include "ui_manager.c"
 #include "ui_play_controls.c"
 #include "ui_song_infos.c"
+#include "ui_songlist.c"
 #include "ui_visualizer.c"
 #include "visible.c"
 #include "wm_connector.c"
@@ -137,7 +138,7 @@ void update(ev_t ev)
           // filter and sort current db and show in ui partial analysis result
 
           visible_set_sortfield("meta/artist", 0);
-          ui_refresh_songlist();
+          ui_songlist_refresh();
         }
       }
       else
@@ -153,7 +154,7 @@ void update(ev_t ev)
         }
 
         visible_set_sortfield("meta/artist", 0);
-        ui_refresh_songlist();
+        ui_songlist_refresh();
       }
 
       // cleanup, ownership was passed with the channel from analyzer
@@ -292,7 +293,7 @@ void on_change_organize(void* userdata, void* data)
   {
     int succ = lib_organize(config_get("lib_path"), db_get_db());
     if (succ == 0) db_write(config_get("lib_path"));
-    ui_refresh_songlist();
+    ui_songlist_refresh();
   }
 }
 
@@ -301,7 +302,7 @@ void on_song_header(void* userdata, void* data)
   char* id = data;
 
   visible_set_sortfield(id, 1);
-  ui_refresh_songlist();
+  ui_songlist_refresh();
 }
 
 void on_filter_songs(void* userdata, void* data)
@@ -309,7 +310,7 @@ void on_filter_songs(void* userdata, void* data)
   char* text = str_cstring((str_t*)data);
 
   visible_set_filter(text);
-  ui_reload_songlist();
+  ui_songlist_update();
 }
 
 void on_genre_select(void* userdata, void* data)
@@ -318,7 +319,7 @@ void on_genre_select(void* userdata, void* data)
   char* query = cstr_fromformat(100, "genre is %s", genre);
 
   visible_set_filter(query);
-  ui_reload_songlist();
+  ui_songlist_update();
   ui_show_query(query);
 }
 
@@ -328,6 +329,6 @@ void on_artist_select(void* userdata, void* data)
   char* query  = cstr_fromformat(100, "artist is %s", artist);
 
   visible_set_filter(query);
-  ui_reload_songlist();
+  ui_songlist_update();
   ui_show_query(query);
 }

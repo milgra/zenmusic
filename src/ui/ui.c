@@ -23,7 +23,6 @@ void ui_show_simple_popup(char* text);
 #include "callbacks.c"
 #include "config.c"
 #include "database.c"
-#include "donatelist.c"
 #include "editor.c"
 #include "editor_popup.c"
 #include "itemlist.c"
@@ -31,15 +30,16 @@ void ui_show_simple_popup(char* text);
 #include "mtnumber.c"
 #include "player.c"
 #include "settingslist.c"
-#include "songlist.c"
 #include "songlistpopup.c"
 #include "textlist.c"
 #include "tg_css.c"
 #include "tg_picker.c"
 #include "tg_text.c"
+#include "ui_donate_popup.c"
 #include "ui_manager.c"
 #include "ui_play_controls.c"
 #include "ui_song_infos.c"
+#include "ui_songlist.c"
 #include "ui_visualizer.c"
 #include "vh_anim.c"
 #include "vh_button.c"
@@ -157,7 +157,7 @@ void ui_load(float width,
 
   // list setup
 
-  songlist_attach(ui.baseview, ui.fontpath, ui_play_index, ui_on_song_edit, ui_on_song_header);
+  ui_songlist_attach(ui.baseview, ui.fontpath, ui_play_index, ui_on_song_edit, ui_on_song_header);
 
   ts.align        = TA_RIGHT;
   ts.margin_right = 20;
@@ -250,7 +250,7 @@ void ui_load(float width,
 
   // about view
 
-  donatelist_attach(view_get_subview(ui.baseview, "aboutlist"), ui.fontpath, ui_show_simple_popup);
+  ui_donate_popup_attach(view_get_subview(ui.baseview, "aboutlist"), ui.fontpath, ui_show_simple_popup);
 
   // attach songlistpopup to song_popup_list view
 
@@ -379,7 +379,7 @@ void ui_editor_accept()
   /* callbacks_call("on_save_entry", old_data); */
 
   /* // reload song list */
-  /* songlist_refresh(); */
+  /* ui_songlist_refresh(); */
 }
 
 void ui_change_library()
@@ -525,7 +525,7 @@ void ui_set_org_btn_lbl(char* text)
 
 void ui_toggle_pause(int state)
 {
-  songlist_toggle_pause(state);
+  ui_songlist_toggle_pause(state);
 }
 
 void ui_hide_libpath_popup()
@@ -586,13 +586,13 @@ void ui_on_songlistpopup_select(int index)
 {
   ui_toggle_baseview(MGET(ui.popup_views, "song_popup_page"));
 
-  if (index == 0) songlist_select(index);
-  if (index == 1) songlist_select_range(index);
-  if (index == 2) songlist_select_all();
+  if (index == 0) ui_songlist_select(index);
+  if (index == 1) ui_songlist_select_range(index);
+  if (index == 2) ui_songlist_select_all();
   if (index == 3)
   {
     vec_reset(ui.selected);
-    songlist_get_selected(ui.selected);
+    ui_songlist_get_selected(ui.selected);
     editor_popup_set_songs(ui.selected, config_get("lib_path"));
     ui_toggle_baseview(MGET(ui.popup_views, "ideditor_popup_page"));
   }
@@ -607,16 +607,6 @@ void ui_filter(view_t* view)
   str_t* text = vh_textinput_get_text(view);
 
   callbacks_call("on_filter_songs", text);
-}
-
-void ui_refresh_songlist()
-{
-  songlist_refresh();
-}
-
-void ui_reload_songlist()
-{
-  songlist_update();
 }
 
 void ui_show_query(char* text)

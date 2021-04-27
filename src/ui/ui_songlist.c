@@ -1,22 +1,19 @@
-/*
-  songlist table and events handler
- */
-#ifndef songlist_h
-#define songlist_h
+#ifndef ui_songlist_h
+#define ui_songlist_h
 
 #include "mtmap.c"
 #include "view.c"
 
-void songlist_select(int index);
-void songlist_select_all();
-void songlist_select_range(int index);
-void songlist_get_selected(vec_t* vec);
+void ui_songlist_select(int index);
+void ui_songlist_select_all();
+void ui_songlist_select_range(int index);
+void ui_songlist_get_selected(vec_t* vec);
 
-void songlist_attach(view_t* base, char* fontpath, void (*on_select)(int), void (*on_edit)(int), void (*on_header_select)(char*));
-void songlist_update();
-void songlist_refresh();
-void songlist_toggle_pause(int state);
-void songlist_select_and_show(int index);
+void ui_songlist_attach(view_t* base, char* fontpath, void (*on_select)(int), void (*on_edit)(int), void (*on_header_select)(char*));
+void ui_songlist_update();
+void ui_songlist_refresh();
+void ui_songlist_toggle_pause(int state);
+void ui_songlist_select_and_show(int index);
 
 #endif
 
@@ -35,7 +32,7 @@ void on_header_field_select(view_t* view, char* id, ev_t ev);
 void on_header_field_insert(view_t* view, int src, int tgt);
 void on_header_field_resize(view_t* view, char* id, int size);
 
-struct songlist_t
+struct ui_songlist_t
 {
   view_t*     view;   // table view
   vec_t*      cache;  // item cache
@@ -68,17 +65,17 @@ sl_cell_t* sl_cell_new(char* id, int size, int index)
   return cell;
 }
 
-void songlist_update()
+void ui_songlist_update()
 {
   vh_list_reset(sl.view);
 }
 
-void songlist_refresh()
+void ui_songlist_refresh()
 {
   vh_list_refresh(sl.view);
 }
 
-void songlist_toggle_pause(int state)
+void ui_songlist_toggle_pause(int state)
 {
   if (state)
     sl.color_s = 0xFF5555FF;
@@ -138,20 +135,20 @@ void on_header_field_resize(view_t* view, char* id, int size)
   }
 }
 
-void songlist_select(int index)
+void ui_songlist_select(int index)
 {
   selection_res();
   selection_add(sl.index_s);
   vh_list_refresh(sl.view);
 }
 
-void songlist_select_range(int index)
+void ui_songlist_select_range(int index)
 {
   selection_rng(sl.index_s);
   vh_list_refresh(sl.view);
 }
 
-void songlist_select_all()
+void ui_songlist_select_all()
 {
   selection_res();
   selection_add(0);
@@ -159,14 +156,14 @@ void songlist_select_all()
   vh_list_refresh(sl.view);
 }
 
-void songlist_get_selected(vec_t* vec)
+void ui_songlist_get_selected(vec_t* vec)
 {
   // if selection is empty, select current index
   if (selection_cnt() < 2) selection_add(sl.index_s);
   selection_add_selection(visible_get_songs(), vec);
 }
 
-void songlist_select_and_show(int index)
+void ui_songlist_select_and_show(int index)
 {
   selection_res();
   selection_add(index);
@@ -175,7 +172,7 @@ void songlist_select_and_show(int index)
 
 // items
 
-void songlist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
+void ui_songlist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
   sl.index_s = index;
   if (ev.button == 1)
@@ -216,7 +213,7 @@ view_t* songitem_create()
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
 
   vh_litem_add(rowview, NULL);
-  vh_litem_set_on_select(rowview, songlist_on_item_select);
+  vh_litem_set_on_select(rowview, ui_songlist_on_item_select);
 
   sl_cell_t* cell;
   while ((cell = VNXT(sl.fields)))
@@ -261,12 +258,12 @@ void songitem_update_row(view_t* rowview, int index, map_t* file, uint32_t color
   tg_text_set(vh_litem_get_cell(rowview, "index"), indbuffer, sl.textstyle);
 }
 
-void songlist_item_recycle(view_t* item)
+void ui_songlist_item_recycle(view_t* item)
 {
   VADD(sl.cache, item);
 }
 
-view_t* songlist_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
+view_t* ui_songlist_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
 {
   if (index < 0)
     return NULL; // no items before 0
@@ -298,11 +295,11 @@ view_t* songlist_item_for_index(int index, void* userdata, view_t* listview, int
   return item;
 }
 
-void songlist_attach(view_t* base,
-                     char*   fontpath,
-                     void (*on_select)(int),
-                     void (*on_edit)(int),
-                     void (*on_header_select)(char*))
+void ui_songlist_attach(view_t* base,
+                        char*   fontpath,
+                        void (*on_select)(int),
+                        void (*on_edit)(int),
+                        void (*on_header_select)(char*))
 {
   assert(base != NULL);
   assert(fontpath != NULL);
@@ -378,8 +375,8 @@ void songlist_attach(view_t* base,
 
   vh_list_add(sl.view,
               ((vh_list_inset_t){30, 200, 0, 10}),
-              songlist_item_for_index,
-              songlist_item_recycle,
+              ui_songlist_item_for_index,
+              ui_songlist_item_recycle,
               NULL);
   vh_list_set_header(sl.view, header);
 }

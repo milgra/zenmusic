@@ -1,13 +1,13 @@
-#ifndef donatelist_h
-#define donatelist_h
+#ifndef ui_donate_popup_h
+#define ui_donate_popup_h
 
 #include "mtmap.c"
 #include "view.c"
 
-void donatelist_attach(view_t* base, char* fontpath, void (*popup)(char* text));
-void donatelist_update();
-void donatelist_refresh();
-void donatelist_toggle_pause(int state);
+void ui_donate_popup_attach(view_t* base, char* fontpath, void (*popup)(char* text));
+void ui_donate_popup_update();
+void ui_donate_popup_refresh();
+void ui_donate_popup_toggle_pause(int state);
 
 #endif
 
@@ -22,11 +22,11 @@ void donatelist_toggle_pause(int state);
 #include "vh_list_item.c"
 #include "visible.c"
 
-void donatelist_on_header_field_select(view_t* view, char* id, ev_t ev);
-void donatelist_on_header_field_insert(view_t* view, int src, int tgt);
-void donatelist_on_header_field_resize(view_t* view, char* id, int size);
+void ui_donate_popup_on_header_field_select(view_t* view, char* id, ev_t ev);
+void ui_donate_popup_on_header_field_insert(view_t* view, int src, int tgt);
+void ui_donate_popup_on_header_field_resize(view_t* view, char* id, int size);
 
-struct donatelist_t
+struct ui_donate_popup_t
 {
   view_t*     view;   // table view
   vec_t*      fields; // fileds in table
@@ -53,22 +53,22 @@ sl_cell_t* donl_cell_new(char* id, int size, int index)
   return cell;
 }
 
-void donatelist_update()
+void ui_donate_popup_update()
 {
   vh_list_reset(donl.view);
 }
 
-void donatelist_refresh()
+void ui_donate_popup_refresh()
 {
   vh_list_refresh(donl.view);
 }
 
-void donatelist_on_header_field_select(view_t* view, char* id, ev_t ev)
+void ui_donate_popup_on_header_field_select(view_t* view, char* id, ev_t ev)
 {
   // (*donl.on_header_select)(id);
 }
 
-void donatelist_on_header_field_insert(view_t* view, int src, int tgt)
+void ui_donate_popup_on_header_field_insert(view_t* view, int src, int tgt)
 {
   // update in fields so new items will use updated order
   sl_cell_t* cell = donl.fields->data[src];
@@ -87,7 +87,7 @@ void donatelist_on_header_field_insert(view_t* view, int src, int tgt)
   }
 }
 
-void donatelist_on_header_field_resize(view_t* view, char* id, int size)
+void ui_donate_popup_on_header_field_resize(view_t* view, char* id, int size)
 {
   // update in fields so new items will use updated size
   for (int i = 0; i < donl.fields->length; i++)
@@ -111,7 +111,7 @@ void donatelist_on_header_field_resize(view_t* view, char* id, int size)
 
 // items
 
-void donatelist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
+void ui_donate_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
   if (donl.popup) (*donl.popup)("The link is opened in the browser.");
 
@@ -143,7 +143,7 @@ view_t* donateitem_create(int index)
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 460, height});
 
   vh_litem_add(rowview, NULL);
-  vh_litem_set_on_select(rowview, donatelist_on_item_select);
+  vh_litem_set_on_select(rowview, ui_donate_popup_on_item_select);
 
   sl_cell_t* cell;
   while ((cell = VNXT(donl.fields)))
@@ -171,7 +171,7 @@ void donateitem_update_row(view_t* rowview, int index, char* field)
   tg_text_set(vh_litem_get_cell(rowview, "field"), field, donl.textstyle);
 }
 
-view_t* donatelist_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
+view_t* ui_donate_popup_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
 {
   if (index < 0)
     return NULL; // no items before 0
@@ -183,7 +183,7 @@ view_t* donatelist_item_for_index(int index, void* userdata, view_t* listview, i
   return donl.items->data[index];
 }
 
-void donatelist_attach(view_t* view, char* fontpath, void (*popup)(char* text))
+void ui_donate_popup_attach(view_t* view, char* fontpath, void (*popup)(char* text))
 {
   assert(fontpath != NULL);
 
@@ -209,7 +209,7 @@ void donatelist_attach(view_t* view, char* fontpath, void (*popup)(char* text))
 
   vh_list_add(donl.view,
               ((vh_list_inset_t){0, 0, 0, 0}),
-              donatelist_item_for_index, NULL, NULL);
+              ui_donate_popup_item_for_index, NULL, NULL);
 
   // create items
 

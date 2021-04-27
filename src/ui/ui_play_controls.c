@@ -22,9 +22,9 @@ void ui_play_update_volume(float ratio);
 #include "config.c"
 #include "mtcstring.c"
 #include "player.c"
-#include "songlist.c"
 #include "tg_knob.c"
 #include "ui_song_infos.c"
+#include "ui_songlist.c"
 #include "vh_button.c"
 #include "vh_knob.c"
 #include "visible.c"
@@ -107,7 +107,7 @@ void ui_play_next()
   else
     ui_play_index(uipc.lastindex + 1);
 
-  songlist_select_and_show(uipc.lastindex);
+  ui_songlist_select_and_show(uipc.lastindex);
 }
 
 void ui_play_prev()
@@ -117,7 +117,7 @@ void ui_play_prev()
   else
     ui_play_index(uipc.lastindex - 1);
 
-  songlist_select_and_show(uipc.lastindex);
+  ui_songlist_select_and_show(uipc.lastindex);
 }
 
 void ui_play_pause()
