@@ -5,13 +5,7 @@
 #include "view.c"
 
 void ui_init();
-void ui_load(float width,
-             float height,
-             char* respath);
-void ui_update_position(float ratio);
-void ui_update_volume(float ratio);
-void ui_update_visualizer();
-void ui_update_video();
+void ui_load(float width, float height, char* respath);
 void ui_toggle_pause(int state);
 void ui_show_libpath_popup(char* message);
 void ui_hide_libpath_popup();
@@ -46,6 +40,7 @@ void ui_show_simple_popup(char* text);
 #include "ui_manager.c"
 #include "ui_play_controls.c"
 #include "ui_song_infos.c"
+#include "ui_visualizer.c"
 #include "vh_anim.c"
 #include "vh_button.c"
 #include "vh_key.c"
@@ -63,8 +58,6 @@ void ui_show_simple_popup(char* text);
 
 struct _ui_t
 {
-  vec_t* songs;
-  int    visu;
   vec_t* selected; // selected songs from songlist
   char*  fontpath; // font path
 
@@ -91,20 +84,9 @@ struct _ui_t
 
   view_t* library_page;
 
-  // visualizer views
-
-  view_t* visuleft;
-  view_t* visuright;
-  view_t* visuvideo;
-  view_t* visuleftbtn;
-  view_t* visurightbtn;
-  view_t* visuleftbtnbck;
-  view_t* visurightbtnbck;
 } ui = {0};
 
 void ui_on_button_down(void* userdata, void* data);
-void ui_on_roll_in_visu(void* userdata, void* data);
-void ui_on_roll_out_visu(void* userdata, void* data);
 void ui_on_song_edit(int index);
 void ui_remove_from_base(view_t* view, void* userdata);
 void ui_on_key_down(void* userdata, void* data);
@@ -124,7 +106,6 @@ void ui_load(float width,
              float height,
              char* respath)
 {
-  ui.songs    = visible_get_songs();
   ui.selected = VNEW();
 
   // init text
@@ -146,6 +127,8 @@ void ui_load(float width,
   callbacks_set("on_button_press", cb_new(ui_on_button_down, NULL));
 
   ui_play_controls_init();
+  ui_song_infos_init();
+  ui_visualizer_init();
 
   // view setup
 
@@ -160,6 +143,8 @@ void ui_load(float width,
 
   ui_song_infos_attach(ui.baseview, ui.fontpath);
 
+  ui_visualizer_attach(ui.baseview);
+
   cb_t* key_cb = cb_new(ui_on_key_down, ui.baseview);
 
   vh_key_add(ui.baseview, key_cb);
@@ -169,33 +154,6 @@ void ui_load(float width,
 
   ui_manager_init(width, height);
   ui_manager_add(ui.baseview);
-
-  // get visualizer views
-
-  ui.visuleft        = view_get_subview(ui.baseview, "visuleft");
-  ui.visuright       = view_get_subview(ui.baseview, "visuright");
-  ui.visuvideo       = view_get_subview(ui.baseview, "visuvideo");
-  ui.visuleftbtn     = view_get_subview(ui.visuleft, "visuleft_btn");
-  ui.visurightbtn    = view_get_subview(ui.visuright, "visuright_btn");
-  ui.visuleftbtnbck  = view_get_subview(ui.visuleft, "visuleft_btn_bck");
-  ui.visurightbtnbck = view_get_subview(ui.visuright, "visuright_btn_bck");
-
-  vh_anim_add(ui.visuleftbtnbck);
-  vh_anim_add(ui.visurightbtnbck);
-
-  /* view_remove(ui.visuleft, ui.visuleftbtn); */
-  /* view_remove(ui.visuright, ui.visurightbtn); */
-
-  // visualise roll over
-
-  cb_t* cb_roll_in_visu  = cb_new(ui_on_roll_in_visu, NULL);
-  cb_t* cb_roll_out_visu = cb_new(ui_on_roll_out_visu, NULL);
-
-  vh_roll_add(ui.visuleft, cb_roll_in_visu, cb_roll_out_visu);
-  vh_roll_add(ui.visuright, cb_roll_in_visu, cb_roll_out_visu);
-
-  vh_anim_alpha(ui.visuleftbtnbck, 1.0, 0.0, 10, AT_LINEAR);
-  vh_anim_alpha(ui.visurightbtnbck, 1.0, 0.0, 10, AT_LINEAR);
 
   // list setup
 
@@ -452,11 +410,6 @@ void ui_set_organize_lib()
   callbacks_call("on_change_organize", "Enable");
 }
 
-void ui_change_visu()
-{
-  ui.visu = 1 - ui.visu;
-}
-
 void ui_on_filter_activate(view_t* view)
 {
   textlist_update(ui.genrelist);
@@ -507,8 +460,6 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "library_popup_close_btn") == 0) ui_toggle_baseview(MGET(ui.popup_views, "library_popup_page"));
   if (strcmp(id, "dec_pop_acc_btn") == 0) ui_set_organize_lib();
   if (strcmp(id, "filterbtn") == 0) ui_on_filter_activate(MGET(ui.popup_views, "filters_popup_page"));
-  if (strcmp(id, "visuright_btn") == 0) ui_change_visu();
-  if (strcmp(id, "visuleft_btn") == 0) ui_change_visu();
   if (strcmp(id, "clearbtn") == 0) ui_clear_search();
 
   if (strcmp(id, "song_popup_page_btn") == 0) ui_toggle_baseview(MGET(ui.popup_views, "song_popup_page"));
@@ -559,18 +510,6 @@ void ui_on_artist_select(int index)
   callbacks_call("on_artist_selected", artist);
 }
 
-void ui_on_roll_in_visu(void* userdata, void* data)
-{
-  vh_anim_alpha(ui.visuleftbtnbck, 0.0, 1.0, 10, AT_LINEAR);
-  vh_anim_alpha(ui.visurightbtnbck, 1.0, 0.0, 10, AT_LINEAR);
-}
-
-void ui_on_roll_out_visu(void* userdata, void* data)
-{
-  vh_anim_alpha(ui.visuleftbtnbck, 1.0, 0.0, 10, AT_LINEAR);
-  vh_anim_alpha(ui.visurightbtnbck, 1.0, 0.0, 10, AT_LINEAR);
-}
-
 void ui_set_org_btn_lbl(char* text)
 {
   // TODO get style from css
@@ -587,29 +526,6 @@ void ui_set_org_btn_lbl(char* text)
 void ui_toggle_pause(int state)
 {
   songlist_toggle_pause(state);
-}
-
-void ui_update_visualizer()
-{
-  if (ui.visu)
-  {
-    player_draw_rdft(0, ui.visuleft->texture.bitmap, 3);
-    player_draw_rdft(1, ui.visuright->texture.bitmap, 3);
-  }
-  else
-  {
-    player_draw_waves(0, ui.visuleft->texture.bitmap, 3);
-    player_draw_waves(1, ui.visuright->texture.bitmap, 3);
-  }
-
-  ui.visuleft->texture.changed  = 1;
-  ui.visuright->texture.changed = 1;
-}
-
-void ui_update_video()
-{
-  player_draw_video(ui.visuvideo->texture.bitmap, 3);
-  ui.visuvideo->texture.changed = 1;
 }
 
 void ui_hide_libpath_popup()

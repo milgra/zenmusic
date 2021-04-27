@@ -15,6 +15,7 @@
 #include "ui_manager.c"
 #include "ui_play_controls.c"
 #include "ui_song_infos.c"
+#include "ui_visualizer.c"
 #include "visible.c"
 #include "wm_connector.c"
 #include "wm_event.c"
@@ -219,8 +220,8 @@ void render(uint32_t time)
       ui_play_update_volume(volratio);
     }
 
-    ui_update_visualizer();
-    ui_update_video();
+    ui_visualizer_update();
+    ui_visualizer_update_video();
   }
 
   ui_manager_render(time);
