@@ -12,6 +12,7 @@
 #include "player.c"
 #include "remote.c"
 #include "ui.c"
+#include "ui_filter_bar.c"
 #include "ui_lib_init_popup.c"
 #include "ui_manager.c"
 #include "ui_play_controls.c"
@@ -346,7 +347,7 @@ void on_genre_select(void* userdata, void* data)
 
   visible_set_filter(query);
   ui_songlist_update();
-  ui_show_query(query);
+  ui_filter_bar_show_query(query);
 }
 
 void on_artist_select(void* userdata, void* data)
@@ -356,5 +357,5 @@ void on_artist_select(void* userdata, void* data)
 
   visible_set_filter(query);
   ui_songlist_update();
-  ui_show_query(query);
+  ui_filter_bar_show_query(query);
 }

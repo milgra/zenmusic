@@ -24,6 +24,7 @@ void ui_toggle_baseview(view_t* view); // shows/hides subview on baseview
 #include "ui_alert_popup.c"
 #include "ui_donate_popup.c"
 #include "ui_editor_popup.c"
+#include "ui_filter_bar.c"
 #include "ui_filter_popup.c"
 #include "ui_lib_change_popup.c"
 #include "ui_lib_init_popup.c"
@@ -48,7 +49,6 @@ void ui_toggle_baseview(view_t* view); // shows/hides subview on baseview
 struct _ui_t
 {
   view_t* baseview;
-  view_t* songlist_filter_bar;
 } ui = {0};
 
 void ui_toggle_pause(int state);
@@ -83,6 +83,7 @@ void ui_load(float width, float height)
   ui_lib_change_popup_init();
   ui_filter_popup_init();
   ui_activity_popup_init();
+  ui_filter_bar_init();
 
   // view setup with inited callbacks
 
@@ -106,6 +107,7 @@ void ui_load(float width, float height)
   ui_settings_popup_attach(view_get_subview(ui.baseview, "settingslist"), config_get("font_path"), NULL, ui_show_liborg_popup, NULL);
   ui_donate_popup_attach(view_get_subview(ui.baseview, "aboutlist"), config_get("font_path"), NULL);
   ui_song_menu_popup_attach(view_get_subview(ui.baseview, "song_popup_list"), config_get("font_path"), NULL);
+  ui_filter_bar_attach(ui.baseview);
 
   view_set_frame(ui.baseview, (r2_t){0.0, 0.0, (float)width, (float)height});
   view_layout(ui.baseview);
@@ -124,26 +126,15 @@ void ui_load(float width, float height)
   view_t* main      = view_get_subview(ui.baseview, "main");
   main->needs_touch = 0;
 
-  ui.songlist_filter_bar                          = view_get_subview(ui.baseview, "filterfield");
-  ui.songlist_filter_bar->layout.background_color = 0xFFFFFFFF;
-
   textstyle_t ts  = {0};
   ts.font         = config_get("font_path");
   ts.size         = 30.0;
-  ts.textcolor    = 0x000000FF;
-  ts.backcolor    = 0;
-  ts.align        = TA_RIGHT;
   ts.margin_right = 20;
+  ts.align        = TA_LEFT;
+  ts.textcolor    = 0x000000FF;
+  ts.backcolor    = 0xFFFFFFFF;
+  ts.multiline    = 1;
 
-  ts.align     = TA_LEFT;
-  ts.textcolor = 0x000000FF;
-  ts.backcolor = 0xFFFFFFFF;
-
-  vh_textinput_add(ui.songlist_filter_bar, "", "Search/Filter", ts, NULL);
-  vh_textinput_set_on_text(ui.songlist_filter_bar, ui_filter);
-  //vh_textinput_set_on_activate(ui.songlist_filter_bar, ui_on_filter_activate);
-
-  ts.multiline       = 1;
   view_t* dec_pop_tf = view_get_subview(ui.baseview, "dec_pop_tf");
   tg_text_add(dec_pop_tf);
   tg_text_set(dec_pop_tf, "Files will be renamed and moved to different folders based on artist, album, track number and title, are you sure?", ts);
@@ -178,12 +169,6 @@ void ui_set_organize_lib()
   callbacks_call("on_change_organize", "Enable");
 }
 
-void ui_clear_search()
-{
-  vh_textinput_set_text(ui.songlist_filter_bar, "");
-  ui_manager_activate(ui.songlist_filter_bar);
-}
-
 void ui_on_key_down(void* userdata, void* data)
 {
   if (userdata == ui.baseview)
@@ -205,7 +190,6 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "app_close_btn") == 0) wm_close();
 
   if (strcmp(id, "dec_pop_acc_btn") == 0) ui_set_organize_lib();
-  if (strcmp(id, "clearbtn") == 0) ui_clear_search();
 
   // if (strcmp(id, "filterbtn") == 0) ui_on_filter_activate(MGET(ui.popup_views, "filters_popup_page"));
 
@@ -238,18 +222,6 @@ void ui_toggle_pause(int state)
 void ui_show_liborg_popup(char* text)
 {
   ui_popup_switcher_toggle("decision_popup_page");
-}
-
-void ui_filter(view_t* view)
-{
-  str_t* text = vh_textinput_get_text(view);
-
-  callbacks_call("on_filter_songs", text);
-}
-
-void ui_show_query(char* text)
-{
-  vh_textinput_set_text(ui.songlist_filter_bar, text);
 }
 
 #endif
