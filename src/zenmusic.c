@@ -64,7 +64,6 @@ void init(int width, int height, char* path)
   zm.rem_ch = ch_new(10);  // remote channel
 
   db_init();
-  ui_init();
   config_init();
   player_init();
   visible_init();

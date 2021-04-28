@@ -5,12 +5,13 @@
 #include "view.c"
 
 void ui_activity_popup_init();
-void ui_activity_popup_attach(view_t* logview, view_t* notifview, char* fontpath);
+void ui_activity_popup_attach(view_t* baseview);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "config.c"
 #include "mtlog.c"
 #include "textlist.c"
 #include "tg_text.c"
@@ -63,10 +64,13 @@ void ui_activity_popup_init()
   log_set_proxy(ui_activity_popup_log);
 }
 
-void ui_activity_popup_attach(view_t* logview, view_t* notifview, char* fontpath)
+void ui_activity_popup_attach(view_t* baseview)
 {
+  view_t* listview = view_get_subview(baseview, "messages_popup_list");
+  view_t* infoview = view_get_subview(baseview, "song_info");
+
   textstyle_t ts = {0};
-  ts.font        = fontpath;
+  ts.font        = config_get("font_path");
   ts.size        = 30.0;
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0x0;
@@ -74,8 +78,8 @@ void ui_activity_popup_attach(view_t* logview, view_t* notifview, char* fontpath
   ts.margin      = 10.0;
 
   act.style = ts;
-  act.list  = textlist_new(logview, act.logs, ts, ui_activity_popup_select);
-  act.info  = notifview;
+  act.list  = textlist_new(listview, act.logs, ts, ui_activity_popup_select);
+  act.info  = infoview;
 
   act.style.align = TA_CENTER;
 }

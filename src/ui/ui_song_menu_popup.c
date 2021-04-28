@@ -4,7 +4,7 @@
 #include "mtmap.c"
 #include "view.c"
 
-void ui_song_menu_popup_attach(view_t* view, char* fontpath, void (*on_select)(int));
+void ui_song_menu_popup_attach(view_t* view);
 void ui_song_menu_popup_update();
 void ui_song_menu_popup_refresh();
 void ui_song_menu_popup_toggle_pause(int state);
@@ -125,7 +125,7 @@ void ui_song_menu_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* 
   {
     vec_t* selected = VNEW();
     ui_songlist_get_selected(selected);
-    ui_editor_popup_set_songs(selected, config_get("lib_path"));
+    ui_editor_popup_set_songs(selected);
     ui_popup_switcher_toggle("ideditor_popup_page");
     REL(selected);
   }
@@ -183,15 +183,13 @@ view_t* ui_song_menu_popup_item_for_index(int index, void* userdata, view_t* lis
   return slp.items->data[index];
 }
 
-void ui_song_menu_popup_attach(view_t* view, char* fontpath, void (*on_select)(int))
+void ui_song_menu_popup_attach(view_t* baseview)
 {
-  assert(fontpath != NULL);
-
-  slp.view   = view;
+  slp.view   = view_get_subview(baseview, "song_popup_list");
   slp.fields = VNEW();
   slp.items  = VNEW();
 
-  slp.textstyle.font      = fontpath;
+  slp.textstyle.font      = config_get("font_path");
   slp.textstyle.align     = TA_CENTER;
   slp.textstyle.margin    = 10;
   slp.textstyle.size      = 30.0;

@@ -4,7 +4,7 @@
 #include "view.c"
 
 void ui_song_infos_init();
-void ui_song_infos_attach(view_t* baseview, char* fontpath);
+void ui_song_infos_attach(view_t* baseview);
 void ui_song_infos_update_time(double time, double left, double duration);
 void ui_song_infos_show(int index);
 
@@ -12,6 +12,7 @@ void ui_song_infos_show(int index);
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "config.c"
 #include "text.c"
 #include "tg_text.c"
 #include "vh_button.c"
@@ -31,8 +32,15 @@ void ui_song_infos_init()
 {
 }
 
-void ui_song_infos_attach(view_t* baseview, char* fontpath)
+void ui_song_infos_attach(view_t* baseview)
 {
+
+  uisi.fontpath            = config_get("font_path");
+  uisi.song_info_view      = view_get_subview(baseview, "song_info");
+  uisi.song_time_view      = view_get_subview(baseview, "song_info_time");
+  uisi.song_length_view    = view_get_subview(baseview, "song_info_length");
+  uisi.song_remaining_view = view_get_subview(baseview, "song_info_remaining");
+
   textstyle_t ts  = {0};
   ts.font         = uisi.fontpath;
   ts.align        = TA_CENTER;
@@ -41,12 +49,7 @@ void ui_song_infos_attach(view_t* baseview, char* fontpath)
   ts.textcolor    = 0x000000FF;
   ts.backcolor    = 0;
 
-  uisi.fontpath            = fontpath;
-  uisi.textstyle           = ts;
-  uisi.song_info_view      = view_get_subview(baseview, "song_info");
-  uisi.song_time_view      = view_get_subview(baseview, "song_info_time");
-  uisi.song_length_view    = view_get_subview(baseview, "song_info_length");
-  uisi.song_remaining_view = view_get_subview(baseview, "song_info_remaining");
+  uisi.textstyle = ts;
 
   tg_text_add(uisi.song_info_view);
   tg_text_set(uisi.song_info_view, "-", ts);

@@ -4,11 +4,7 @@
 #include "mtmap.c"
 #include "view.c"
 
-void ui_settings_popup_attach(view_t* view,
-                              char*   fontpath,
-                              void (*libpath_popup)(char* text),
-                              void (*liborg_popup)(char* text),
-                              void (*info_popup)(char* text));
+void ui_settings_popup_attach(view_t* view);
 void ui_settings_popup_update();
 void ui_settings_popup_refresh();
 
@@ -16,6 +12,7 @@ void ui_settings_popup_refresh();
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "config.c"
 #include "selection.c"
 #include "tg_css.c"
 #include "tg_text.c"
@@ -34,10 +31,6 @@ struct ui_settings_popup_t
   vec_t*      fields; // fileds in table
   vec_t*      items;
   textstyle_t textstyle;
-
-  void (*libpath_popup)(char* text);
-  void (*liborg_popup)(char* text);
-  void (*info_popup)(char* text);
 } setl = {0};
 
 typedef struct _sl_cell_t
@@ -125,16 +118,16 @@ void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* c
   switch (index)
   {
   case 0:
-    (*setl.libpath_popup)(NULL);
+    //(*setl.libpath_popup)(NULL);
     break;
   case 1:
-    (*setl.liborg_popup)(NULL);
+    //(*setl.liborg_popup)(NULL);
     break;
   case 3:
-    (*setl.info_popup)("You cannot set the config path");
+    //(*setl.info_popup)("You cannot set the config path");
     break;
   case 4:
-    (*setl.info_popup)("You cannot set the style path");
+    //(*setl.info_popup)("You cannot set the style path");
     break;
   }
 }
@@ -188,23 +181,13 @@ view_t* ui_settings_popup_item_for_index(int index, void* userdata, view_t* list
   return setl.items->data[index];
 }
 
-void ui_settings_popup_attach(view_t* view,
-                              char*   fontpath,
-                              void (*libpath_popup)(char* text),
-                              void (*liborg_popup)(char* text),
-                              void (*info_popup)(char* text))
+void ui_settings_popup_attach(view_t* baseview)
 {
-  assert(fontpath != NULL);
-
-  setl.view   = view;
+  setl.view   = view_get_subview(baseview, "settingslist");
   setl.fields = VNEW();
   setl.items  = VNEW();
 
-  setl.libpath_popup = libpath_popup;
-  setl.liborg_popup  = liborg_popup;
-  setl.info_popup    = info_popup;
-
-  setl.textstyle.font        = fontpath;
+  setl.textstyle.font        = config_get("font_path");
   setl.textstyle.align       = 0;
   setl.textstyle.margin_left = 10;
   setl.textstyle.size        = 30.0;

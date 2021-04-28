@@ -4,7 +4,7 @@
 #include "view.c"
 
 void ui_lib_init_popup_init();
-void ui_lib_init_popup_attach(view_t* baseview, char* fontpath);
+void ui_lib_init_popup_attach(view_t* baseview);
 void ui_lib_init_popup_show(char* text);
 void ui_lib_init_popup_hide();
 void ui_lib_init_popup_set_library();
@@ -14,6 +14,7 @@ void ui_lib_init_popup_set_library();
 #if __INCLUDE_LEVEL__ == 0
 
 #include "callbacks.c"
+#include "config.c"
 #include "text.c"
 #include "tg_text.c"
 #include "ui_manager.c"
@@ -35,16 +36,16 @@ void ui_lib_init_popup_init()
   callbacks_set("on_lib_init_button_press", cb_new(ui_lib_init_on_button_down, NULL));
 }
 
-void ui_lib_init_popup_attach(view_t* baseview, char* fontpath)
+void ui_lib_init_popup_attach(view_t* baseview)
 {
-  ulip.fontpath                 = fontpath;
+  ulip.fontpath                 = config_get("font_path");
   ulip.baseview                 = baseview;
   ulip.lib_init_popup           = view_get_subview(baseview, "lib_init_page");
   ulip.lib_init_textfield_view  = view_get_subview(baseview, "lib_init_textfield");
   ulip.lib_init_inputfield_view = view_get_subview(baseview, "lib_init_inputfield");
 
   textstyle_t ts  = {0};
-  ts.font         = fontpath;
+  ts.font         = ulip.fontpath;
   ts.align        = TA_CENTER;
   ts.margin_right = 0;
   ts.size         = 30.0;

@@ -1,10 +1,8 @@
 #ifndef ui_h
 #define ui_h
 
-#include "mtmap.c"
 #include "view.c"
 
-void ui_init();
 void ui_load(float width, float height);
 
 #endif
@@ -47,10 +45,6 @@ void ui_load(float width, float height);
 void ui_on_button_down(void* userdata, void* data);
 void ui_on_key_down(void* userdata, void* data);
 
-void ui_init()
-{
-}
-
 void ui_load(float width, float height)
 {
   text_init();
@@ -61,16 +55,16 @@ void ui_load(float width, float height)
 
   // setup callbacks in subnamespaces
 
-  ui_play_controls_init();
   ui_song_infos_init();
   ui_visualizer_init();
+  ui_filter_bar_init();
   ui_alert_popup_init();
+  ui_filter_popup_init();
+  ui_play_controls_init();
+  ui_activity_popup_init();
   ui_popup_switcher_init();
   ui_lib_init_popup_init();
   ui_lib_change_popup_init();
-  ui_filter_popup_init();
-  ui_activity_popup_init();
-  ui_filter_bar_init();
 
   // view setup with inited callbacks
 
@@ -80,22 +74,6 @@ void ui_load(float width, float height)
                                callbacks_get_data());
 
   view_t* baseview = vec_head(views);
-  view_t* mainview = view_get_subview(baseview, "main");
-
-  ui_play_controls_attach(baseview);
-  ui_song_infos_attach(baseview, config_get("font_path"));
-  ui_visualizer_attach(baseview);
-  ui_alert_popup_attach(baseview, config_get("font_path"));
-  ui_lib_init_popup_attach(baseview, config_get("font_path"));
-  ui_lib_change_popup_attach(baseview, config_get("font_path"));
-  ui_filter_popup_attach(baseview);
-  ui_activity_popup_attach(view_get_subview(baseview, "messagelist"), view_get_subview(baseview, "song_info"), config_get("font_path"));
-  ui_songlist_attach(baseview, config_get("font_path"), ui_play_index, NULL, NULL);
-  ui_editor_popup_attach(view_get_subview(baseview, "song_editor_popup"), config_get("font_path"));
-  ui_settings_popup_attach(view_get_subview(baseview, "settingslist"), config_get("font_path"), NULL, NULL, NULL);
-  ui_donate_popup_attach(view_get_subview(baseview, "aboutlist"), config_get("font_path"), NULL);
-  ui_song_menu_popup_attach(view_get_subview(baseview, "song_popup_list"), config_get("font_path"), NULL);
-  ui_filter_bar_attach(baseview);
 
   // initial layout of views
 
@@ -107,10 +85,28 @@ void ui_load(float width, float height)
   ui_manager_init(width, height);
   ui_manager_add(baseview);
 
+  // attach ui components
+
+  ui_songlist_attach(baseview);
+  ui_song_infos_attach(baseview);
+  ui_visualizer_attach(baseview);
+  ui_filter_bar_attach(baseview);
+  ui_alert_popup_attach(baseview);
+  ui_filter_popup_attach(baseview);
+  ui_editor_popup_attach(baseview);
+  ui_donate_popup_attach(baseview);
+  ui_play_controls_attach(baseview);
+  ui_lib_init_popup_attach(baseview);
+  ui_activity_popup_attach(baseview);
+  ui_settings_popup_attach(baseview);
+  ui_song_menu_popup_attach(baseview);
+  ui_lib_change_popup_attach(baseview);
+
   // setup views
 
-  cb_t* key_cb = cb_new(ui_on_key_down, baseview);
-  cb_t* but_cb = cb_new(ui_on_button_down, NULL);
+  view_t* mainview = view_get_subview(baseview, "main");
+  cb_t*   key_cb   = cb_new(ui_on_key_down, baseview);
+  cb_t*   but_cb   = cb_new(ui_on_button_down, NULL);
 
   mainview->needs_touch = 0;                                                        // don't cover events from songlist
   vh_key_add(baseview, key_cb);                                                     // listen on baseview for shortcuts
@@ -156,18 +152,18 @@ void ui_on_button_down(void* userdata, void* data)
 {
   char* id = ((view_t*)data)->id;
 
-  if (strcmp(id, "maxbtn") == 0) wm_toggle_fullscreen();
   if (strcmp(id, "app_close_btn") == 0) wm_close();
+  if (strcmp(id, "app_maximize_btn") == 0) wm_toggle_fullscreen();
 
   // todo sanitize button names
 
-  if (strcmp(id, "settingsbtn") == 0) ui_popup_switcher_toggle("settings_popup_page");
-  if (strcmp(id, "closesettingsbtn") == 0) ui_popup_switcher_toggle("settings_popup_page");
-  if (strcmp(id, "aboutbtn") == 0) ui_popup_switcher_toggle("about_popup_page");
   if (strcmp(id, "editbtn") == 0) ui_popup_switcher_toggle("ideditor_popup_page");
+  if (strcmp(id, "aboutbtn") == 0) ui_popup_switcher_toggle("about_popup_page");
   if (strcmp(id, "song_info") == 0) ui_popup_switcher_toggle("messages_popup_page");
+  if (strcmp(id, "settingsbtn") == 0) ui_popup_switcher_toggle("settings_popup_page");
   if (strcmp(id, "closefilterbtn") == 0) ui_popup_switcher_toggle("filters_popup_page");
   if (strcmp(id, "closeeditorbtn") == 0) ui_popup_switcher_toggle("ideditor_popup_page");
+  if (strcmp(id, "closesettingsbtn") == 0) ui_popup_switcher_toggle("settings_popup_page");
   if (strcmp(id, "library_popup_close_btn") == 0) ui_popup_switcher_toggle("library_popup_page");
 }
 

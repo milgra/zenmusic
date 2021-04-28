@@ -4,7 +4,7 @@
 #include "mtmap.c"
 #include "view.c"
 
-void ui_donate_popup_attach(view_t* base, char* fontpath, void (*popup)(char* text));
+void ui_donate_popup_attach(view_t* base);
 void ui_donate_popup_update();
 void ui_donate_popup_refresh();
 
@@ -12,6 +12,7 @@ void ui_donate_popup_refresh();
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "config.c"
 #include "selection.c"
 #include "tg_css.c"
 #include "tg_text.c"
@@ -182,16 +183,13 @@ view_t* ui_donate_popup_item_for_index(int index, void* userdata, view_t* listvi
   return donl.items->data[index];
 }
 
-void ui_donate_popup_attach(view_t* view, char* fontpath, void (*popup)(char* text))
+void ui_donate_popup_attach(view_t* baseview)
 {
-  assert(fontpath != NULL);
-
-  donl.view   = view;
+  donl.view   = view_get_subview(baseview, "aboutlist");
   donl.fields = VNEW();
   donl.items  = VNEW();
-  donl.popup  = popup;
 
-  donl.textstyle.font      = fontpath;
+  donl.textstyle.font      = config_get("font_path");
   donl.textstyle.align     = TA_CENTER;
   donl.textstyle.margin    = 10;
   donl.textstyle.size      = 30.0;

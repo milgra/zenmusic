@@ -9,7 +9,7 @@ void ui_songlist_select_all();
 void ui_songlist_select_range(int index);
 void ui_songlist_get_selected(vec_t* vec);
 
-void ui_songlist_attach(view_t* base, char* fontpath, void (*on_select)(int), void (*on_edit)(int), void (*on_header_select)(char*));
+void ui_songlist_attach(view_t* base);
 void ui_songlist_update();
 void ui_songlist_refresh();
 void ui_songlist_toggle_pause(int state);
@@ -20,6 +20,7 @@ void ui_songlist_select_and_show(int index);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "callbacks.c"
+#include "config.c"
 #include "selection.c"
 #include "tg_css.c"
 #include "tg_text.c"
@@ -299,14 +300,9 @@ view_t* ui_songlist_item_for_index(int index, void* userdata, view_t* listview, 
   return item;
 }
 
-void ui_songlist_attach(view_t* base,
-                        char*   fontpath,
-                        void (*on_select)(int),
-                        void (*on_edit)(int),
-                        void (*on_header_select)(char*))
+void ui_songlist_attach(view_t* base)
 {
   assert(base != NULL);
-  assert(fontpath != NULL);
 
   sl.view   = view_get_subview(base, "songlist");
   sl.cache  = VNEW();
@@ -314,11 +310,7 @@ void ui_songlist_attach(view_t* base,
 
   sl.color_s = 0x55FF55FF;
 
-  sl.on_edit          = on_edit;
-  sl.on_select        = on_select;
-  sl.on_header_select = on_header_select;
-
-  sl.textstyle.font        = fontpath;
+  sl.textstyle.font        = config_get("font_path");
   sl.textstyle.align       = 0;
   sl.textstyle.margin_left = 10;
   sl.textstyle.size        = 30.0;

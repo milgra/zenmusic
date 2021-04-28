@@ -4,8 +4,8 @@
 #include "mtmap.c"
 #include "view.c"
 
-void   ui_editor_popup_attach(view_t* view, char* fontpath);
-void   ui_editor_popup_set_songs(vec_t* vec, char* libpath);
+void   ui_editor_popup_attach(view_t* view);
+void   ui_editor_popup_set_songs(vec_t* vec);
 map_t* ui_editor_popup_get_changed();
 vec_t* ui_editor_popup_get_removed();
 char*  ui_editor_popup_get_cover();
@@ -14,6 +14,7 @@ char*  ui_editor_popup_get_cover();
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "config.c"
 #include "editor.c"
 #include "mtcallback.c"
 #include "mtcstring.c"
@@ -282,7 +283,7 @@ void ui_editor_popup_on_button_down(void* userdata, void* data)
 {
 }
 
-void ui_editor_popup_attach(view_t* view, char* fontpath)
+void ui_editor_popup_attach(view_t* view)
 {
   view_t* listview  = view_get_subview(view, "editorlist");
   view_t* headview  = view_get_subview(view, "ideditorheader");
@@ -293,7 +294,7 @@ void ui_editor_popup_attach(view_t* view, char* fontpath)
               ui_editor_popup_item_for_index, NULL, NULL);
 
   textstyle_t ts = {0};
-  ts.font        = fontpath;
+  ts.font        = config_get("font_path");
   ts.margin      = 10.0;
   ts.align       = TA_LEFT;
   ts.size        = 30.0;
@@ -347,7 +348,7 @@ char* ui_editor_popup_get_cover()
   return ep.cover;
 }
 
-void ui_editor_popup_set_songs(vec_t* vec, char* libpath)
+void ui_editor_popup_set_songs(vec_t* vec)
 {
   if (vec->length > 0)
   {
@@ -399,7 +400,7 @@ void ui_editor_popup_set_songs(vec_t* vec, char* libpath)
 
     map_t* song = vec->data[0];
     char*  path = MGET(song, "file/path");
-    char*  file = cstr_fromformat(100, "%s%s", libpath, path);
+    char*  file = cstr_fromformat(100, "%s%s", config_get("lib_path"), path);
 
     editor_get_album(file, ep.coverview->texture.bitmap);
 
