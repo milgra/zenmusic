@@ -5,7 +5,7 @@
 #include "view.c"
 
 void ui_init();
-void ui_load(float width, float height, char* respath);
+void ui_load(float width, float height);
 void ui_show_query(char* text);        // show query in search/query field
 void ui_set_org_btn_lbl(char* text);   // sets label of organize library button
 void ui_toggle_baseview(view_t* view); // shows/hides subview on baseview
@@ -70,21 +70,9 @@ void ui_init()
 {
 }
 
-void ui_load(float width,
-             float height,
-             char* respath)
+void ui_load(float width, float height)
 {
   text_init();
-
-  ui.fontpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/Baloo.ttf", respath);
-
-  textstyle_t ts  = {0};
-  ts.font         = ui.fontpath;
-  ts.align        = TA_CENTER;
-  ts.margin_right = 0;
-  ts.size         = 30.0;
-  ts.textcolor    = 0x000000FF;
-  ts.backcolor    = 0;
 
   // event setup
 
@@ -102,19 +90,19 @@ void ui_load(float width,
 
   // view setup with inited callbacks
 
-  char* csspath  = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/main.css", respath);
-  char* htmlpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/main.html", respath);
-
-  vec_t* views = view_gen_load(htmlpath, csspath, respath, callbacks_get_data());
+  vec_t* views = view_gen_load(config_get("html_path"),
+                               config_get("css_path"),
+                               config_get("res_path"),
+                               callbacks_get_data());
 
   ui.baseview = vec_head(views);
 
   ui_play_controls_attach(ui.baseview);
-  ui_song_infos_attach(ui.baseview, ui.fontpath);
+  ui_song_infos_attach(ui.baseview, config_get("font_path"));
   ui_visualizer_attach(ui.baseview);
-  ui_alert_popup_attach(ui.baseview, ui.fontpath);
-  ui_lib_init_popup_attach(ui.baseview, ui.fontpath);
-  ui_lib_change_popup_attach(ui.baseview, ui.fontpath);
+  ui_alert_popup_attach(ui.baseview, config_get("font_path"));
+  ui_lib_init_popup_attach(ui.baseview, config_get("font_path"));
+  ui_lib_change_popup_attach(ui.baseview, config_get("font_path"));
 
   cb_t* key_cb = cb_new(ui_on_key_down, ui.baseview);
 
@@ -128,8 +116,13 @@ void ui_load(float width,
 
   // list setup
 
-  ui_songlist_attach(ui.baseview, ui.fontpath, ui_play_index, ui_on_song_edit, ui_on_song_header);
+  ui_songlist_attach(ui.baseview, config_get("font_path"), ui_play_index, ui_on_song_edit, ui_on_song_header);
 
+  textstyle_t ts  = {0};
+  ts.font         = config_get("font_path");
+  ts.size         = 30.0;
+  ts.textcolor    = 0x000000FF;
+  ts.backcolor    = 0;
   ts.align        = TA_RIGHT;
   ts.margin_right = 20;
 
@@ -140,19 +133,10 @@ void ui_load(float width,
 
   // display views
 
-  ts.margin_right = 0;
-  ts.textcolor    = 0x000000FF;
-  ts.backcolor    = 0x0;
-
-  ts.align = TA_LEFT;
-
-  ts.align  = TA_LEFT;
-  ts.margin = 10.0;
-
   // init activity
 
   ui_activity_popup_init();
-  ui_activity_popup_attach(view_get_subview(ui.baseview, "messagelist"), view_get_subview(ui.baseview, "song_info"), ts);
+  ui_activity_popup_attach(view_get_subview(ui.baseview, "messagelist"), view_get_subview(ui.baseview, "song_info"), config_get("font_path"));
 
   cb_t* msg_show_cb = cb_new(ui_on_button_down, NULL);
   vh_button_add(view_get_subview(ui.baseview, "song_info"), VH_BUTTON_NORMAL, msg_show_cb);
@@ -177,7 +161,7 @@ void ui_load(float width,
 
   // song editor
 
-  ui_editor_popup_attach(view_get_subview(ui.baseview, "song_editor_popup"), ui.fontpath);
+  ui_editor_popup_attach(view_get_subview(ui.baseview, "song_editor_popup"), config_get("font_path"));
 
   // lib input popup
 
@@ -192,15 +176,15 @@ void ui_load(float width,
 
   // settings
 
-  ui_settings_popup_attach(view_get_subview(ui.baseview, "settingslist"), ui.fontpath, NULL, ui_show_liborg_popup, NULL);
+  ui_settings_popup_attach(view_get_subview(ui.baseview, "settingslist"), config_get("font_path"), NULL, ui_show_liborg_popup, NULL);
 
   // about view
 
-  ui_donate_popup_attach(view_get_subview(ui.baseview, "aboutlist"), ui.fontpath, NULL);
+  ui_donate_popup_attach(view_get_subview(ui.baseview, "aboutlist"), config_get("font_path"), NULL);
 
   // attach songlistpopup to song_popup_list view
 
-  ui_song_menu_popup_attach(view_get_subview(ui.baseview, "song_popup_list"), ui.fontpath, NULL);
+  ui_song_menu_popup_attach(view_get_subview(ui.baseview, "song_popup_list"), config_get("font_path"), NULL);
 
   // popup setup, it removes views so it has to be the last command
 

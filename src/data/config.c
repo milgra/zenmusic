@@ -4,8 +4,8 @@
 #include "mtmap.c"
 
 void  config_init();
-void  config_read();
-void  config_write();
+void  config_read(char* path);
+void  config_write(char* path);
 void  config_set(char* key, char* value);
 char* config_get(char* key);
 int   config_get_bool(char* key);
@@ -29,9 +29,8 @@ void config_init()
   confmap = MNEW();
 }
 
-void config_read()
+void config_read(char* path)
 {
-  char*  path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/.config/zenmusic/config.kvl", getenv("HOME"));
   map_t* data = MNEW();
 
   kvlist_read(path, data, "id");

@@ -1,6 +1,6 @@
 first version
 
-fontpath configba
+event recorder, event player
 check organize, save entries
 save shuffle state, last played song, last played position
 fix leaks

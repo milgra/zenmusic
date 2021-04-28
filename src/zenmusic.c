@@ -78,13 +78,28 @@ void init(int width, int height, char* path)
   callbacks_set("on_genre_selected", cb_new(on_genre_select, NULL));
   callbacks_set("on_artist_selected", cb_new(on_artist_select, NULL));
 
-  // init config
+  // init paths
 
 #ifndef DEBUG
   char* res_path = cstr_fromstring("/usr/local/share/zenmusic");
 #else
-  char* res_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/../res", path);
+  char* res_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s../res", path);
 #endif
+  char* cfg_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/.config/zenmusic/config.kvl", getenv("HOME"));
+
+  char* css_path  = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/main.css", res_path);
+  char* html_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/main.html", res_path);
+  char* font_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/Baloo.ttf", res_path);
+
+  // print path info to console
+
+  printf("config path   : %s\n", cfg_path);
+  printf("resource path : %s\n", res_path);
+  printf("css path      : %s\n", res_path);
+  printf("html path     : %s\n", html_path);
+  printf("font path     : %s\n", font_path);
+
+  // init config
 
   config_set("organize_db", "false");
   config_set("remote_enabled", "false");
@@ -93,11 +108,18 @@ void init(int width, int height, char* path)
 
   // read config, it overwrites defaults if exists
 
-  config_read();
+  config_read(cfg_path);
+
+  // init non-configurable defaults
+
+  config_set("cfg_path", cfg_path);
+  config_set("css_path", css_path);
+  config_set("html_path", html_path);
+  config_set("font_path", font_path);
 
   // load ui from descriptors
 
-  ui_load(width, height, config_get("res_path"));
+  ui_load(width, height);
 
   // show library popup if no lib path is saved yet or load library
 
@@ -114,6 +136,9 @@ void init(int width, int height, char* path)
   }
 
   REL(res_path);
+  REL(css_path);
+  REL(html_path);
+  REL(font_path);
 }
 
 void update(ev_t ev)
@@ -269,7 +294,7 @@ void on_change_library(void* userdata, void* data)
   if (files_path_exists(lib_path))
   {
     config_set("lib_path", lib_path);
-    config_write();
+    config_write(config_get("cfg_path"));
 
     load_library();
 

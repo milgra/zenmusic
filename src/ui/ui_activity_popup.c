@@ -5,7 +5,7 @@
 #include "view.c"
 
 void ui_activity_popup_init();
-void ui_activity_popup_attach(view_t* logview, view_t* notifview, textstyle_t style);
+void ui_activity_popup_attach(view_t* logview, view_t* notifview, char* fontpath);
 
 #endif
 
@@ -63,10 +63,18 @@ void ui_activity_popup_init()
   log_set_proxy(ui_activity_popup_log);
 }
 
-void ui_activity_popup_attach(view_t* logview, view_t* notifview, textstyle_t style)
+void ui_activity_popup_attach(view_t* logview, view_t* notifview, char* fontpath)
 {
-  act.style = style;
-  act.list  = textlist_new(logview, act.logs, style, ui_activity_popup_select);
+  textstyle_t ts = {0};
+  ts.font        = fontpath;
+  ts.size        = 30.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0x0;
+  ts.align       = TA_LEFT;
+  ts.margin      = 10.0;
+
+  act.style = ts;
+  act.list  = textlist_new(logview, act.logs, ts, ui_activity_popup_select);
   act.info  = notifview;
 
   act.style.align = TA_CENTER;
