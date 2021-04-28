@@ -20,12 +20,12 @@ void ui_toggle_baseview(view_t* view); // shows/hides subview on baseview
 #include "mtcstring.c"
 #include "mtnumber.c"
 #include "player.c"
-#include "textlist.c"
 #include "tg_text.c"
 #include "ui_activity_popup.c"
 #include "ui_alert_popup.c"
 #include "ui_donate_popup.c"
 #include "ui_editor_popup.c"
+#include "ui_filter_popup.c"
 #include "ui_lib_change_popup.c"
 #include "ui_lib_init_popup.c"
 #include "ui_manager.c"
@@ -48,11 +48,8 @@ void ui_toggle_baseview(view_t* view); // shows/hides subview on baseview
 
 struct _ui_t
 {
-  view_t*     baseview;
-  char*       fontpath;
-  view_t*     songlist_filter_bar;
-  textlist_t* artistlist;
-  textlist_t* genrelist;
+  view_t* baseview;
+  view_t* songlist_filter_bar;
 } ui = {0};
 
 void ui_toggle_pause(int state);
@@ -61,8 +58,6 @@ void ui_on_song_edit(int index);
 void ui_remove_from_base(view_t* view, void* userdata);
 void ui_on_key_down(void* userdata, void* data);
 void ui_on_song_header(char* id);
-void ui_on_genre_select(int index);
-void ui_on_artist_select(int index);
 void ui_filter(view_t* view);
 void ui_show_liborg_popup(char* text);
 
@@ -87,6 +82,8 @@ void ui_load(float width, float height)
   ui_popup_switcher_init();
   ui_lib_init_popup_init();
   ui_lib_change_popup_init();
+  ui_filter_popup_init();
+  ui_activity_popup_init();
 
   // view setup with inited callbacks
 
@@ -103,6 +100,8 @@ void ui_load(float width, float height)
   ui_alert_popup_attach(ui.baseview, config_get("font_path"));
   ui_lib_init_popup_attach(ui.baseview, config_get("font_path"));
   ui_lib_change_popup_attach(ui.baseview, config_get("font_path"));
+  ui_filter_popup_attach(ui.baseview);
+  ui_activity_popup_attach(view_get_subview(ui.baseview, "messagelist"), view_get_subview(ui.baseview, "song_info"), config_get("font_path"));
 
   cb_t* key_cb = cb_new(ui_on_key_down, ui.baseview);
 
@@ -118,25 +117,7 @@ void ui_load(float width, float height)
 
   ui_songlist_attach(ui.baseview, config_get("font_path"), ui_play_index, ui_on_song_edit, ui_on_song_header);
 
-  textstyle_t ts  = {0};
-  ts.font         = config_get("font_path");
-  ts.size         = 30.0;
-  ts.textcolor    = 0x000000FF;
-  ts.backcolor    = 0;
-  ts.align        = TA_RIGHT;
-  ts.margin_right = 20;
-
-  ui.genrelist = textlist_new(view_get_subview(ui.baseview, "genrelist"), visible_get_genres(), ts, ui_on_genre_select);
-
-  ts.align      = TA_LEFT;
-  ui.artistlist = textlist_new(view_get_subview(ui.baseview, "artistlist"), visible_get_artists(), ts, ui_on_artist_select);
-
   // display views
-
-  // init activity
-
-  ui_activity_popup_init();
-  ui_activity_popup_attach(view_get_subview(ui.baseview, "messagelist"), view_get_subview(ui.baseview, "song_info"), config_get("font_path"));
 
   cb_t* msg_show_cb = cb_new(ui_on_button_down, NULL);
   vh_button_add(view_get_subview(ui.baseview, "song_info"), VH_BUTTON_NORMAL, msg_show_cb);
@@ -148,6 +129,14 @@ void ui_load(float width, float height)
 
   ui.songlist_filter_bar                          = view_get_subview(ui.baseview, "filterfield");
   ui.songlist_filter_bar->layout.background_color = 0xFFFFFFFF;
+
+  textstyle_t ts  = {0};
+  ts.font         = config_get("font_path");
+  ts.size         = 30.0;
+  ts.textcolor    = 0x000000FF;
+  ts.backcolor    = 0;
+  ts.align        = TA_RIGHT;
+  ts.margin_right = 20;
 
   ts.align     = TA_LEFT;
   ts.textcolor = 0x000000FF;
@@ -172,17 +161,9 @@ void ui_load(float width, float height)
   tg_text_add(dec_pop_tf);
   tg_text_set(dec_pop_tf, "Files will be renamed and moved to different folders based on artist, album, track number and title, are you sure?", ts);
 
-  // simple popup text
-
-  // settings
-
   ui_settings_popup_attach(view_get_subview(ui.baseview, "settingslist"), config_get("font_path"), NULL, ui_show_liborg_popup, NULL);
 
-  // about view
-
   ui_donate_popup_attach(view_get_subview(ui.baseview, "aboutlist"), config_get("font_path"), NULL);
-
-  // attach songlistpopup to song_popup_list view
 
   ui_song_menu_popup_attach(view_get_subview(ui.baseview, "song_popup_list"), config_get("font_path"), NULL);
 
@@ -262,14 +243,6 @@ void ui_set_organize_lib()
   callbacks_call("on_change_organize", "Enable");
 }
 
-void ui_on_filter_activate(view_t* view)
-{
-  textlist_update(ui.genrelist);
-  textlist_update(ui.artistlist);
-
-  ui_popup_switcher_toggle("filters_popup_page");
-}
-
 void ui_clear_search()
 {
   vh_textinput_set_text(ui.songlist_filter_bar, "");
@@ -320,24 +293,6 @@ void ui_on_song_edit(int index)
 void ui_on_song_header(char* id)
 {
   callbacks_call("on_song_header", id);
-}
-
-void ui_on_genre_select(int index)
-{
-  printf("on genre select %i\n", index);
-
-  vec_t* genres = visible_get_genres();
-  char*  genre  = genres->data[index];
-  callbacks_call("on_genre_selected", genre);
-}
-
-void ui_on_artist_select(int index)
-{
-  printf("on artist select %i\n", index);
-
-  vec_t* artists = visible_get_artists();
-  char*  artist  = artists->data[index];
-  callbacks_call("on_artist_selected", artist);
 }
 
 void ui_set_org_btn_lbl(char* text)
