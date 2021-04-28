@@ -120,6 +120,8 @@ void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* c
 {
   printf("item select %i\n", index);
 
+  // ui_popup_switcher_toggle("decision_popup_page");
+
   switch (index)
   {
   case 0:

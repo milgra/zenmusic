@@ -19,9 +19,11 @@ void ui_songlist_select_and_show(int index);
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "callbacks.c"
 #include "selection.c"
 #include "tg_css.c"
 #include "tg_text.c"
+#include "ui_popup_switcher.c"
 #include "vh_button.c"
 #include "vh_list.c"
 #include "vh_list_head.c"
@@ -91,7 +93,7 @@ void ui_songlist_toggle_pause(int state)
 
 void on_header_field_select(view_t* view, char* id, ev_t ev)
 {
-  (*sl.on_header_select)(id);
+  callbacks_call("on_song_header", id);
 }
 
 void on_header_field_insert(view_t* view, int src, int tgt)
@@ -194,7 +196,9 @@ void ui_songlist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, e
   }
   else if (ev.button == 3)
   {
-    if (sl.on_edit) (*sl.on_edit)(index);
+
+    ui_popup_switcher_toggle("song_popup_page");
+
     if (selection_cnt() < 2)
     {
       selection_res();

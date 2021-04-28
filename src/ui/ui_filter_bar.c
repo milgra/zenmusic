@@ -35,6 +35,7 @@ void ui_filter_bar_attach(view_t* baseview)
   ufb.songlist_filter_bar->layout.background_color = 0xFFFFFFFF;
 
   // if (strcmp(id, "clearbtn") == 0) ui_filter_bar_clear_search();
+  // if (strcmp(id, "filterbtn") == 0) ui_on_filter_activate(MGET(ui.popup_views, "filters_popup_page"));
 
   textstyle_t ts  = {0};
   ts.font         = config_get("font_path");
