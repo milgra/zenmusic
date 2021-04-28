@@ -313,7 +313,7 @@ void on_change_organize(void* userdata, void* data)
 
   config_set_bool("organize_db", flag);
 
-  ui_set_org_btn_lbl(flag ? "Disable" : "Enable");
+  // ui_set_org_btn_lbl(flag ? "Disable" : "Enable");
 
   if (config_get_bool("organize_db"))
   {

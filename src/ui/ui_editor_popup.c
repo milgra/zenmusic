@@ -15,11 +15,15 @@ char*  ui_editor_popup_get_cover();
 #if __INCLUDE_LEVEL__ == 0
 
 #include "editor.c"
+#include "mtcallback.c"
 #include "mtcstring.c"
 #include "mtvector.c"
 #include "text.c"
 #include "tg_text.c"
+#include "ui_alert_popup.c"
 #include "ui_manager.c"
+#include "ui_popup_switcher.c"
+#include "vh_button.c"
 #include "vh_list.c"
 #include "vh_list_item.c"
 #include "vh_textinput.c"
@@ -274,6 +278,10 @@ void ui_editor_popup_set_song()
   }
 }
 
+void ui_editor_popup_on_button_down(void* userdata, void* data)
+{
+}
+
 void ui_editor_popup_attach(view_t* view, char* fontpath)
 {
   view_t* listview  = view_get_subview(view, "editorlist");
@@ -313,6 +321,11 @@ void ui_editor_popup_attach(view_t* view, char* fontpath)
   view_t* newfieldbtn = view_get_subview(view, "newfieldbtn");
   tg_text_add(newfieldbtn);
   tg_text_set(newfieldbtn, "add new field", ts);
+
+  view_t* acceptbtn = view_get_subview(view, "accepteditorbtn");
+
+  cb_t* but_cb = cb_new(ui_editor_popup_on_button_down, NULL);
+  vh_button_add(acceptbtn, VH_BUTTON_NORMAL, but_cb);
 
   ts.align = TA_CENTER;
   tg_text_add(headview);
@@ -393,6 +406,52 @@ void ui_editor_popup_set_songs(vec_t* vec, char* libpath)
     REL(file);
     ep.coverview->texture.changed = 1;
   }
+}
+
+void ui_editor_popup_accept()
+{
+  ui_popup_switcher_toggle("ideditor_popup_page");
+
+  map_t* changed = ui_editor_popup_get_changed();
+  vec_t* removed = ui_editor_popup_get_removed();
+  char*  cover   = ui_editor_popup_get_cover();
+
+  ui_alert_popup_show("ARE YOU SURE?");
+
+  /* char* libpath = config_get("lib_path"); */
+
+  /* editor_update_metadata(libpath, ui.selected, changed, removed, cover); */
+
+  // update metadata in media files
+
+  // update metadata in database
+
+  // organize library ( if path has to change )
+
+  /* map_t* old_data = ui_editor_popup_get_old_data(); */
+  /* map_t* new_data = ui_editor_popup_get_new_data(); */
+
+  /* // update modified entity in database */
+  /* vec_t* keys = VNEW(); */
+  /* map_keys(new_data, keys); */
+  /* for (int index = 0; index < keys->length; index++) */
+  /* { */
+  /*   char* key    = keys->data[index]; */
+  /*   char* oldval = MGET(old_data, key); */
+  /*   char* newval = MGET(new_data, key); */
+
+  /*   if (strcmp(oldval, newval) != 0) */
+  /*   { */
+  /*     printf("%s changed from %s to %s, writing to db\n", key, oldval, newval); */
+  /*     MPUT(old_data, key, newval); */
+  /*   } */
+  /* } */
+
+  /* // notify main namespace to organize and save metadata and database */
+  /* callbacks_call("on_save_entry", old_data); */
+
+  /* // reload song list */
+  /* ui_songlist_refresh(); */
 }
 
 #endif
