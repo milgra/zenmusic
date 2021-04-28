@@ -46,17 +46,20 @@ void ui_play_on_mute_button_down(view_t* view);
 void ui_play_on_position_change(view_t* view, float angle);
 void ui_play_on_volume_change(view_t* view, float angle);
 
-void ui_play_controls_init()
-{
-  callbacks_set("on_play_button_press", cb_new(ui_play_on_button_down, NULL));
-}
-
 void ui_play_controls_attach(view_t* baseview)
 {
   uipc.seekknob = view_get_subview(baseview, "seekknob");
   uipc.playbtn  = view_get_subview(baseview, "playbtn");
   uipc.volknob  = view_get_subview(baseview, "volknob");
   uipc.mutebtn  = view_get_subview(baseview, "mutebtn");
+
+  cb_t* cb_btn_press = cb_new(ui_play_on_button_down, NULL);
+
+  vh_button_add(uipc.playbtn, VH_BUTTON_NORMAL, cb_btn_press);
+  vh_button_add(uipc.mutebtn, VH_BUTTON_NORMAL, cb_btn_press);
+  vh_button_add(view_get_subview(baseview, "nextbtn"), VH_BUTTON_NORMAL, cb_btn_press);
+  vh_button_add(view_get_subview(baseview, "prevbtn"), VH_BUTTON_NORMAL, cb_btn_press);
+  vh_button_add(view_get_subview(baseview, "shufflebtn"), VH_BUTTON_NORMAL, cb_btn_press);
 
   tg_knob_add(uipc.seekknob);
   vh_knob_add(uipc.seekknob, ui_play_on_position_change, ui_play_on_play_button_down);

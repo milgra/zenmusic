@@ -3,7 +3,6 @@
 
 #include "view.c"
 
-void ui_song_infos_init();
 void ui_song_infos_attach(view_t* baseview);
 void ui_song_infos_update_time(double time, double left, double duration);
 void ui_song_infos_show(int index);
@@ -15,7 +14,6 @@ void ui_song_infos_show(int index);
 #include "config.c"
 #include "text.c"
 #include "tg_text.c"
-#include "vh_button.c"
 #include "visible.c"
 
 struct ui_song_infos_t
@@ -27,10 +25,6 @@ struct ui_song_infos_t
   textstyle_t textstyle;
   char*       fontpath;
 } uisi;
-
-void ui_song_infos_init()
-{
-}
 
 void ui_song_infos_attach(view_t* baseview)
 {

@@ -3,7 +3,6 @@
 
 #include "view.c"
 
-void ui_visualizer_init();
 void ui_visualizer_attach(view_t* baseview);
 void ui_visualizer_update();
 void ui_visualizer_update_video();
@@ -12,14 +11,15 @@ void ui_visualizer_update_video();
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "callbacks.c"
 #include "mtcallback.c"
 #include "player.c"
 #include "vh_anim.c"
+#include "vh_button.c"
 #include "vh_roll.c"
 
 struct vizualizer_t
 {
+  int     visu;
   view_t* visuleft;
   view_t* visuright;
   view_t* visuvideo;
@@ -27,17 +27,11 @@ struct vizualizer_t
   view_t* visurightbtn;
   view_t* visuleftbtnbck;
   view_t* visurightbtnbck;
-  int     visu;
 } uiv;
 
 void ui_visualizer_on_roll_in(void* userdata, void* data);
 void ui_visualizer_on_roll_out(void* userdata, void* data);
 void ui_visualizer_on_button_down(void* userdata, void* data);
-
-void ui_visualizer_init()
-{
-  callbacks_set("on_visualizer_button_press", cb_new(ui_visualizer_on_button_down, NULL));
-}
 
 void ui_visualizer_attach(view_t* baseview)
 {
@@ -57,8 +51,12 @@ void ui_visualizer_attach(view_t* baseview)
 
   // visualise roll over
 
+  cb_t* cb_btn_press     = cb_new(ui_visualizer_on_button_down, NULL);
   cb_t* cb_roll_in_visu  = cb_new(ui_visualizer_on_roll_in, NULL);
   cb_t* cb_roll_out_visu = cb_new(ui_visualizer_on_roll_out, NULL);
+
+  vh_button_add(uiv.visuleftbtn, VH_BUTTON_NORMAL, cb_btn_press);
+  vh_button_add(uiv.visurightbtn, VH_BUTTON_NORMAL, cb_btn_press);
 
   vh_roll_add(uiv.visuleft, cb_roll_in_visu, cb_roll_out_visu);
   vh_roll_add(uiv.visuright, cb_roll_in_visu, cb_roll_out_visu);

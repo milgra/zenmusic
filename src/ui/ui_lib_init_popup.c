@@ -3,7 +3,6 @@
 
 #include "view.c"
 
-void ui_lib_init_popup_init();
 void ui_lib_init_popup_attach(view_t* baseview);
 void ui_lib_init_popup_show(char* text);
 void ui_lib_init_popup_hide();
@@ -15,9 +14,11 @@ void ui_lib_init_popup_set_library();
 
 #include "callbacks.c"
 #include "config.c"
+#include "mtcallback.c"
 #include "text.c"
 #include "tg_text.c"
 #include "ui_manager.c"
+#include "vh_button.c"
 #include "vh_textinput.c"
 
 struct _ui_lib_init_popup_t
@@ -31,11 +32,6 @@ struct _ui_lib_init_popup_t
 
 void ui_lib_init_on_button_down(void* userdata, void* data);
 
-void ui_lib_init_popup_init()
-{
-  callbacks_set("on_lib_init_button_press", cb_new(ui_lib_init_on_button_down, NULL));
-}
-
 void ui_lib_init_popup_attach(view_t* baseview)
 {
   ulip.fontpath                 = config_get("font_path");
@@ -43,6 +39,10 @@ void ui_lib_init_popup_attach(view_t* baseview)
   ulip.lib_init_popup           = view_get_subview(baseview, "lib_init_page");
   ulip.lib_init_textfield_view  = view_get_subview(baseview, "lib_init_textfield");
   ulip.lib_init_inputfield_view = view_get_subview(baseview, "lib_init_inputfield");
+
+  cb_t* cb_btn_press = cb_new(ui_lib_init_on_button_down, NULL);
+
+  vh_button_add(view_get_subview(baseview, "acceptlibbtn"), VH_BUTTON_NORMAL, cb_btn_press);
 
   textstyle_t ts  = {0};
   ts.font         = ulip.fontpath;

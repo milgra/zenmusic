@@ -3,7 +3,6 @@
 
 #include "view.c"
 
-void ui_alert_popup_init();
 void ui_alert_popup_attach(view_t* baseview);
 void ui_alert_popup_show(char* text);
 
@@ -20,10 +19,6 @@ struct _ui_alert_popup_t
   view_t* sim_pop_txt;
   char*   fontpath;
 } uap = {0};
-
-void ui_alert_popup_init()
-{
-}
 
 void ui_alert_popup_attach(view_t* baseview)
 {

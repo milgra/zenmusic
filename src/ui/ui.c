@@ -11,11 +11,8 @@ void ui_load(float width, float height);
 
 #include "callbacks.c"
 #include "config.c"
-#include "itemlist.c"
-#include "mtcstring.c"
 #include "mtnumber.c"
 #include "player.c"
-#include "tg_text.c"
 #include "ui_activity_popup.c"
 #include "ui_alert_popup.c"
 #include "ui_donate_popup.c"
@@ -34,13 +31,9 @@ void ui_load(float width, float height);
 #include "ui_visualizer.c"
 #include "vh_button.c"
 #include "vh_key.c"
-#include "vh_textinput.c"
-#include "vh_touch.c"
 #include "view_generator.c"
 #include "view_layout.c"
-#include "visible.c"
 #include "wm_connector.c"
-#include <limits.h>
 
 void ui_on_button_down(void* userdata, void* data);
 void ui_on_key_down(void* userdata, void* data);
@@ -53,74 +46,53 @@ void ui_load(float width, float height)
 
   callbacks_set("on_button_press", cb_new(ui_on_button_down, NULL));
 
-  // setup callbacks in subnamespaces
+  // view setup with existing callbacks
 
-  ui_song_infos_init();
-  ui_visualizer_init();
-  ui_filter_bar_init();
-  ui_alert_popup_init();
-  ui_filter_popup_init();
-  ui_play_controls_init();
-  ui_activity_popup_init();
-  ui_popup_switcher_init();
-  ui_lib_init_popup_init();
-  ui_lib_change_popup_init();
-
-  // view setup with inited callbacks
-
-  vec_t* views = view_gen_load(config_get("html_path"),
-                               config_get("css_path"),
-                               config_get("res_path"),
-                               callbacks_get_data());
-
-  view_t* baseview = vec_head(views);
+  vec_t*  view_list = view_gen_load(config_get("html_path"), config_get("css_path"), config_get("res_path"), callbacks_get_data());
+  view_t* view_base = vec_head(view_list);
 
   // initial layout of views
 
-  view_set_frame(baseview, (r2_t){0.0, 0.0, (float)width, (float)height});
-  view_layout(baseview);
+  view_set_frame(view_base, (r2_t){0.0, 0.0, (float)width, (float)height});
+  view_layout(view_base);
 
   // setup ui manager
 
   ui_manager_init(width, height);
-  ui_manager_add(baseview);
+  ui_manager_add(view_base);
 
   // attach ui components
 
-  ui_songlist_attach(baseview);
-  ui_song_infos_attach(baseview);
-  ui_visualizer_attach(baseview);
-  ui_filter_bar_attach(baseview);
-  ui_alert_popup_attach(baseview);
-  ui_filter_popup_attach(baseview);
-  ui_editor_popup_attach(baseview);
-  ui_donate_popup_attach(baseview);
-  ui_play_controls_attach(baseview);
-  ui_lib_init_popup_attach(baseview);
-  ui_activity_popup_attach(baseview);
-  ui_settings_popup_attach(baseview);
-  ui_song_menu_popup_attach(baseview);
-  ui_lib_change_popup_attach(baseview);
+  ui_songlist_attach(view_base);
+  ui_song_infos_attach(view_base);
+  ui_visualizer_attach(view_base);
+  ui_filter_bar_attach(view_base);
+  ui_alert_popup_attach(view_base);
+  ui_filter_popup_attach(view_base);
+  ui_editor_popup_attach(view_base);
+  ui_donate_popup_attach(view_base);
+  ui_play_controls_attach(view_base);
+  ui_lib_init_popup_attach(view_base);
+  ui_activity_popup_attach(view_base);
+  ui_settings_popup_attach(view_base);
+  ui_song_menu_popup_attach(view_base);
+  ui_lib_change_popup_attach(view_base);
 
   // setup views
 
-  view_t* mainview = view_get_subview(baseview, "main");
-  cb_t*   key_cb   = cb_new(ui_on_key_down, baseview);
-  cb_t*   but_cb   = cb_new(ui_on_button_down, NULL);
+  view_t* main_view = view_get_subview(view_base, "main");
+  view_t* song_info = view_get_subview(main_view, "song_info");
 
-  mainview->needs_touch = 0;                                                        // don't cover events from songlist
-  vh_key_add(baseview, key_cb);                                                     // listen on baseview for shortcuts
-  vh_button_add(view_get_subview(mainview, "song_info"), VH_BUTTON_NORMAL, but_cb); // show messages on song info click
+  cb_t* key_cb = cb_new(ui_on_key_down, view_base);
+  cb_t* but_cb = cb_new(ui_on_button_down, NULL);
+
+  main_view->needs_touch = 0;                         // don't cover events from songlist
+  vh_key_add(view_base, key_cb);                      // listen on view_base for shortcuts
+  vh_button_add(song_info, VH_BUTTON_NORMAL, but_cb); // show messages on song info click
 
   // finally attach and remove popups, it removes views so it has to be the last command
 
-  ui_popup_switcher_attach(baseview);
-
-  // set glossy effect on header
-
-  /* view_t* header = view_get_subview(baseview, "header"); */
-  /* header->texture.blur = 1; */
-  /* header->texture.shadow = 1; */
+  ui_popup_switcher_attach(view_base);
 
   // show texture map for debug
 
@@ -132,6 +104,12 @@ void ui_load(float width, float height)
   /* texmap->layout.bottom = 1; */
 
   /* ui_manager_add(texmap); */
+
+  // set glossy effect on header
+
+  /* view_t* header = view_get_subview(view_base, "header"); */
+  /* header->texture.blur = 1; */
+  /* header->texture.shadow = 1; */
 }
 
 // key event from base view

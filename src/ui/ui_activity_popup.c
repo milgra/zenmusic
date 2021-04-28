@@ -4,7 +4,6 @@
 #include "text.c"
 #include "view.c"
 
-void ui_activity_popup_init();
 void ui_activity_popup_attach(view_t* baseview);
 
 #endif
@@ -58,14 +57,11 @@ void ui_activity_popup_log(char* log)
   pthread_mutex_unlock(&act.lock);
 }
 
-void ui_activity_popup_init()
+void ui_activity_popup_attach(view_t* baseview)
 {
   act.logs = VNEW();
   log_set_proxy(ui_activity_popup_log);
-}
 
-void ui_activity_popup_attach(view_t* baseview)
-{
   view_t* listview = view_get_subview(baseview, "messages_popup_list");
   view_t* infoview = view_get_subview(baseview, "song_info");
 

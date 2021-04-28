@@ -3,7 +3,6 @@
 
 #include "view.c"
 
-void ui_lib_change_popup_init();
 void ui_lib_change_popup_attach(view_t* baseview);
 void ui_lib_change_popup_show();
 
@@ -17,6 +16,7 @@ void ui_show_libpath_popup1(char* text);
 #include "config.c"
 #include "text.c"
 #include "tg_text.c"
+#include "vh_button.c"
 #include "vh_textinput.c"
 
 struct _ui_lib_change_popup_t
@@ -26,16 +26,15 @@ struct _ui_lib_change_popup_t
 
 void ui_lib_change_on_button_down(void* userdata, void* data);
 
-void ui_lib_change_popup_init()
-{
-  callbacks_set("on_lib_change_button_press", cb_new(ui_lib_change_on_button_down, NULL));
-}
-
 void ui_lib_change_popup_attach(view_t* baseview)
 {
   view_t* lib_change_textfield = view_get_subview(baseview, "lib_change_textfield");
 
   ulcp.lib_change_inputfield = view_get_subview(baseview, "lib_change_inputfield");
+
+  cb_t* cb_btn_press = cb_new(ui_lib_change_on_button_down, NULL);
+
+  vh_button_add(view_get_subview(baseview, "lib_change_accept_btn"), VH_BUTTON_NORMAL, cb_btn_press);
 
   textstyle_t ts  = {0};
   ts.font         = config_get("font_path");

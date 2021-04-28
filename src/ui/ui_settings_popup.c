@@ -16,7 +16,6 @@ void ui_settings_popup_refresh();
 #include "selection.c"
 #include "tg_css.c"
 #include "tg_text.c"
-#include "vh_button.c"
 #include "vh_list.c"
 #include "vh_list_head.c"
 #include "vh_list_item.c"

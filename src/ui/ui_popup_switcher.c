@@ -3,7 +3,6 @@
 
 #include "view.c"
 
-void ui_popup_switcher_init();
 void ui_popup_switcher_attach(view_t* baseview);
 void ui_popup_switcher_toggle(char* id);
 
@@ -26,10 +25,6 @@ struct _ui_popup_switcher_t
 
 void ui_popup_switcher_remove(view_t* view, void* userdata);
 void ui_popup_switcher_on_button_down(void* userdata, void* data);
-
-void ui_popup_switcher_init()
-{
-}
 
 void ui_popup_switcher_attach(view_t* baseview)
 {

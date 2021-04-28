@@ -21,7 +21,6 @@ void ui_song_menu_popup_toggle_pause(int state);
 #include "ui_editor_popup.c"
 #include "ui_popup_switcher.c"
 #include "ui_songlist.c"
-#include "vh_button.c"
 #include "vh_list.c"
 #include "vh_list_head.c"
 #include "vh_list_item.c"

@@ -3,7 +3,6 @@
 
 #include "view.c"
 
-void ui_filter_bar_init();
 void ui_filter_bar_attach(view_t* baseview);
 void ui_filter_bar_clear_search();
 void ui_filter_bar_show_query(char* text);
@@ -15,7 +14,9 @@ void ui_filter_bar_show_query(char* text);
 #include "callbacks.c"
 #include "config.c"
 #include "ui_manager.c"
+#include "ui_songlist.c"
 #include "vh_textinput.c"
+#include "visible.c"
 
 void ui_filter_bar_filter(view_t* view);
 
@@ -24,10 +25,6 @@ struct _ui_filter_bar_t
   view_t* songlist_filter_bar;
 
 } ufb = {0};
-
-void ui_filter_bar_init()
-{
-}
 
 void ui_filter_bar_attach(view_t* baseview)
 {
@@ -58,7 +55,12 @@ void ui_filter_bar_filter(view_t* view)
 {
   str_t* text = vh_textinput_get_text(view);
 
-  callbacks_call("on_filter_songs", text);
+  // callbacks_call("on_filter_songs", text);
+
+  char* ctext = str_cstring(text);
+
+  visible_set_filter(ctext);
+  ui_songlist_update();
 }
 
 void ui_filter_bar_clear_search()

@@ -34,13 +34,8 @@ void render(uint32_t time);
 void destroy();
 
 void load_library();
-
 void on_change_library(void* userdata, void* data);
 void on_change_organize(void* userdata, void* data);
-void on_song_header(void* userdata, void* data);
-void on_genre_select(void* userdata, void* data);
-void on_artist_select(void* userdata, void* data);
-void on_filter_songs(void* userdata, void* data);
 
 struct
 {
@@ -52,7 +47,6 @@ struct
 int main(int argc, char* args[])
 {
   wm_init(init, update, render, destroy);
-
   return 0;
 }
 
@@ -71,12 +65,8 @@ void init(int width, int height, char* path)
 
   // init callbacks
 
-  callbacks_set("on_song_header", cb_new(on_song_header, NULL));
   callbacks_set("on_change_library", cb_new(on_change_library, NULL));
   callbacks_set("on_change_organize", cb_new(on_change_organize, NULL));
-  callbacks_set("on_filter_songs", cb_new(on_filter_songs, NULL));
-  callbacks_set("on_genre_selected", cb_new(on_genre_select, NULL));
-  callbacks_set("on_artist_selected", cb_new(on_artist_select, NULL));
 
   // init paths
 
@@ -121,19 +111,16 @@ void init(int width, int height, char* path)
 
   ui_load(width, height);
 
+  // start listening for remote control events if set
+
+  if (config_get("remote_enabled") && config_get_bool("remote_enabled")) remote_listen(zm.rem_ch);
+
   // show library popup if no lib path is saved yet or load library
 
   if (config_get("lib_path") == NULL)
     ui_lib_init_popup_show("Please enter the location of your music library folder.");
   else
     load_library();
-
-  // start listening for remote control events if set
-
-  if (config_get("remote_enabled"))
-  {
-    if (config_get_bool("remote_enabled")) remote_listen(zm.rem_ch);
-  }
 
   REL(res_path);
   REL(css_path);
@@ -321,40 +308,4 @@ void on_change_organize(void* userdata, void* data)
     if (succ == 0) db_write(config_get("lib_path"));
     ui_songlist_refresh();
   }
-}
-
-void on_song_header(void* userdata, void* data)
-{
-  char* id = data;
-
-  visible_set_sortfield(id, 1);
-  ui_songlist_refresh();
-}
-
-void on_filter_songs(void* userdata, void* data)
-{
-  char* text = str_cstring((str_t*)data);
-
-  visible_set_filter(text);
-  ui_songlist_update();
-}
-
-void on_genre_select(void* userdata, void* data)
-{
-  char* genre = data;
-  char* query = cstr_fromformat(100, "genre is %s", genre);
-
-  visible_set_filter(query);
-  ui_songlist_update();
-  ui_filter_bar_show_query(query);
-}
-
-void on_artist_select(void* userdata, void* data)
-{
-  char* artist = data;
-  char* query  = cstr_fromformat(100, "artist is %s", artist);
-
-  visible_set_filter(query);
-  ui_songlist_update();
-  ui_filter_bar_show_query(query);
 }

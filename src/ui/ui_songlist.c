@@ -19,11 +19,11 @@ void ui_songlist_select_and_show(int index);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "callbacks.c"
 #include "config.c"
 #include "selection.c"
 #include "tg_css.c"
 #include "tg_text.c"
+#include "ui_play_controls.c"
 #include "ui_popup_switcher.c"
 #include "vh_button.c"
 #include "vh_list.c"
@@ -35,20 +35,8 @@ void on_header_field_select(view_t* view, char* id, ev_t ev);
 void on_header_field_insert(view_t* view, int src, int tgt);
 void on_header_field_resize(view_t* view, char* id, int size);
 
-struct ui_songlist_t
-{
-  view_t*     view;   // table view
-  vec_t*      cache;  // item cache
-  vec_t*      fields; // fileds in table
-  textstyle_t textstyle;
-
-  uint32_t color_s; // color selected
-  int32_t  index_s; // index selected
-
-  void (*on_edit)(int index);
-  void (*on_select)(int index);
-  void (*on_header_select)(char* id);
-} sl = {0};
+view_t* ui_songlist_item_for_index(int index, void* userdata, view_t* listview, int* item_count);
+void    ui_songlist_item_recycle(view_t* item);
 
 typedef struct _sl_cell_t
 {
@@ -66,6 +54,96 @@ sl_cell_t* sl_cell_new(char* id, int size, int index)
   cell->index = index;
 
   return cell;
+}
+
+struct ui_songlist_t
+{
+  view_t*     view;   // table view
+  vec_t*      cache;  // item cache
+  vec_t*      fields; // fileds in table
+  textstyle_t textstyle;
+
+  uint32_t color_s; // color selected
+  int32_t  index_s; // index selected
+
+  void (*on_select)(int index);
+} sl = {0};
+
+void ui_songlist_attach(view_t* base)
+{
+  assert(base != NULL);
+
+  sl.view   = view_get_subview(base, "songlist");
+  sl.cache  = VNEW();
+  sl.fields = VNEW();
+
+  sl.color_s = 0x55FF55FF;
+
+  sl.textstyle.font        = config_get("font_path");
+  sl.textstyle.align       = 0;
+  sl.textstyle.margin_left = 10;
+  sl.textstyle.size        = 30.0;
+  sl.textstyle.textcolor   = 0x000000FF;
+  sl.textstyle.backcolor   = 0xF5F5F5FF;
+
+  // create fields
+
+  VADD(sl.fields, sl_cell_new("index", 50, 0));
+  VADD(sl.fields, sl_cell_new("meta/artist", 300, 1));
+  VADD(sl.fields, sl_cell_new("meta/album", 200, 2));
+  VADD(sl.fields, sl_cell_new("meta/title", 300, 3));
+  VADD(sl.fields, sl_cell_new("meta/date", 150, 4));
+  VADD(sl.fields, sl_cell_new("meta/genre", 150, 5));
+  VADD(sl.fields, sl_cell_new("meta/track", 150, 6));
+  VADD(sl.fields, sl_cell_new("meta/disc", 150, 7));
+  VADD(sl.fields, sl_cell_new("file/duration", 100, 8));
+  VADD(sl.fields, sl_cell_new("file/channels", 100, 9));
+  VADD(sl.fields, sl_cell_new("file/bit_rate", 100, 10));
+  VADD(sl.fields, sl_cell_new("file/sample_rate", 100, 11));
+  VADD(sl.fields, sl_cell_new("file/play_count", 150, 12));
+  VADD(sl.fields, sl_cell_new("file/skip_count", 150, 13));
+  VADD(sl.fields, sl_cell_new("file/added", 150, 14));
+  VADD(sl.fields, sl_cell_new("file/last_played", 150, 15));
+  VADD(sl.fields, sl_cell_new("file/last_skipped", 150, 16));
+  VADD(sl.fields, sl_cell_new("file/media_type", 150, 17));
+  VADD(sl.fields, sl_cell_new("file/container", 150, 18));
+
+  vec_dec_retcount(sl.fields);
+
+  // add header handler
+
+  view_t* header = view_new("songlist_header", (r2_t){0, 0, 10, 30});
+  /* header->layout.background_color = 0x333333FF; */
+  /* header->layout.shadow_blur      = 3; */
+  /* header->layout.border_radius    = 3; */
+  tg_css_add(header);
+
+  vh_lhead_add(header);
+  vh_lhead_set_on_select(header, on_header_field_select);
+  vh_lhead_set_on_insert(header, on_header_field_insert);
+  vh_lhead_set_on_resize(header, on_header_field_resize);
+
+  sl_cell_t* cell;
+  while ((cell = VNXT(sl.fields)))
+  {
+    char*   id       = cstr_fromformat(100, "%s%s", header->id, cell->id);
+    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
+    tg_text_add(cellview);
+    tg_text_set(cellview, cell->id, sl.textstyle);
+
+    vh_lhead_add_cell(header, cell->id, cell->size, cellview);
+
+    REL(id);
+  }
+
+  // add list handler to view
+
+  vh_list_add(sl.view,
+              ((vh_list_inset_t){30, 200, 0, 10}),
+              ui_songlist_item_for_index,
+              ui_songlist_item_recycle,
+              NULL);
+  vh_list_set_header(sl.view, header);
 }
 
 void ui_songlist_update()
@@ -94,7 +172,8 @@ void ui_songlist_toggle_pause(int state)
 
 void on_header_field_select(view_t* view, char* id, ev_t ev)
 {
-  callbacks_call("on_song_header", id);
+  visible_set_sortfield(id, 1);
+  ui_songlist_refresh();
 }
 
 void on_header_field_insert(view_t* view, int src, int tgt)
@@ -190,8 +269,12 @@ void ui_songlist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, e
     {
       selection_add(index);
     }
+
     printf("%i %i\n", index, ev.dclick);
-    if (ev.dclick && sl.on_select) (*sl.on_select)(index);
+    if (ev.dclick)
+    {
+      ui_play_index(index);
+    }
 
     vh_list_refresh(sl.view);
   }
@@ -298,83 +381,6 @@ view_t* ui_songlist_item_for_index(int index, void* userdata, view_t* listview, 
   }
 
   return item;
-}
-
-void ui_songlist_attach(view_t* base)
-{
-  assert(base != NULL);
-
-  sl.view   = view_get_subview(base, "songlist");
-  sl.cache  = VNEW();
-  sl.fields = VNEW();
-
-  sl.color_s = 0x55FF55FF;
-
-  sl.textstyle.font        = config_get("font_path");
-  sl.textstyle.align       = 0;
-  sl.textstyle.margin_left = 10;
-  sl.textstyle.size        = 30.0;
-  sl.textstyle.textcolor   = 0x000000FF;
-  sl.textstyle.backcolor   = 0xF5F5F5FF;
-
-  // create fields
-
-  VADD(sl.fields, sl_cell_new("index", 50, 0));
-  VADD(sl.fields, sl_cell_new("meta/artist", 300, 1));
-  VADD(sl.fields, sl_cell_new("meta/album", 200, 2));
-  VADD(sl.fields, sl_cell_new("meta/title", 300, 3));
-  VADD(sl.fields, sl_cell_new("meta/date", 150, 4));
-  VADD(sl.fields, sl_cell_new("meta/genre", 150, 5));
-  VADD(sl.fields, sl_cell_new("meta/track", 150, 6));
-  VADD(sl.fields, sl_cell_new("meta/disc", 150, 7));
-  VADD(sl.fields, sl_cell_new("file/duration", 100, 8));
-  VADD(sl.fields, sl_cell_new("file/channels", 100, 9));
-  VADD(sl.fields, sl_cell_new("file/bit_rate", 100, 10));
-  VADD(sl.fields, sl_cell_new("file/sample_rate", 100, 11));
-  VADD(sl.fields, sl_cell_new("file/play_count", 150, 12));
-  VADD(sl.fields, sl_cell_new("file/skip_count", 150, 13));
-  VADD(sl.fields, sl_cell_new("file/added", 150, 14));
-  VADD(sl.fields, sl_cell_new("file/last_played", 150, 15));
-  VADD(sl.fields, sl_cell_new("file/last_skipped", 150, 16));
-  VADD(sl.fields, sl_cell_new("file/media_type", 150, 17));
-  VADD(sl.fields, sl_cell_new("file/container", 150, 18));
-
-  vec_dec_retcount(sl.fields);
-
-  // add header handler
-
-  view_t* header = view_new("songlist_header", (r2_t){0, 0, 10, 30});
-  /* header->layout.background_color = 0x333333FF; */
-  /* header->layout.shadow_blur      = 3; */
-  /* header->layout.border_radius    = 3; */
-  tg_css_add(header);
-
-  vh_lhead_add(header);
-  vh_lhead_set_on_select(header, on_header_field_select);
-  vh_lhead_set_on_insert(header, on_header_field_insert);
-  vh_lhead_set_on_resize(header, on_header_field_resize);
-
-  sl_cell_t* cell;
-  while ((cell = VNXT(sl.fields)))
-  {
-    char*   id       = cstr_fromformat(100, "%s%s", header->id, cell->id);
-    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
-    tg_text_add(cellview);
-    tg_text_set(cellview, cell->id, sl.textstyle);
-
-    vh_lhead_add_cell(header, cell->id, cell->size, cellview);
-
-    REL(id);
-  }
-
-  // add list handler to view
-
-  vh_list_add(sl.view,
-              ((vh_list_inset_t){30, 200, 0, 10}),
-              ui_songlist_item_for_index,
-              ui_songlist_item_recycle,
-              NULL);
-  vh_list_set_header(sl.view, header);
 }
 
 #endif
