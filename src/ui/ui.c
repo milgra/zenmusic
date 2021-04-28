@@ -82,8 +82,6 @@ void ui_load(float width, float height)
   view_t* baseview = vec_head(views);
   view_t* mainview = view_get_subview(baseview, "main");
 
-  mainview->needs_touch = 0; // don't cover events from songlist
-
   ui_play_controls_attach(baseview);
   ui_song_infos_attach(baseview, config_get("font_path"));
   ui_visualizer_attach(baseview);
@@ -99,19 +97,26 @@ void ui_load(float width, float height)
   ui_song_menu_popup_attach(view_get_subview(baseview, "song_popup_list"), config_get("font_path"), NULL);
   ui_filter_bar_attach(baseview);
 
+  // initial layout of views
+
   view_set_frame(baseview, (r2_t){0.0, 0.0, (float)width, (float)height});
   view_layout(baseview);
+
+  // setup ui manager
 
   ui_manager_init(width, height);
   ui_manager_add(baseview);
 
+  // setup views
+
   cb_t* key_cb = cb_new(ui_on_key_down, baseview);
   cb_t* but_cb = cb_new(ui_on_button_down, NULL);
 
+  mainview->needs_touch = 0;                                                        // don't cover events from songlist
   vh_key_add(baseview, key_cb);                                                     // listen on baseview for shortcuts
-  vh_button_add(view_get_subview(baseview, "song_info"), VH_BUTTON_NORMAL, but_cb); // show messages on song info click
+  vh_button_add(view_get_subview(mainview, "song_info"), VH_BUTTON_NORMAL, but_cb); // show messages on song info click
 
-  // popup setup, it removes views so it has to be the last command
+  // finally attach and remove popups, it removes views so it has to be the last command
 
   ui_popup_switcher_attach(baseview);
 
@@ -133,6 +138,8 @@ void ui_load(float width, float height)
   /* ui_manager_add(texmap); */
 }
 
+// key event from base view
+
 void ui_on_key_down(void* userdata, void* data)
 {
   ev_t* ev = (ev_t*)data;
@@ -143,6 +150,8 @@ void ui_on_key_down(void* userdata, void* data)
   }
 }
 
+// button down event from descriptor html
+
 void ui_on_button_down(void* userdata, void* data)
 {
   char* id = ((view_t*)data)->id;
@@ -151,6 +160,7 @@ void ui_on_button_down(void* userdata, void* data)
   if (strcmp(id, "app_close_btn") == 0) wm_close();
 
   // todo sanitize button names
+
   if (strcmp(id, "settingsbtn") == 0) ui_popup_switcher_toggle("settings_popup_page");
   if (strcmp(id, "closesettingsbtn") == 0) ui_popup_switcher_toggle("settings_popup_page");
   if (strcmp(id, "aboutbtn") == 0) ui_popup_switcher_toggle("about_popup_page");
