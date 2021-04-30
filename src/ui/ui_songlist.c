@@ -80,7 +80,6 @@ void ui_songlist_attach(view_t* base)
   sl.color_s = 0x55FF55FF;
 
   sl.textstyle.font        = config_get("font_path");
-  sl.textstyle.align       = 0;
   sl.textstyle.margin_left = 10;
   sl.textstyle.size        = 30.0;
   sl.textstyle.textcolor   = 0x000000FF;

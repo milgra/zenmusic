@@ -1,5 +1,6 @@
 first version
 
+songlist refactor
 event recorder, event player
 check organize, save entries
 save shuffle state, last played song, last played position
@@ -9,9 +10,12 @@ metadata update eseten sulyos leak, a hatterben tortenjen, analyzer kozben is le
 index col resize problem scorllkor
 UI Recorder - UI player API, -uiscript
 testing - record ui events, inject ui events, check result
+decide which files to read in library
 
 ideas
 
+log sor elejen legyen ora perc, fentrol le mukodjon
+test module playing also
 text style is cssbol jojjon
 rdft ne logaritmikus legyen, alig latszik a kozep tartomany
 search/filter history ( use filters for playlists)

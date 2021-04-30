@@ -69,6 +69,8 @@ void ui_popup_switcher_on_button_down(void* userdata, void* data)
 {
   char* id = ((view_t*)data)->id;
 
+  // todo extract page name programmatically
+
   if (strcmp(id, "song_popup_page_btn") == 0) ui_popup_switcher_toggle("song_popup_page");
   if (strcmp(id, "messages_popup_page_btn") == 0) ui_popup_switcher_toggle("messages_popup_page");
   if (strcmp(id, "ideditor_popup_page_btn") == 0) ui_popup_switcher_toggle("ideditor_popup_page");

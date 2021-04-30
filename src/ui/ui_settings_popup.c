@@ -24,13 +24,17 @@ void ui_settings_popup_on_header_field_select(view_t* view, char* id, ev_t ev);
 void ui_settings_popup_on_header_field_insert(view_t* view, int src, int tgt);
 void ui_settings_popup_on_header_field_resize(view_t* view, char* id, int size);
 
+view_t* ui_settings_popup_item_for_index(int index, void* userdata, view_t* listview, int* item_count);
+view_t* settingsitem_create();
+void    settingsitem_update_row(view_t* rowview, int index, char* field, char* value);
+
 struct ui_settings_popup_t
 {
   view_t*     view;   // table view
   vec_t*      fields; // fileds in table
   vec_t*      items;
   textstyle_t textstyle;
-} setl = {0};
+} uisp = {0};
 
 typedef struct _sl_cell_t
 {
@@ -39,7 +43,7 @@ typedef struct _sl_cell_t
   int   index;
 } sl_cell_t;
 
-sl_cell_t* setl_cell_new(char* id, int size, int index)
+sl_cell_t* uisp_cell_new(char* id, int size, int index)
 {
   sl_cell_t* cell = mem_calloc(sizeof(sl_cell_t), "sl_cell_t", NULL, NULL);
 
@@ -50,34 +54,104 @@ sl_cell_t* setl_cell_new(char* id, int size, int index)
   return cell;
 }
 
+void ui_settings_popup_attach(view_t* baseview)
+{
+  uisp.view   = view_get_subview(baseview, "settingslist");
+  uisp.fields = VNEW();
+  uisp.items  = VNEW();
+
+  uisp.textstyle.font        = config_get("font_path");
+  uisp.textstyle.align       = 0;
+  uisp.textstyle.margin_left = 10;
+  uisp.textstyle.size        = 30.0;
+  uisp.textstyle.textcolor   = 0x000000FF;
+  uisp.textstyle.backcolor   = 0xF5F5F5FF;
+
+  // create fields
+
+  VADD(uisp.fields, uisp_cell_new("key", 300, 0));
+  VADD(uisp.fields, uisp_cell_new("value", 340, 1));
+
+  vec_dec_retcount(uisp.fields);
+
+  // add header handler
+
+  view_t* header = view_new("settingslist_header", (r2_t){0, 0, 10, 30});
+  /* header->layout.background_color = 0x333333FF; */
+  /* header->layout.shadow_blur      = 3; */
+  /* header->layout.border_radius    = 3; */
+  tg_css_add(header);
+
+  vh_lhead_add(header);
+  vh_lhead_set_on_select(header, ui_settings_popup_on_header_field_select);
+  vh_lhead_set_on_insert(header, ui_settings_popup_on_header_field_insert);
+  vh_lhead_set_on_resize(header, ui_settings_popup_on_header_field_resize);
+
+  sl_cell_t* cell;
+  while ((cell = VNXT(uisp.fields)))
+  {
+    char*   id       = cstr_fromformat(100, "%s%s", header->id, cell->id);
+    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
+    REL(id);
+
+    tg_text_add(cellview);
+    tg_text_set(cellview, cell->id, uisp.textstyle);
+
+    vh_lhead_add_cell(header, cell->id, cell->size, cellview);
+  }
+
+  // add list handler to view
+
+  vh_list_add(uisp.view,
+              ((vh_list_inset_t){30, 0, 0, 0}),
+              ui_settings_popup_item_for_index, NULL, NULL);
+  vh_list_set_header(uisp.view, header);
+
+  // create items
+
+  VADD(uisp.items, settingsitem_create());
+  VADD(uisp.items, settingsitem_create());
+  VADD(uisp.items, settingsitem_create());
+  VADD(uisp.items, settingsitem_create());
+  VADD(uisp.items, settingsitem_create());
+  VADD(uisp.items, settingsitem_create());
+
+  settingsitem_update_row(uisp.items->data[0], 0, "Library Path", "/home/user/milgra/Music");
+  settingsitem_update_row(uisp.items->data[1], 1, "Organize Library", "Disabled");
+  settingsitem_update_row(uisp.items->data[2], 2, "Dark Mode", "Disabled");
+  settingsitem_update_row(uisp.items->data[3], 3, "Remote Control", "Disabled");
+  settingsitem_update_row(uisp.items->data[4], 4, "Config Path", "/home/.config/zenmusic/config");
+  settingsitem_update_row(uisp.items->data[5], 5, "Style Path", "/usr/local/share/zenmusic");
+}
+
 void ui_settings_popup_update()
 {
-  vh_list_reset(setl.view);
+  vh_list_reset(uisp.view);
 }
 
 void ui_settings_popup_refresh()
 {
-  vh_list_refresh(setl.view);
+  vh_list_refresh(uisp.view);
 }
 
 void ui_settings_popup_on_header_field_select(view_t* view, char* id, ev_t ev)
 {
-  // (*setl.on_header_select)(id);
+  // (*uisp.on_header_select)(id);
 }
 
 void ui_settings_popup_on_header_field_insert(view_t* view, int src, int tgt)
 {
   // update in fields so new items will use updated order
-  sl_cell_t* cell = setl.fields->data[src];
+  sl_cell_t* cell = uisp.fields->data[src];
 
   RET(cell);
-  VREM(setl.fields, cell);
-  vec_ins(setl.fields, cell, tgt);
+  VREM(uisp.fields, cell);
+  vec_ins(uisp.fields, cell, tgt);
   REL(cell);
 
   // update all items and cache
   view_t* item;
-  vec_t*  items = vh_list_items(setl.view);
+  vec_t*  items = vh_list_items(uisp.view);
   while ((item = VNXT(items)))
   {
     vh_litem_swp_cell(item, src, tgt);
@@ -87,9 +161,9 @@ void ui_settings_popup_on_header_field_insert(view_t* view, int src, int tgt)
 void ui_settings_popup_on_header_field_resize(view_t* view, char* id, int size)
 {
   // update in fields so new items will use updated size
-  for (int i = 0; i < setl.fields->length; i++)
+  for (int i = 0; i < uisp.fields->length; i++)
   {
-    sl_cell_t* cell = setl.fields->data[i];
+    sl_cell_t* cell = uisp.fields->data[i];
     if (strcmp(cell->id, id) == 0)
     {
       cell->size = size;
@@ -99,7 +173,7 @@ void ui_settings_popup_on_header_field_resize(view_t* view, char* id, int size)
 
   // update all items and cache
   view_t* item;
-  vec_t*  items = vh_list_items(setl.view);
+  vec_t*  items = vh_list_items(uisp.view);
   while ((item = VNXT(items)))
   {
     vh_litem_upd_cell_size(item, id, size);
@@ -117,16 +191,16 @@ void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* c
   switch (index)
   {
   case 0:
-    //(*setl.libpath_popup)(NULL);
+    //(*uisp.libpath_popup)(NULL);
     break;
   case 1:
-    //(*setl.liborg_popup)(NULL);
+    //(*uisp.liborg_popup)(NULL);
     break;
   case 3:
-    //(*setl.info_popup)("You cannot set the config path");
+    //(*uisp.info_popup)("You cannot set the config path");
     break;
   case 4:
-    //(*setl.info_popup)("You cannot set the style path");
+    //(*uisp.info_popup)("You cannot set the style path");
     break;
   }
 }
@@ -135,7 +209,7 @@ view_t* settingsitem_create()
 {
   static int item_cnt      = 0;
   char       idbuffer[100] = {0};
-  snprintf(idbuffer, 100, "setlist_item%i", item_cnt++);
+  snprintf(idbuffer, 100, "uispist_item%i", item_cnt++);
 
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 640, 50});
 
@@ -143,7 +217,7 @@ view_t* settingsitem_create()
   vh_litem_set_on_select(rowview, ui_settings_popup_on_item_select);
 
   sl_cell_t* cell;
-  while ((cell = VNXT(setl.fields)))
+  while ((cell = VNXT(uisp.fields)))
   {
     char*   id       = cstr_fromformat(100, "%s%s", rowview->id, cell->id);
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 50});
@@ -160,94 +234,24 @@ view_t* settingsitem_create()
 void settingsitem_update_row(view_t* rowview, int index, char* field, char* value)
 {
   uint32_t color1          = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
-  setl.textstyle.backcolor = color1;
+  uisp.textstyle.backcolor = color1;
 
   vh_litem_upd_index(rowview, index);
 
-  tg_text_set(vh_litem_get_cell(rowview, "key"), field, setl.textstyle);
-  tg_text_set(vh_litem_get_cell(rowview, "value"), value, setl.textstyle);
+  tg_text_set(vh_litem_get_cell(rowview, "key"), field, uisp.textstyle);
+  tg_text_set(vh_litem_get_cell(rowview, "value"), value, uisp.textstyle);
 }
 
 view_t* ui_settings_popup_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
 {
   if (index < 0)
     return NULL; // no items before 0
-  if (index >= setl.items->length)
+  if (index >= uisp.items->length)
     return NULL; // no more items
 
-  *item_count = setl.items->length;
+  *item_count = uisp.items->length;
 
-  return setl.items->data[index];
-}
-
-void ui_settings_popup_attach(view_t* baseview)
-{
-  setl.view   = view_get_subview(baseview, "settingslist");
-  setl.fields = VNEW();
-  setl.items  = VNEW();
-
-  setl.textstyle.font        = config_get("font_path");
-  setl.textstyle.align       = 0;
-  setl.textstyle.margin_left = 10;
-  setl.textstyle.size        = 30.0;
-  setl.textstyle.textcolor   = 0x000000FF;
-  setl.textstyle.backcolor   = 0xF5F5F5FF;
-
-  // create fields
-
-  VADD(setl.fields, setl_cell_new("key", 300, 0));
-  VADD(setl.fields, setl_cell_new("value", 340, 1));
-
-  vec_dec_retcount(setl.fields);
-
-  // add header handler
-
-  view_t* header = view_new("settingslist_header", (r2_t){0, 0, 10, 30});
-  /* header->layout.background_color = 0x333333FF; */
-  /* header->layout.shadow_blur      = 3; */
-  /* header->layout.border_radius    = 3; */
-  tg_css_add(header);
-
-  vh_lhead_add(header);
-  vh_lhead_set_on_select(header, ui_settings_popup_on_header_field_select);
-  vh_lhead_set_on_insert(header, ui_settings_popup_on_header_field_insert);
-  vh_lhead_set_on_resize(header, ui_settings_popup_on_header_field_resize);
-
-  sl_cell_t* cell;
-  while ((cell = VNXT(setl.fields)))
-  {
-    char*   id       = cstr_fromformat(100, "%s%s", header->id, cell->id);
-    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
-    REL(id);
-
-    tg_text_add(cellview);
-    tg_text_set(cellview, cell->id, setl.textstyle);
-
-    vh_lhead_add_cell(header, cell->id, cell->size, cellview);
-  }
-
-  // add list handler to view
-
-  vh_list_add(setl.view,
-              ((vh_list_inset_t){30, 0, 0, 0}),
-              ui_settings_popup_item_for_index, NULL, NULL);
-  vh_list_set_header(setl.view, header);
-
-  // create items
-
-  VADD(setl.items, settingsitem_create());
-  VADD(setl.items, settingsitem_create());
-  VADD(setl.items, settingsitem_create());
-  VADD(setl.items, settingsitem_create());
-  VADD(setl.items, settingsitem_create());
-  VADD(setl.items, settingsitem_create());
-
-  settingsitem_update_row(setl.items->data[0], 0, "Library Path", "/home/user/milgra/Music");
-  settingsitem_update_row(setl.items->data[1], 1, "Organize Library", "Disabled");
-  settingsitem_update_row(setl.items->data[2], 2, "Dark Mode", "Disabled");
-  settingsitem_update_row(setl.items->data[3], 3, "Remote Control", "Disabled");
-  settingsitem_update_row(setl.items->data[4], 4, "Config Path", "/home/.config/zenmusic/config");
-  settingsitem_update_row(setl.items->data[5], 5, "Style Path", "/usr/local/share/zenmusic");
+  return uisp.items->data[index];
 }
 
 #endif

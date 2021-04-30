@@ -13,9 +13,9 @@ void ui_load(float width, float height);
 #include "config.c"
 #include "mtnumber.c"
 #include "player.c"
+#include "ui_about_popup.c"
 #include "ui_activity_popup.c"
 #include "ui_alert_popup.c"
-#include "ui_donate_popup.c"
 #include "ui_editor_popup.c"
 #include "ui_filter_bar.c"
 #include "ui_filter_popup.c"
@@ -67,10 +67,10 @@ void ui_load(float width, float height)
   ui_song_infos_attach(view_base);
   ui_visualizer_attach(view_base);
   ui_filter_bar_attach(view_base);
+  ui_about_popup_attach(view_base);
   ui_alert_popup_attach(view_base);
   ui_filter_popup_attach(view_base);
   ui_editor_popup_attach(view_base);
-  ui_donate_popup_attach(view_base);
   ui_play_controls_attach(view_base);
   ui_lib_init_popup_attach(view_base);
   ui_activity_popup_attach(view_base);

@@ -85,7 +85,7 @@ void init(int width, int height, char* path)
 
   printf("config path   : %s\n", cfg_path);
   printf("resource path : %s\n", res_path);
-  printf("css path      : %s\n", res_path);
+  printf("css path      : %s\n", css_path);
   printf("html path     : %s\n", html_path);
   printf("font path     : %s\n", font_path);
 

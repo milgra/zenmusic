@@ -23,27 +23,23 @@ struct ui_song_infos_t
   view_t*     song_time_view;
   view_t*     song_length_view;
   textstyle_t textstyle;
-  char*       fontpath;
 } uisi;
 
 void ui_song_infos_attach(view_t* baseview)
 {
-
-  uisi.fontpath            = config_get("font_path");
-  uisi.song_info_view      = view_get_subview(baseview, "song_info");
-  uisi.song_time_view      = view_get_subview(baseview, "song_info_time");
-  uisi.song_length_view    = view_get_subview(baseview, "song_info_length");
-  uisi.song_remaining_view = view_get_subview(baseview, "song_info_remaining");
-
   textstyle_t ts  = {0};
-  ts.font         = uisi.fontpath;
+  ts.font         = config_get("font_path");
   ts.align        = TA_CENTER;
   ts.margin_right = 0;
   ts.size         = 30.0;
   ts.textcolor    = 0x000000FF;
   ts.backcolor    = 0;
 
-  uisi.textstyle = ts;
+  uisi.song_info_view      = view_get_subview(baseview, "song_info");
+  uisi.song_time_view      = view_get_subview(baseview, "song_info_time");
+  uisi.song_length_view    = view_get_subview(baseview, "song_info_length");
+  uisi.song_remaining_view = view_get_subview(baseview, "song_info_remaining");
+  uisi.textstyle           = ts;
 
   tg_text_add(uisi.song_info_view);
   tg_text_set(uisi.song_info_view, "-", ts);
@@ -56,14 +52,6 @@ void ui_song_infos_attach(view_t* baseview)
 
 void ui_song_infos_update_time(double time, double left, double dur)
 {
-  textstyle_t ts = {0};
-  ts.font        = uisi.fontpath;
-  ts.align       = TA_RIGHT;
-  ts.size        = 30.0;
-  ts.textcolor   = 0x000000FF;
-  ts.backcolor   = 0;
-  ts.margin_left = 17;
-
   char timebuff[20];
 
   int tmin = (int)floor(time / 60.0);
@@ -73,23 +61,24 @@ void ui_song_infos_update_time(double time, double left, double dur)
   int dmin = (int)floor(dur / 60.0);
   int dsec = (int)dur % 60;
 
-  ts.align = TA_LEFT;
+  uisi.textstyle.align        = TA_LEFT;
+  uisi.textstyle.margin_right = 0;
+  uisi.textstyle.margin_left  = 17;
+
   snprintf(timebuff, 20, "%.2i:%.2i", dmin, dsec);
-  tg_text_set(uisi.song_length_view, timebuff, ts);
+  tg_text_set(uisi.song_length_view, timebuff, uisi.textstyle);
+
   snprintf(timebuff, 20, "%.2i:%.2i", tmin, tsec);
-  tg_text_set(uisi.song_time_view, timebuff, ts);
+  tg_text_set(uisi.song_time_view, timebuff, uisi.textstyle);
+
   snprintf(timebuff, 20, "%.2i:%.2i", lmin, lsec);
-  tg_text_set(uisi.song_remaining_view, timebuff, ts);
+  tg_text_set(uisi.song_remaining_view, timebuff, uisi.textstyle);
 }
 
 void ui_song_infos_show(int index)
 {
-  textstyle_t ts = {0};
-  ts.font        = uisi.fontpath;
-  ts.align       = TA_CENTER;
-  ts.size        = 28.0;
-  ts.textcolor   = 0x000000FF;
-  ts.backcolor   = 0;
+  uisi.textstyle.align = TA_CENTER;
+  uisi.textstyle.size  = 28.0;
 
   vec_t* songs   = visible_get_songs();
   map_t* songmap = songs->data[index];
@@ -109,7 +98,7 @@ void ui_song_infos_show(int index)
            br / 1000,
            (char*)MGET(songmap, "file/channels"));
 
-  tg_text_set(uisi.song_info_view, infostr, ts);
+  tg_text_set(uisi.song_info_view, infostr, uisi.textstyle);
 }
 
 #endif

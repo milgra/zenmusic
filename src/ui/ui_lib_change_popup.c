@@ -29,20 +29,16 @@ void ui_lib_change_on_button_down(void* userdata, void* data);
 void ui_lib_change_popup_attach(view_t* baseview)
 {
   view_t* lib_change_textfield = view_get_subview(baseview, "lib_change_textfield");
-
-  ulcp.lib_change_inputfield = view_get_subview(baseview, "lib_change_inputfield");
+  ulcp.lib_change_inputfield   = view_get_subview(baseview, "lib_change_inputfield");
 
   cb_t* cb_btn_press = cb_new(ui_lib_change_on_button_down, NULL);
-
   vh_button_add(view_get_subview(baseview, "lib_change_accept_btn"), VH_BUTTON_NORMAL, cb_btn_press);
 
-  textstyle_t ts  = {0};
-  ts.font         = config_get("font_path");
-  ts.align        = TA_CENTER;
-  ts.margin_right = 0;
-  ts.size         = 30.0;
-  ts.textcolor    = 0x000000FF;
-  ts.backcolor    = 0;
+  textstyle_t ts = {0};
+  ts.font        = config_get("font_path");
+  ts.align       = TA_CENTER;
+  ts.size        = 30.0;
+  ts.textcolor   = 0x000000FF;
 
   tg_text_add(lib_change_textfield);
   tg_text_set(lib_change_textfield, "Use library at", ts);

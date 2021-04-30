@@ -37,14 +37,10 @@ void ui_filter_bar_attach(view_t* baseview)
   textstyle_t ts  = {0};
   ts.font         = config_get("font_path");
   ts.size         = 30.0;
-  ts.textcolor    = 0x000000FF;
-  ts.backcolor    = 0;
-  ts.align        = TA_RIGHT;
   ts.margin_right = 20;
-
-  ts.align     = TA_LEFT;
-  ts.textcolor = 0x000000FF;
-  ts.backcolor = 0xFFFFFFFF;
+  ts.align        = TA_LEFT;
+  ts.textcolor    = 0x000000FF;
+  ts.backcolor    = 0xFFFFFFFF;
 
   vh_textinput_add(ufb.songlist_filter_bar, "", "Search/Filter", ts, NULL);
   vh_textinput_set_on_text(ufb.songlist_filter_bar, ui_filter_bar_filter);
