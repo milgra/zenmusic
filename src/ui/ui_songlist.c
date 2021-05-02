@@ -186,10 +186,17 @@ void on_header_field_insert(view_t* view, int src, int tgt)
   REL(cell);
 
   // update all items and cache
-  view_t* item;
-  vec_t*  items = vh_list_items(sl.view);
-  while ((item = VNXT(items)))
+  vec_t* items = vh_list_items(sl.view);
+  for (int index = 0; index < items->length; index++)
   {
+    view_t* item = items->data[index];
+    vh_litem_swp_cell(item, src, tgt);
+  }
+
+  items = sl.cache;
+  for (int index = 0; index < items->length; index++)
+  {
+    view_t* item = items->data[index];
     vh_litem_swp_cell(item, src, tgt);
   }
 }
@@ -208,10 +215,18 @@ void on_header_field_resize(view_t* view, char* id, int size)
   }
 
   // update all items and cache
-  view_t* item;
-  vec_t*  items = vh_list_items(sl.view);
-  while ((item = VNXT(items)))
+  vec_t* items = vh_list_items(sl.view);
+
+  for (int index = 0; index < items->length; index++)
   {
+    view_t* item = items->data[index];
+    vh_litem_upd_cell_size(item, id, size);
+  }
+
+  items = sl.cache;
+  for (int index = 0; index < items->length; index++)
+  {
+    view_t* item = items->data[index];
     vh_litem_upd_cell_size(item, id, size);
   }
 }
@@ -352,10 +367,8 @@ void ui_songlist_item_recycle(view_t* item)
 
 view_t* ui_songlist_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
 {
-  if (index < 0)
-    return NULL; // no items before 0
-  if (index >= visible_song_count())
-    return NULL; // no more items
+  if (index < 0) return NULL;                     // no items before 0
+  if (index >= visible_song_count()) return NULL; // no more items
 
   *item_count = visible_song_count();
 

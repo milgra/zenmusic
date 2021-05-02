@@ -1,8 +1,3 @@
-/*
-  stores songs selected in songlist
-  does batch edit/conversion on songs
- */
-
 #ifndef selection_h
 #define selection_h
 

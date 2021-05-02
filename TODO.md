@@ -1,5 +1,6 @@
 first version
 
+selector view ala keruljon
 songlist refactor
 event recorder, event player
 check organize, save entries

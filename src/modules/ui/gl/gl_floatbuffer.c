@@ -54,8 +54,7 @@ void fb_expand(fb_t* fb)
 
 void fb_add(fb_t* fb, GLfloat* data, size_t count)
 {
-  while (fb->pos + count >= fb->cap)
-    fb_expand(fb);
+  while (fb->pos + count >= fb->cap) fb_expand(fb);
   memcpy(fb->data + fb->pos, data, sizeof(GLfloat) * count);
   fb->pos += count;
   fb->changed = 1;
