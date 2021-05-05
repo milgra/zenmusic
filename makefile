@@ -5,6 +5,8 @@ OBJDIRREL = bin/obj/rel
 SOURCES = \
 	$(wildcard src/mtlib/*.c) \
 	$(wildcard src/modules/*.c) \
+	$(wildcard src/modules/data/*.c) \
+	$(wildcard src/modules/file/*.c) \
 	$(wildcard src/modules/image/*.c) \
 	$(wildcard src/modules/player/*.c) \
 	$(wildcard src/modules/text/*.c) \
@@ -23,6 +25,8 @@ CFLAGS = \
 	-I/usr/local/include/SDL2 \
 	-Isrc/mtlib \
 	-Isrc/modules \
+	-Isrc/modules/data \
+	-Isrc/modules/file \
 	-Isrc/modules/net \
 	-Isrc/modules/text \
 	-Isrc/modules/html \
