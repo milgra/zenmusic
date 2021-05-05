@@ -1,5 +1,9 @@
 first version
 
+delete song
+record/play, switches
+audio stream meglete dontse el hogy mi keruljon libraryba
+delete mukodjon
 selector view ala keruljon
 songlist refactor
 event recorder, event player

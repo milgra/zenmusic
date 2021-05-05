@@ -43,3 +43,5 @@ Please follow these guidelines :
 - if you mofify existing code be sure that a test covers your modification
 - always run all tests before push
 - always run valgrind and check for leaks before push
+
+ valgrind --leak-check=full --show-leak-kinds=all --suppressions=valgrind.supp bin/zenmusicdev  

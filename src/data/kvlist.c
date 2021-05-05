@@ -17,7 +17,7 @@ int kvlist_write(char* libpath, map_t* db);
 int kvlist_read(char* libpath, map_t* db, char* keyfield)
 {
   int   retv  = -1;
-  char* dbstr = cstr_fromfile(libpath);
+  char* dbstr = cstr_fromfile(libpath); // REL 0
 
   if (dbstr)
   {
@@ -25,7 +25,7 @@ int kvlist_read(char* libpath, map_t* db, char* keyfield)
 
     char*  token = strtok(dbstr, "\n");
     char*  key   = NULL;
-    map_t* map   = MNEW();
+    map_t* map   = MNEW(); // REL 1
 
     while (token)
     {
@@ -43,8 +43,8 @@ int kvlist_read(char* libpath, map_t* db, char* keyfield)
         {
           key = MGET(map, keyfield);
           MPUT(db, key, map);
-          REL(map);
-          map = MNEW();
+          REL(map);     // REL 1
+          map = MNEW(); // REL 1
           key = NULL;
         }
         else
@@ -53,7 +53,8 @@ int kvlist_read(char* libpath, map_t* db, char* keyfield)
       token = strtok(NULL, "\n");
     }
 
-    REL(dbstr);
+    REL(map);   // REL 1
+    REL(dbstr); // REL 0
   }
   else
     printf("ERROR kvlist_read cannot read file %s\n", libpath);

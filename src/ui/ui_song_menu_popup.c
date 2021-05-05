@@ -13,7 +13,7 @@ void ui_song_menu_popup_attach(view_t* view);
 #include "config.c"
 #include "text.c"
 #include "tg_text.c"
-#include "ui_alert_popup.c"
+#include "ui_decision_popup.c"
 #include "ui_editor_popup.c"
 #include "ui_popup_switcher.c"
 #include "ui_songlist.c"
@@ -55,6 +55,10 @@ void ui_song_menu_popup_attach(view_t* baseview)
   vh_list_add(slp.view, ((vh_list_inset_t){0, 10, 0, 10}), ui_song_menu_popup_item_for_index, NULL, NULL);
 }
 
+void ui_song_menu_popup_on_item_delete(void* userdata, void* data)
+{
+}
+
 void ui_song_menu_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
   ui_popup_switcher_toggle("song_popup_page");
@@ -72,7 +76,8 @@ void ui_song_menu_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* 
   }
   if (index == 4)
   {
-    ui_alert_popup_show("Are you sure you want to delete x items?");
+    cb_t* del_cb = cb_new(ui_song_menu_popup_on_item_delete, NULL);
+    ui_decision_popup_show("Are you sure you want to delete x items?", del_cb);
   }
 }
 

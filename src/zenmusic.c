@@ -70,6 +70,8 @@ void init(int width, int height, char* path)
 
   // init paths
 
+  path = "/home/milgra/Projects/zenmusic/bin/";
+
 #ifndef DEBUG
   char* res_path = cstr_fromstring("/usr/local/share/zenmusic");
 #else
@@ -243,6 +245,12 @@ void render(uint32_t time)
 
 void destroy()
 {
+  /* ui_unload(); */
+  /* callbacks_destroy(); */
+  /* visible_destroy(); */
+  /* player_destroy(); */
+  /* config_destroy(); */
+  /* db_destroy(); */
 }
 
 void load_library()

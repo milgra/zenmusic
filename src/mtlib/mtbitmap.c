@@ -35,18 +35,19 @@ void  bm_describe(void* p, int level);
 void bm_del(void* pointer)
 {
   bm_t* bm = pointer;
-  if (bm->data != NULL) mem_release(bm->data);
+
+  if (bm->data != NULL) mem_release(bm->data); // REL 1
 }
 
 bm_t* bm_new(int the_w, int the_h)
 {
-  bm_t* bm = mem_calloc(sizeof(bm_t), "mtbitmap", bm_del, bm_describe);
+  bm_t* bm = mem_calloc(sizeof(bm_t), "mtbitmap", bm_del, bm_describe); // REL 0
 
   bm->w = the_w;
   bm->h = the_h;
 
   bm->size = 4 * the_w * the_h;
-  bm->data = mem_calloc(bm->size * sizeof(unsigned char), "uint8_t*", bm_del, NULL);
+  bm->data = mem_calloc(bm->size * sizeof(unsigned char), "uint8_t*", NULL, NULL); // REL 1
 
   return bm;
 }

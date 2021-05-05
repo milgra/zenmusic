@@ -1,6 +1,7 @@
 #ifndef ui_alert_popup_h
 #define ui_alert_popup_h
 
+#include "mtcallback.c"
 #include "view.c"
 
 void ui_alert_popup_attach(view_t* baseview);
@@ -13,6 +14,7 @@ void ui_alert_popup_show(char* text);
 #include "config.c"
 #include "text.c"
 #include "tg_text.c"
+#include "ui_popup_switcher.c"
 
 struct _ui_alert_popup_t
 {
@@ -38,7 +40,7 @@ void ui_alert_popup_show(char* text)
 
   tg_text_set(uap.sim_pop_txt, text, ts);
 
-  // ui_toggle_baseview(MGET(uap.popup_views, "simple_popup_page"));
+  ui_popup_switcher_toggle("simple_popup_page");
 }
 
 #endif

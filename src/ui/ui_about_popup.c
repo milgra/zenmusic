@@ -21,6 +21,7 @@ void ui_about_popup_refresh();
 #include "vh_list_head.c"
 #include "vh_list_item.c"
 #include "visible.c"
+#include <limits.h>
 
 void ui_about_popup_on_header_field_select(view_t* view, char* id, ev_t ev);
 void ui_about_popup_on_header_field_insert(view_t* view, int src, int tgt);
@@ -138,7 +139,9 @@ view_t* donateitem_create(int index)
   char       idbuffer[100] = {0};
   snprintf(idbuffer, 100, "donlist_item%i", item_cnt++);
 
-  float height = index == 0 ? 150 : 50;
+  float height = 50;
+  if (index == 0) height = 150;
+  if (index == 6) height = 200;
 
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 460, height});
 
@@ -153,7 +156,19 @@ view_t* donateitem_create(int index)
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, height});
 
     REL(id);
-    tg_text_add(cellview);
+
+    if (index == 6)
+    {
+      char* respath                     = config_get("res_path");
+      char* imagepath                   = cstr_fromformat(100, "%s/freebsd.png", respath);
+      cellview->layout.margin           = INT_MAX;
+      cellview->layout.background_image = imagepath;
+      tg_css_add(cellview);
+    }
+    else
+    {
+      tg_text_add(cellview);
+    }
 
     vh_litem_add_cell(rowview, cell->id, cell->size, cellview);
   }
@@ -216,6 +231,7 @@ void ui_about_popup_attach(view_t* baseview)
   VADD(donl.items, donateitem_create(3));
   VADD(donl.items, donateitem_create(4));
   VADD(donl.items, donateitem_create(5));
+  VADD(donl.items, donateitem_create(6));
 
   donateitem_update_row(donl.items->data[0], 0, "Zen Music v0.8\n by Milan Toth\nFree and Open Source Software.\nIf you like it, please support the development.");
   donateitem_update_row(donl.items->data[1], 1, "Donate on Paypal");

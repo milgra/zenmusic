@@ -604,6 +604,8 @@ bm_t* editor_get_image(const char* path)
                         0,
                         0);
 
+        sws_freeContext(img_convert_ctx);
+
         return bitmap;
       }
     }

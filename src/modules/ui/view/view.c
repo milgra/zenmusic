@@ -376,7 +376,9 @@ void view_set_block_touch(view_t* view, char block, char recursive)
 
 void view_set_texture_bmp(view_t* view, bm_t* bitmap)
 {
-  RPL(view->texture.bitmap, bitmap);
+  if (view->texture.bitmap) REL(view->texture.bitmap);
+  RET(bitmap);
+  view->texture.bitmap  = bitmap;
   view->texture.state   = TS_READY;
   view->texture.changed = 1;
 }

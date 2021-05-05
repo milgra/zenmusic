@@ -46,18 +46,28 @@ prop_t* html_parse_css(char* path);
 char* html_read(char* path)
 {
   FILE* f = fopen(path, "rb");
-  fseek(f, 0, SEEK_END);
-  long fsize = ftell(f);
-  fseek(f, 0, SEEK_SET);
 
-  char* string = mem_alloc(fsize + 1, "char*", NULL, cstr_describe);
+  if (f)
+  {
+    fseek(f, 0, SEEK_END);
 
-  fread(string, 1, fsize, f);
-  fclose(f);
+    long fsize = ftell(f);
+    fseek(f, 0, SEEK_SET);
 
-  string[fsize] = 0;
+    char* string = mem_alloc(fsize + 1, "char*", NULL, cstr_describe);
 
-  return string;
+    fread(string, 1, fsize, f);
+    fclose(f);
+
+    string[fsize] = 0;
+
+    return string;
+  }
+  else
+  {
+    printf("CANNOT OPEN %s\n", path);
+    return NULL;
+  }
 }
 
 uint32_t count_tags(char* html)

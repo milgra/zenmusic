@@ -1,11 +1,11 @@
 #ifndef ui_decision_popup_h
 #define ui_decision_popup_h
 
+#include "mtcallback.c"
 #include "view.c"
 
-void ui_decision_popup_init();
 void ui_decision_popup_attach(view_t* baseview);
-void ui_decision_popup_show(char* text);
+void ui_decision_popup_show(char* text, cb_t* callback);
 
 #endif
 
@@ -13,15 +13,13 @@ void ui_decision_popup_show(char* text);
 
 #include "config.c"
 #include "tg_text.c"
+#include "ui_popup_switcher.c"
 
 struct _ui_decision_popup_t
 {
-  view_t* dec_pop_tf;
+  textstyle_t ts;
+  view_t*     dec_pop_tf;
 } udp = {0};
-
-void ui_decision_popup_init()
-{
-}
 
 void ui_decision_popup_attach(view_t* baseview)
 {
@@ -36,7 +34,15 @@ void ui_decision_popup_attach(view_t* baseview)
 
   view_t* dec_pop_tf = view_get_subview(baseview, "dec_pop_tf");
   tg_text_add(dec_pop_tf);
-  tg_text_set(dec_pop_tf, "Files will be renamed and moved to different folders based on artist, album, track number and title, are you sure?", ts);
+
+  udp.ts         = ts;
+  udp.dec_pop_tf = dec_pop_tf;
+}
+
+void ui_decision_popup_show(char* text, cb_t* callback)
+{
+  tg_text_set(udp.dec_pop_tf, text, udp.ts);
+  ui_popup_switcher_toggle("decision_popup_page");
 }
 
 #endif

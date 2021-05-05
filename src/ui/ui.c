@@ -16,6 +16,7 @@ void ui_load(float width, float height);
 #include "ui_about_popup.c"
 #include "ui_activity_popup.c"
 #include "ui_alert_popup.c"
+#include "ui_decision_popup.c"
 #include "ui_editor_popup.c"
 #include "ui_filter_bar.c"
 #include "ui_filter_popup.c"
@@ -72,6 +73,7 @@ void ui_load(float width, float height)
   ui_filter_popup_attach(view_base);
   ui_editor_popup_attach(view_base);
   ui_play_controls_attach(view_base);
+  ui_decision_popup_attach(view_base);
   ui_lib_init_popup_attach(view_base);
   ui_activity_popup_attach(view_base);
   ui_settings_popup_attach(view_base);

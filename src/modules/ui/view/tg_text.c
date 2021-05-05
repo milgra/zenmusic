@@ -36,18 +36,17 @@ void tg_text_gen(view_t* view)
   tg_text_t* gen = view->tex_gen_data;
   if (view->frame.local.w > 0 && view->frame.local.h > 0)
   {
-    bm_t*       fontmap = bm_new((int)view->frame.local.w, (int)view->frame.local.h);
+    bm_t*       fontmap = bm_new((int)view->frame.local.w, (int)view->frame.local.h); // REL 0
     textstyle_t style   = gen->style;
 
     if (gen->text)
     {
-      str_t* str = str_new();
+      str_t* str = str_new(); // REL 1
       str_addbytearray(str, gen->text);
 
-      text_render(
-          str,
-          style,
-          fontmap);
+      text_render(str, style, fontmap);
+
+      REL(str); // REL 1
     }
     else
     {
@@ -55,6 +54,8 @@ void tg_text_gen(view_t* view)
     }
 
     view_set_texture_bmp(view, fontmap);
+
+    REL(fontmap); // REL 0
   }
 }
 
