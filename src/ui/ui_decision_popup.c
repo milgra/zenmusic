@@ -38,9 +38,9 @@ void ui_decision_popup_attach(view_t* baseview)
   ts.font         = config_get("font_path");
   ts.size         = 30.0;
   ts.margin_right = 20;
-  ts.align        = TA_LEFT;
+  ts.align        = TA_CENTER;
   ts.textcolor    = 0x000000FF;
-  ts.backcolor    = 0xFFFFFFFF;
+  ts.backcolor    = 0;
   ts.multiline    = 1;
 
   view_t* btn = view_get_subview(baseview, "dec_pop_acc_btn");

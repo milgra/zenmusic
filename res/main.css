@@ -473,8 +473,17 @@
     background-color: #00000000;
 }
 
+#dec_pop_rej_btn {
+    background-color: #FF5555FF;
+    width: 30px;
+    height: 30px;
+    bottom: 12px;
+    border-radius: 14px;
+    right: 54px;
+}
+
 #dec_pop_acc_btn {
-    background-color: #FFFFFFFF;
+    background-color: #55FF55FF;
     width: 30px;
     height: 30px;
     bottom: 12px;
@@ -833,10 +842,19 @@
 }
 
 .acceptbtn {
-    background-color: #FFFFFFFF;
+    background-color: #00FF00FF;
     width: 30px;
     height: 30px;
     right: 12px;
+    bottom: 12px;
+    border-radius: 14px;
+}
+
+#editor_popup_reject_btn {
+    background-color: #FF5555FF;
+    width: 30px;
+    height: 30px;
+    right: 54px;
     bottom: 12px;
     border-radius: 14px;
 }

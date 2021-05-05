@@ -323,7 +323,7 @@ void ui_editor_popup_attach(view_t* view)
   tg_text_add(newfieldbtn);
   tg_text_set(newfieldbtn, "add new field", ts);
 
-  view_t* acceptbtn = view_get_subview(view, "accepteditorbtn");
+  view_t* acceptbtn = view_get_subview(view, "editor_popup_accept_btn");
 
   cb_t* but_cb = cb_new(ui_editor_popup_on_button_down, NULL);
   vh_button_add(acceptbtn, VH_BUTTON_NORMAL, but_cb);
