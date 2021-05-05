@@ -3,9 +3,6 @@ OBJDIRDEV = bin/obj/dev
 OBJDIRREL = bin/obj/rel
 
 SOURCES = \
-	$(wildcard src/*.c) \
-	$(wildcard src/ui/*.c) \
-	$(wildcard src/data/*.c) \
 	$(wildcard src/mtlib/*.c) \
 	$(wildcard src/modules/*.c) \
 	$(wildcard src/modules/image/*.c) \
@@ -16,17 +13,15 @@ SOURCES = \
 	$(wildcard src/modules/ui/*.c) \
 	$(wildcard src/modules/ui/gl/*.c) \
 	$(wildcard src/modules/ui/wm/*.c) \
-	$(wildcard src/modules/ui/view/*.c)
+	$(wildcard src/modules/ui/view/*.c) \
+	$(wildcard src/zenmusic/*.c) \
+	$(wildcard src/zenmusic/ui/*.c)
 
 CFLAGS = \
 	-I/usr/local/include \
 	-I/usr/local/include/GL \
 	-I/usr/local/include/SDL2 \
-	-Isrc \
-	-Isrc/ui \
-	-Isrc/data \
 	-Isrc/mtlib \
-	-Isrc/views \
 	-Isrc/modules \
 	-Isrc/modules/net \
 	-Isrc/modules/text \
@@ -36,7 +31,9 @@ CFLAGS = \
 	-Isrc/modules/ui \
 	-Isrc/modules/ui/gl \
 	-Isrc/modules/ui/wm \
-	-Isrc/modules/ui/view 
+	-Isrc/modules/ui/view \
+	-Isrc/zenmusic \
+	-Isrc/zenmusic/ui \
 
 LDFLAGS = \
 	-L/usr/local/lib \
