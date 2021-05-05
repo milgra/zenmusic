@@ -20,6 +20,7 @@ dark mode
 
 ideas
 
+on cover/video click open big cover/video view"
 log sor elejen legyen ora perc, fentrol le mukodjon
 test module playing also
 text style is cssbol jojjon

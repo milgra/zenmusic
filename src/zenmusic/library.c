@@ -7,6 +7,7 @@
 void lib_read(char* libpath);
 void lib_remove_duplicates(map_t* db);
 void lib_analyze(ch_t* channel);
+void lib_delete(char* libpath, map_t* entry);
 int  lib_organize_entry(char* libpath, map_t* db, map_t* entry);
 int  lib_organize(char* libpath, map_t* db);
 int  lib_entries();
@@ -28,14 +29,36 @@ int  lib_exists(char* path);
 #include <stdio.h>
 #include <time.h>
 
-map_t* lib_db;
-vec_t* rem_db;
-char   lock_db  = 0;
-char*  lib_path = NULL;
+struct lib_t
+{
+  map_t* db;
+  vec_t* remaining;
+  char   lock;
+  char*  path;
+} lib = {0};
 
 int lib_entries()
 {
-  return lib_db->count;
+  return lib.db->count;
+}
+
+void lib_delete(char* libpath, map_t* entry)
+{
+  assert(libpath != NULL);
+
+  char* path = MGET(entry, "file/path");
+
+  char* file_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", libpath, path);
+
+  int error = remove(file_path);
+  if (error)
+  {
+    LOG("cannot remove file %s : %s\n", file_path, strerror(errno));
+  }
+  else
+  {
+    LOG("file %s removed.\n", file_path);
+  }
 }
 
 static int lib_file_data(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
@@ -54,7 +77,7 @@ static int lib_file_data(const char* fpath, const struct stat* sb, int tflag, st
     if (strstr(fpath, "zenmusic") == NULL)
     {
       char* size = cstr_fromformat(20, "%li", sb->st_size);
-      MPUT(lib_db, fpath + strlen(lib_path), size); // use relative path as path
+      MPUT(lib.db, fpath + strlen(lib.path), size); // use relative path as path
       REL(size);
     }
   }
@@ -64,13 +87,13 @@ static int lib_file_data(const char* fpath, const struct stat* sb, int tflag, st
 
 void lib_read(char* libpath)
 {
-  if (lock_db) return;
+  if (lib.lock) return;
 
-  if (lib_path) REL(lib_path);
-  if (lib_db) REL(lib_db);
+  if (lib.path) REL(lib.path);
+  if (lib.db) REL(lib.db);
 
-  lib_path = cstr_fromcstring(libpath);
-  lib_db   = MNEW();
+  lib.path = cstr_fromcstring(libpath);
+  lib.db   = MNEW();
 
   int flags = 0;
   int id    = 0;
@@ -80,12 +103,12 @@ void lib_read(char* libpath)
 
   nftw(libpath, lib_file_data, 20, flags);
 
-  LOG("library scanned, files : %i", lib_db->count);
+  LOG("library scanned, files : %i", lib.db->count);
 }
 
 void lib_remove_duplicates(map_t* db)
 {
-  if (lock_db) return;
+  if (lib.lock) return;
 
   // go through db paths
   vec_t* paths = VNEW();
@@ -93,7 +116,7 @@ void lib_remove_duplicates(map_t* db)
   for (int index = 0; index < paths->length; index++)
   {
     char*  path = paths->data[index];
-    map_t* map  = MGET(lib_db, path);
+    map_t* map  = MGET(lib.db, path);
     if (!map)
     {
       // db path is missing from file path, file was removed
@@ -104,7 +127,7 @@ void lib_remove_duplicates(map_t* db)
 
   // go through lib paths
   vec_reset(paths);
-  map_keys(lib_db, paths);
+  map_keys(lib.db, paths);
   for (int index = 0; index < paths->length; index++)
   {
     char*  path = paths->data[index];
@@ -112,7 +135,7 @@ void lib_remove_duplicates(map_t* db)
     if (map)
     {
       // path exist in db, removing entry from lib
-      MDEL(lib_db, path);
+      MDEL(lib.db, path);
     }
   }
 
@@ -127,17 +150,17 @@ int analyzer_thread(void* chptr)
 
   ch_t*    channel = chptr;
   map_t*   song    = NULL;
-  uint32_t total   = rem_db->length;
+  uint32_t total   = lib.remaining->length;
   int      ratio   = -1;
 
-  while (rem_db->length > 0)
+  while (lib.remaining->length > 0)
   {
     if (!song)
     {
       song = MNEW();
 
-      char* path = vec_tail(rem_db);
-      char* size = MGET(lib_db, path);
+      char* path = vec_tail(lib.remaining);
+      char* size = MGET(lib.db, path);
 
       char* time_str = mem_calloc(80, "char*", NULL, NULL);
       // snprintf(time_str, 20, "%lu", time(NULL));
@@ -157,7 +180,7 @@ int analyzer_thread(void* chptr)
       MPUT(song, "file/play_count", cstr_fromcstring("0"));
       MPUT(song, "file/skip_count", cstr_fromcstring("0"));
 
-      char* real = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", lib_path, path);
+      char* real = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", lib.path, path);
 
       // read and add file and meta data
 
@@ -217,7 +240,7 @@ int analyzer_thread(void* chptr)
       REL(real);
 
       // remove entry from remaining
-      vec_rematindex(rem_db, rem_db->length - 1);
+      vec_rematindex(lib.remaining, lib.remaining->length - 1);
     }
     else
     {
@@ -227,7 +250,7 @@ int analyzer_thread(void* chptr)
     }
 
     // show progress
-    int ratio_new = (int)((float)(total - rem_db->length) / (float)total * 100.0);
+    int ratio_new = (int)((float)(total - lib.remaining->length) / (float)total * 100.0);
     if (ratio != ratio_new)
     {
       ratio = ratio_new;
@@ -239,22 +262,22 @@ int analyzer_thread(void* chptr)
   MPUT(song, "file/path", cstr_fromcstring("//////")); // impossible path
   ch_send(channel, song);                              // send finishing entry
 
-  lock_db = 0;
+  lib.lock = 0;
   return 0;
 }
 
 void lib_analyze(ch_t* channel)
 {
-  if (lock_db) return;
+  if (lib.lock) return;
 
   LOG("analyzing entires...");
 
-  lock_db = 1;
+  lib.lock = 1;
 
-  if (rem_db) REL(rem_db);
+  if (lib.remaining) REL(lib.remaining);
 
-  rem_db = VNEW();
-  map_keys(lib_db, rem_db);
+  lib.remaining = VNEW();
+  map_keys(lib.db, lib.remaining);
 
   printf("START THREAD %zx\n", (size_t)channel);
 
