@@ -58,6 +58,18 @@ void ui_song_menu_popup_attach(view_t* baseview)
 void ui_song_menu_popup_on_item_delete(void* userdata, void* data)
 {
   printf("SONG MENU POPUP ITEM DELETE\n");
+  vec_t* selected = VNEW();
+  ui_songlist_get_selected(selected);
+  mem_describe(selected, 0);
+
+  for (int index = 0; index < selected->length; index++)
+  {
+    map_t* entry = selected->data[index];
+    //lib_delete_file(config_get("lib_path"), entry);
+    //db_remove_entry(entry);
+  }
+
+  REL(selected);
 }
 
 void ui_song_menu_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)

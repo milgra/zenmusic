@@ -7,6 +7,7 @@ void db_init();
 void db_read(char* libpath);
 void db_write(char* libpath);
 void db_add_entry(char* path, map_t* entry);
+void db_remove_entry(map_t* entry);
 
 map_t*   db_get_db();
 uint32_t db_count();
@@ -65,6 +66,12 @@ void db_write(char* libpath)
 void db_add_entry(char* path, map_t* entry)
 {
   MPUT(db, path, entry);
+}
+
+void db_remove_entry(map_t* entry)
+{
+  char* path = MGET(entry, "file/path");
+  MDEL(db, path);
 }
 
 void db_reset()

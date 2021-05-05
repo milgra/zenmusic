@@ -5,9 +5,10 @@
 #include "mtmap.c"
 
 void lib_read(char* libpath);
-void lib_remove_duplicates(map_t* db);
+void lib_delete_file(char* libpath, map_t* entry);
 void lib_analyze(ch_t* channel);
-void lib_delete(char* libpath, map_t* entry);
+
+void lib_remove_duplicates(map_t* db);
 int  lib_organize_entry(char* libpath, map_t* db, map_t* entry);
 int  lib_organize(char* libpath, map_t* db);
 int  lib_entries();
@@ -29,6 +30,9 @@ int  lib_exists(char* path);
 #include <stdio.h>
 #include <time.h>
 
+static int lib_file_data_step(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf);
+int        analyzer_thread(void* chptr);
+
 struct lib_t
 {
   map_t* db;
@@ -37,31 +41,26 @@ struct lib_t
   char*  path;
 } lib = {0};
 
-int lib_entries()
+void lib_read(char* lib_path)
 {
-  return lib.db->count;
+  if (lib.lock) return;
+
+  if (lib.path) REL(lib.path);
+  if (lib.db) REL(lib.db);
+
+  LOG("reading library : %s\n", lib_path);
+
+  lib.path = cstr_fromcstring(lib_path);
+  lib.db   = MNEW();
+
+  int flags = FTW_PHYS;
+
+  nftw(lib_path, lib_file_data_step, 20, flags);
+
+  LOG("library scanned, files : %i", lib.db->count);
 }
 
-void lib_delete(char* libpath, map_t* entry)
-{
-  assert(libpath != NULL);
-
-  char* path = MGET(entry, "file/path");
-
-  char* file_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", libpath, path);
-
-  int error = remove(file_path);
-  if (error)
-  {
-    LOG("cannot remove file %s : %s\n", file_path, strerror(errno));
-  }
-  else
-  {
-    LOG("file %s removed.\n", file_path);
-  }
-}
-
-static int lib_file_data(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
+static int lib_file_data_step(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
 {
   /* printf("%-3s %2d %7jd   %-40s %d %s\n", */
   /*        (tflag == FTW_D) ? "d" : (tflag == FTW_DNR) ? "dnr" : (tflag == FTW_DP) ? "dp" : (tflag == FTW_F) ? "f" : (tflag == FTW_NS) ? "ns" : (tflag == FTW_SL) ? "sl" : (tflag == FTW_SLN) ? "sln" : "???", */
@@ -85,69 +84,38 @@ static int lib_file_data(const char* fpath, const struct stat* sb, int tflag, st
   return 0; /* To tell nftw() to continue */
 }
 
-void lib_read(char* libpath)
+void lib_delete_file(char* lib_path, map_t* entry)
 {
-  if (lib.lock) return;
+  assert(lib_path != NULL);
 
-  if (lib.path) REL(lib.path);
-  if (lib.db) REL(lib.db);
+  char* rel_path  = MGET(entry, "file/path");
+  char* file_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", lib_path, rel_path);
 
-  lib.path = cstr_fromcstring(libpath);
-  lib.db   = MNEW();
+  int error = remove(file_path);
+  if (error)
+    LOG("cannot remove file %s : %s\n", file_path, strerror(errno));
+  else
+    LOG("file %s removed.\n", file_path);
 
-  int flags = 0;
-  int id    = 0;
-
-  //flags |= FTW_DEPTH;
-  flags |= FTW_PHYS;
-
-  nftw(libpath, lib_file_data, 20, flags);
-
-  LOG("library scanned, files : %i", lib.db->count);
+  REL(file_path);
 }
 
-void lib_remove_duplicates(map_t* db)
+void lib_analyze(ch_t* channel)
 {
   if (lib.lock) return;
 
-  // go through db paths
-  vec_t* paths = VNEW();
-  map_keys(db, paths);
-  for (int index = 0; index < paths->length; index++)
-  {
-    char*  path = paths->data[index];
-    map_t* map  = MGET(lib.db, path);
-    if (!map)
-    {
-      // db path is missing from file path, file was removed
-      MDEL(db, path);
-      printf("LOG file is missing for path %s, song entry was removed from db\n", path);
-    }
-  }
+  lib.lock = 1;
 
-  // go through lib paths
-  vec_reset(paths);
-  map_keys(lib.db, paths);
-  for (int index = 0; index < paths->length; index++)
-  {
-    char*  path = paths->data[index];
-    map_t* map  = MGET(db, path);
-    if (map)
-    {
-      // path exist in db, removing entry from lib
-      MDEL(lib.db, path);
-    }
-  }
+  if (lib.remaining) REL(lib.remaining);
+  lib.remaining = VNEW();
 
-  REL(paths);
+  map_keys(lib.db, lib.remaining);
 
-  LOG("new files detected : %i", lib_entries());
+  SDL_CreateThread(analyzer_thread, "analyzer", channel);
 }
 
 int analyzer_thread(void* chptr)
 {
-  printf("ananlyzer thread %zx\n", (size_t)chptr);
-
   ch_t*    channel = chptr;
   map_t*   song    = NULL;
   uint32_t total   = lib.remaining->length;
@@ -266,22 +234,47 @@ int analyzer_thread(void* chptr)
   return 0;
 }
 
-void lib_analyze(ch_t* channel)
+int lib_entries()
+{
+  return lib.db->count;
+}
+
+void lib_remove_duplicates(map_t* db)
 {
   if (lib.lock) return;
 
-  LOG("analyzing entires...");
+  // go through db paths
+  vec_t* paths = VNEW();
+  map_keys(db, paths);
+  for (int index = 0; index < paths->length; index++)
+  {
+    char*  path = paths->data[index];
+    map_t* map  = MGET(lib.db, path);
+    if (!map)
+    {
+      // db path is missing from file path, file was removed
+      MDEL(db, path);
+      printf("LOG file is missing for path %s, song entry was removed from db\n", path);
+    }
+  }
 
-  lib.lock = 1;
+  // go through lib paths
+  vec_reset(paths);
+  map_keys(lib.db, paths);
+  for (int index = 0; index < paths->length; index++)
+  {
+    char*  path = paths->data[index];
+    map_t* map  = MGET(db, path);
+    if (map)
+    {
+      // path exist in db, removing entry from lib
+      MDEL(lib.db, path);
+    }
+  }
 
-  if (lib.remaining) REL(lib.remaining);
+  REL(paths);
 
-  lib.remaining = VNEW();
-  map_keys(lib.db, lib.remaining);
-
-  printf("START THREAD %zx\n", (size_t)channel);
-
-  SDL_CreateThread(analyzer_thread, "analyzer", channel);
+  LOG("new files detected : %i", lib_entries());
 }
 
 char* lib_replace_char(char* str, char find, char replace)

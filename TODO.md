@@ -1,12 +1,8 @@
 first version
 
-delete song
-record/play, switches
 audio stream meglete dontse el hogy mi keruljon libraryba
-delete mukodjon
-selector view ala keruljon
 songlist refactor
-event recorder, event player
+event recorder, event player, command line paths
 check organize, save entries
 save shuffle state, last played song, last played position
 fix leaks
