@@ -16,6 +16,7 @@ index col resize problem scorllkor
 UI Recorder - UI player API, -uiscript
 testing - record ui events, inject ui events, check result
 decide which files to read in library
+dark mode
 
 ideas
 

@@ -77,8 +77,9 @@ void ui_song_menu_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* 
   }
   if (index == 4)
   {
-    cb_t* del_cb = cb_new(ui_song_menu_popup_on_item_delete, NULL);
-    ui_decision_popup_show("Are you sure you want to delete x items?", del_cb);
+    cb_t* acc_cb = cb_new(ui_song_menu_popup_on_item_delete, NULL);
+    ui_decision_popup_show("Are you sure you want to delete x items?", acc_cb, NULL);
+    REL(acc_cb);
   }
 }
 

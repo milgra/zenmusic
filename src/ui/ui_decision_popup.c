@@ -5,7 +5,7 @@
 #include "view.c"
 
 void ui_decision_popup_attach(view_t* baseview);
-void ui_decision_popup_show(char* text, cb_t* callback);
+void ui_decision_popup_show(char* text, cb_t* acc_cb, cb_t* rej_cb);
 
 #endif
 
@@ -19,14 +19,13 @@ void ui_decision_popup_show(char* text, cb_t* callback);
 #include "vh_button.c"
 
 void ui_decision_popup_accept(void* userdata, void* data);
+void ui_decision_popup_reject(void* userdata, void* data);
 
 struct _ui_decision_popup_t
 {
   char        attached;
-  vec_t*      textqueue;
-  vec_t*      callqueue;
+  vec_t*      requests;
   view_t*     tf;
-  view_t*     btn;
   textstyle_t ts;
 } udp = {0};
 
@@ -43,28 +42,47 @@ void ui_decision_popup_attach(view_t* baseview)
   ts.backcolor    = 0;
   ts.multiline    = 1;
 
-  view_t* btn = view_get_subview(baseview, "dec_pop_acc_btn");
-  view_t* tf  = view_get_subview(baseview, "dec_pop_tf");
+  view_t* acc_btn = view_get_subview(baseview, "dec_pop_acc_btn");
+  view_t* rej_btn = view_get_subview(baseview, "dec_pop_rej_btn");
+  view_t* tf      = view_get_subview(baseview, "dec_pop_tf");
 
-  cb_t* acc = cb_new(ui_decision_popup_accept, NULL);
+  cb_t* acc_cb = cb_new(ui_decision_popup_accept, NULL);
+  cb_t* rej_cb = cb_new(ui_decision_popup_reject, NULL);
 
   tg_text_add(tf);
-  vh_button_add(btn, VH_BUTTON_NORMAL, acc);
 
-  REL(acc);
+  vh_button_add(acc_btn, VH_BUTTON_NORMAL, acc_cb);
+  vh_button_add(rej_btn, VH_BUTTON_NORMAL, rej_cb);
 
-  udp.ts        = ts;
-  udp.tf        = tf;
-  udp.btn       = btn;
-  udp.attached  = 1;
-  udp.textqueue = VNEW();
-  udp.callqueue = VNEW();
+  REL(acc_cb);
+  REL(rej_cb);
+
+  udp.ts       = ts;
+  udp.tf       = tf;
+  udp.attached = 1;
+  udp.requests = VNEW();
 }
 
-void ui_decision_popup_show(char* text, cb_t* callback)
+void ui_decision_popup_shownext()
 {
-  VADDR(udp.textqueue, cstr_fromcstring(text));
-  VADD(udp.callqueue, callback);
+  if (udp.requests->length > 0)
+  {
+    map_t* request = vec_tail(udp.requests);
+    char*  text    = MGET(request, "text");
+    tg_text_set(udp.tf, text, udp.ts);
+  }
+  else
+    ui_popup_switcher_toggle("decision_popup_page");
+}
+
+void ui_decision_popup_show(char* text, cb_t* acc_cb, cb_t* rej_cb)
+{
+  map_t* request = MNEW();
+  MPUTR(request, "text", cstr_fromcstring(text));
+  if (acc_cb) MPUT(request, "acc_cb", acc_cb);
+  if (rej_cb) MPUT(request, "rej_cb", rej_cb);
+
+  VADD(udp.requests, request);
 
   tg_text_set(udp.tf, text, udp.ts);
   ui_popup_switcher_toggle("decision_popup_page");
@@ -72,25 +90,32 @@ void ui_decision_popup_show(char* text, cb_t* callback)
 
 void ui_decision_popup_accept(void* userdata, void* data)
 {
-  ui_popup_switcher_toggle("decision_popup_page");
+  map_t* request = vec_tail(udp.requests);
+  if (request)
+  {
+    char* text   = MGET(request, "text");
+    cb_t* acc_cb = MGET(request, "acc_cb");
 
-  cb_t* callback = vec_tail(udp.callqueue);
-  if (callback)
-  {
-    (*callback->fp)(callback->userdata, NULL);
-    vec_rem(udp.callqueue, callback);
-    char* text = vec_tail(udp.textqueue);
-    vec_rem(udp.textqueue, text);
+    if (acc_cb) (*acc_cb->fp)(acc_cb->userdata, NULL);
+    vec_rem(udp.requests, request);
   }
-  if (udp.textqueue->length > 0)
-  {
-    char* text = vec_tail(udp.textqueue);
-    tg_text_set(udp.tf, text, udp.ts);
-  }
+
+  ui_decision_popup_shownext();
 }
 
 void ui_decision_popup_reject(void* userdata, void* data)
 {
+  map_t* request = vec_tail(udp.requests);
+  if (request)
+  {
+    char* text   = MGET(request, "text");
+    cb_t* rej_cb = MGET(request, "rej_cb");
+
+    if (rej_cb) (*rej_cb->fp)(rej_cb->userdata, NULL);
+    vec_rem(udp.requests, request);
+  }
+
+  ui_decision_popup_shownext();
 }
 
 #endif
