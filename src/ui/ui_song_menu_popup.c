@@ -57,6 +57,7 @@ void ui_song_menu_popup_attach(view_t* baseview)
 
 void ui_song_menu_popup_on_item_delete(void* userdata, void* data)
 {
+  printf("SONG MENU POPUP ITEM DELETE\n");
 }
 
 void ui_song_menu_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)

@@ -74,11 +74,11 @@ void ui_popup_switcher_on_button_down(void* userdata, void* data)
   if (strcmp(id, "song_popup_page_btn") == 0) ui_popup_switcher_toggle("song_popup_page");
   if (strcmp(id, "messages_popup_page_btn") == 0) ui_popup_switcher_toggle("messages_popup_page");
   if (strcmp(id, "ideditor_popup_page_btn") == 0) ui_popup_switcher_toggle("ideditor_popup_page");
-  if (strcmp(id, "about_popup_page_btn") == 0) ui_popup_switcher_toggle("about_popup_page");
   if (strcmp(id, "simple_popup_page_btn") == 0) ui_popup_switcher_toggle("simple_popup_page");
   if (strcmp(id, "settings_popup_page_btn") == 0) ui_popup_switcher_toggle("settings_popup_page");
   if (strcmp(id, "filters_popup_page_btn") == 0) ui_popup_switcher_toggle("filters_popup_page");
-  if (strcmp(id, "decision_popup_page_btn") == 0) ui_popup_switcher_toggle("decision_popup_page");
+  // if (strcmp(id, "about_popup_page_btn") == 0) ui_popup_switcher_toggle("about_popup_page");
+  // if (strcmp(id, "decision_popup_page_btn") == 0) ui_popup_switcher_toggle("decision_popup_page");
   if (strcmp(id, "library_popup_page_btn") == 0) ui_popup_switcher_toggle("library_popup_page");
 }
 

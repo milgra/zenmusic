@@ -12,6 +12,7 @@ void ui_alert_popup_show(char* text);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "config.c"
+#include "mtvector.c"
 #include "text.c"
 #include "tg_text.c"
 #include "ui_popup_switcher.c"
@@ -20,13 +21,15 @@ struct _ui_alert_popup_t
 {
   view_t* sim_pop_txt;
   char*   fontpath;
+  vec_t*  textqueue;
 } uap = {0};
 
 void ui_alert_popup_attach(view_t* baseview)
 {
   uap.sim_pop_txt = view_get_subview(baseview, "sim_pop_txt");
   tg_text_add(uap.sim_pop_txt);
-  uap.fontpath = config_get("font_path");
+  uap.fontpath  = config_get("font_path");
+  uap.textqueue = VNEW();
 }
 
 void ui_alert_popup_show(char* text)
@@ -41,6 +44,10 @@ void ui_alert_popup_show(char* text)
   tg_text_set(uap.sim_pop_txt, text, ts);
 
   ui_popup_switcher_toggle("simple_popup_page");
+}
+
+void ui_alert_popup_reject(void* userdata, void* data)
+{
 }
 
 #endif
