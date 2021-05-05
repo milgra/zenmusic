@@ -137,12 +137,12 @@ void ui_on_button_down(void* userdata, void* data)
 
   // todo sanitize button names
 
-  if (strcmp(id, "editbtn") == 0) ui_popup_switcher_toggle("ideditor_popup_page");
+  if (strcmp(id, "editbtn") == 0) ui_popup_switcher_toggle("song_editor_popup_page");
   if (strcmp(id, "aboutbtn") == 0) ui_popup_switcher_toggle("about_popup_page");
   if (strcmp(id, "song_info") == 0) ui_popup_switcher_toggle("messages_popup_page");
   if (strcmp(id, "settingsbtn") == 0) ui_popup_switcher_toggle("settings_popup_page");
   if (strcmp(id, "closefilterbtn") == 0) ui_popup_switcher_toggle("filters_popup_page");
-  if (strcmp(id, "closeeditorbtn") == 0) ui_popup_switcher_toggle("ideditor_popup_page");
+  if (strcmp(id, "closeeditorbtn") == 0) ui_popup_switcher_toggle("song_editor_popup_page");
   if (strcmp(id, "closesettingsbtn") == 0) ui_popup_switcher_toggle("settings_popup_page");
   if (strcmp(id, "library_popup_close_btn") == 0) ui_popup_switcher_toggle("library_popup_page");
 }

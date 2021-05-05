@@ -278,14 +278,14 @@
     box-shadow: 2px;
 }
 
-#ideditorback {
+#song_editorback {
     width: 680px;
     height: 520px;
     top: 300px;
     margin: auto;
 }
 
-#editorlistback {
+#song_editor_list_back {
     width: 500px;
     height: 500px;
     top: 10px;

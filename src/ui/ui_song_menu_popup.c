@@ -72,7 +72,7 @@ void ui_song_menu_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* 
     vec_t* selected = VNEW();
     ui_songlist_get_selected(selected);
     ui_editor_popup_set_songs(selected);
-    ui_popup_switcher_toggle("ideditor_popup_page");
+    ui_popup_switcher_toggle("song_editor_popup_page");
     REL(selected);
   }
   if (index == 4)

@@ -286,7 +286,7 @@ void ui_editor_popup_on_button_down(void* userdata, void* data)
 void ui_editor_popup_attach(view_t* view)
 {
   view_t* listview  = view_get_subview(view, "editorlist");
-  view_t* headview  = view_get_subview(view, "ideditorheader");
+  view_t* headview  = view_get_subview(view, "song_editorheader");
   view_t* coverview = view_get_subview(view, "coverview");
 
   vh_list_add(listview,
@@ -411,7 +411,7 @@ void ui_editor_popup_set_songs(vec_t* vec)
 
 void ui_editor_popup_accept()
 {
-  ui_popup_switcher_toggle("ideditor_popup_page");
+  ui_popup_switcher_toggle("song_editor_popup_page");
 
   map_t* changed = ui_editor_popup_get_changed();
   vec_t* removed = ui_editor_popup_get_removed();

@@ -35,7 +35,7 @@ void ui_popup_switcher_attach(view_t* baseview)
   VADDR(ups.popup_names, cstr_fromcstring("lib_change_popup_page"));
   VADDR(ups.popup_names, cstr_fromcstring("song_popup_page"));
   VADDR(ups.popup_names, cstr_fromcstring("messages_popup_page"));
-  VADDR(ups.popup_names, cstr_fromcstring("ideditor_popup_page"));
+  VADDR(ups.popup_names, cstr_fromcstring("song_editor_popup_page"));
   VADDR(ups.popup_names, cstr_fromcstring("about_popup_page"));
   VADDR(ups.popup_names, cstr_fromcstring("filters_popup_page"));
   VADDR(ups.popup_names, cstr_fromcstring("settings_popup_page"));
@@ -73,7 +73,7 @@ void ui_popup_switcher_on_button_down(void* userdata, void* data)
 
   if (strcmp(id, "song_popup_page_btn") == 0) ui_popup_switcher_toggle("song_popup_page");
   if (strcmp(id, "messages_popup_page_btn") == 0) ui_popup_switcher_toggle("messages_popup_page");
-  if (strcmp(id, "ideditor_popup_page_btn") == 0) ui_popup_switcher_toggle("ideditor_popup_page");
+  if (strcmp(id, "song_editor_popup_page_btn") == 0) ui_popup_switcher_toggle("song_editor_popup_page");
   if (strcmp(id, "simple_popup_page_btn") == 0) ui_popup_switcher_toggle("simple_popup_page");
   if (strcmp(id, "settings_popup_page_btn") == 0) ui_popup_switcher_toggle("settings_popup_page");
   if (strcmp(id, "filters_popup_page_btn") == 0) ui_popup_switcher_toggle("filters_popup_page");
