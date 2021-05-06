@@ -23,6 +23,7 @@
 #include "wm_connector.c"
 #include "wm_event.c"
 #include <SDL.h>
+#include <getopt.h>
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,10 +43,44 @@ struct
   double last_step; // last timestep
   ch_t*  lib_ch;    // library channel
   ch_t*  rem_ch;    // remote channel
+
+  char* cfg_par;
+  char* lib_par;
+  char* res_par;
 } zm = {0};
 
-int main(int argc, char* args[])
+int main(int argc, char* argv[])
 {
+  const struct option long_options[] =
+      {
+          {"resources", optional_argument, 0, 'r'},
+          {"library", optional_argument, 0, 'l'},
+          {"record", optional_argument, 0, 's'},
+          {"replay", optional_argument, 0, 'p'},
+          {"config", optional_argument, 0, 'c'},
+          {0, 0, 0, 0},
+      };
+
+  int option       = 0;
+  int option_index = 0;
+
+  while ((option = getopt_long(argc, argv, "c:l:r:s:p:", long_options, &option_index)) != -1)
+  {
+    if (option != '?') printf("parsing option %c value: %s\n", option, optarg);
+    if (option == 'c') zm.cfg_par = cstr_fromcstring(optarg);
+    if (option == 'l') zm.lib_par = cstr_fromcstring(optarg);
+    if (option == 'r') zm.res_par = cstr_fromcstring(optarg);
+    if (option == '?')
+    {
+      printf("zenmusic v210505 by Milan Toth\nCommand line options:\n");
+      printf("-c --config= [config file] \t use config file for session\n");
+      printf("-l --library= [library folder] \t use library for session\n");
+      printf("-r --resources= [resources folder] \t use resources dir for session\n");
+      printf("-s --record= [recorder file] \t record session to file\n");
+      printf("-p --replay= [recorder file] \t replay session from file\n");
+    }
+  }
+
   wm_init(init, update, render, destroy);
   return 0;
 }
@@ -70,8 +105,6 @@ void init(int width, int height, char* path)
 
   // init paths
 
-  path = "/home/milgra/Projects/zenmusic/bin/";
-
 #ifndef DEBUG
   char* res_path = cstr_fromstring("/usr/local/share/zenmusic");
 #else
@@ -82,6 +115,12 @@ void init(int width, int height, char* path)
   char* css_path  = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/main.css", res_path);
   char* html_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/main.html", res_path);
   char* font_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/Baloo.ttf", res_path);
+
+  // override from parameters
+
+  if (zm.cfg_par) cfg_path = zm.cfg_par;
+  if (zm.res_par) res_path = zm.res_par;
+  if (zm.lib_par) config_set("lib_path", cstr_fromcstring(zm.lib_par));
 
   // print path info to console
 

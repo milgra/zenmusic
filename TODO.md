@@ -1,12 +1,13 @@
 first version
 
+event recorder, event player, command line paths
+fix space problem, case sensitiveness in search
+query engine
 audio stream meglete dontse el hogy mi keruljon libraryba
 songlist refactor
-event recorder, event player, command line paths
 check organize, save entries
 save shuffle state, last played song, last played position
 fix leaks
-fix space problem, case sensitiveness in search
 metadata update eseten sulyos leak, a hatterben tortenjen, analyzer kozben is lehessen mar bongeszni
 index col resize problem scorllkor
 UI Recorder - UI player API, -uiscript
