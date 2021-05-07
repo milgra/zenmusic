@@ -64,8 +64,6 @@ int editor_get_metadata(const char* path, map_t* map)
   {
     if (pFormatCtx)
     {
-      retv = 0;
-
       AVOutputFormat* format = av_guess_format(NULL, path, NULL);
       if (format)
       {
@@ -85,6 +83,19 @@ int editor_get_metadata(const char* path, map_t* map)
           REL(container);
         }
       }
+      else
+      {
+        printf("cannot guess format for %s\n", path);
+        return retv;
+      }
+
+      if (strcmp(MGET(map, "file/container"), "audio") != 0 && strcmp(MGET(map, "file/media_type"), "video") != 0)
+      {
+        printf("not audio not video\n");
+        return retv;
+      }
+
+      retv = 0;
 
       av_dict_set(&format_opts, "scan_all_pmts", NULL, AV_DICT_MATCH_CASE);
 

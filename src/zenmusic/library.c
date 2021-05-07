@@ -48,14 +48,10 @@ void lib_read(char* lib_path)
   if (lib.path) REL(lib.path);
   if (lib.db) REL(lib.db);
 
-  LOG("reading library : %s\n", lib_path);
-
   lib.path = cstr_fromcstring(lib_path);
   lib.db   = MNEW();
 
-  int flags = FTW_PHYS;
-
-  nftw(lib_path, lib_file_data_step, 20, flags);
+  nftw(lib_path, lib_file_data_step, 20, FTW_PHYS);
 
   LOG("library scanned, files : %i", lib.db->count);
 }
@@ -226,6 +222,7 @@ int analyzer_thread(void* chptr)
     }
   }
 
+  // send empty song to initiaite finish
   song = MNEW();
   MPUT(song, "file/path", cstr_fromcstring("//////")); // impossible path
   ch_send(channel, song);                              // send finishing entry

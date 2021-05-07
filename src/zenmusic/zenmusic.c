@@ -308,8 +308,6 @@ void update(ev_t ev)
 
 void render(uint32_t time)
 {
-  printf("render time %u\n", time);
-
   double phead = player_time();
 
   if (phead > 0.0)

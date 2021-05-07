@@ -2,7 +2,6 @@ first version
 
 library refactor
 fix space problem, case sensitiveness in search
-audio stream meglete dontse el hogy mi keruljon libraryba decide which files to read in library
 songlist refactor
 check organize, save entries
 fix leaks
