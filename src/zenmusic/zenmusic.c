@@ -2,6 +2,7 @@
 #include "config.c"
 #include "database.c"
 #include "editor.c"
+#include "evrecorder.c"
 #include "files.c"
 #include "library.c"
 #include "mtcallback.c"
@@ -11,6 +12,7 @@
 #include "mtstring.c"
 #include "player.c"
 #include "remote.c"
+#include "tg_css.c"
 #include "ui.c"
 #include "ui_filter_bar.c"
 #include "ui_lib_init_popup.c"
@@ -47,6 +49,11 @@ struct
   char* cfg_par;
   char* lib_par;
   char* res_par;
+
+  char* rec_par; // record parameter
+  char* rep_par; // replay parameter
+
+  view_t* rep_cur; // replay cursor
 } zm = {0};
 
 int main(int argc, char* argv[])
@@ -58,6 +65,7 @@ int main(int argc, char* argv[])
           {"record", optional_argument, 0, 's'},
           {"replay", optional_argument, 0, 'p'},
           {"config", optional_argument, 0, 'c'},
+          {"frame", optional_argument, 0, 'f'},
           {0, 0, 0, 0},
       };
 
@@ -70,6 +78,8 @@ int main(int argc, char* argv[])
     if (option == 'c') zm.cfg_par = cstr_fromcstring(optarg);
     if (option == 'l') zm.lib_par = cstr_fromcstring(optarg);
     if (option == 'r') zm.res_par = cstr_fromcstring(optarg);
+    if (option == 's') zm.rec_par = cstr_fromcstring(optarg);
+    if (option == 'p') zm.rep_par = cstr_fromcstring(optarg);
     if (option == '?')
     {
       printf("zenmusic v210505 by Milan Toth\nCommand line options:\n");
@@ -78,6 +88,7 @@ int main(int argc, char* argv[])
       printf("-r --resources= [resources folder] \t use resources dir for session\n");
       printf("-s --record= [recorder file] \t record session to file\n");
       printf("-p --replay= [recorder file] \t replay session from file\n");
+      printf("-f --frame= [widthxheight] \t initial window dimension\n");
     }
   }
 
@@ -97,6 +108,8 @@ void init(int width, int height, char* path)
   player_init();
   visible_init();
   callbacks_init();
+  if (zm.rec_par) evrec_init_recorder(zm.rec_par);
+  if (zm.rep_par) evrec_init_player(zm.rep_par);
 
   // init callbacks
 
@@ -132,8 +145,8 @@ void init(int width, int height, char* path)
 
   // init config
 
-  config_set("organize_db", "false");
   config_set("remote_enabled", "false");
+  config_set("organize_db", "false");
   config_set("ui_color", "0xEEEEEEFF");
   config_set("res_path", res_path);
 
@@ -162,6 +175,19 @@ void init(int width, int height, char* path)
     ui_lib_init_popup_show("Please enter the location of your music library folder.");
   else
     load_library();
+
+  // init cursor if replay
+
+  if (zm.rep_par)
+  {
+    zm.rep_cur                          = view_new("rep_cur", ((r2_t){10, 10, 10, 10}));
+    zm.rep_cur->exclude                 = 0;
+    zm.rep_cur->layout.background_color = 0xFF0000FF;
+    tg_css_add(zm.rep_cur);
+    ui_manager_add(zm.rep_cur);
+  }
+
+  // cleanup
 
   REL(res_path);
   REL(css_path);
@@ -251,14 +277,39 @@ void update(ev_t ev)
       ui_play_next();
     }
   }
+  else if (zm.rec_par)
+  {
+    evrec_record(ev);
+  }
 
-  ui_manager_event(ev);
+  if (!zm.rep_par)
+  {
+    ui_manager_event(ev);
+  }
+  else
+  {
+    // filter out all events except time
+    if (ev.type == EV_TIME)
+    {
+      // get recorded events
+      ev_t* recev;
+      while ((recev = evrec_replay(ev.time)) != NULL)
+      {
+        ui_manager_event(*recev);
+        view_set_frame(zm.rep_cur, (r2_t){recev->x, recev->y, 10, 10});
+      }
+      // finally send time event
+      ui_manager_event(ev);
+    }
+  }
 }
 
 // render, called once per frame
 
 void render(uint32_t time)
 {
+  printf("render time %u\n", time);
+
   double phead = player_time();
 
   if (phead > 0.0)

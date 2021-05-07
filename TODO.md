@@ -1,22 +1,20 @@
 first version
 
-event recorder, event player, command line paths
+library refactor
 fix space problem, case sensitiveness in search
-query engine
-audio stream meglete dontse el hogy mi keruljon libraryba
+audio stream meglete dontse el hogy mi keruljon libraryba decide which files to read in library
 songlist refactor
 check organize, save entries
-save shuffle state, last played song, last played position
 fix leaks
 metadata update eseten sulyos leak, a hatterben tortenjen, analyzer kozben is lehessen mar bongeszni
 index col resize problem scorllkor
-UI Recorder - UI player API, -uiscript
-testing - record ui events, inject ui events, check result
-decide which files to read in library
-dark mode
+automata tesztek!!
 
 ideas
 
+dark mode
+save shuffle state, last played song, last played position
+query engine
 on cover/video click open big cover/video view"
 log sor elejen legyen ora perc, fentrol le mukodjon
 test module playing also

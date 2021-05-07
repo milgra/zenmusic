@@ -30,7 +30,7 @@ typedef struct _ev_t
   float       dy;
   int         w;
   int         h;
-  char*       text;
+  char        text[32];
   char        drag;
   uint32_t    time;
   uint32_t    dtime;

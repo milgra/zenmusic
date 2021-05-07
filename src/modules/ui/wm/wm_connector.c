@@ -200,12 +200,12 @@ void wm_init(void (*init)(int, int, char*),
             else if (event.type == SDL_TEXTINPUT)
             {
               ev.type = EV_TEXT;
-              ev.text = event.text.text;
+              strcpy(ev.text, event.text.text);
             }
             else if (event.type == SDL_TEXTEDITING)
             {
               ev.type = EV_TEXT;
-              ev.text = event.text.text;
+              strcpy(ev.text, event.text.text);
             }
 
             (*update)(ev);
