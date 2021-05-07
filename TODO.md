@@ -1,13 +1,11 @@
 first version
 
-library refactor
-fix space problem, case sensitiveness in search
-songlist refactor
 check organize, save entries
+automata tesztek!!
 fix leaks
 metadata update eseten sulyos leak, a hatterben tortenjen, analyzer kozben is lehessen mar bongeszni
-index col resize problem scorllkor
-automata tesztek!!
+fix space problem, case sensitiveness in search
+songlist refactor
 
 ideas
 

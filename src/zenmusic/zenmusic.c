@@ -8,6 +8,7 @@
 #include "mtcallback.c"
 #include "mtchannel.c"
 #include "mtcstring.c"
+#include "mtlog.c"
 #include "mtmap.c"
 #include "mtstring.c"
 #include "player.c"
@@ -229,7 +230,7 @@ void update(ev_t ev)
         {
           // organize db if needed
 
-          int succ = lib_organize(config_get("lib_path"), db_get_db());
+          int succ = db_organize(config_get("lib_path"), db_get_db());
           if (succ == 0) db_write(config_get("lib_path"));
         }
 
@@ -348,12 +349,19 @@ void load_library()
   db_reset();
   db_read(config_get("lib_path"));
 
-  lib_read(config_get("lib_path"));
-  lib_remove_duplicates(db_get_db());
+  map_t* files = MNEW();                         // REL 0
+  lib_read_files(config_get("lib_path"), files); // read all files under library path
+  db_update(files);                              // remove deleted files from db, remove existing files from files
 
-  if (lib_entries() > 0) lib_analyze(zm.lib_ch); // start analyzing new entries
+  if (files->count > 0)
+  {
+    LOG("new files detected : %i", files->count);
+    lib_analyze_files(zm.lib_ch, files); // start analyzing new entries
+  }
 
   visible_set_sortfield("meta/artist", 0);
+
+  REL(files); // REL 0
 }
 
 void on_change_library(void* userdata, void* data)
@@ -400,7 +408,7 @@ void on_change_organize(void* userdata, void* data)
 
   if (config_get_bool("organize_db"))
   {
-    int succ = lib_organize(config_get("lib_path"), db_get_db());
+    int succ = db_organize(config_get("lib_path"), db_get_db());
     if (succ == 0) db_write(config_get("lib_path"));
     ui_songlist_refresh();
   }
