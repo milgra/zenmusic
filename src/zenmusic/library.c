@@ -45,7 +45,7 @@ void lib_read_files(char* lib_path, map_t* files)
 
   nftw(lib_path, lib_file_data_step, 20, FTW_PHYS);
 
-  LOG("library scanned, files : %i", files->count);
+  LOG("lib : scanned, files : %i", files->count);
 }
 
 static int lib_file_data_step(const char* fpath, const struct stat* sb, int tflag, struct FTW* ftwbuf)
@@ -81,16 +81,16 @@ void lib_delete_file(char* lib_path, map_t* entry)
 
   int error = remove(file_path);
   if (error)
-    LOG("cannot remove file %s : %s\n", file_path, strerror(errno));
+    LOG("lib : cannot remove file %s : %s", file_path, strerror(errno));
   else
-    LOG("file %s removed.\n", file_path);
+    LOG("lib : file %s removed.", file_path);
 
   REL(file_path);
 }
 
 int lib_rename_file(char* old_path, char* new_path, char* new_dirs)
 {
-  LOG("lib: renaming %s to %s\n", old_path, new_path);
+  LOG("lib : renaming %s to %s", old_path, new_path);
 
   return 0;
 
@@ -152,6 +152,8 @@ int analyzer_thread(void* chptr)
       MPUT(song, "file/skip_count", cstr_fromcstring("0"));
 
       char* real = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", lib.path, path);
+
+      LOG("lib : analyzing %s", real);
 
       // read and add file and meta data
 
@@ -225,7 +227,7 @@ int analyzer_thread(void* chptr)
     if (ratio != ratio_new)
     {
       ratio = ratio_new;
-      LOG(" analyzer progress : %i%%", ratio);
+      LOG(" lib : analyzer progress : %i%%", ratio);
     }
   }
 

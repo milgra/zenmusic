@@ -42,11 +42,11 @@ void db_read(char* libpath)
 
   char* dbpath = cstr_fromformat(PATH_MAX + NAME_MAX, "/%s/zenmusic.kvl", libpath); // REL 0
 
-  LOG("reading db %s", dbpath);
+  LOG("db : reading db %s", dbpath);
 
   kvlist_read(dbpath, db, "file/path");
 
-  LOG("database loaded, entries : %i", db->count);
+  LOG("db : loaded, entries : %i", db->count);
 
   REL(dbpath); // REL 0
 }
@@ -57,13 +57,11 @@ void db_write(char* libpath)
 
   char* dbpath = cstr_fromformat(PATH_MAX + NAME_MAX, "/%s/zenmusic.kvl", libpath);
 
-  LOG("writing db to %s", dbpath);
-
   int res = kvlist_write(dbpath, db);
 
   if (res < 0) LOG("ERROR db_write cannot write database %s\n", dbpath);
 
-  LOG("db written");
+  LOG("db : written");
 
   REL(dbpath);
 }
@@ -191,12 +189,10 @@ int db_organize_entry(char* libpath, map_t* db, map_t* entry)
 
   if (strcmp(old_path, new_path) != 0)
   {
-    LOG("moving %s to %s\n", old_path, new_path);
-
     int error = lib_rename_file(old_path, new_path, new_dirs);
     if (error == 0)
     {
-      LOG("updating path in db,\n");
+      LOG("db : updating path");
       MPUT(entry, "file/path", new_path_rel);
       MPUT(db, new_path_rel, entry);
       MDEL(db, path);
@@ -214,7 +210,7 @@ int db_organize_entry(char* libpath, map_t* db, map_t* entry)
 
 int db_organize(char* libpath, map_t* db)
 {
-  LOG("organizing database...");
+  LOG("db : organizing database");
 
   // go through all db entries, check path, move if needed
 

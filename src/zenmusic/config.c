@@ -47,9 +47,9 @@ void config_read(char* path)
       char* key = keys->data[index];
       MPUT(confmap, key, MGET(cfdb, key));
     }
-  }
 
-  printf("config loaded from %s, entries : %i\n", path, confmap->count);
+    printf("config loaded from %s, entries : %i\n", path, confmap->count);
+  }
 
   REL(path);
   REL(data);

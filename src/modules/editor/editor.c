@@ -89,7 +89,7 @@ int editor_get_metadata(const char* path, map_t* map)
         return retv;
       }
 
-      if (strcmp(MGET(map, "file/container"), "audio") != 0 && strcmp(MGET(map, "file/media_type"), "video") != 0)
+      if (strcmp(MGET(map, "file/media_type"), "audio") != 0 && strcmp(MGET(map, "file/media_type"), "video") != 0)
       {
         printf("not audio not video\n");
         return retv;

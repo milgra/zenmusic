@@ -39,7 +39,6 @@ void ui_activity_popup_log(char* log)
 
   if (last && log[0] == ' ' && last[0] == ' ')
   {
-    printf("length %i\n", act.logs->length);
     vec_replaceatindex(act.logs, log, 0);
   }
   else
