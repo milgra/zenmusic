@@ -1,3 +1,7 @@
+# Zen Music music player and organizer test protocol
+# All tests are recorded and automated with the command line session recorder options
+# Please re-record a test case if you created a test-breaking change
+
 1. FIRST START
 
    1.1 library popup

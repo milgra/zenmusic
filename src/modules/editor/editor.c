@@ -151,14 +151,14 @@ int editor_get_metadata(const char* path, map_t* map)
     }
     else
     {
-      printf("editor_get_metadata no media context for %s\n", path);
+      LOG("editor : skpping %s, no media context present", path);
     }
 
     avformat_close_input(&pFormatCtx);
   }
   else
   {
-    printf("editor_get_metadata cannot open input %s\n", path);
+    LOG("editor : skipping %s, probably not a media file", path);
   }
 
   return retv;

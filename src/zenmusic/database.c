@@ -175,11 +175,9 @@ int db_organize_entry(char* libpath, map_t* db, map_t* entry)
 
   if (track)
   {
-    int  trackno    = atoi(track);
-    char trackst[5] = {0};
-    snprintf(trackst, 5, "%.3i", trackno);
-    new_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s/%s/%s %s.%s", libpath, artist, album, trackst, title, ext);
-    new_path_rel = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s %s.%s", artist, album, trackst, title, ext);
+    int trackno  = atoi(track);
+    new_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s/%s/%.3i %s.%s", libpath, artist, album, trackno, title, ext);
+    new_path_rel = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%.3i %s.%s", artist, album, trackno, title, ext);
   }
   else
   {

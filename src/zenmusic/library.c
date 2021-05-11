@@ -92,8 +92,6 @@ int lib_rename_file(char* old_path, char* new_path, char* new_dirs)
 {
   LOG("lib : renaming %s to %s", old_path, new_path);
 
-  return 0;
-
   int error = files_mkpath(new_dirs, 0777);
 
   if (error == 0)
@@ -182,21 +180,12 @@ int analyzer_thread(void* chptr)
               break;
             }
           }
+          if (slashindex == -1) slashindex = 0;
+          int   len   = dotindex - slashindex;
+          char* title = mem_calloc(len + 1, "char*", NULL, NULL);
+          memcpy(title, path + slashindex, len);
 
-          if (dotindex > slashindex)
-          {
-            int   len   = dotindex - slashindex;
-            char* title = mem_calloc(len + 1, "char*", NULL, NULL);
-            memcpy(title, path + slashindex, len);
-
-            MPUT(song, "meta/title", title);
-          }
-          else
-          {
-            // use path if nothing works
-
-            MPUT(song, "meta/title", path);
-          }
+          MPUT(song, "meta/title", title);
         }
 
         // try to send it to main thread
