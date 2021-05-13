@@ -13,10 +13,14 @@ void ui_settings_popup_show();
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "callbacks.c"
 #include "config.c"
+#include "mtcallback.c"
 #include "selection.c"
 #include "tg_css.c"
 #include "tg_text.c"
+#include "ui_decision_popup.c"
+#include "ui_lib_change_popup.c"
 #include "ui_popup_switcher.c"
 #include "vh_list.c"
 #include "vh_list_head.c"
@@ -194,6 +198,18 @@ void ui_settings_popup_on_header_field_resize(view_t* view, char* id, int size)
   }
 }
 
+void ui_settings_popup_on_accept(void* userdata, void* data)
+{
+  int enabled = config_get_bool("organize_lib");
+  if (enabled)
+    config_set_bool("organize_lib", 0);
+  else
+    config_set_bool("organize_lib", 1);
+  config_write(config_get("cfg_path"));
+  settingsitem_update_row(uisp.items->data[1], 1, "Organize Library", config_get("organize_lib"));
+  callbacks_call("on_change_organize", NULL);
+}
+
 // items
 
 void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
@@ -206,10 +222,19 @@ void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* c
   {
   case 0:
     //(*uisp.libpath_popup)(NULL);
+    ui_lib_change_popup_show();
     break;
   case 1:
-    //(*uisp.liborg_popup)(NULL);
+  {
+    int   enabled = config_get_bool("organize_lib");
+    cb_t* acc_cb  = cb_new(ui_settings_popup_on_accept, NULL);
+    if (enabled)
+      ui_decision_popup_show("Are you sure you want to switch off automatic organization?", acc_cb, NULL);
+    else
+      ui_decision_popup_show("Are you sure you want to keep your library organized automatically?", acc_cb, NULL);
+    REL(acc_cb);
     break;
+  }
   case 3:
     //(*uisp.info_popup)("You cannot set the config path");
     break;

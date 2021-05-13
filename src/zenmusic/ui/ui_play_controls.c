@@ -97,7 +97,7 @@ void ui_play_index(int index)
     ui_song_infos_show(uipc.lastindex);
     vec_t* songs   = visible_get_songs();
     map_t* songmap = songs->data[uipc.lastindex];
-    char*  path    = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", config_get("lib_path"), MGET(songmap, "file/path"));
+    char*  path    = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", config_get("lib_path"), MGET(songmap, "file/path"));
     player_play(path);
     player_set_volume(0.9);
     REL(path);

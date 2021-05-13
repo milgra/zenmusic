@@ -6,8 +6,6 @@
 void ui_lib_change_popup_attach(view_t* baseview);
 void ui_lib_change_popup_show();
 
-void ui_show_libpath_popup1(char* text);
-
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
@@ -16,6 +14,8 @@ void ui_show_libpath_popup1(char* text);
 #include "config.c"
 #include "text.c"
 #include "tg_text.c"
+#include "ui_manager.c"
+#include "ui_popup_switcher.c"
 #include "vh_button.c"
 #include "vh_textinput.c"
 
@@ -33,10 +33,11 @@ void ui_lib_change_popup_attach(view_t* baseview)
 
   cb_t* cb_btn_press = cb_new(ui_lib_change_on_button_down, NULL);
   vh_button_add(view_get_subview(baseview, "lib_change_accept_btn"), VH_BUTTON_NORMAL, cb_btn_press);
+  vh_button_add(view_get_subview(baseview, "lib_change_reject_btn"), VH_BUTTON_NORMAL, cb_btn_press);
 
   textstyle_t ts = {0};
   ts.font        = config_get("font_path");
-  ts.align       = TA_CENTER;
+  ts.align       = TA_LEFT;
   ts.size        = 30.0;
   ts.textcolor   = 0x000000FF;
 
@@ -60,6 +61,14 @@ void ui_lib_change_on_button_down(void* userdata, void* data)
   char* id = ((view_t*)data)->id;
 
   if (strcmp(id, "lib_change_accept_btn") == 0) ui_change_library();
+
+  ui_popup_switcher_toggle("lib_change_popup_page");
+}
+
+void ui_lib_change_popup_show()
+{
+  ui_popup_switcher_toggle("lib_change_popup_page");
+  ui_manager_activate(ulcp.lib_change_inputfield); // set text input as event receiver
 }
 
 #endif

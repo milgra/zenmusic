@@ -847,10 +847,19 @@
 }
 
 .acceptbtn {
-    background-color: #00FF00FF;
+    background-color: #55FF55FF;
     width: 30px;
     height: 30px;
     right: 12px;
+    bottom: 12px;
+    border-radius: 14px;
+}
+
+.rejectbtn {
+    background-color: #FF5555FF;
+    width: 30px;
+    height: 30px;
+    right: 54px;
     bottom: 12px;
     border-radius: 14px;
 }
@@ -865,7 +874,7 @@
 }
 
 #lib_change_popup {
-    width: 500px;
+    width: 600px;
     height: 180px;
     margin: auto;
     top: 190px;

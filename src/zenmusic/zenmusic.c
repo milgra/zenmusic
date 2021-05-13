@@ -389,13 +389,6 @@ void on_change_library(void* userdata, void* data)
 
 void on_change_organize(void* userdata, void* data)
 {
-  char* value = data;
-  char  flag  = strcmp(value, "Enable") == 0;
-
-  config_set_bool("organize_lib", flag);
-
-  // ui_set_org_btn_lbl(flag ? "Disable" : "Enable");
-
   if (config_get_bool("organize_lib"))
   {
     int succ = db_organize(config_get("lib_path"), db_get_db());
