@@ -97,7 +97,7 @@ char* config_get(char* key)
 int config_get_bool(char* key)
 {
   char* val = MGET(confmap, key);
-  if (val && strcmp(val, "true"))
+  if (val && strcmp(val, "true") == 0)
     return 1;
   else
     return 0;

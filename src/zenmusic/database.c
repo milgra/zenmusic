@@ -168,20 +168,20 @@ int db_organize_entry(char* libpath, map_t* db, map_t* entry)
   char* ext = mem_calloc(len + 1, "char*", NULL, NULL);
   memcpy(ext, path + index, len);
 
-  char* old_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", libpath, path);
-  char* new_dirs     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s/%s/", libpath, artist, album);
+  char* old_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", libpath, path);
+  char* new_dirs     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s/", libpath, artist, album);
   char* new_path     = NULL;
   char* new_path_rel = NULL;
 
   if (track)
   {
     int trackno  = atoi(track);
-    new_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s/%s/%.3i %s.%s", libpath, artist, album, trackno, title, ext);
+    new_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s/%.3i %s.%s", libpath, artist, album, trackno, title, ext);
     new_path_rel = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%.3i %s.%s", artist, album, trackno, title, ext);
   }
   else
   {
-    new_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s/%s/%s.%s", libpath, artist, album, title, ext);
+    new_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s/%s.%s", libpath, artist, album, title, ext);
     new_path_rel = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s.%s", artist, album, title, ext);
   }
 
