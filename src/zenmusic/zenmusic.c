@@ -47,9 +47,9 @@ struct
   ch_t*  lib_ch;    // library channel
   ch_t*  rem_ch;    // remote channel
 
-  char* cfg_par;
-  char* lib_par;
-  char* res_par;
+  char* cfg_par; // config path parameter
+  char* lib_par; // library path parameter
+  char* res_par; // resources path parameter
 
   char* rec_par; // record parameter
   char* rep_par; // replay parameter

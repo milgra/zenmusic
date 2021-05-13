@@ -25,12 +25,16 @@ typedef struct _vh_anim_t
   float sa; // starting alpha
   float ea; // ending alpha
 
+  char anim_alpha;
   char anim_frame;
   char anim_region;
-  char anim_alpha;
 
-  int step;
-  int steps;
+  int astep;
+  int asteps;
+  int rstep;
+  int rsteps;
+  int fstep;
+  int fsteps;
 
   void* userdata;
   void (*on_finish)(view_t*, void*);
@@ -70,9 +74,9 @@ void vh_anim_evt(view_t* view, ev_t ev)
   {
     vh_anim_t* vh = view->handler_data;
 
-    if (vh->step < vh->steps)
+    if (vh->anim_frame)
     {
-      if (vh->anim_frame)
+      if (vh->fstep < vh->fsteps)
       {
         r2_t sf = vh->sf;
         r2_t cf = sf;
@@ -81,15 +85,15 @@ void vh_anim_evt(view_t* view, ev_t ev)
         if (vh->type == AT_LINEAR)
         {
           // just increase current with delta
-          cf.x = sf.x + ((ef.x - sf.x) / vh->steps) * vh->step;
-          cf.y = sf.y + ((ef.y - sf.y) / vh->steps) * vh->step;
-          cf.w = sf.w + ((ef.w - sf.w) / vh->steps) * vh->step;
-          cf.h = sf.h + ((ef.h - sf.h) / vh->steps) * vh->step;
+          cf.x = sf.x + ((ef.x - sf.x) / vh->fsteps) * vh->fstep;
+          cf.y = sf.y + ((ef.y - sf.y) / vh->fsteps) * vh->fstep;
+          cf.w = sf.w + ((ef.w - sf.w) / vh->fsteps) * vh->fstep;
+          cf.h = sf.h + ((ef.h - sf.h) / vh->fsteps) * vh->fstep;
         }
         else if (vh->type == AT_EASE)
         {
           // speed function based on cosine ( half circle )
-          float angle = 3.14 + (3.14 / vh->steps) * vh->step;
+          float angle = 3.14 + (3.14 / vh->fsteps) * vh->fstep;
           float delta = (cos(angle) + 1.0) / 2.0;
 
           cf.x = sf.x + (ef.x - sf.x) * delta;
@@ -98,12 +102,23 @@ void vh_anim_evt(view_t* view, ev_t ev)
           cf.h = sf.h + (ef.h - sf.h) * delta;
         }
 
-        if (vh->step == vh->steps - 1) cf = ef;
+        if (vh->fstep == vh->fsteps - 1) cf = ef;
 
         view_set_frame(view, cf);
-      }
 
-      if (vh->anim_region)
+        vh->fstep += 1;
+
+        if (vh->fstep == vh->fsteps)
+        {
+          vh->anim_frame = 0;
+          if (vh->on_finish) (*vh->on_finish)(view, vh->userdata);
+        }
+      }
+    }
+
+    if (vh->anim_region)
+    {
+      if (vh->rstep < vh->rsteps)
       {
         r2_t sr = vh->sr;
         r2_t cr = sr;
@@ -112,15 +127,15 @@ void vh_anim_evt(view_t* view, ev_t ev)
         if (vh->type == AT_LINEAR)
         {
           // just increase current with delta
-          cr.x = sr.x + ((er.x - sr.x) / vh->steps) * vh->step;
-          cr.y = sr.y + ((er.y - sr.y) / vh->steps) * vh->step;
-          cr.w = sr.w + ((er.w - sr.w) / vh->steps) * vh->step;
-          cr.h = sr.h + ((er.h - sr.h) / vh->steps) * vh->step;
+          cr.x = sr.x + ((er.x - sr.x) / vh->rsteps) * vh->rstep;
+          cr.y = sr.y + ((er.y - sr.y) / vh->rsteps) * vh->rstep;
+          cr.w = sr.w + ((er.w - sr.w) / vh->rsteps) * vh->rstep;
+          cr.h = sr.h + ((er.h - sr.h) / vh->rsteps) * vh->rstep;
         }
         else if (vh->type == AT_EASE)
         {
           // speed function based on cosine ( half circle )
-          float angle = 3.14 + (3.14 / vh->steps) * vh->step;
+          float angle = 3.14 + (3.14 / vh->rsteps) * vh->rstep;
           float delta = (cos(angle) + 1.0) / 2.0;
 
           cr.x = sr.x + (er.x - sr.x) * delta;
@@ -129,12 +144,23 @@ void vh_anim_evt(view_t* view, ev_t ev)
           cr.h = sr.h + (er.h - sr.h) * delta;
         }
 
-        if (vh->step == vh->steps - 1) cr = er;
+        if (vh->rstep == vh->rsteps - 1) cr = er;
 
         view_set_region(view, cr);
-      }
 
-      if (vh->anim_alpha)
+        vh->rstep += 1;
+
+        if (vh->rstep == vh->rsteps)
+        {
+          vh->anim_region = 0;
+          if (vh->on_finish) (*vh->on_finish)(view, vh->userdata);
+        }
+      }
+    }
+
+    if (vh->anim_alpha)
+    {
+      if (vh->astep < vh->asteps)
       {
         float sa = vh->sa;
         float ea = vh->ea;
@@ -143,30 +169,27 @@ void vh_anim_evt(view_t* view, ev_t ev)
         if (vh->type == AT_LINEAR)
         {
           // just increase current with delta
-          ca = sa + ((ea - sa) / vh->steps) * vh->step;
+          ca = sa + ((ea - sa) / vh->asteps) * vh->astep;
         }
         else if (vh->type == AT_EASE)
         {
           // speed function based on cosine ( half circle )
-          float angle = 3.14 + (3.14 / vh->steps) * vh->step;
+          float angle = 3.14 + (3.14 / vh->asteps) * vh->astep;
           float delta = (cos(angle) + 1.0) / 2.0;
           ca          = sa + (ea - sa) * delta;
         }
 
-        if (vh->step == vh->steps - 1) ca = ea;
+        if (vh->astep == vh->asteps - 1) ca = ea;
 
         view_set_texture_alpha(view, ca, 1);
-      }
 
-      vh->step += 1;
+        vh->astep += 1;
 
-      if (vh->step == vh->steps)
-      {
-        vh->anim_frame  = 0;
-        vh->anim_region = 0;
-        vh->anim_alpha  = 0;
-
-        if (vh->on_finish) (*vh->on_finish)(view, vh->userdata);
+        if (vh->astep == vh->asteps)
+        {
+          vh->anim_alpha = 0;
+          if (vh->on_finish) (*vh->on_finish)(view, vh->userdata);
+        }
       }
     }
   }
@@ -179,13 +202,13 @@ void vh_anim_frame(view_t*    view,
                    animtype_t type)
 {
   vh_anim_t* vh = view->handler_data;
-  if (vh->step == vh->steps)
+  if (vh->fstep == vh->fsteps)
   {
     vh->sf         = sf;
     vh->ef         = ef;
-    vh->step       = 0;
+    vh->fstep      = 0;
     vh->type       = type;
-    vh->steps      = steps;
+    vh->fsteps     = steps;
     vh->anim_frame = 1;
   }
 }
@@ -197,13 +220,13 @@ void vh_anim_region(view_t*    view,
                     animtype_t type)
 {
   vh_anim_t* vh = view->handler_data;
-  if (vh->step == vh->steps)
+  if (vh->rstep == vh->rsteps)
   {
     vh->sr          = sr;
     vh->er          = er;
-    vh->step        = 0;
+    vh->rstep       = 0;
     vh->type        = type;
-    vh->steps       = steps;
+    vh->rsteps      = steps;
     vh->anim_region = 1;
   }
 }
@@ -215,13 +238,13 @@ void vh_anim_alpha(view_t*    view,
                    animtype_t type)
 {
   vh_anim_t* vh = view->handler_data;
-  if (vh->step == vh->steps)
+  if (vh->astep == vh->asteps)
   {
     vh->sa         = sa;
     vh->ea         = ea;
-    vh->step       = 0;
+    vh->astep      = 0;
     vh->type       = type;
-    vh->steps      = steps;
+    vh->asteps     = steps;
     vh->anim_alpha = 1;
   }
 }
@@ -229,7 +252,9 @@ void vh_anim_alpha(view_t*    view,
 void vh_anim_finish(view_t* view)
 {
   vh_anim_t* vh = view->handler_data;
-  vh->step      = vh->steps;
+  vh->astep     = vh->asteps;
+  vh->fstep     = vh->fsteps;
+  vh->rstep     = vh->rsteps;
 
   if (vh->anim_frame) view_set_frame(view, vh->ef);
   if (vh->anim_region) view_set_region(view, vh->er);

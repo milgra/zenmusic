@@ -664,8 +664,8 @@
 }
 
 #lib_init_page_back {
-    width: 500px;
-    height: 150px;
+    width: 560px;
+    height: 180px;
     margin: auto;
 }
 
@@ -676,13 +676,18 @@
     background-color: #00000000;
 }
 
-.ch_lib_if {
+.ch_lib_if_back {
     bottom: 10px;
     left: 10px;
-    width: 380px;
+    width: 435px;
     height: 35px;
     border-radius: 10px;
     background-color: #FFFFFFFF;
+}
+
+.ch_lib_if {
+    width: 100%;
+    height: 100%;
 }
 
 #app_maximize_btn {

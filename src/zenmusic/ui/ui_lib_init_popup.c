@@ -31,6 +31,7 @@ struct _ui_lib_init_popup_t
 } ulip = {0};
 
 void ui_lib_init_on_button_down(void* userdata, void* data);
+void ui_lib_init_popup_set_library(view_t* view);
 
 void ui_lib_init_popup_attach(view_t* baseview)
 {
@@ -46,19 +47,24 @@ void ui_lib_init_popup_attach(view_t* baseview)
 
   textstyle_t ts  = {0};
   ts.font         = ulip.fontpath;
-  ts.align        = TA_CENTER;
-  ts.margin_right = 0;
+  ts.align        = TA_LEFT;
+  ts.margin_left  = 10;
+  ts.margin_right = 10;
   ts.size         = 30.0;
   ts.textcolor    = 0x000000FF;
   ts.backcolor    = 0;
 
   tg_text_add(ulip.lib_init_textfield_view);
+
+  ts.backcolor = 0xFFFFFFFF;
   vh_textinput_add(ulip.lib_init_inputfield_view, "/home/youruser/Music", "", ts, NULL);
+
+  vh_textinput_set_on_return(ulip.lib_init_inputfield_view, ui_lib_init_popup_set_library);
 
   view_remove(baseview, ulip.lib_init_popup);
 }
 
-void ui_lib_init_popup_set_library()
+void ui_lib_init_popup_set_library(view_t* view)
 {
   // get path string
   str_t* path    = vh_textinput_get_text(ulip.lib_init_inputfield_view);
@@ -72,7 +78,7 @@ void ui_lib_init_on_button_down(void* userdata, void* data)
 {
   char* id = ((view_t*)data)->id;
 
-  if (strcmp(id, "acceptlibbtn") == 0) ui_lib_init_popup_set_library();
+  if (strcmp(id, "acceptlibbtn") == 0) ui_lib_init_popup_set_library(NULL);
 }
 
 void ui_lib_init_popup_show(char* text)

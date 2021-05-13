@@ -35,6 +35,7 @@ char   mem_releaseeach(void* first, ...);
 size_t mem_retaincount(void* pointer);
 void   mem_replace(void** address, void* data);
 void*  mem_stack_to_heap(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*, int), uint8_t* data);
+char*  mem_type(void* pointer);
 void   mem_describe(void* pointer, int level);
 void   mem_exit(char* text, char* type);
 
@@ -180,6 +181,14 @@ size_t mem_retaincount(void* pointer)
   assert(head->id[0] == 'm' && head->id[1] == 't');
 
   return head->retaincount;
+}
+
+char* mem_type(void* pointer)
+{
+  uint8_t* bytes = (uint8_t*)pointer;
+  bytes -= sizeof(struct mem_head);
+  struct mem_head* head = (struct mem_head*)bytes;
+  return head->type;
 }
 
 void mem_replace(void** address, void* data)
