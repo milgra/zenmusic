@@ -24,6 +24,7 @@ void     db_reset();
 #include "kvlist.c"
 #include "library.c"
 #include "mtcstring.c"
+#include "mtcstrpath.c"
 #include "mtlog.c"
 #include "mtvector.c"
 #include <ctype.h>
@@ -154,19 +155,7 @@ int db_organize_entry(char* libpath, map_t* db, map_t* entry)
 
   // get extension
 
-  int index;
-  for (index = strlen(path) - 1; index > -1; --index)
-  {
-    if (path[index] == '.')
-    {
-      index++;
-      break;
-    }
-  }
-
-  int   len = strlen(path) - index;
-  char* ext = mem_calloc(len + 1, "char*", NULL, NULL);
-  memcpy(ext, path + index, len);
+  char* ext = cstr_path_extension(path);
 
   char* old_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", libpath, path);
   char* new_dirs     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s/", libpath, artist, album);

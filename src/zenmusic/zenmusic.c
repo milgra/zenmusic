@@ -8,6 +8,7 @@
 #include "mtcallback.c"
 #include "mtchannel.c"
 #include "mtcstring.c"
+#include "mtcstrpath.c"
 #include "mtlog.c"
 #include "mtmap.c"
 #include "mtstring.c"
@@ -48,7 +49,6 @@ struct
   ch_t*  rem_ch;    // remote channel
 
   char* cfg_par; // config path parameter
-  char* lib_par; // library path parameter
   char* res_par; // resources path parameter
 
   char* rec_par; // record parameter
@@ -62,7 +62,6 @@ int main(int argc, char* argv[])
   const struct option long_options[] =
       {
           {"resources", optional_argument, 0, 'r'},
-          {"library", optional_argument, 0, 'l'},
           {"record", optional_argument, 0, 's'},
           {"replay", optional_argument, 0, 'p'},
           {"config", optional_argument, 0, 'c'},
@@ -77,7 +76,6 @@ int main(int argc, char* argv[])
   {
     if (option != '?') printf("parsing option %c value: %s\n", option, optarg);
     if (option == 'c') zm.cfg_par = cstr_fromcstring(optarg);
-    if (option == 'l') zm.lib_par = cstr_fromcstring(optarg);
     if (option == 'r') zm.res_par = cstr_fromcstring(optarg);
     if (option == 's') zm.rec_par = cstr_fromcstring(optarg);
     if (option == 'p') zm.rep_par = cstr_fromcstring(optarg);
@@ -85,7 +83,6 @@ int main(int argc, char* argv[])
     {
       printf("zenmusic v210505 by Milan Toth\nCommand line options:\n");
       printf("-c --config= [config file] \t use config file for session\n");
-      printf("-l --library= [library folder] \t use library for session\n");
       printf("-r --resources= [resources folder] \t use resources dir for session\n");
       printf("-s --record= [recorder file] \t record session to file\n");
       printf("-p --replay= [recorder file] \t replay session from file\n");
@@ -120,21 +117,15 @@ void init(int width, int height, char* path)
   // init paths
 
 #ifndef DEBUG
-  char* res_path = cstr_fromstring("/usr/local/share/zenmusic");
+  char* res_path = zm.res_par ? zm.res_par : cstr_fromstring("/usr/local/share/zenmusic");
 #else
-  char* res_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s../res", path);
+  char* res_path = zm.res_par ? zm.res_par : cstr_fromformat(PATH_MAX + NAME_MAX, "%s../res", path);
 #endif
-  char* cfg_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/.config/zenmusic/config.kvl", getenv("HOME"));
+  char* cfg_path = zm.cfg_par ? zm.cfg_par : cstr_fromformat(PATH_MAX + NAME_MAX, "%s/.config/zenmusic", getenv("HOME"));
 
   char* css_path  = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/main.css", res_path);
   char* html_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/main.html", res_path);
   char* font_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/Baloo.ttf", res_path);
-
-  // override from parameters
-
-  if (zm.cfg_par) cfg_path = zm.cfg_par;
-  if (zm.res_par) res_path = zm.res_par;
-  if (zm.lib_par) config_set("lib_path", cstr_fromcstring(zm.lib_par));
 
   // print path info to console
 
@@ -143,6 +134,8 @@ void init(int width, int height, char* path)
   printf("css path      : %s\n", css_path);
   printf("html path     : %s\n", html_path);
   printf("font path     : %s\n", font_path);
+
+  char* fin_cfg_path = cstr_add_path_component(cfg_path, "config.kvl");
 
   // init config
 
@@ -153,11 +146,11 @@ void init(int width, int height, char* path)
 
   // read config, it overwrites defaults if exists
 
-  config_read(cfg_path);
+  config_read(fin_cfg_path);
 
   // init non-configurable defaults
 
-  config_set("cfg_path", cfg_path);
+  config_set("cfg_path", fin_cfg_path);
   config_set("css_path", css_path);
   config_set("html_path", html_path);
   config_set("font_path", font_path);
@@ -371,10 +364,7 @@ void on_change_library(void* userdata, void* data)
 
   // construct path if needed
 
-  if (new_path[0] == '~')
-    lib_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", getenv("HOME"), new_path + 1); // replace tilde's with home
-  else
-    lib_path = cstr_fromcstring(new_path);
+  lib_path = cstr_path_extend_tilde(new_path);
 
   // remove slash if needed
 

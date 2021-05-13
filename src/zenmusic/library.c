@@ -19,6 +19,7 @@ void lib_analyze_files(ch_t* channel, map_t* files);
 #include "editor.c"
 #include "files.c"
 #include "mtcstring.c"
+#include "mtcstrpath.c"
 #include "mtlog.c"
 #include <errno.h>
 #include <limits.h>
@@ -159,34 +160,9 @@ int analyzer_thread(void* chptr)
 
       if (res == 0)
       {
-        if (MGET(song, "meta/artist") == NULL) MPUT(song, "meta/artist", cstr_fromcstring("Unknown"));
-        if (MGET(song, "meta/album") == NULL) MPUT(song, "meta/album", cstr_fromcstring("Unknown"));
-        if (MGET(song, "meta/title") == NULL)
-        {
-          // if no title present use file name
-
-          int dotindex;
-          for (dotindex = strlen(path) - 1; dotindex > -1; --dotindex)
-          {
-            if (path[dotindex] == '.') break;
-          }
-
-          int slashindex;
-          for (slashindex = strlen(path) - 1; slashindex > -1; --slashindex)
-          {
-            if (path[slashindex] == '/')
-            {
-              slashindex++;
-              break;
-            }
-          }
-          if (slashindex == -1) slashindex = 0;
-          int   len   = dotindex - slashindex;
-          char* title = mem_calloc(len + 1, "char*", NULL, NULL);
-          memcpy(title, path + slashindex, len);
-
-          MPUT(song, "meta/title", title);
-        }
+        if (MGET(song, "meta/artist") == NULL) MPUTR(song, "meta/artist", cstr_fromcstring("Unknown"));
+        if (MGET(song, "meta/album") == NULL) MPUTR(song, "meta/album", cstr_fromcstring("Unknown"));
+        if (MGET(song, "meta/title") == NULL) MPUTR(song, "meta/title", cstr_path_filename(path));
 
         // try to send it to main thread
         if (ch_send(channel, song)) song = NULL;

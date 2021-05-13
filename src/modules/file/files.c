@@ -11,8 +11,10 @@ int files_mkpath(char* file_path, mode_t mode);
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "mtcstring.c"
 #include <assert.h>
 #include <errno.h>
+#include <limits.h>
 #include <stdio.h>
 #include <string.h>
 

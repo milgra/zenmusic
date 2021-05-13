@@ -19,6 +19,7 @@ void  config_set_bool(char* key, int val);
 #include "kvlist.c"
 #include "library.c"
 #include "mtcstring.c"
+#include "mtcstrpath.c"
 #include "mtlog.c"
 #include <limits.h>
 
@@ -55,11 +56,12 @@ void config_read(char* path)
   REL(data);
 }
 
-void config_write()
+void config_write(char* path)
 {
   map_t* data    = MNEW();
-  char*  dirpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/.config/zenmusic/", getenv("HOME"));
-  char*  cfgpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/.config/zenmusic/config.kvl", getenv("HOME"));
+  char*  dirpath = cstr_remove_last_path_component(path);
+
+  printf("CONFIG DIR %s FILE %s\n", dirpath, path);
 
   MPUT(confmap, "id", cstr_fromcstring("config")); // put id in config db
   MPUT(data, "id", confmap);                       // put config db in final data with same id
@@ -68,7 +70,7 @@ void config_write()
 
   if (error == 0)
   {
-    int res = kvlist_write(cfgpath, data);
+    int res = kvlist_write(path, data);
     if (res < 0)
       LOG("ERROR config_write cannot write config\n");
     else
@@ -78,7 +80,6 @@ void config_write()
     LOG("ERROR config_write cannot create config path\n");
 
   REL(dirpath);
-  REL(cfgpath);
   REL(data);
 }
 
