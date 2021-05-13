@@ -7,6 +7,7 @@
 void ui_settings_popup_attach(view_t* view);
 void ui_settings_popup_update();
 void ui_settings_popup_refresh();
+void ui_settings_popup_show();
 
 #endif
 
@@ -16,6 +17,7 @@ void ui_settings_popup_refresh();
 #include "selection.c"
 #include "tg_css.c"
 #include "tg_text.c"
+#include "ui_popup_switcher.c"
 #include "vh_list.c"
 #include "vh_list_head.c"
 #include "vh_list_item.c"
@@ -122,6 +124,18 @@ void ui_settings_popup_attach(view_t* baseview)
   settingsitem_update_row(uisp.items->data[3], 3, "Remote Control", "Disabled");
   settingsitem_update_row(uisp.items->data[4], 4, "Config Path", "/home/.config/zenmusic/config");
   settingsitem_update_row(uisp.items->data[5], 5, "Style Path", "/usr/local/share/zenmusic");
+}
+
+void ui_settings_popup_show()
+{
+  settingsitem_update_row(uisp.items->data[0], 0, "Library Path", config_get("lib_path"));
+  settingsitem_update_row(uisp.items->data[1], 1, "Organize Library", config_get("organize_lib"));
+  settingsitem_update_row(uisp.items->data[2], 2, "Dark Mode", config_get("dark_mode"));
+  settingsitem_update_row(uisp.items->data[3], 3, "Remote Control", config_get("remote_enabled"));
+  settingsitem_update_row(uisp.items->data[4], 4, "Config Path", config_get("cfg_path"));
+  settingsitem_update_row(uisp.items->data[5], 5, "HTML/Style Path", config_get("res_path"));
+
+  ui_popup_switcher_toggle("settings_popup_page");
 }
 
 void ui_settings_popup_update()

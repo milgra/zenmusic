@@ -140,8 +140,8 @@ void init(int width, int height, char* path)
   // init config
 
   config_set("remote_enabled", "false");
-  config_set("organize_db", "false");
-  config_set("ui_color", "0xEEEEEEFF");
+  config_set("organize_lib", "false");
+  config_set("dark_mode", "false");
   config_set("res_path", res_path);
 
   // read config, it overwrites defaults if exists
@@ -219,7 +219,7 @@ void update(ev_t ev)
       {
         db_write(config_get("lib_path"));
 
-        if (config_get_bool("organize_db"))
+        if (config_get_bool("organize_lib"))
         {
           // organize db if needed
 
@@ -392,11 +392,11 @@ void on_change_organize(void* userdata, void* data)
   char* value = data;
   char  flag  = strcmp(value, "Enable") == 0;
 
-  config_set_bool("organize_db", flag);
+  config_set_bool("organize_lib", flag);
 
   // ui_set_org_btn_lbl(flag ? "Disable" : "Enable");
 
-  if (config_get_bool("organize_db"))
+  if (config_get_bool("organize_lib"))
   {
     int succ = db_organize(config_get("lib_path"), db_get_db());
     if (succ == 0) db_write(config_get("lib_path"));
