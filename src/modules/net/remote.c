@@ -4,6 +4,7 @@
 #include "mtchannel.c"
 
 void remote_listen(ch_t* channel);
+void remote_close();
 
 #endif
 
@@ -33,7 +34,6 @@ void* remote_listen_ins(void* p)
   ch_t* channel = (ch_t*)p;
 
   char               buffer[MAXLINE];
-  char*              hello = "Hello from server";
   struct sockaddr_in servaddr, cliaddr;
 
   // Creating socket file descriptor
@@ -73,6 +73,10 @@ void* remote_listen_ins(void* p)
     printf("data received : %s\n", buffer);
   }
 
+  close(sockfd);
+
+  printf("remote socket closed\n");
+
   return NULL;
 }
 
@@ -88,6 +92,11 @@ void remote_listen(ch_t* channel)
 
     if (err) printf("Thread creation failed : %s", strerror(err));
   }
+}
+
+void remote_close()
+{
+  remote_alive = 0;
 }
 
 #endif

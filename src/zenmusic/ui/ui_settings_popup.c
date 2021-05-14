@@ -19,6 +19,7 @@ void ui_settings_popup_show();
 #include "selection.c"
 #include "tg_css.c"
 #include "tg_text.c"
+#include "ui_alert_popup.c"
 #include "ui_decision_popup.c"
 #include "ui_lib_change_popup.c"
 #include "ui_popup_switcher.c"
@@ -75,8 +76,8 @@ void ui_settings_popup_attach(view_t* baseview)
 
   // create fields
 
-  VADD(uisp.fields, uisp_cell_new("key", 300, 0));
-  VADD(uisp.fields, uisp_cell_new("value", 340, 1));
+  VADD(uisp.fields, uisp_cell_new("key", 200, 0));
+  VADD(uisp.fields, uisp_cell_new("value", 500, 1));
 
   vec_dec_retcount(uisp.fields);
 
@@ -117,27 +118,27 @@ void ui_settings_popup_attach(view_t* baseview)
 
   VADD(uisp.items, settingsitem_create());
   VADD(uisp.items, settingsitem_create());
-  VADD(uisp.items, settingsitem_create());
+  // VADD(uisp.items, settingsitem_create());
   VADD(uisp.items, settingsitem_create());
   VADD(uisp.items, settingsitem_create());
   VADD(uisp.items, settingsitem_create());
 
   settingsitem_update_row(uisp.items->data[0], 0, "Library Path", "/home/user/milgra/Music");
   settingsitem_update_row(uisp.items->data[1], 1, "Organize Library", "Disabled");
-  settingsitem_update_row(uisp.items->data[2], 2, "Dark Mode", "Disabled");
-  settingsitem_update_row(uisp.items->data[3], 3, "Remote Control", "Disabled");
-  settingsitem_update_row(uisp.items->data[4], 4, "Config Path", "/home/.config/zenmusic/config");
-  settingsitem_update_row(uisp.items->data[5], 5, "Style Path", "/usr/local/share/zenmusic");
+  //  settingsitem_update_row(uisp.items->data[2], 2, "Dark Mode", "Disabled");
+  settingsitem_update_row(uisp.items->data[2], 2, "Remote Control", "Disabled");
+  settingsitem_update_row(uisp.items->data[3], 3, "Config Path", "/home/.config/zenmusic/config");
+  settingsitem_update_row(uisp.items->data[4], 4, "Style Path", "/usr/local/share/zenmusic");
 }
 
 void ui_settings_popup_show()
 {
   settingsitem_update_row(uisp.items->data[0], 0, "Library Path", config_get("lib_path"));
   settingsitem_update_row(uisp.items->data[1], 1, "Organize Library", config_get("organize_lib"));
-  settingsitem_update_row(uisp.items->data[2], 2, "Dark Mode", config_get("dark_mode"));
-  settingsitem_update_row(uisp.items->data[3], 3, "Remote Control", config_get("remote_enabled"));
-  settingsitem_update_row(uisp.items->data[4], 4, "Config Path", config_get("cfg_path"));
-  settingsitem_update_row(uisp.items->data[5], 5, "HTML/Style Path", config_get("res_path"));
+  //  settingsitem_update_row(uisp.items->data[2], 2, "Dark Mode", config_get("dark_mode"));
+  settingsitem_update_row(uisp.items->data[2], 2, "Remote Control", config_get("remote_enabled"));
+  settingsitem_update_row(uisp.items->data[3], 3, "Config Path", config_get("cfg_path"));
+  settingsitem_update_row(uisp.items->data[4], 4, "HTML/Style Path", config_get("res_path"));
 
   ui_popup_switcher_toggle("settings_popup_page");
 }
@@ -210,6 +211,18 @@ void ui_settings_popup_on_accept(void* userdata, void* data)
   callbacks_call("on_change_organize", NULL);
 }
 
+void ui_settings_popup_on_accept_remote(void* userdata, void* data)
+{
+  int enabled = config_get_bool("remote_enabled");
+  if (enabled)
+    config_set_bool("remote_enabled", 0);
+  else
+    config_set_bool("remote_enabled", 1);
+  config_write(config_get("cfg_path"));
+  settingsitem_update_row(uisp.items->data[2], 1, "Organize Library", config_get("remote_enabled"));
+  callbacks_call("on_change_remote", NULL);
+}
+
 // items
 
 void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
@@ -221,7 +234,6 @@ void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* c
   switch (index)
   {
   case 0:
-    //(*uisp.libpath_popup)(NULL);
     ui_lib_change_popup_show();
     break;
   case 1:
@@ -235,11 +247,22 @@ void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* c
     REL(acc_cb);
     break;
   }
+  case 2:
+  {
+    int   enabled = config_get_bool("remote_enabled");
+    cb_t* acc_cb  = cb_new(ui_settings_popup_on_accept_remote, NULL);
+    if (enabled)
+      ui_decision_popup_show("Are you sure you want to switch off remote control?", acc_cb, NULL);
+    else
+      ui_decision_popup_show("You can remote control Zen Music by sending 0x00(play/pause) 0x01(prev song) 0x02(next song) to UDP port 23723. Would you like to enable it?", acc_cb, NULL);
+    REL(acc_cb);
+    break;
+  }
   case 3:
-    //(*uisp.info_popup)("You cannot set the config path");
+    ui_alert_popup_show("You cannot set the config path");
     break;
   case 4:
-    //(*uisp.info_popup)("You cannot set the style path");
+    ui_alert_popup_show("You cannot set the style path");
     break;
   }
 }

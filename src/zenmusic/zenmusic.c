@@ -39,6 +39,7 @@ void render(uint32_t time);
 void destroy();
 
 void load_library();
+void on_change_remote(void* userdata, void* data);
 void on_change_library(void* userdata, void* data);
 void on_change_organize(void* userdata, void* data);
 
@@ -111,6 +112,7 @@ void init(int width, int height, char* path)
 
   // init callbacks
 
+  callbacks_set("on_change_remote", cb_new(on_change_remote, NULL));
   callbacks_set("on_change_library", cb_new(on_change_library, NULL));
   callbacks_set("on_change_organize", cb_new(on_change_organize, NULL));
 
@@ -355,6 +357,14 @@ void load_library()
   visible_set_sortfield("meta/artist", 0);
 
   REL(files); // REL 0
+}
+
+void on_change_remote(void* userdata, void* data)
+{
+  if (config_get_bool("remote_enabled"))
+    remote_listen(zm.rem_ch);
+  else
+    remote_close();
 }
 
 void on_change_library(void* userdata, void* data)

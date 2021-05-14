@@ -318,7 +318,7 @@
     overflow: hidden;
     width: 100%;
     height: 100%;
-    margin: 10px;
+    margin: 5px;
     border-radius: 10px;
     background-color: #EEEEEEFF;
 }
@@ -374,8 +374,8 @@
 #song_editor {
     width: 100%;
     height: 100%;
-    margin: 10px;
-    border-radius: 15px;
+    margin: 5px;
+    border-radius: 12px;
     background-color: #EEEEEEFF;
 }
 
@@ -437,7 +437,7 @@
     overflow: hidden;
     width: 100%;
     height: 100%;
-    border-radius: 15px;
+    border-radius: 12px;
     background-color: #EEEEEEFF;
     box-shadow: 2px;
 }
@@ -515,8 +515,8 @@
     overflow: hidden;
     width: 100%;
     height: 100%;
-    margin: 10px;
-    border-radius: 10px;
+    margin: 5px;
+    border-radius: 12px;
     background-color: #EEEEEEFF;
 }
 
