@@ -16,6 +16,7 @@ void ui_about_popup_refresh();
 #include "selection.c"
 #include "tg_css.c"
 #include "tg_text.c"
+#include "ui_alert_popup.c"
 #include "vh_button.c"
 #include "vh_list.c"
 #include "vh_list_head.c"
@@ -114,23 +115,23 @@ void ui_about_popup_on_header_field_resize(view_t* view, char* id, int size)
 
 void ui_about_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
-  if (donl.popup) (*donl.popup)("The link is opened in the browser.");
-
   switch (index)
   {
   case 1:
-    system("xdg-open https://paypal.me/milgra");
-    break;
-  case 2:
     system("xdg-open https://patreon.com/milgra");
     break;
+  case 2:
+    system("xdg-open https://paypal.me/milgra");
+    break;
   case 3:
-    system("xdg-open https://github.com/milgra/zenmusic");
+    system("xdg-open https://github.com/milgra/zenmusic/issues");
     break;
   case 4:
-    system("xdg-open https://yotubue.com/milgra");
+    system("xdg-open https://github.com/milgra/zenmusic");
     break;
   }
+
+  if (index < 5) ui_alert_popup_show("Link is opened in the browser.");
 }
 
 view_t* donateitem_create(int index)
@@ -141,7 +142,7 @@ view_t* donateitem_create(int index)
 
   float height = 50;
   if (index == 0) height = 150;
-  if (index == 6) height = 200;
+  if (index == 5) height = 220;
 
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 460, height});
 
@@ -157,13 +158,18 @@ view_t* donateitem_create(int index)
 
     REL(id);
 
-    if (index == 6)
+    if (index == 5)
     {
-      char* respath                     = config_get("res_path");
-      char* imagepath                   = cstr_fromformat(100, "%s/freebsd.png", respath);
-      cellview->layout.margin           = INT_MAX;
-      cellview->layout.background_image = imagepath;
-      tg_css_add(cellview);
+      view_t* imgview                  = view_new("bsdlogo", ((r2_t){130, 10, 200, 200}));
+      char*   respath                  = config_get("res_path");
+      char*   imagepath                = cstr_fromformat(100, "%s/freebsd.png", respath);
+      imgview->layout.background_image = imagepath;
+      tg_css_add(imgview);
+      // TODO set image instead of direct set
+      // REL(imagepath);
+      view_add(cellview, imgview);
+
+      vh_litem_upd_index(rowview, 5);
     }
     else
     {
@@ -231,14 +237,12 @@ void ui_about_popup_attach(view_t* baseview)
   VADD(donl.items, donateitem_create(3));
   VADD(donl.items, donateitem_create(4));
   VADD(donl.items, donateitem_create(5));
-  VADD(donl.items, donateitem_create(6));
 
   donateitem_update_row(donl.items->data[0], 0, "Zen Music v0.8\n by Milan Toth\nFree and Open Source Software.\nIf you like it, please support the development.");
-  donateitem_update_row(donl.items->data[1], 1, "Donate on Paypal");
-  donateitem_update_row(donl.items->data[2], 2, "Support on Patreon");
-  donateitem_update_row(donl.items->data[3], 3, "GitHub Page");
-  donateitem_update_row(donl.items->data[4], 4, "Youtube Channel");
-  donateitem_update_row(donl.items->data[5], 5, "Report an Issue");
+  donateitem_update_row(donl.items->data[1], 1, "Support on Patreon");
+  donateitem_update_row(donl.items->data[2], 2, "Donate on Paypal");
+  donateitem_update_row(donl.items->data[3], 3, "Report an Issue");
+  donateitem_update_row(donl.items->data[4], 4, "GitHub Page");
 }
 
 #endif

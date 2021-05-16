@@ -77,7 +77,7 @@ void ui_popup_switcher_on_button_down(void* userdata, void* data)
   if (strcmp(id, "simple_popup_page_btn") == 0) ui_popup_switcher_toggle("simple_popup_page");
   if (strcmp(id, "settings_popup_page_btn") == 0) ui_popup_switcher_toggle("settings_popup_page");
   if (strcmp(id, "filters_popup_page_btn") == 0) ui_popup_switcher_toggle("filters_popup_page");
-  // if (strcmp(id, "about_popup_page_btn") == 0) ui_popup_switcher_toggle("about_popup_page");
+  if (strcmp(id, "about_popup_page_btn") == 0) ui_popup_switcher_toggle("about_popup_page");
   // if (strcmp(id, "decision_popup_page_btn") == 0) ui_popup_switcher_toggle("decision_popup_page");
   if (strcmp(id, "library_popup_page_btn") == 0) ui_popup_switcher_toggle("library_popup_page");
 }

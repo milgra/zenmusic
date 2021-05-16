@@ -77,7 +77,7 @@ void ui_settings_popup_attach(view_t* baseview)
   // create fields
 
   VADD(uisp.fields, uisp_cell_new("key", 200, 0));
-  VADD(uisp.fields, uisp_cell_new("value", 500, 1));
+  VADD(uisp.fields, uisp_cell_new("value", 460, 1));
 
   vec_dec_retcount(uisp.fields);
 
@@ -243,7 +243,7 @@ void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* c
     if (enabled)
       ui_decision_popup_show("Are you sure you want to switch off automatic organization?", acc_cb, NULL);
     else
-      ui_decision_popup_show("Are you sure you want to keep your library organized automatically?", acc_cb, NULL);
+      ui_decision_popup_show("Are you sure you want to keep your library organized automatically? New songs will be organized automatically based on artist, title and track number after every start.", acc_cb, NULL);
     REL(acc_cb);
     break;
   }

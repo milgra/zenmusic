@@ -9,6 +9,7 @@ songlist refactor
 
 ideas
 
+horizontally maximized textfields
 dark mode
 save shuffle state, last played song, last played position
 query engine

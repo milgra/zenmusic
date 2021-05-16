@@ -428,7 +428,7 @@
 
 #settings_popup {
     width: 700px;
-    height: 390px;
+    height: 340px;
     top: 220px;
     margin: auto;
 }
@@ -496,6 +496,15 @@
     height: 200px;
     top: 220px;
     margin: auto;
+}
+
+#simple_pop_acc_btn {
+    background-color: #55FF55FF;
+    width: 30px;
+    height: 30px;
+    bottom: 12px;
+    border-radius: 14px;
+    right: 12px;
 }
 
 #sim_pop_txt {
