@@ -142,6 +142,7 @@ void init(int width, int height, char* path)
   // init config
 
   config_set("remote_enabled", "false");
+  config_set("remote_port", "23723");
   config_set("organize_lib", "false");
   config_set("dark_mode", "false");
   config_set("res_path", res_path);
@@ -163,7 +164,7 @@ void init(int width, int height, char* path)
 
   // start listening for remote control events if set
 
-  if (config_get("remote_enabled") && config_get_bool("remote_enabled")) remote_listen(zm.rem_ch);
+  if (config_get("remote_enabled") && config_get_bool("remote_enabled")) remote_listen(zm.rem_ch, config_get_int("remote_port"));
 
   // show library popup if no lib path is saved yet or load library
 
@@ -362,7 +363,7 @@ void load_library()
 void on_change_remote(void* userdata, void* data)
 {
   if (config_get_bool("remote_enabled"))
-    remote_listen(zm.rem_ch);
+    remote_listen(zm.rem_ch, config_get_int("remote_port"));
   else
     remote_close();
 }

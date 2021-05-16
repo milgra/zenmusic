@@ -8,6 +8,7 @@ void  config_read(char* path);
 void  config_write(char* path);
 void  config_set(char* key, char* value);
 char* config_get(char* key);
+int   config_get_int(char* key);
 int   config_get_bool(char* key);
 void  config_set_bool(char* key, int val);
 
@@ -100,6 +101,15 @@ int config_get_bool(char* key)
   char* val = MGET(confmap, key);
   if (val && strcmp(val, "true") == 0)
     return 1;
+  else
+    return 0;
+}
+
+int config_get_int(char* key)
+{
+  char* val = MGET(confmap, key);
+  if (val)
+    return atoi(val);
   else
     return 0;
 }

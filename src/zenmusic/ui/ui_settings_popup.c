@@ -254,7 +254,12 @@ void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* c
     if (enabled)
       ui_decision_popup_show("Are you sure you want to switch off remote control?", acc_cb, NULL);
     else
-      ui_decision_popup_show("You can remote control Zen Music by sending 0x00(play/pause) 0x01(prev song) 0x02(next song) to UDP port 23723. Would you like to enable it?", acc_cb, NULL);
+    {
+      char* message = cstr_fromformat(200, "You can remote control Zen Music by sending 0x00(play/pause) 0x01(prev song) 0x02(next song) to UDP port %s. "
+                                           "Would you like to enable it?",
+                                      config_get("remote_port"));
+      ui_decision_popup_show(message, acc_cb, NULL);
+    }
     REL(acc_cb);
     break;
   }

@@ -67,7 +67,7 @@ void vh_litem_set_on_select(view_t* view, void (*on_select)(view_t*, int index, 
 
 void vh_litem_evt(view_t* view, ev_t ev)
 {
-  if (ev.type == EV_MDOWN)
+  if (ev.type == EV_MUP)
   {
     vh_litem_t* vh = view->handler_data;
 

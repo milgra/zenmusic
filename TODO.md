@@ -1,8 +1,6 @@
 first version
 
 -c -l relative path-tal is mukodjon! 
-lib change enterre, auto focus
-udp port from config
 automata tesztek!!
 fix leaks
 metadata update eseten sulyos leak, a hatterben tortenjen, analyzer kozben is lehessen mar bongeszni

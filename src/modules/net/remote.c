@@ -3,7 +3,7 @@
 
 #include "mtchannel.c"
 
-void remote_listen(ch_t* channel);
+void remote_listen(ch_t* channel, int port);
 void remote_close();
 
 #endif
@@ -24,10 +24,13 @@ void remote_close();
 #include <sys/types.h>
 #include <unistd.h>
 
-#define PORT 23723
 #define MAXLINE 10
 
-int remote_alive = 0;
+struct _remote_t
+{
+  int port;
+  int alive;
+} rem;
 
 void* remote_listen_ins(void* p)
 {
@@ -47,7 +50,7 @@ void* remote_listen_ins(void* p)
   // Filling server information
   servaddr.sin_family      = AF_INET; // IPv4
   servaddr.sin_addr.s_addr = INADDR_ANY;
-  servaddr.sin_port        = htons(PORT);
+  servaddr.sin_port        = htons(rem.port);
 
   // Bind the socket with the server address
 
@@ -56,7 +59,7 @@ void* remote_listen_ins(void* p)
 
   socklen_t len = sizeof(cliaddr); //len is value/resuslt
 
-  while (remote_alive)
+  while (rem.alive)
   {
     // blocking listen
     int num = recvfrom(sockfd,
@@ -80,13 +83,14 @@ void* remote_listen_ins(void* p)
   return NULL;
 }
 
-void remote_listen(ch_t* channel)
+void remote_listen(ch_t* channel, int port)
 {
   pthread_t threadId;
 
-  if (remote_alive == 0)
+  if (rem.alive == 0)
   {
-    remote_alive = 1;
+    rem.alive = 1;
+    rem.port  = port;
 
     int err = pthread_create(&threadId, NULL, &remote_listen_ins, channel);
 
@@ -96,7 +100,7 @@ void remote_listen(ch_t* channel)
 
 void remote_close()
 {
-  remote_alive = 0;
+  rem.alive = 0;
 }
 
 #endif
