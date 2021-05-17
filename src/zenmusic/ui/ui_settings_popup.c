@@ -32,8 +32,8 @@ void ui_settings_popup_on_header_field_insert(view_t* view, int src, int tgt);
 void ui_settings_popup_on_header_field_resize(view_t* view, char* id, int size);
 
 view_t* ui_settings_popup_item_for_index(int index, void* userdata, view_t* listview, int* item_count);
-view_t* settingsitem_create();
-void    settingsitem_update_row(view_t* rowview, int index, char* field, char* value);
+view_t* ui_settings_popup_create_item();
+void    ui_settings_popup_update_item(view_t* rowview, int index, char* field, char* value);
 
 struct ui_settings_popup_t
 {
@@ -107,36 +107,34 @@ void ui_settings_popup_attach(view_t* baseview)
 
   // add list handler to view
 
-  vh_list_add(uisp.view,
-              ((vh_list_inset_t){30, 0, 0, 0}),
-              ui_settings_popup_item_for_index, NULL, NULL);
+  vh_list_add(uisp.view, ((vh_list_inset_t){30, 0, 0, 0}), ui_settings_popup_item_for_index, NULL, NULL);
   vh_list_set_header(uisp.view, header);
 
   // create items
 
-  VADD(uisp.items, settingsitem_create());
-  VADD(uisp.items, settingsitem_create());
-  // VADD(uisp.items, settingsitem_create());
-  VADD(uisp.items, settingsitem_create());
-  VADD(uisp.items, settingsitem_create());
-  VADD(uisp.items, settingsitem_create());
+  VADD(uisp.items, ui_settings_popup_create_item());
+  VADD(uisp.items, ui_settings_popup_create_item());
+  // VADD(uisp.items, ui_settings_popup_create_item());
+  VADD(uisp.items, ui_settings_popup_create_item());
+  VADD(uisp.items, ui_settings_popup_create_item());
+  VADD(uisp.items, ui_settings_popup_create_item());
 
-  settingsitem_update_row(uisp.items->data[0], 0, "Library Path", "/home/user/milgra/Music");
-  settingsitem_update_row(uisp.items->data[1], 1, "Organize Library", "Disabled");
-  //  settingsitem_update_row(uisp.items->data[2], 2, "Dark Mode", "Disabled");
-  settingsitem_update_row(uisp.items->data[2], 2, "Remote Control", "Disabled");
-  settingsitem_update_row(uisp.items->data[3], 3, "Config Path", "/home/.config/zenmusic/config");
-  settingsitem_update_row(uisp.items->data[4], 4, "Style Path", "/usr/local/share/zenmusic");
+  ui_settings_popup_update_item(uisp.items->data[0], 0, "Library Path", "/home/user/milgra/Music");
+  ui_settings_popup_update_item(uisp.items->data[1], 1, "Organize Library", "Disabled");
+  //  ui_settings_popup_update_item(uisp.items->data[2], 2, "Dark Mode", "Disabled");
+  ui_settings_popup_update_item(uisp.items->data[2], 2, "Remote Control", "Disabled");
+  ui_settings_popup_update_item(uisp.items->data[3], 3, "Config Path", "/home/.config/zenmusic/config");
+  ui_settings_popup_update_item(uisp.items->data[4], 4, "Style Path", "/usr/local/share/zenmusic");
 }
 
 void ui_settings_popup_show()
 {
-  settingsitem_update_row(uisp.items->data[0], 0, "Library Path", config_get("lib_path"));
-  settingsitem_update_row(uisp.items->data[1], 1, "Organize Library", config_get("organize_lib"));
-  //  settingsitem_update_row(uisp.items->data[2], 2, "Dark Mode", config_get("dark_mode"));
-  settingsitem_update_row(uisp.items->data[2], 2, "Remote Control", config_get("remote_enabled"));
-  settingsitem_update_row(uisp.items->data[3], 3, "Config Path", config_get("cfg_path"));
-  settingsitem_update_row(uisp.items->data[4], 4, "HTML/Style Path", config_get("res_path"));
+  ui_settings_popup_update_item(uisp.items->data[0], 0, "Library Path", config_get("lib_path"));
+  ui_settings_popup_update_item(uisp.items->data[1], 1, "Organize Library", config_get("organize_lib"));
+  //  ui_settings_popup_update_item(uisp.items->data[2], 2, "Dark Mode", config_get("dark_mode"));
+  ui_settings_popup_update_item(uisp.items->data[2], 2, "Remote Control", config_get("remote_enabled"));
+  ui_settings_popup_update_item(uisp.items->data[3], 3, "Config Path", config_get("cfg_path"));
+  ui_settings_popup_update_item(uisp.items->data[4], 4, "HTML/Style Path", config_get("res_path"));
 
   ui_popup_switcher_toggle("settings_popup_page");
 }
@@ -205,7 +203,7 @@ void ui_settings_popup_on_accept(void* userdata, void* data)
   else
     config_set_bool("organize_lib", 1);
   config_write(config_get("cfg_path"));
-  settingsitem_update_row(uisp.items->data[1], 1, "Organize Library", config_get("organize_lib"));
+  ui_settings_popup_update_item(uisp.items->data[1], 1, "Organize Library", config_get("organize_lib"));
   callbacks_call("on_change_organize", NULL);
 }
 
@@ -217,7 +215,7 @@ void ui_settings_popup_on_accept_remote(void* userdata, void* data)
   else
     config_set_bool("remote_enabled", 1);
   config_write(config_get("cfg_path"));
-  settingsitem_update_row(uisp.items->data[2], 1, "Organize Library", config_get("remote_enabled"));
+  ui_settings_popup_update_item(uisp.items->data[2], 1, "Organize Library", config_get("remote_enabled"));
   callbacks_call("on_change_remote", NULL);
 }
 
@@ -270,7 +268,7 @@ void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* c
   }
 }
 
-view_t* settingsitem_create()
+view_t* ui_settings_popup_create_item()
 {
   static int item_cnt      = 0;
   char       idbuffer[100] = {0};
@@ -296,7 +294,7 @@ view_t* settingsitem_create()
   return rowview;
 }
 
-void settingsitem_update_row(view_t* rowview, int index, char* field, char* value)
+void ui_settings_popup_update_item(view_t* rowview, int index, char* field, char* value)
 {
   uint32_t color1          = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
   uisp.textstyle.backcolor = color1;

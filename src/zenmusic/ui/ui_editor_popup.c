@@ -18,6 +18,7 @@ void ui_editor_popup_show();
 #include "mtcstring.c"
 #include "mtvector.c"
 #include "text.c"
+#include "tg_css.c"
 #include "tg_text.c"
 #include "ui_alert_popup.c"
 #include "ui_decision_popup.c"
@@ -38,6 +39,9 @@ void    ui_editor_popup_on_button_down(void* userdata, void* data);
 void    ui_editor_popup_on_header_field_select(view_t* view, char* id, ev_t ev);
 void    ui_editor_popup_on_header_field_insert(view_t* view, int src, int tgt);
 void    ui_editor_popup_on_header_field_resize(view_t* view, char* id, int size);
+void    ui_editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev);
+void    ui_editor_popup_input_cell_value_changed(view_t* inputview);
+void    ui_editor_popup_input_cell_edit_finished(view_t* inputview);
 
 struct _ui_editor_popup_t
 {
@@ -132,13 +136,14 @@ void ui_editor_popup_attach(view_t* view)
 
 void ui_editor_popup_create_table()
 {
-  VADDR(ep.cols, uise_cell_new("key", 100, 0));
-  VADDR(ep.cols, uise_cell_new("value", 200, 1));
+  VADDR(ep.cols, uise_cell_new("key", 120, 0));
+  VADDR(ep.cols, uise_cell_new("value", 360, 1));
   VADDR(ep.cols, uise_cell_new("delete", 80, 2));
 
   // create header
 
   view_t* header = view_new("songeditorlist_header", (r2_t){0, 0, 10, 10});
+  tg_css_add(header);
 
   vh_lhead_add(header);
   vh_lhead_set_on_select(header, ui_editor_popup_on_header_field_select);
@@ -153,12 +158,12 @@ void ui_editor_popup_create_table()
   {
     char*   id       = cstr_fromformat(100, "%s%s", header->id, cell->id);
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
-    REL(id);
 
     tg_text_add(cellview);
     tg_text_set(cellview, cell->id, ep.textstyle);
-
     vh_lhead_add_cell(header, cell->id, cell->size, cellview);
+
+    REL(id);
   }
 
   vh_list_add(ep.listview, ((vh_list_inset_t){30, 10, 0, 10}), ui_editor_popup_item_for_index, NULL, NULL);
@@ -210,7 +215,7 @@ void ui_editor_popup_on_header_field_resize(view_t* view, char* id, int size)
   while ((item = VNXT(items))) vh_litem_upd_cell_size(item, id, size);
 }
 
-// item related
+// row related
 
 view_t* ui_editor_popup_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
 {
@@ -224,53 +229,35 @@ view_t* ui_editor_popup_item_for_index(int index, void* userdata, view_t* listvi
 
 // cell related
 
-void ui_editor_popup_input_cell_value_changed(view_t* inputview)
+view_t* ui_editor_popup_create_item()
 {
-  vh_textinput_t* data = inputview->handler_data;
+  static int itemcnt;
 
-  char* key  = data->userdata;
-  char* text = str_cstring(vh_textinput_get_text(inputview));
-
-  printf("ui_editor_popup_input_cell_value_changed key %s text %s\n", key, text);
-
-  MPUT(ep.temp, key, text);
-}
-
-void ui_editor_popup_input_cell_edit_finished(view_t* inputview)
-{
-  vh_textinput_t* data = inputview->handler_data;
-
-  char* key  = data->userdata;
-  char* text = str_cstring(vh_textinput_get_text(inputview));
-
-  MPUT(ep.changed, key, text);
-
-  printf("ui_editor_popup_input_cell_edit_finished key %s text %s\n", key, text);
-
-  // remove text view handler
-  char* id = cstr_fromformat(100, "%s%s", ep.sel_item->id, "val");
-
-  view_t* textcell = view_new(id, inputview->frame.local);
+  char*   id      = cstr_fromformat(100, "editor_popup_item%i", itemcnt++);
+  view_t* rowview = view_new(id, (r2_t){0, 0, 0, 35});
   REL(id);
 
-  tg_text_add(textcell);
-  tg_text_set(textcell, text, ep.textstyle);
-  textcell->blocks_touch = 0;
+  vh_litem_add(rowview, NULL);
+  vh_litem_set_on_select(rowview, ui_editor_popup_select_item);
 
-  // TODO check if previous cell gets released
-  vh_litem_rpl_cell(ep.sel_item, key, textcell);
+  se_cell_t* cell;
+  while ((cell = VNXT(ep.cols)))
+  {
+    char*   id       = cstr_fromformat(100, "%s%s", rowview->id, cell->id);
+    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
+    REL(id);
 
-  printf("text cell created id %s\n", textcell->id);
-  printf("replacing intpu cell with text cell\n");
+    tg_text_add(cellview);
+    tg_text_set(cellview, cell->id, ep.textstyle);
 
-  // unlock scrolling
-  vh_list_lock_scroll(ep.listview, 0);
+    vh_litem_add_cell(rowview, cell->id, cell->size, cellview);
+  }
+
+  return rowview;
 }
 
 void ui_editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
-  printf("ui_editor_popup_select_item %s index %i cell id %s\n", itemview->id, index, cell->id);
-
   char* key   = ep.fields->data[index];
   char* value = MGET(ep.data, key);
 
@@ -320,31 +307,47 @@ void ui_editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, 
   }
 }
 
-view_t* ui_editor_popup_create_item()
+void ui_editor_popup_input_cell_value_changed(view_t* inputview)
 {
-  static int itemcnt;
+  vh_textinput_t* data = inputview->handler_data;
 
-  char*   id      = cstr_fromformat(100, "editor_popup_item%i", itemcnt++);
-  view_t* rowview = view_new(id, (r2_t){0, 0, 0, 35});
+  char* key  = data->userdata;
+  char* text = str_cstring(vh_textinput_get_text(inputview));
+
+  printf("ui_editor_popup_input_cell_value_changed key %s text %s\n", key, text);
+
+  MPUT(ep.temp, key, text);
+}
+
+void ui_editor_popup_input_cell_edit_finished(view_t* inputview)
+{
+  vh_textinput_t* data = inputview->handler_data;
+
+  char* key  = data->userdata;
+  char* text = str_cstring(vh_textinput_get_text(inputview));
+
+  MPUT(ep.changed, key, text);
+
+  printf("ui_editor_popup_input_cell_edit_finished key %s text %s\n", key, text);
+
+  // remove text view handler
+  char* id = cstr_fromformat(100, "%s%s", ep.sel_item->id, "val");
+
+  view_t* textcell = view_new(id, inputview->frame.local);
   REL(id);
 
-  vh_litem_add(rowview, NULL);
-  vh_litem_set_on_select(rowview, ui_editor_popup_select_item);
+  tg_text_add(textcell);
+  tg_text_set(textcell, text, ep.textstyle);
+  textcell->blocks_touch = 0;
 
-  se_cell_t* cell;
-  while ((cell = VNXT(ep.cols)))
-  {
-    char*   id       = cstr_fromformat(100, "%s%s", rowview->id, cell->id);
-    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
-    REL(id);
+  // TODO check if previous cell gets released
+  vh_litem_rpl_cell(ep.sel_item, key, textcell);
 
-    tg_text_add(cellview);
-    tg_text_set(cellview, cell->id, ep.textstyle);
+  printf("text cell created id %s\n", textcell->id);
+  printf("replacing intpu cell with text cell\n");
 
-    vh_litem_add_cell(rowview, cell->id, cell->size, cellview);
-  }
-
-  return rowview;
+  // unlock scrolling
+  vh_list_lock_scroll(ep.listview, 0);
 }
 
 int ui_editor_popup_comp_text(void* left, void* right)
