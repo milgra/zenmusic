@@ -9,6 +9,7 @@ void   ui_editor_popup_set_songs(vec_t* vec);
 map_t* ui_editor_popup_get_changed();
 vec_t* ui_editor_popup_get_removed();
 char*  ui_editor_popup_get_cover();
+void   ui_editor_popup_show();
 
 #endif
 
@@ -24,6 +25,7 @@ char*  ui_editor_popup_get_cover();
 #include "ui_alert_popup.c"
 #include "ui_manager.c"
 #include "ui_popup_switcher.c"
+#include "ui_songlist.c"
 #include "vh_button.c"
 #include "vh_list.c"
 #include "vh_list_item.c"
@@ -453,6 +455,15 @@ void ui_editor_popup_accept()
 
   /* // reload song list */
   /* ui_songlist_refresh(); */
+}
+
+void ui_editor_popup_show()
+{
+  vec_t* selected = VNEW();
+  ui_songlist_get_selected(selected);
+  ui_editor_popup_set_songs(selected);
+  REL(selected);
+  ui_popup_switcher_toggle("song_editor_popup_page");
 }
 
 #endif

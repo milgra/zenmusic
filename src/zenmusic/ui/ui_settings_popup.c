@@ -243,7 +243,7 @@ void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* c
     if (enabled)
       ui_decision_popup_show("Are you sure you want to switch off automatic organization?", acc_cb, NULL);
     else
-      ui_decision_popup_show("Are you sure you want to keep your library organized automatically? New songs will be organized automatically based on artist, title and track number after every start.", acc_cb, NULL);
+      ui_decision_popup_show("Music files will be renamed/reorganized automatically under your library folder, based on artist, title and track number. Are you sure?", acc_cb, NULL);
     REL(acc_cb);
     break;
   }

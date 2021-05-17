@@ -142,7 +142,7 @@ view_t* donateitem_create(int index)
 
   float height = 50;
   if (index == 0) height = 170;
-  if (index == 5) height = 220;
+  if (index == 5) height = 160;
 
   view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 460, height});
 
@@ -238,7 +238,7 @@ void ui_about_popup_attach(view_t* baseview)
   VADD(donl.items, donateitem_create(4));
   VADD(donl.items, donateitem_create(5));
 
-  char* version = cstr_fromformat(200, "Zen Music\nv%i-%i\nby Milan Toth\nFree and Open Source Software.\nIf you like it, please support the development.",
+  char* version = cstr_fromformat(200, "Zen Music by Milan Toth\nv%i-%i\nFree and Open Source Software.\nIf you like it, please support the development.",
                                   VERSION / 10000,
                                   VERSION % 10000);
 

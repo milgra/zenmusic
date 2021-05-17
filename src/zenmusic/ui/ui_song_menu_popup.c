@@ -79,14 +79,7 @@ void ui_song_menu_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* 
   if (index == 0) ui_songlist_select(index);
   if (index == 1) ui_songlist_select_range(index);
   if (index == 2) ui_songlist_select_all();
-  if (index == 3)
-  {
-    vec_t* selected = VNEW();
-    ui_songlist_get_selected(selected);
-    ui_editor_popup_set_songs(selected);
-    ui_popup_switcher_toggle("song_editor_popup_page");
-    REL(selected);
-  }
+  if (index == 3) ui_editor_popup_show();
   if (index == 4)
   {
     cb_t* acc_cb = cb_new(ui_song_menu_popup_on_item_delete, NULL);

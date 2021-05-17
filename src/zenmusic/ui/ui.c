@@ -137,7 +137,7 @@ void ui_on_button_down(void* userdata, void* data)
 
   // todo sanitize button names
 
-  if (strcmp(id, "editbtn") == 0) ui_popup_switcher_toggle("song_editor_popup_page");
+  if (strcmp(id, "editbtn") == 0) ui_editor_popup_show();
   if (strcmp(id, "aboutbtn") == 0) ui_popup_switcher_toggle("about_popup_page");
   if (strcmp(id, "song_info") == 0) ui_popup_switcher_toggle("messages_popup_page");
   if (strcmp(id, "settingsbtn") == 0) ui_settings_popup_show();

@@ -143,6 +143,10 @@ void ui_songlist_attach(view_t* base)
               ui_songlist_item_recycle,
               NULL);
   vh_list_set_header(sl.view, header);
+
+  // select first song by default
+
+  selection_add(0);
 }
 
 void ui_songlist_update()
