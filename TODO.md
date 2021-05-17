@@ -1,6 +1,7 @@
 first version
 
 editor popup - image upload, new field button, buttons, fix
+editor popup masodik openre megy csak cover art view
 -c -l relative path-tal is mukodjon! 
 automata tesztek!!
 fix leaks

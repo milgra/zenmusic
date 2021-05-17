@@ -358,7 +358,7 @@
 #song_editor_list_back {
     overflow: hidden;
     width: 510px;
-    height: 400px;
+    height: 410px;
     top: 50px;
     left: 10px;
     border-radius: 10px;
@@ -379,7 +379,7 @@
     background-color: #EEEEEEFF;
 }
 
-#song_editorheader {
+#song_editor_header {
     width: 670px;
     left: 10px;
     top: 10px;

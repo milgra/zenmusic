@@ -76,10 +76,8 @@ void ui_settings_popup_attach(view_t* baseview)
 
   // create fields
 
-  VADD(uisp.fields, uisp_cell_new("key", 200, 0));
-  VADD(uisp.fields, uisp_cell_new("value", 460, 1));
-
-  vec_dec_retcount(uisp.fields);
+  VADDR(uisp.fields, uisp_cell_new("key", 200, 0));
+  VADDR(uisp.fields, uisp_cell_new("value", 460, 1));
 
   // add header handler
 

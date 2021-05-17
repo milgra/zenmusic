@@ -4,12 +4,9 @@
 #include "mtmap.c"
 #include "view.c"
 
-void   ui_editor_popup_attach(view_t* view);
-void   ui_editor_popup_set_songs(vec_t* vec);
-map_t* ui_editor_popup_get_changed();
-vec_t* ui_editor_popup_get_removed();
-char*  ui_editor_popup_get_cover();
-void   ui_editor_popup_show();
+void ui_editor_popup_attach(view_t* view);
+void ui_editor_popup_set_songs(vec_t* vec);
+void ui_editor_popup_show();
 
 #endif
 
@@ -23,17 +20,29 @@ void   ui_editor_popup_show();
 #include "text.c"
 #include "tg_text.c"
 #include "ui_alert_popup.c"
+#include "ui_decision_popup.c"
 #include "ui_manager.c"
 #include "ui_popup_switcher.c"
 #include "ui_songlist.c"
 #include "vh_button.c"
 #include "vh_list.c"
+#include "vh_list_head.c"
 #include "vh_list_item.c"
 #include "vh_textinput.c"
 #include <string.h>
 
+void    ui_editor_popup_create_table();
+void    ui_editor_popup_on_accept();
+view_t* ui_editor_popup_item_for_index(int index, void* userdata, view_t* listview, int* item_count);
+void    ui_editor_popup_on_button_down(void* userdata, void* data);
+void    ui_editor_popup_on_header_field_select(view_t* view, char* id, ev_t ev);
+void    ui_editor_popup_on_header_field_insert(view_t* view, int src, int tgt);
+void    ui_editor_popup_on_header_field_resize(view_t* view, char* id, int size);
+
 struct _ui_editor_popup_t
 {
+  int song_count;
+
   view_t* listview;
   view_t* headview;
   view_t* coverview;
@@ -43,6 +52,7 @@ struct _ui_editor_popup_t
 
   vec_t* fields;
   vec_t* items;
+  vec_t* cols;
 
   map_t* changed;
   vec_t* removed;
@@ -52,6 +62,171 @@ struct _ui_editor_popup_t
   textstyle_t textstyle;
 
 } ep = {0};
+
+// TODO unify these
+
+typedef struct _se_cell_t
+{
+  char* id;
+  int   size;
+  int   index;
+} se_cell_t;
+
+se_cell_t* uise_cell_new(char* id, int size, int index)
+{
+  se_cell_t* cell = mem_calloc(sizeof(se_cell_t), "se_cell_t", NULL, NULL);
+
+  cell->id    = cstr_fromcstring(id);
+  cell->size  = size;
+  cell->index = index;
+
+  return cell;
+}
+
+void ui_editor_popup_attach(view_t* view)
+{
+  view_t* headview    = view_get_subview(view, "song_editor_header");
+  view_t* listview    = view_get_subview(view, "editorlist");
+  view_t* coverview   = view_get_subview(view, "coverview");
+  view_t* acceptbtn   = view_get_subview(view, "editor_popup_accept_btn");
+  view_t* rejectbtn   = view_get_subview(view, "editor_popup_reject_btn");
+  view_t* uploadbtn   = view_get_subview(view, "uploadbtn");
+  view_t* newfieldbtn = view_get_subview(view, "newfieldbtn");
+  cb_t*   but_cb      = cb_new(ui_editor_popup_on_button_down, NULL);
+
+  textstyle_t ts = {0};
+  ts.font        = config_get("font_path");
+  ts.margin      = 10.0;
+  ts.align       = TA_LEFT;
+  ts.size        = 30.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0;
+
+  ep.headview  = headview;
+  ep.listview  = listview;
+  ep.coverview = coverview;
+  ep.temp      = MNEW();
+  ep.fields    = VNEW();
+  ep.textstyle = ts;
+  ep.items     = VNEW();
+  ep.data      = MNEW();
+  ep.changed   = MNEW();
+  ep.removed   = VNEW();
+  ep.cover     = NULL;
+  ep.cols      = VNEW();
+
+  ui_editor_popup_create_table();
+
+  tg_text_add(uploadbtn);
+  tg_text_set(uploadbtn, "add new image", ts);
+
+  tg_text_add(newfieldbtn);
+  tg_text_set(newfieldbtn, "add new field", ts);
+
+  vh_button_add(acceptbtn, VH_BUTTON_NORMAL, but_cb);
+  vh_button_add(rejectbtn, VH_BUTTON_NORMAL, but_cb);
+
+  ts.align = TA_CENTER;
+  tg_text_add(headview);
+  tg_text_set(headview, "Editing 1 data", ts);
+}
+
+void ui_editor_popup_create_table()
+{
+  VADDR(ep.cols, uise_cell_new("key", 200, 0));
+  VADDR(ep.cols, uise_cell_new("value", 460, 1));
+
+  // create header
+
+  view_t* header = view_new("songeditorlist_header", (r2_t){0, 0, 10, 10});
+
+  vh_lhead_add(header);
+  vh_lhead_set_on_select(header, ui_editor_popup_on_header_field_select);
+  vh_lhead_set_on_insert(header, ui_editor_popup_on_header_field_insert);
+  vh_lhead_set_on_resize(header, ui_editor_popup_on_header_field_resize);
+
+  se_cell_t* cell;
+  while ((cell = VNXT(ep.cols)))
+  {
+    char*   id       = cstr_fromformat(100, "%s%s", header->id, cell->id);
+    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
+    REL(id);
+
+    ep.textstyle.backcolor = 0xFFFFFFFF;
+
+    tg_text_add(cellview);
+    tg_text_set(cellview, cell->id, ep.textstyle);
+
+    vh_lhead_add_cell(header, cell->id, cell->size, cellview);
+  }
+
+  vh_list_add(ep.listview, ((vh_list_inset_t){30, 10, 0, 10}), ui_editor_popup_item_for_index, NULL, NULL);
+  vh_list_set_header(ep.listview, header);
+}
+
+// header related
+
+void ui_editor_popup_on_header_field_select(view_t* view, char* id, ev_t ev)
+{
+  // (*uisp.on_header_select)(id);
+}
+
+void ui_editor_popup_on_header_field_insert(view_t* view, int src, int tgt)
+{
+  // update in fields so new items will use updated order
+  se_cell_t* cell = ep.cols->data[src];
+
+  RET(cell);
+  VREM(ep.cols, cell);
+  vec_ins(ep.cols, cell, tgt);
+  REL(cell);
+
+  // update all items and cache
+  view_t* item;
+  vec_t*  items = vh_list_items(ep.listview);
+  while ((item = VNXT(items)))
+  {
+    vh_litem_swp_cell(item, src, tgt);
+  }
+}
+
+void ui_editor_popup_on_header_field_resize(view_t* view, char* id, int size)
+{
+  // update in fields so new items will use updated size
+  for (int i = 0; i < ep.cols->length; i++)
+  {
+    se_cell_t* cell = ep.cols->data[i];
+    if (strcmp(cell->id, id) == 0)
+    {
+      cell->size = size;
+      break;
+    }
+  }
+
+  // update all items and cache
+  view_t* item;
+  vec_t*  items = vh_list_items(ep.listview);
+  while ((item = VNXT(items)))
+  {
+    vh_litem_upd_cell_size(item, id, size);
+  }
+}
+
+// item related
+
+view_t* ui_editor_popup_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
+{
+  if (index < 0)
+    return NULL; // no items before 0
+  if (index >= ep.items->length)
+    return NULL; // no more items
+
+  *item_count = ep.items->length;
+
+  return ep.items->data[index];
+}
+
+// cell related
 
 void ui_editor_popup_input_cell_value_changed(view_t* inputview)
 {
@@ -190,18 +365,6 @@ view_t* ui_editor_popup_create_item()
   return rowview;
 }
 
-view_t* ui_editor_popup_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
-{
-  if (index < 0)
-    return NULL; // no items before 0
-  if (index >= ep.items->length)
-    return NULL; // no more items
-
-  *item_count = ep.items->length;
-
-  return ep.items->data[index];
-}
-
 int ui_editor_popup_comp_text(void* left, void* right)
 {
   char* la = left;
@@ -283,71 +446,18 @@ void ui_editor_popup_set_song()
 
 void ui_editor_popup_on_button_down(void* userdata, void* data)
 {
-}
-
-void ui_editor_popup_attach(view_t* view)
-{
-  view_t* listview  = view_get_subview(view, "editorlist");
-  view_t* headview  = view_get_subview(view, "song_editorheader");
-  view_t* coverview = view_get_subview(view, "coverview");
-
-  vh_list_add(listview,
-              ((vh_list_inset_t){0, 10, 0, 10}),
-              ui_editor_popup_item_for_index, NULL, NULL);
-
-  textstyle_t ts = {0};
-  ts.font        = config_get("font_path");
-  ts.margin      = 10.0;
-  ts.align       = TA_LEFT;
-  ts.size        = 30.0;
-  ts.textcolor   = 0x000000FF;
-  ts.backcolor   = 0xFFFFFFFF;
-
-  ep.headview  = headview;
-  ep.listview  = listview;
-  ep.coverview = coverview;
-  ep.temp      = MNEW();
-  ep.fields    = VNEW();
-  ep.textstyle = ts;
-  ep.items     = VNEW();
-  ep.data      = MNEW();
-  ep.changed   = MNEW();
-  ep.removed   = VNEW();
-  ep.cover     = NULL;
-
-  ts.backcolor = 0;
-
-  view_t* uploadbtn = view_get_subview(view, "uploadbtn");
-  tg_text_add(uploadbtn);
-  tg_text_set(uploadbtn, "add new image", ts);
-
-  view_t* newfieldbtn = view_get_subview(view, "newfieldbtn");
-  tg_text_add(newfieldbtn);
-  tg_text_set(newfieldbtn, "add new field", ts);
-
-  view_t* acceptbtn = view_get_subview(view, "editor_popup_accept_btn");
-
-  cb_t* but_cb = cb_new(ui_editor_popup_on_button_down, NULL);
-  vh_button_add(acceptbtn, VH_BUTTON_NORMAL, but_cb);
-
-  ts.align = TA_CENTER;
-  tg_text_add(headview);
-  tg_text_set(headview, "Editing 1 data", ts);
-}
-
-map_t* ui_editor_popup_get_changed()
-{
-  return ep.changed;
-}
-
-vec_t* ui_editor_popup_get_removed()
-{
-  return ep.removed;
-}
-
-char* ui_editor_popup_get_cover()
-{
-  return ep.cover;
+  view_t* view = data;
+  if (strcmp(view->id, "editor_popup_accept_btn") == 0)
+  {
+    char* message = cstr_fromformat(150, "%i fields will be changed %i fields will be removed cover will be %s on %i items, are you sure you want these modifications?", ep.changed->count, ep.removed->length, ep.cover, ep.song_count);
+    cb_t* acc_cb  = cb_new(ui_editor_popup_on_accept, NULL);
+    ui_decision_popup_show(message, acc_cb, NULL);
+    REL(message);
+  }
+  if (strcmp(view->id, "editor_popup_reject_btn") == 0)
+  {
+    ui_popup_switcher_toggle("song_editor_popup_page");
+  }
 }
 
 void ui_editor_popup_set_songs(vec_t* vec)
@@ -392,7 +502,12 @@ void ui_editor_popup_set_songs(vec_t* vec)
 
   char text[100];
   snprintf(text, 100, "Editing %i song(s)", vec->length);
-  tg_text_add(ep.headview);
+
+  ep.song_count = vec->length;
+
+  // tg_text_add(ep.headview);
+
+  ep.textstyle.backcolor = 0;
   tg_text_set(ep.headview, text, ep.textstyle);
 
   // load cover
@@ -411,15 +526,9 @@ void ui_editor_popup_set_songs(vec_t* vec)
   }
 }
 
-void ui_editor_popup_accept()
+void ui_editor_popup_on_accept()
 {
   ui_popup_switcher_toggle("song_editor_popup_page");
-
-  map_t* changed = ui_editor_popup_get_changed();
-  vec_t* removed = ui_editor_popup_get_removed();
-  char*  cover   = ui_editor_popup_get_cover();
-
-  ui_alert_popup_show("ARE YOU SURE?");
 
   /* char* libpath = config_get("lib_path"); */
 

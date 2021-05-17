@@ -119,7 +119,7 @@ void init(int width, int height, char* path)
   // init paths
 
 #ifndef DEBUG
-  char* res_path = zm.res_par ? zm.res_par : cstr_fromstring("/usr/local/share/zenmusic");
+  char* res_path = zm.res_par ? zm.res_par : cstr_fromcstring("/usr/local/share/zenmusic");
 #else
   char* res_path = zm.res_par ? zm.res_par : cstr_fromformat(PATH_MAX + NAME_MAX, "%s../res", path);
 #endif
