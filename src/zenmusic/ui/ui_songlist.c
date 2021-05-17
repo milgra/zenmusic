@@ -58,9 +58,9 @@ sl_cell_t* sl_cell_new(char* id, int size, int index)
 
 struct ui_songlist_t
 {
-  view_t*     view;   // table view
-  vec_t*      cache;  // item cache
-  vec_t*      fields; // fileds in table
+  view_t*     view;    // table view
+  vec_t*      cache;   // item cache
+  vec_t*      columns; // fileds in table
   textstyle_t textstyle;
 
   uint32_t color_s; // color selected
@@ -73,9 +73,9 @@ void ui_songlist_attach(view_t* base)
 {
   assert(base != NULL);
 
-  sl.view   = view_get_subview(base, "songlist");
-  sl.cache  = VNEW();
-  sl.fields = VNEW();
+  sl.view    = view_get_subview(base, "songlist");
+  sl.cache   = VNEW();
+  sl.columns = VNEW();
 
   sl.color_s = 0x55FF55FF;
 
@@ -85,29 +85,29 @@ void ui_songlist_attach(view_t* base)
   sl.textstyle.textcolor   = 0x000000FF;
   sl.textstyle.backcolor   = 0xF5F5F5FF;
 
-  // create fields
+  // create columns
 
-  VADD(sl.fields, sl_cell_new("index", 50, 0));
-  VADD(sl.fields, sl_cell_new("meta/artist", 300, 1));
-  VADD(sl.fields, sl_cell_new("meta/album", 200, 2));
-  VADD(sl.fields, sl_cell_new("meta/title", 300, 3));
-  VADD(sl.fields, sl_cell_new("meta/date", 150, 4));
-  VADD(sl.fields, sl_cell_new("meta/genre", 150, 5));
-  VADD(sl.fields, sl_cell_new("meta/track", 150, 6));
-  VADD(sl.fields, sl_cell_new("meta/disc", 150, 7));
-  VADD(sl.fields, sl_cell_new("file/duration", 100, 8));
-  VADD(sl.fields, sl_cell_new("file/channels", 100, 9));
-  VADD(sl.fields, sl_cell_new("file/bit_rate", 100, 10));
-  VADD(sl.fields, sl_cell_new("file/sample_rate", 100, 11));
-  VADD(sl.fields, sl_cell_new("file/play_count", 150, 12));
-  VADD(sl.fields, sl_cell_new("file/skip_count", 150, 13));
-  VADD(sl.fields, sl_cell_new("file/added", 150, 14));
-  VADD(sl.fields, sl_cell_new("file/last_played", 150, 15));
-  VADD(sl.fields, sl_cell_new("file/last_skipped", 150, 16));
-  VADD(sl.fields, sl_cell_new("file/media_type", 150, 17));
-  VADD(sl.fields, sl_cell_new("file/container", 150, 18));
+  VADD(sl.columns, sl_cell_new("index", 50, 0));
+  VADD(sl.columns, sl_cell_new("meta/artist", 300, 1));
+  VADD(sl.columns, sl_cell_new("meta/album", 200, 2));
+  VADD(sl.columns, sl_cell_new("meta/title", 300, 3));
+  VADD(sl.columns, sl_cell_new("meta/date", 150, 4));
+  VADD(sl.columns, sl_cell_new("meta/genre", 150, 5));
+  VADD(sl.columns, sl_cell_new("meta/track", 150, 6));
+  VADD(sl.columns, sl_cell_new("meta/disc", 150, 7));
+  VADD(sl.columns, sl_cell_new("file/duration", 100, 8));
+  VADD(sl.columns, sl_cell_new("file/channels", 100, 9));
+  VADD(sl.columns, sl_cell_new("file/bit_rate", 100, 10));
+  VADD(sl.columns, sl_cell_new("file/sample_rate", 100, 11));
+  VADD(sl.columns, sl_cell_new("file/play_count", 150, 12));
+  VADD(sl.columns, sl_cell_new("file/skip_count", 150, 13));
+  VADD(sl.columns, sl_cell_new("file/added", 150, 14));
+  VADD(sl.columns, sl_cell_new("file/last_played", 150, 15));
+  VADD(sl.columns, sl_cell_new("file/last_skipped", 150, 16));
+  VADD(sl.columns, sl_cell_new("file/media_type", 150, 17));
+  VADD(sl.columns, sl_cell_new("file/container", 150, 18));
 
-  vec_dec_retcount(sl.fields);
+  vec_dec_retcount(sl.columns);
 
   // add header handler
 
@@ -123,7 +123,7 @@ void ui_songlist_attach(view_t* base)
   vh_lhead_set_on_resize(header, on_header_field_resize);
 
   sl_cell_t* cell;
-  while ((cell = VNXT(sl.fields)))
+  while ((cell = VNXT(sl.columns)))
   {
     char*   id       = cstr_fromformat(100, "%s%s", header->id, cell->id);
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
@@ -181,12 +181,12 @@ void on_header_field_select(view_t* view, char* id, ev_t ev)
 
 void on_header_field_insert(view_t* view, int src, int tgt)
 {
-  // update in fields so new items will use updated order
-  sl_cell_t* cell = sl.fields->data[src];
+  // update in columns so new items will use updated order
+  sl_cell_t* cell = sl.columns->data[src];
 
   RET(cell);
-  VREM(sl.fields, cell);
-  vec_ins(sl.fields, cell, tgt);
+  VREM(sl.columns, cell);
+  vec_ins(sl.columns, cell, tgt);
   REL(cell);
 
   // update all items and cache
@@ -207,10 +207,10 @@ void on_header_field_insert(view_t* view, int src, int tgt)
 
 void on_header_field_resize(view_t* view, char* id, int size)
 {
-  // update in fields so new items will use updated size
-  for (int i = 0; i < sl.fields->length; i++)
+  // update in columns so new items will use updated size
+  for (int i = 0; i < sl.columns->length; i++)
   {
-    sl_cell_t* cell = sl.fields->data[i];
+    sl_cell_t* cell = sl.columns->data[i];
     if (strcmp(cell->id, id) == 0)
     {
       cell->size = size;
@@ -322,7 +322,7 @@ view_t* songitem_create()
   vh_litem_set_on_select(rowview, ui_songlist_on_item_select);
 
   sl_cell_t* cell;
-  while ((cell = VNXT(sl.fields)))
+  while ((cell = VNXT(sl.columns)))
   {
     char*   id       = cstr_fromformat(100, "%s%s", rowview->id, cell->id);
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 35});
@@ -349,7 +349,7 @@ void songitem_update_row(view_t* rowview, int index, map_t* file, uint32_t color
   vh_litem_upd_index(rowview, index);
 
   sl_cell_t* cell;
-  while ((cell = VNXT(sl.fields)))
+  while ((cell = VNXT(sl.columns)))
   {
     if (MGET(file, cell->id))
     {

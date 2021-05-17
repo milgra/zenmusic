@@ -126,15 +126,15 @@ void ui_editor_popup_attach(view_t* view)
   vh_button_add(acceptbtn, VH_BUTTON_NORMAL, but_cb);
   vh_button_add(rejectbtn, VH_BUTTON_NORMAL, but_cb);
 
-  ts.align = TA_CENTER;
   tg_text_add(headview);
   tg_text_set(headview, "Editing 1 data", ts);
 }
 
 void ui_editor_popup_create_table()
 {
-  VADDR(ep.cols, uise_cell_new("key", 200, 0));
-  VADDR(ep.cols, uise_cell_new("value", 460, 1));
+  VADDR(ep.cols, uise_cell_new("key", 100, 0));
+  VADDR(ep.cols, uise_cell_new("value", 200, 1));
+  VADDR(ep.cols, uise_cell_new("delete", 80, 2));
 
   // create header
 
@@ -145,14 +145,15 @@ void ui_editor_popup_create_table()
   vh_lhead_set_on_insert(header, ui_editor_popup_on_header_field_insert);
   vh_lhead_set_on_resize(header, ui_editor_popup_on_header_field_resize);
 
+  ep.textstyle.align     = TA_LEFT;
+  ep.textstyle.backcolor = 0xFFFFFFFF;
+
   se_cell_t* cell;
   while ((cell = VNXT(ep.cols)))
   {
     char*   id       = cstr_fromformat(100, "%s%s", header->id, cell->id);
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
     REL(id);
-
-    ep.textstyle.backcolor = 0xFFFFFFFF;
 
     tg_text_add(cellview);
     tg_text_set(cellview, cell->id, ep.textstyle);
@@ -206,20 +207,15 @@ void ui_editor_popup_on_header_field_resize(view_t* view, char* id, int size)
   // update all items and cache
   view_t* item;
   vec_t*  items = vh_list_items(ep.listview);
-  while ((item = VNXT(items)))
-  {
-    vh_litem_upd_cell_size(item, id, size);
-  }
+  while ((item = VNXT(items))) vh_litem_upd_cell_size(item, id, size);
 }
 
 // item related
 
 view_t* ui_editor_popup_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
 {
-  if (index < 0)
-    return NULL; // no items before 0
-  if (index >= ep.items->length)
-    return NULL; // no more items
+  if (index < 0) return NULL;                 // no items before 0
+  if (index >= ep.items->length) return NULL; // no more items
 
   *item_count = ep.items->length;
 
@@ -317,8 +313,8 @@ void ui_editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, 
     // indicate row for deletio
     ep.textstyle.backcolor = 0xFF0000AA;
     tg_text_set(vh_litem_get_cell(itemview, "key"), key, ep.textstyle);
-    tg_text_set(vh_litem_get_cell(itemview, "val"), value, ep.textstyle);
-    tg_text_set(vh_litem_get_cell(itemview, "del"), "Remove", ep.textstyle);
+    tg_text_set(vh_litem_get_cell(itemview, "value"), value, ep.textstyle);
+    tg_text_set(vh_litem_get_cell(itemview, "delete"), "Remove", ep.textstyle);
 
     VADD(ep.removed, key);
   }
@@ -327,40 +323,26 @@ void ui_editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, 
 view_t* ui_editor_popup_create_item()
 {
   static int itemcnt;
-  char       idbuffer[100] = {0};
-  snprintf(idbuffer, 100, "editor_popup_item%i", itemcnt++);
 
-  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
+  char*   id      = cstr_fromformat(100, "editor_popup_item%i", itemcnt++);
+  view_t* rowview = view_new(id, (r2_t){0, 0, 0, 35});
+  REL(id);
 
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, ui_editor_popup_select_item);
 
-  char* id = cstr_fromformat(100, "%s%s", rowview->id, "key");
-  // first cell is a simple text cell
-  view_t* keycell = view_new(id, (r2_t){0, 0, 100, 35});
-  REL(id);
+  se_cell_t* cell;
+  while ((cell = VNXT(ep.cols)))
+  {
+    char*   id       = cstr_fromformat(100, "%s%s", rowview->id, cell->id);
+    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
+    REL(id);
 
-  tg_text_add(keycell);
+    tg_text_add(cellview);
+    tg_text_set(cellview, cell->id, ep.textstyle);
 
-  id = cstr_fromformat(100, "%s%s", rowview->id, "val");
-
-  view_t* valcell = view_new(id, (r2_t){0, 0, 300, 35});
-
-  REL(id);
-
-  tg_text_add(valcell);
-
-  id = cstr_fromformat(100, "%s%s", rowview->id, "del");
-
-  view_t* delcell = view_new(id, (r2_t){0, 0, 110, 35});
-
-  REL(id);
-
-  tg_text_add(delcell);
-
-  vh_litem_add_cell(rowview, "key", 200, keycell);
-  vh_litem_add_cell(rowview, "val", 200, valcell);
-  vh_litem_add_cell(rowview, "del", 200, delcell);
+    vh_litem_add_cell(rowview, cell->id, cell->size, cellview);
+  }
 
   return rowview;
 }
@@ -436,9 +418,9 @@ void ui_editor_popup_set_song()
 
     ep.textstyle.backcolor = color2;
 
-    tg_text_set(vh_litem_get_cell(item, "val"), value, ep.textstyle);
+    tg_text_set(vh_litem_get_cell(item, "value"), value, ep.textstyle);
 
-    if (key[0] != 'f') tg_text_set(vh_litem_get_cell(item, "del"), "Remove", ep.textstyle);
+    if (key[0] != 'f') tg_text_set(vh_litem_get_cell(item, "delete"), "Delete", ep.textstyle);
 
     VADD(ep.items, item);
   }

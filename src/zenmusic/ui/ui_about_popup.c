@@ -144,7 +144,7 @@ view_t* donateitem_create(int index)
   if (index == 0) height = 170;
   if (index == 5) height = 160;
 
-  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 460, height});
+  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 470, height});
 
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, ui_about_popup_on_item_select);
@@ -219,15 +219,13 @@ void ui_about_popup_attach(view_t* baseview)
 
   // create fields
 
-  VADD(donl.fields, donl_cell_new("field", 460, 0));
+  VADD(donl.fields, donl_cell_new("field", 470, 0));
 
   vec_dec_retcount(donl.fields);
 
   // add list handler to view
 
-  vh_list_add(donl.view,
-              ((vh_list_inset_t){0, 0, 0, 0}),
-              ui_about_popup_item_for_index, NULL, NULL);
+  vh_list_add(donl.view, ((vh_list_inset_t){0, 0, 0, 0}), ui_about_popup_item_for_index, NULL, NULL);
 
   // create items
 

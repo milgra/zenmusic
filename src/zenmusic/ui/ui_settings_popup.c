@@ -37,8 +37,8 @@ void    settingsitem_update_row(view_t* rowview, int index, char* field, char* v
 
 struct ui_settings_popup_t
 {
-  view_t*     view;   // table view
-  vec_t*      fields; // fileds in table
+  view_t*     view;    // table view
+  vec_t*      columns; // columns in table
   vec_t*      items;
   textstyle_t textstyle;
 } uisp = {0};
@@ -63,9 +63,9 @@ sl_cell_t* uisp_cell_new(char* id, int size, int index)
 
 void ui_settings_popup_attach(view_t* baseview)
 {
-  uisp.view   = view_get_subview(baseview, "settingslist");
-  uisp.fields = VNEW();
-  uisp.items  = VNEW();
+  uisp.view    = view_get_subview(baseview, "settingslist");
+  uisp.columns = VNEW();
+  uisp.items   = VNEW();
 
   uisp.textstyle.font        = config_get("font_path");
   uisp.textstyle.align       = 0;
@@ -74,10 +74,10 @@ void ui_settings_popup_attach(view_t* baseview)
   uisp.textstyle.textcolor   = 0x000000FF;
   uisp.textstyle.backcolor   = 0xF5F5F5FF;
 
-  // create fields
+  // create columns
 
-  VADDR(uisp.fields, uisp_cell_new("key", 200, 0));
-  VADDR(uisp.fields, uisp_cell_new("value", 460, 1));
+  VADDR(uisp.columns, uisp_cell_new("key", 200, 0));
+  VADDR(uisp.columns, uisp_cell_new("value", 460, 1));
 
   // add header handler
 
@@ -93,7 +93,7 @@ void ui_settings_popup_attach(view_t* baseview)
   vh_lhead_set_on_resize(header, ui_settings_popup_on_header_field_resize);
 
   sl_cell_t* cell;
-  while ((cell = VNXT(uisp.fields)))
+  while ((cell = VNXT(uisp.columns)))
   {
     char*   id       = cstr_fromformat(100, "%s%s", header->id, cell->id);
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
@@ -158,12 +158,12 @@ void ui_settings_popup_on_header_field_select(view_t* view, char* id, ev_t ev)
 
 void ui_settings_popup_on_header_field_insert(view_t* view, int src, int tgt)
 {
-  // update in fields so new items will use updated order
-  sl_cell_t* cell = uisp.fields->data[src];
+  // update in columns so new items will use updated order
+  sl_cell_t* cell = uisp.columns->data[src];
 
   RET(cell);
-  VREM(uisp.fields, cell);
-  vec_ins(uisp.fields, cell, tgt);
+  VREM(uisp.columns, cell);
+  vec_ins(uisp.columns, cell, tgt);
   REL(cell);
 
   // update all items and cache
@@ -177,10 +177,10 @@ void ui_settings_popup_on_header_field_insert(view_t* view, int src, int tgt)
 
 void ui_settings_popup_on_header_field_resize(view_t* view, char* id, int size)
 {
-  // update in fields so new items will use updated size
-  for (int i = 0; i < uisp.fields->length; i++)
+  // update in columns so new items will use updated size
+  for (int i = 0; i < uisp.columns->length; i++)
   {
-    sl_cell_t* cell = uisp.fields->data[i];
+    sl_cell_t* cell = uisp.columns->data[i];
     if (strcmp(cell->id, id) == 0)
     {
       cell->size = size;
@@ -282,7 +282,7 @@ view_t* settingsitem_create()
   vh_litem_set_on_select(rowview, ui_settings_popup_on_item_select);
 
   sl_cell_t* cell;
-  while ((cell = VNXT(uisp.fields)))
+  while ((cell = VNXT(uisp.columns)))
   {
     char*   id       = cstr_fromformat(100, "%s%s", rowview->id, cell->id);
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 50});
