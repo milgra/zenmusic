@@ -65,15 +65,15 @@ rel: $(OBJECTSREL)
 	$(CC) $^ -o bin/zenmusic $(LDFLAGS)
 
 dev: $(OBJECTSDEV)
-	$(CC) $^ -o bin/zenmusicdev $(LDFLAGS)	
+	$(CC) $^ -o bin/zenmusicdev $(LDFLAGS)
 
 $(OBJECTSDEV): $(OBJDIRDEV)/%.o: %.c
 	mkdir -p $(@D)
-	$(CC) -c $< -o $@ $(CFLAGS) -g -DDEBUG
+	$(CC) -c $< -o $@ $(CFLAGS) -g -DDEBUG -DVERSION=$(shell date "+%y%m%d%H%M")
 
 $(OBJECTSREL): $(OBJDIRREL)/%.o: %.c
 	mkdir -p $(@D)
-	$(CC) -c $< -o $@ $(CFLAGS) -O3
+	$(CC) -c $< -o $@ $(CFLAGS) -O3 -DVERSION=$(shell date "+%y%m%d%H%M")
 
 deps:
 	@sudo pkg install ffmpeg sdl2 glew

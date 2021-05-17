@@ -1,5 +1,7 @@
 first version
 
+0. song legyen kivalasztva indulas utan
+image upload, new field button
 -c -l relative path-tal is mukodjon! 
 automata tesztek!!
 fix leaks
