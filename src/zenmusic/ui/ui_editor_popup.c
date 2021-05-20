@@ -5,7 +5,6 @@
 #include "view.c"
 
 void ui_editor_popup_attach(view_t* view);
-void ui_editor_popup_set_songs(vec_t* vec);
 void ui_editor_popup_show();
 
 #endif
@@ -32,6 +31,7 @@ void ui_editor_popup_show();
 #include "vh_textinput.c"
 #include <string.h>
 
+void    ui_editor_popup_set_songs(vec_t* vec);
 void    ui_editor_popup_create_table();
 void    ui_editor_popup_on_accept();
 view_t* ui_editor_popup_item_for_index(int index, void* userdata, view_t* listview, int* item_count);
@@ -45,14 +45,13 @@ void    ui_editor_popup_input_cell_edit_finished(view_t* inputview);
 
 struct _ui_editor_popup_t
 {
-  int song_count;
+  int song_count; // song count for final message
 
-  view_t* listview;
-  view_t* headview;
-  view_t* coverview;
+  view_t* list_view;  // editor table
+  view_t* head_view;  // header veiw
+  view_t* cover_view; // cover view
 
-  map_t* data;
-  map_t* temp;
+  map_t* attributes; // current attributes in table
 
   vec_t* fields;
   vec_t* items;
@@ -89,9 +88,9 @@ se_cell_t* uise_cell_new(char* id, int size, int index)
 
 void ui_editor_popup_attach(view_t* view)
 {
-  view_t* headview    = view_get_subview(view, "song_editor_header");
-  view_t* listview    = view_get_subview(view, "editorlist");
-  view_t* coverview   = view_get_subview(view, "coverview");
+  view_t* head_view   = view_get_subview(view, "song_editor_header");
+  view_t* list_view   = view_get_subview(view, "editorlist");
+  view_t* cover_view  = view_get_subview(view, "coverview");
   view_t* acceptbtn   = view_get_subview(view, "editor_popup_accept_btn");
   view_t* rejectbtn   = view_get_subview(view, "editor_popup_reject_btn");
   view_t* uploadbtn   = view_get_subview(view, "uploadbtn");
@@ -106,18 +105,17 @@ void ui_editor_popup_attach(view_t* view)
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0;
 
-  ep.headview  = headview;
-  ep.listview  = listview;
-  ep.coverview = coverview;
-  ep.temp      = MNEW();
-  ep.fields    = VNEW();
-  ep.textstyle = ts;
-  ep.items     = VNEW();
-  ep.data      = MNEW();
-  ep.changed   = MNEW();
-  ep.removed   = VNEW();
-  ep.cover     = NULL;
-  ep.cols      = VNEW();
+  ep.head_view  = head_view;
+  ep.list_view  = list_view;
+  ep.cover_view = cover_view;
+  ep.fields     = VNEW();
+  ep.textstyle  = ts;
+  ep.items      = VNEW();
+  ep.attributes = MNEW();
+  ep.changed    = MNEW();
+  ep.removed    = VNEW();
+  ep.cover      = NULL;
+  ep.cols       = VNEW();
 
   ui_editor_popup_create_table();
 
@@ -130,8 +128,38 @@ void ui_editor_popup_attach(view_t* view)
   vh_button_add(acceptbtn, VH_BUTTON_NORMAL, but_cb);
   vh_button_add(rejectbtn, VH_BUTTON_NORMAL, but_cb);
 
-  tg_text_add(headview);
-  tg_text_set(headview, "Editing 1 data", ts);
+  tg_text_add(head_view);
+  tg_text_set(head_view, "Editing 1 data", ts);
+}
+
+void ui_editor_popup_show()
+{
+  vec_t* selected = VNEW();
+  ui_songlist_get_selected(selected);
+  ui_editor_popup_set_songs(selected);
+  ui_popup_switcher_toggle("song_editor_popup_page");
+  REL(selected);
+}
+
+void ui_editor_popup_on_button_down(void* userdata, void* data)
+{
+  view_t* view = data;
+  if (strcmp(view->id, "editor_popup_accept_btn") == 0)
+  {
+    char* message = cstr_fromformat(150, "%i fields will be changed %i fields will be removed cover will be %s on %i items, are you sure you want these modifications?",
+                                    ep.changed->count,
+                                    ep.removed->length,
+                                    ep.cover,
+                                    ep.song_count);
+
+    cb_t* acc_cb = cb_new(ui_editor_popup_on_accept, NULL);
+    ui_decision_popup_show(message, acc_cb, NULL);
+    REL(message);
+  }
+  if (strcmp(view->id, "editor_popup_reject_btn") == 0)
+  {
+    ui_popup_switcher_toggle("song_editor_popup_page");
+  }
 }
 
 void ui_editor_popup_create_table()
@@ -142,7 +170,7 @@ void ui_editor_popup_create_table()
 
   // create header
 
-  view_t* header = view_new("songeditorlist_header", (r2_t){0, 0, 10, 10});
+  view_t* header = view_new("songeditorlist_header", (r2_t){0, 0, 10, 30});
   tg_css_add(header);
 
   vh_lhead_add(header);
@@ -166,8 +194,8 @@ void ui_editor_popup_create_table()
     REL(id);
   }
 
-  vh_list_add(ep.listview, ((vh_list_inset_t){30, 10, 0, 10}), ui_editor_popup_item_for_index, NULL, NULL);
-  vh_list_set_header(ep.listview, header);
+  vh_list_add(ep.list_view, ((vh_list_inset_t){30, 10, 0, 10}), ui_editor_popup_item_for_index, NULL, NULL);
+  vh_list_set_header(ep.list_view, header);
 }
 
 // header related
@@ -189,7 +217,7 @@ void ui_editor_popup_on_header_field_insert(view_t* view, int src, int tgt)
 
   // update all items and cache
   view_t* item;
-  vec_t*  items = vh_list_items(ep.listview);
+  vec_t*  items = vh_list_items(ep.list_view);
   while ((item = VNXT(items)))
   {
     vh_litem_swp_cell(item, src, tgt);
@@ -211,13 +239,13 @@ void ui_editor_popup_on_header_field_resize(view_t* view, char* id, int size)
 
   // update all items and cache
   view_t* item;
-  vec_t*  items = vh_list_items(ep.listview);
+  vec_t*  items = vh_list_items(ep.list_view);
   while ((item = VNXT(items))) vh_litem_upd_cell_size(item, id, size);
 }
 
 // row related
 
-view_t* ui_editor_popup_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
+view_t* ui_editor_popup_item_for_index(int index, void* userdata, view_t* list_view, int* item_count)
 {
   if (index < 0) return NULL;                 // no items before 0
   if (index >= ep.items->length) return NULL; // no more items
@@ -244,7 +272,7 @@ view_t* ui_editor_popup_create_item()
   while ((cell = VNXT(ep.cols)))
   {
     char*   id       = cstr_fromformat(100, "%s%s", rowview->id, cell->id);
-    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
+    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 35});
     REL(id);
 
     tg_text_add(cellview);
@@ -259,45 +287,33 @@ view_t* ui_editor_popup_create_item()
 void ui_editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
   char* key   = ep.fields->data[index];
-  char* value = MGET(ep.data, key);
+  char* value = MGET(ep.attributes, key);
 
-  printf("key for item %s value %s\n", key, value);
-
-  // only value cells are editable
-  if (strcmp(cell->id, "val") == 0)
+  if (strcmp(cell->id, "value") == 0)
   {
-    uint32_t color1 = 0x00FF00AA;
+    uint32_t color1 = (index % 2 == 0) ? 0xFEFEFEFF : 0xEFEFEFFF;
 
     ep.textstyle.backcolor = color1;
     ep.sel_item            = itemview;
 
-    char* id = cstr_fromformat(100, "%s%s%s", itemview->id, key, "edit");
+    // replace simple text cell with textinput cell
 
+    char*   id        = cstr_fromformat(100, "%s%s%s", itemview->id, key, "edit");
     view_t* inputcell = view_new(id, cell->view->frame.local);
-    REL(id);
 
-    vh_textinput_add(inputcell, "", value, ep.textstyle, key);                           // add text handler with key as userdata
-    vh_textinput_set_on_text(inputcell, ui_editor_popup_input_cell_value_changed);       // listen for text change
+    vh_textinput_add(inputcell, value, "", ep.textstyle, key);                           // add text handler with key as userdata
     vh_textinput_set_on_deactivate(inputcell, ui_editor_popup_input_cell_edit_finished); // listen for text editing finish
     vh_textinput_activate(inputcell, 1);                                                 // activate text input
     ui_manager_activate(inputcell);                                                      // set text input as event receiver
-    vh_list_lock_scroll(ep.listview, 1);                                                 // lock scrolling of list to avoid going out screen
-    vh_litem_rpl_cell(itemview, cell->id, inputcell);                                    // replacing simple text cell with input cell
 
-    // TODO check if previous cell gets released
+    vh_list_lock_scroll(ep.list_view, 1);             // lock scrolling of list to avoid going out screen
+    vh_litem_rpl_cell(itemview, cell->id, inputcell); // replacing simple text cell with input cell
 
-    printf("input cell created id %s\n", inputcell->id);
-    printf("replacing text cell with input cell %s\n", cell->id);
-
-    /* ep.textstyle.backcolor = 0x00FF00AA; */
-    /* tg_text_set(vh_litem_get_cell(itemview, "key"), key, ep.textstyle); */
-    /* tg_text_set(vh_litem_get_cell(itemview, "val"), value, ep.textstyle); */
-    /* tg_text_set(vh_litem_get_cell(itemview, "del"), "Remove", ep.textstyle); */
+    REL(id);
   }
 
-  if (strcmp(cell->id, "del") == 0)
+  if (strcmp(cell->id, "delete") == 0)
   {
-    // indicate row for deletio
     ep.textstyle.backcolor = 0xFF0000AA;
     tg_text_set(vh_litem_get_cell(itemview, "key"), key, ep.textstyle);
     tg_text_set(vh_litem_get_cell(itemview, "value"), value, ep.textstyle);
@@ -305,18 +321,6 @@ void ui_editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, 
 
     VADD(ep.removed, key);
   }
-}
-
-void ui_editor_popup_input_cell_value_changed(view_t* inputview)
-{
-  vh_textinput_t* data = inputview->handler_data;
-
-  char* key  = data->userdata;
-  char* text = str_cstring(vh_textinput_get_text(inputview));
-
-  printf("ui_editor_popup_input_cell_value_changed key %s text %s\n", key, text);
-
-  MPUT(ep.temp, key, text);
 }
 
 void ui_editor_popup_input_cell_edit_finished(view_t* inputview)
@@ -328,26 +332,20 @@ void ui_editor_popup_input_cell_edit_finished(view_t* inputview)
 
   MPUT(ep.changed, key, text);
 
-  printf("ui_editor_popup_input_cell_edit_finished key %s text %s\n", key, text);
+  // replace textinput cell with simple text cell
 
-  // remove text view handler
-  char* id = cstr_fromformat(100, "%s%s", ep.sel_item->id, "val");
-
+  char*   id       = cstr_fromformat(100, "%s%s", ep.sel_item->id, "value");
   view_t* textcell = view_new(id, inputview->frame.local);
-  REL(id);
 
   tg_text_add(textcell);
   tg_text_set(textcell, text, ep.textstyle);
-  textcell->blocks_touch = 0;
 
-  // TODO check if previous cell gets released
+  vh_list_lock_scroll(ep.list_view, 0);
   vh_litem_rpl_cell(ep.sel_item, key, textcell);
 
-  printf("text cell created id %s\n", textcell->id);
-  printf("replacing intpu cell with text cell\n");
+  textcell->blocks_touch = 0;
 
-  // unlock scrolling
-  vh_list_lock_scroll(ep.listview, 0);
+  REL(id);
 }
 
 int ui_editor_popup_comp_text(void* left, void* right)
@@ -371,15 +369,14 @@ void ui_editor_popup_remove_str(vec_t* vec, char* str)
   }
 }
 
-void ui_editor_popup_set_song()
+void ui_editor_popup_create_items()
 {
   // reset temporary fields containers
-  map_reset(ep.temp);
   vec_reset(ep.fields);
   vec_reset(ep.items);
 
   // store song and extract fields
-  map_keys(ep.data, ep.fields);
+  map_keys(ep.attributes, ep.fields);
 
   // sort fields
   vec_sort(ep.fields, VSD_DSC, ui_editor_popup_comp_text);
@@ -393,7 +390,7 @@ void ui_editor_popup_set_song()
   vec_ins(ep.fields, cstr_fromcstring("meta/artist"), 0);
 
   // reset list handler
-  vh_list_reset(ep.listview);
+  vh_list_reset(ep.list_view);
 
   // create items
 
@@ -401,26 +398,21 @@ void ui_editor_popup_set_song()
   {
     view_t* item = ui_editor_popup_create_item();
 
+    vh_litem_upd_index(item, index);
+
     char* key   = ep.fields->data[index];
-    char* value = MGET(ep.data, key);
+    char* value = MGET(ep.attributes, key);
 
     uint32_t color1 = (index % 2 == 0) ? 0xFEFEFEFF : 0xEFEFEFFF;
-
-    // "file" fields are non-editable
-    if (key[0] == 'f') color1 &= 0xFFDDDDFF;
-
-    ep.textstyle.backcolor = color1;
-
-    vh_litem_upd_index(item, index);
-    tg_text_set(vh_litem_get_cell(item, "key"), key + 5, ep.textstyle); // show last key name component
-
     uint32_t color2 = (index % 2 == 0) ? 0xF8F8F8FF : 0xE8E8E8FF;
 
     // "file" fields are non-editable
+    if (key[0] == 'f') color1 &= 0xFFDDDDFF;
     if (key[0] == 'f') color2 &= 0xFFDDDDFF;
 
+    ep.textstyle.backcolor = color1;
+    tg_text_set(vh_litem_get_cell(item, "key"), key + 5, ep.textstyle); // show last key name component
     ep.textstyle.backcolor = color2;
-
     tg_text_set(vh_litem_get_cell(item, "value"), value, ep.textstyle);
 
     if (key[0] != 'f') tg_text_set(vh_litem_get_cell(item, "delete"), "Delete", ep.textstyle);
@@ -429,27 +421,11 @@ void ui_editor_popup_set_song()
   }
 }
 
-void ui_editor_popup_on_button_down(void* userdata, void* data)
-{
-  view_t* view = data;
-  if (strcmp(view->id, "editor_popup_accept_btn") == 0)
-  {
-    char* message = cstr_fromformat(150, "%i fields will be changed %i fields will be removed cover will be %s on %i items, are you sure you want these modifications?", ep.changed->count, ep.removed->length, ep.cover, ep.song_count);
-    cb_t* acc_cb  = cb_new(ui_editor_popup_on_accept, NULL);
-    ui_decision_popup_show(message, acc_cb, NULL);
-    REL(message);
-  }
-  if (strcmp(view->id, "editor_popup_reject_btn") == 0)
-  {
-    ui_popup_switcher_toggle("song_editor_popup_page");
-  }
-}
-
 void ui_editor_popup_set_songs(vec_t* vec)
 {
   if (vec->length > 0)
   {
-    map_reset(ep.data);
+    map_reset(ep.attributes);
     map_reset(ep.changed);
     vec_reset(ep.removed);
 
@@ -467,47 +443,43 @@ void ui_editor_popup_set_songs(vec_t* vec)
       {
         char* field = fields->data[fi];
         char* value = MGET(song, field);
-        char* curr  = MGET(ep.data, field);
+        char* curr  = MGET(ep.attributes, field);
 
         if (curr == NULL)
         {
-          MPUT(ep.data, field, value);
+          MPUT(ep.attributes, field, value);
         }
         else
         {
-          if (strcmp(curr, value) != 0) MPUT(ep.data, field, cstr_fromcstring("MULTIPLE"));
+          if (strcmp(curr, value) != 0) MPUT(ep.attributes, field, cstr_fromcstring("MULTIPLE"));
         }
       }
     }
-    ui_editor_popup_set_song();
+    ui_editor_popup_create_items();
 
     REL(fields);
     REL(values);
   }
 
-  char text[100];
-  snprintf(text, 100, "Editing %i song(s)", vec->length);
-
-  ep.song_count = vec->length;
-
-  // tg_text_add(ep.headview);
-
+  ep.song_count          = vec->length;
   ep.textstyle.backcolor = 0;
-  tg_text_set(ep.headview, text, ep.textstyle);
+
+  char* text = cstr_fromformat(100, "Editing %i song(s)", vec->length);
+  tg_text_set(ep.head_view, text, ep.textstyle);
+  REL(text);
 
   // load cover
 
-  if (ep.coverview->texture.bitmap)
+  if (ep.cover_view->texture.bitmap)
   {
-
     map_t* song = vec->data[0];
     char*  path = MGET(song, "file/path");
     char*  file = cstr_fromformat(100, "%s%s", config_get("lib_path"), path);
 
-    editor_get_album(file, ep.coverview->texture.bitmap);
+    editor_get_album(file, ep.cover_view->texture.bitmap);
 
     REL(file);
-    ep.coverview->texture.changed = 1;
+    ep.cover_view->texture.changed = 1;
   }
 }
 
@@ -549,15 +521,6 @@ void ui_editor_popup_on_accept()
 
   /* // reload song list */
   /* ui_songlist_refresh(); */
-}
-
-void ui_editor_popup_show()
-{
-  vec_t* selected = VNEW();
-  ui_songlist_get_selected(selected);
-  ui_editor_popup_set_songs(selected);
-  REL(selected);
-  ui_popup_switcher_toggle("song_editor_popup_page");
 }
 
 #endif
