@@ -1,3 +1,6 @@
+bin/zenmusicdev -c /home/milgra/Downloads/ZMTestConfig -s testrecord.rec  
+bin/zenmusicdev -c /home/milgra/Downloads/ZMTestConfig -p testrecord.rec  
+
 # Zen Music music player and organizer test protocol
 # All tests are recorded and automated with the command line session recorder options
 # Please re-record a test case if you created a test-breaking change

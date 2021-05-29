@@ -11,10 +11,15 @@ void ui_filter_bar_show_query(char* text);
 
 #if __INCLUDE_LEVEL__ == 0
 
+void ui_filter_bar_show_filters(void* userdata, void* data);
+void ui_filter_bar_clear_search(void* userdata, void* data);
+
 #include "callbacks.c"
 #include "config.c"
+#include "ui_filter_popup.c"
 #include "ui_manager.c"
 #include "ui_songlist.c"
+#include "vh_button.c"
 #include "vh_textinput.c"
 #include "visible.c"
 
@@ -31,9 +36,6 @@ void ui_filter_bar_attach(view_t* baseview)
   ufb.songlist_filter_bar                          = view_get_subview(baseview, "filterfield");
   ufb.songlist_filter_bar->layout.background_color = 0xFFFFFFFF;
 
-  // if (strcmp(id, "clearbtn") == 0) ui_filter_bar_clear_search();
-  // if (strcmp(id, "filterbtn") == 0) ui_on_filter_activate(MGET(ui.popup_views, "filters_popup_page"));
-
   textstyle_t ts  = {0};
   ts.font         = config_get("font_path");
   ts.size         = 30.0;
@@ -41,6 +43,18 @@ void ui_filter_bar_attach(view_t* baseview)
   ts.align        = TA_LEFT;
   ts.textcolor    = 0x000000FF;
   ts.backcolor    = 0xFFFFFFFF;
+
+  view_t* clearbtn  = view_get_subview(baseview, "clearbtn");
+  view_t* filterbtn = view_get_subview(baseview, "filterbtn");
+
+  cb_t* filter_cb = cb_new(ui_filter_bar_show_filters, NULL);
+  cb_t* clear_cb  = cb_new(ui_filter_bar_clear_search, NULL);
+
+  vh_button_add(filterbtn, VH_BUTTON_NORMAL, filter_cb);
+  vh_button_add(clearbtn, VH_BUTTON_NORMAL, clear_cb);
+
+  REL(filter_cb);
+  REL(clear_cb);
 
   vh_textinput_add(ufb.songlist_filter_bar, "", "Search/Filter", ts, NULL);
   vh_textinput_set_on_text(ufb.songlist_filter_bar, ui_filter_bar_filter);
@@ -59,8 +73,13 @@ void ui_filter_bar_filter(view_t* view)
   ui_songlist_update();
 }
 
-void ui_filter_bar_clear_search()
+void ui_filter_bar_show_filters(void* userdata, void* data)
 {
+  ui_filter_popup_show();
+}
+void ui_filter_bar_clear_search(void* userdata, void* data)
+{
+  printf("CLEAR\n");
   vh_textinput_set_text(ufb.songlist_filter_bar, "");
   ui_manager_activate(ufb.songlist_filter_bar);
 }

@@ -1,13 +1,18 @@
 first version
 
+artist/genre filter mukodjon
 editor popup - image upload, new field button, buttons, fix
 editor popup masodik openre megy csak cover art view
--c -l relative path-tal is mukodjon! 
+scroll, toggle buttons
+date legyen default mezo editorban ha nincs akkor is
+-c -l relative path-tal is mukodjon! - base path
 automata tesztek!!
 fix leaks
 metadata update eseten sulyos leak, a hatterben tortenjen, analyzer kozben is lehessen mar bongeszni
 fix space problem, case sensitiveness in search
 songlist refactor
+popup item scroll csak egermozgas utan reagal
+scroll kozben kimozgatott egerkor beragad a content
 
 ideas
 

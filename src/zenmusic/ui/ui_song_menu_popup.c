@@ -93,7 +93,7 @@ view_t* ui_song_menu_popupitem_create(int index, char* text)
   char*   rowid    = cstr_fromformat(100, "smlist_item%i", index);
   char*   cellid   = cstr_fromformat(100, "%s%s", rowid, "field");
   view_t* rowview  = view_new(rowid, (r2_t){0, 0, 460, 50});
-  view_t* cellview = view_new(cellid, (r2_t){0, 0, 240, 50});
+  view_t* cellview = view_new(cellid, (r2_t){0, 0, 250, 50});
 
   REL(rowid);
   REL(cellid);
