@@ -1,9 +1,9 @@
 #ifndef vh_picker_h
 #define vh_picker_h
 
-#include "mtcallback.c"
 #include "view.c"
 #include "wm_event.c"
+#include "zc_callback.c"
 
 void vh_picker_add(view_t* view, cb_t* on_press);
 
@@ -11,7 +11,7 @@ void vh_picker_add(view_t* view, cb_t* on_press);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtnumber.c"
+#include "zc_number.c"
 
 typedef struct
 {

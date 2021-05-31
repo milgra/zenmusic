@@ -2,7 +2,7 @@
 #ifndef render_h
 #define render_h
 
-#include "mtbitmap.c"
+#include "zc_bitmap.c"
 
 void video_show(void* opaque, int index, int w, int h, bm_t* bitmap, int edge);
 void render_draw_waves(void* opaque, int channel, bm_t* bitmap, int edge);
@@ -18,11 +18,10 @@ void video_refresh(void* opaque, double* remaining_time, int index);
 #include "libavutil/time.h"
 #include "libswresample/swresample.h"
 #include "libswscale/swscale.h"
-#include "mtbitmap.c"
-#include "mtgraphics.c"
 #include "options.c"
 #include "strcomm.c"
 #include "video.c"
+#include "zc_graphics.c"
 #include <GL/glew.h>
 
 /* no AV sync correction is done if below the minimum AV sync threshold */

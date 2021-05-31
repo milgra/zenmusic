@@ -1,20 +1,16 @@
-/*
-  Milan Toth's 4D math functions
- */
+#ifndef zc_math4_h
+#define zc_math4_h
 
-#ifndef __c36__math4__
-#define __c36__math4__
-
-#include "mtmath3.c"
+#include "zc_math3.c"
 #include <stdio.h>
 #include <stdlib.h>
 
 #ifndef M_PI
-#define M_PI 3.14159265358979323846
+  #define M_PI 3.14159265358979323846
 #endif
 
 #ifndef M_PI_2
-#define M_PI_2 3.14159265358979323846 * 2
+  #define M_PI_2 3.14159265358979323846 * 2
 #endif
 
 typedef struct _v4_t v4_t;

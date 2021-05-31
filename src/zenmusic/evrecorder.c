@@ -13,7 +13,7 @@ ev_t* evrec_replay(uint32_t time);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtvector.c"
+#include "zc_vector.c"
 #include <stdio.h>
 
 struct evrec_t

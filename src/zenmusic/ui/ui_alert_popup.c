@@ -1,8 +1,8 @@
 #ifndef ui_alert_popup_h
 #define ui_alert_popup_h
 
-#include "mtcallback.c"
 #include "view.c"
+#include "zc_callback.c"
 
 void ui_alert_popup_attach(view_t* baseview);
 void ui_alert_popup_show(char* text);
@@ -12,11 +12,11 @@ void ui_alert_popup_show(char* text);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "config.c"
-#include "mtvector.c"
 #include "text.c"
 #include "tg_text.c"
 #include "ui_popup_switcher.c"
 #include "vh_button.c"
+#include "zc_vector.c"
 
 void ui_alert_popup_accept(void* userdata, void* data);
 

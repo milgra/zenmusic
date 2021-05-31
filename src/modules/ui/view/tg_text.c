@@ -23,11 +23,11 @@ char* tg_text_get(view_t* view);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtbitmap.c"
-#include "mtcstring.c"
-#include "mtgraphics.c"
-#include "mtstring.c"
 #include "tg_css.c"
+#include "zc_bitmap.c"
+#include "zc_cstring.c"
+#include "zc_graphics.c"
+#include "zc_string.c"
 
 int tg_text_index = 0;
 

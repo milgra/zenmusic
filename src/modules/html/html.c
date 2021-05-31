@@ -1,9 +1,9 @@
 #ifndef html_h
 #define html_h
 
-#include "mtcstring.c"
-#include "mtmap.c"
-#include "mtvector.c"
+#include "zc_cstring.c"
+#include "zc_map.c"
+#include "zc_vector.c"
 #include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>

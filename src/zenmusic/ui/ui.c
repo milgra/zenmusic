@@ -11,7 +11,6 @@ void ui_load(float width, float height);
 
 #include "callbacks.c"
 #include "config.c"
-#include "mtnumber.c"
 #include "player.c"
 #include "ui_about_popup.c"
 #include "ui_activity_popup.c"
@@ -35,6 +34,7 @@ void ui_load(float width, float height);
 #include "view_generator.c"
 #include "view_layout.c"
 #include "wm_connector.c"
+#include "zc_number.c"
 
 void ui_on_button_down(void* userdata, void* data);
 void ui_on_key_down(void* userdata, void* data);

@@ -11,8 +11,8 @@ void vh_knob_add(view_t* view,
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtgraphics.c"
 #include "tg_knob.c"
+#include "zc_graphics.c"
 #include <stdio.h>
 
 typedef struct _vh_knob_t

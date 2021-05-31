@@ -1,8 +1,8 @@
 #ifndef vh_anim_h
 #define vh_anim_h
 
-#include "mtmath2.c"
 #include "view.c"
+#include "zc_math2.c"
 
 typedef enum _animtype_t
 {

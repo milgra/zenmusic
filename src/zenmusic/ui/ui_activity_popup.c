@@ -11,9 +11,9 @@ void ui_activity_popup_attach(view_t* baseview);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "config.c"
-#include "mtlog.c"
 #include "textlist.c"
 #include "tg_text.c"
+#include "zc_log.c"
 #include <pthread.h>
 
 struct _ui_activity_popup_t

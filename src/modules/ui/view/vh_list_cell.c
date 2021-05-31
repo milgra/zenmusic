@@ -21,8 +21,8 @@ void        vh_lcell_set_size(vec_t* cells, char* id, int size);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtcstring.c"
-#include "mtvector.c"
+#include "zc_cstring.c"
+#include "zc_vector.c"
 
 vh_lcell_t* vh_lcell_new(char* id, int size, view_t* view, int index)
 {

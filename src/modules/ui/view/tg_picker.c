@@ -9,7 +9,7 @@ void tg_picker_add(view_t* view);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtgraphics.c"
+#include "zc_graphics.c"
 
 void tg_picker_gen(view_t* view)
 {

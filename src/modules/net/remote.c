@@ -1,7 +1,7 @@
 #ifndef remote_h
 #define remote_h
 
-#include "mtchannel.c"
+#include "zc_channel.c"
 
 void remote_listen(ch_t* channel, int port);
 void remote_close();

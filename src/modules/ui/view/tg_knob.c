@@ -18,7 +18,7 @@ void tg_knob_set_angle(view_t* view, float angle);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtgraphics.c"
+#include "zc_graphics.c"
 
 void tg_knob_gen(view_t* view)
 {

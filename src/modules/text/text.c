@@ -1,9 +1,9 @@
 #ifndef text_h
 #define text_h
 
-#include "mtbitmap.c"
-#include "mtstring.c"
-#include "mtvector.c"
+#include "zc_bitmap.c"
+#include "zc_string.c"
+#include "zc_vector.c"
 
 #include <stdint.h>
 
@@ -102,9 +102,9 @@ void text_render(
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtgraphics.c"
-#include "mtmap.c"
-#include "mtmath2.c"
+#include "zc_graphics.c"
+#include "zc_map.c"
+#include "zc_math2.c"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>

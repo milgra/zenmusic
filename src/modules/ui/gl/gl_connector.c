@@ -9,8 +9,8 @@
 
 #include "gl_floatbuffer.c"
 #include "gl_shader.c"
-#include "mtbitmap.c"
-#include "mtmath4.c"
+#include "zc_bitmap.c"
+#include "zc_math4.c"
 #include <GL/glew.h>
 #include <stdio.h>
 #include <stdlib.h>

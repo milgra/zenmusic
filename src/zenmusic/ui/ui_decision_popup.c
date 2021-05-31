@@ -1,8 +1,8 @@
 #ifndef ui_decision_popup_h
 #define ui_decision_popup_h
 
-#include "mtcallback.c"
 #include "view.c"
+#include "zc_callback.c"
 
 void ui_decision_popup_attach(view_t* baseview);
 void ui_decision_popup_show(char* text, cb_t* acc_cb, cb_t* rej_cb);
@@ -12,11 +12,11 @@ void ui_decision_popup_show(char* text, cb_t* acc_cb, cb_t* rej_cb);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "config.c"
-#include "mtcstring.c"
-#include "mtvector.c"
 #include "tg_text.c"
 #include "ui_popup_switcher.c"
 #include "vh_button.c"
+#include "zc_cstring.c"
+#include "zc_vector.c"
 
 void ui_decision_popup_accept(void* userdata, void* data);
 void ui_decision_popup_reject(void* userdata, void* data);

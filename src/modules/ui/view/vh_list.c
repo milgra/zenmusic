@@ -1,9 +1,9 @@
 #ifndef vh_list_h
 #define vh_list_h
 
-#include "mtvector.c"
 #include "view.c"
 #include "wm_event.c"
+#include "zc_vector.c"
 
 typedef struct _vh_list_inset_t
 {
@@ -66,12 +66,12 @@ void    vh_list_scroll_to_index(view_t* view, int index);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtcstring.c"
-#include "mtstring.c"
 #include "tg_css.c"
 #include "tg_text.c"
 #include "vh_anim.c"
 #include "vh_sbar.c"
+#include "zc_cstring.c"
+#include "zc_string.c"
 #include <math.h>
 
 #define PRELOAD_DISTANCE 100.0

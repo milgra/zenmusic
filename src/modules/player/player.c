@@ -5,8 +5,8 @@
 #ifndef player_h
 #define player_h
 
-#include "mtbitmap.c"
-#include "mtmap.c"
+#include "zc_bitmap.c"
+#include "zc_map.c"
 
 void  player_init();
 void  player_play(char* path);
@@ -34,12 +34,12 @@ int  player_refresh();
 
 #include "libavformat/avformat.h"
 #include "libavutil/imgutils.h"
-#include "mtcstring.c"
-#include "mtgraphics.c"
-#include "mtlog.c"
 #include "render.c"
 #include "strcomm.c"
 #include "stream.c"
+#include "zc_cstring.c"
+#include "zc_graphics.c"
+#include "zc_log.c"
 #include <assert.h>
 
 static AVInputFormat* file_iformat;

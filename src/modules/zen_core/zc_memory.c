@@ -1,9 +1,5 @@
-/*
-  Milan Toth's memory handler functions
- */
-
-#ifndef mtmem_h
-#define mtmem_h
+#ifndef zc_memory_h
+#define zc_memory_h
 
 #include <assert.h>
 #include <stdarg.h>
@@ -19,7 +15,7 @@
 
 struct mem_head
 {
-  char id[2]; // starting bytes for mtmem managed memory ranges to detect invalid object during retain/release
+  char id[2]; // starting bytes for zc_memory managed memory ranges to detect invalid object during retain/release
   char type[10];
   void (*destructor)(void*);
   void (*descriptor)(void*, int);
@@ -146,7 +142,7 @@ char mem_release(void* pointer)
   if (head->retaincount == 0)
   {
     if (head->destructor != NULL) head->destructor(pointer);
-    // zero out bytes that will be deallocated so it will be easier to detect re-using of released mtmem areas
+    // zero out bytes that will be deallocated so it will be easier to detect re-using of released zc_memory areas
     memset(bytes, 0, sizeof(struct mem_head));
     free(bytes);
     return 1;

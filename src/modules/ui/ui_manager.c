@@ -21,11 +21,11 @@ void ui_manager_activate(view_t* view);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtmap.c"
-#include "mtmath2.c"
-#include "mtvector.c"
 #include "ui_generator.c"
 #include "view_layout.c"
+#include "zc_map.c"
+#include "zc_math2.c"
+#include "zc_vector.c"
 
 struct _uim_t
 {

@@ -1,8 +1,8 @@
 #ifndef ui_about_popup_h
 #define ui_about_popup_h
 
-#include "mtmap.c"
 #include "view.c"
+#include "zc_map.c"
 
 void ui_about_popup_attach(view_t* base);
 void ui_about_popup_update();

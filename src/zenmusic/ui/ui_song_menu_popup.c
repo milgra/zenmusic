@@ -1,8 +1,8 @@
 #ifndef ui_song_menu_popup_h
 #define ui_song_menu_popup_h
 
-#include "mtmap.c"
 #include "view.c"
+#include "zc_map.c"
 
 void ui_song_menu_popup_attach(view_t* view);
 

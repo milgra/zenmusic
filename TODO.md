@@ -1,10 +1,15 @@
 first version
 
 artist/genre filter mukodjon
+utf8 case insensitive space insensitive comparison
 editor popup - image upload, new field button, buttons, fix
 editor popup masodik openre megy csak cover art view
-scroll, toggle buttons
-date legyen default mezo editorban ha nincs akkor is
+visu lepegeto fix
+scroll fix
+toggle buttons fix
+video play fix
+meta/file remove from songlist header
+mandatory tags - date legyen default mezo editorban ha nincs akkor is
 -c -l relative path-tal is mukodjon! - base path
 automata tesztek!!
 fix leaks
@@ -13,6 +18,9 @@ fix space problem, case sensitiveness in search
 songlist refactor
 popup item scroll csak egermozgas utan reagal
 scroll kozben kimozgatott egerkor beragad a content
+activity-re kattintva songlist ugorjon aktualis szamra
+ures cover art-ra kattintva lehessen uploadolni, telire full screen
+delete nem mukodik
 
 ideas
 
@@ -26,13 +34,13 @@ test module playing also
 text style is cssbol jojjon
 rdft ne logaritmikus legyen, alig latszik a kozep tartomany
 search/filter history ( use filters for playlists)
-songs from one year ago this day
+songs from one year ago this day - history browser?
+statisztikak - top 10 leghallgatottabb, milyen genre-t hallgatsz foleg elmult 1 honap, stb - statistics browser
 textinput autoscroller
 rdft left/right channel
 full screen visualizers
 save small changes to a delta database, add it to the big one at startup
 amit releaselni kell, csinalodjon new-val!
-add text/input selectors to css, use text style from css
 speed up font rendering by using glyph indexes instead of codepoints
 grid-based warping of video/album cover based on frequence ( bass in the center )
 andromeda: monolith-like particle visu
@@ -42,7 +50,6 @@ remove non-standard css and html (type=button, blocks)
 analog mutatos output meterek is visualizacioban
 glossy effekt
 scroll-ra lehessen novelni/csokkenteni visuals meretet
-statisztikak - top 10 leghallgatottabb, milyen genre-t hallgatsz foleg elmult 1 honap, stb
 cortex as visualizer - level gen based on freq, LEFT/DOWN!!!
 volume fade in/out, cover arton is mute/play next eseten
 

@@ -18,7 +18,7 @@ void vh_sbar_update(view_t* view, float pos, float size);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtgraphics.c"
+#include "zc_graphics.c"
 #include <stdio.h>
 
 typedef struct _vh_sbar_t

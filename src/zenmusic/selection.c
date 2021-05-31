@@ -1,7 +1,7 @@
 #ifndef selection_h
 #define selection_h
 
-#include "mtvector.c"
+#include "zc_vector.c"
 
 void selection_attach();
 void selection_add(int i);

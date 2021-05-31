@@ -6,8 +6,8 @@
 #ifndef texgen_css_h
 #define texgen_css_h
 
-#include "mtbitmap.c"
 #include "view.c"
+#include "zc_bitmap.c"
 
 typedef struct _tg_css_t
 {
@@ -23,8 +23,8 @@ void tg_css_add(view_t* view);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "editor.c"
-#include "mtcstring.c"
-#include "mtgraphics.c"
+#include "zc_cstring.c"
+#include "zc_graphics.c"
 
 uint32_t tg_css_graycolor = 0;
 

@@ -1,8 +1,8 @@
 #ifndef lib_h
 #define lib_h
 
-#include "mtchannel.c"
-#include "mtmap.c"
+#include "zc_channel.c"
+#include "zc_map.c"
 
 void lib_read_files(char* libpath, map_t* db);
 void lib_delete_file(char* libpath, map_t* entry);
@@ -18,9 +18,9 @@ void lib_analyze_files(ch_t* channel, map_t* files);
 
 #include "editor.c"
 #include "files.c"
-#include "mtcstring.c"
-#include "mtcstrpath.c"
-#include "mtlog.c"
+#include "zc_cstring.c"
+#include "zc_cstrpath.c"
+#include "zc_log.c"
 #include <errno.h>
 #include <limits.h>
 #include <stdio.h>

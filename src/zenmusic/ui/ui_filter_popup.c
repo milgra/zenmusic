@@ -12,13 +12,13 @@ void ui_filter_popup_show();
 
 #include "callbacks.c"
 #include "config.c"
-#include "mtcstring.c"
 #include "textlist.c"
 #include "tg_text.c"
 #include "ui_filter_bar.c"
 #include "ui_popup_switcher.c"
 #include "ui_songlist.c"
 #include "visible.c"
+#include "zc_cstring.c"
 
 void ui_filter_popup_on_genre_select(int index);
 void ui_filter_popup_on_artist_select(int index);

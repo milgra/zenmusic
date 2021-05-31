@@ -24,11 +24,11 @@ void     ui_generator_rerender();
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtchannel.c"
-#include "mtmap.c"
-#include "mtvector.c"
 #include "ui_compositor.c"
 #include "view.c"
+#include "zc_channel.c"
+#include "zc_map.c"
+#include "zc_vector.c"
 #include <SDL.h>
 #include <unistd.h>
 

@@ -10,11 +10,11 @@ void ui_popup_switcher_toggle(char* id);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtcstring.c"
-#include "mtmap.c"
-#include "mtvector.c"
 #include "vh_anim.c"
 #include "vh_touch.c"
+#include "zc_cstring.c"
+#include "zc_map.c"
+#include "zc_vector.c"
 
 struct _ui_popup_switcher_t
 {

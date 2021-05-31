@@ -1,7 +1,7 @@
-#ifndef mtcallbacks_h
-#define mtcallbacks_h
+#ifndef zc_callbacks_h
+#define zc_callbacks_h
 
-#include "mtcallback.c"
+#include "zc_callback.c"
 
 void   callbacks_init();
 void   callbacks_set(char* id, cb_t* cb);
@@ -13,8 +13,8 @@ map_t* callbacks_get_data();
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtlog.c"
-#include "mtmap.c"
+#include "zc_log.c"
+#include "zc_map.c"
 
 map_t* callbacks;
 

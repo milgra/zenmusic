@@ -1,8 +1,8 @@
 #ifndef vh_key_h
 #define vh_key_h
 
-#include "mtcallback.c"
 #include "view.c"
+#include "zc_callback.c"
 
 void vh_key_add(view_t* view, cb_t* on_key);
 

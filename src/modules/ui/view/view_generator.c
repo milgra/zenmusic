@@ -1,9 +1,9 @@
 #ifndef view_gen_h
 #define view_gen_h
 
-#include "mtmap.c"
-#include "mtvector.c"
 #include "view.c"
+#include "zc_map.c"
+#include "zc_vector.c"
 
 vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callbacks);
 
@@ -12,9 +12,9 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
 #if __INCLUDE_LEVEL__ == 0
 
 #include "html.c"
-#include "mtcallback.c"
 #include "tg_css.c"
 #include "vh_button.c"
+#include "zc_callback.c"
 #include <limits.h>
 
 void view_gen_apply_style(view_t* view, map_t* style, char* respath)

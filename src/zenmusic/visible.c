@@ -1,7 +1,7 @@
 #ifndef visible_h
 #define visible_h
 
-#include "mtmap.c"
+#include "zc_map.c"
 
 void visible_init();
 
@@ -20,7 +20,7 @@ void visible_set_filter(char* text);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "database.c"
-#include "mtcstring.c"
+#include "zc_cstring.c"
 
 struct _visible_t
 {

@@ -1,7 +1,7 @@
 #ifndef config_h
 #define config_h
 
-#include "mtmap.c"
+#include "zc_map.c"
 
 void  config_init();
 void  config_read(char* path);
@@ -19,9 +19,9 @@ void  config_set_bool(char* key, int val);
 #include "files.c"
 #include "kvlist.c"
 #include "library.c"
-#include "mtcstring.c"
-#include "mtcstrpath.c"
-#include "mtlog.c"
+#include "zc_cstring.c"
+#include "zc_cstrpath.c"
+#include "zc_log.c"
 #include <limits.h>
 
 map_t* confmap;

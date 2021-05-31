@@ -13,8 +13,8 @@
 #define ui_compositor_h
 
 #include "gl_connector.c"
-#include "mtbitmap.c"
-#include "mtmath2.c"
+#include "zc_bitmap.c"
+#include "zc_math2.c"
 
 void ui_compositor_init();
 
@@ -47,11 +47,11 @@ void ui_compositor_render(uint32_t time, int width, int height, int wpwr, int hp
 #define UI_STAT_DELAY 10.0
 
 #include "gl_floatbuffer.c"
-#include "mtcstring.c"
-#include "mtmap.c"
-#include "mtmath4.c"
-#include "mttexmap.c"
-#include "mtvector.c"
+#include "zc_cstring.c"
+#include "zc_map.c"
+#include "zc_math4.c"
+#include "zc_texmap.c"
+#include "zc_vector.c"
 
 typedef struct _crect_t
 {

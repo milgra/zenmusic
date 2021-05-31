@@ -1,10 +1,10 @@
 #ifndef vh_textinput_h
 #define vh_textinput_h
 
-#include "mtstring.c"
 #include "text.c"
 #include "view.c"
 #include "wm_event.c"
+#include "zc_string.c"
 
 typedef struct _vh_textinput_t
 {
@@ -43,12 +43,12 @@ void   vh_textinput_set_on_deactivate(view_t* view, void (*event)(view_t*));
 #if __INCLUDE_LEVEL__ == 0
 
 #include "SDL.h"
-#include "mtcstring.c"
-#include "mtgraphics.c"
-#include "mtvector.c"
 #include "tg_css.c"
 #include "tg_text.c"
 #include "vh_anim.c"
+#include "zc_cstring.c"
+#include "zc_graphics.c"
+#include "zc_vector.c"
 
 void vh_textinput_upd(view_t* view)
 {

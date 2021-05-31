@@ -1,10 +1,10 @@
 #ifndef view_h
 #define view_h
 
-#include "mtbitmap.c"
-#include "mtmath2.c"
-#include "mtvector.c"
 #include "wm_event.c"
+#include "zc_bitmap.c"
+#include "zc_math2.c"
+#include "zc_vector.c"
 
 typedef enum _laypos_t // layout position
 {
@@ -170,8 +170,8 @@ extern char resend;
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtcstring.c"
-#include "mtmemory.c"
+#include "zc_cstring.c"
+#include "zc_memory.c"
 #include <limits.h>
 
 char resend = 1;

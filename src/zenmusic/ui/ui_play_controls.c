@@ -20,7 +20,6 @@ void ui_play_update_volume(float ratio);
 
 #include "callbacks.c"
 #include "config.c"
-#include "mtcstring.c"
 #include "player.c"
 #include "tg_knob.c"
 #include "ui_song_infos.c"
@@ -28,6 +27,7 @@ void ui_play_update_volume(float ratio);
 #include "vh_button.c"
 #include "vh_knob.c"
 #include "visible.c"
+#include "zc_cstring.c"
 #include <limits.h>
 
 struct ui_play_controls_t

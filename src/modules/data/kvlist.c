@@ -1,7 +1,7 @@
 #ifndef kvlist_h
 #define kvlist_h
 
-#include "mtmap.c"
+#include "zc_map.c"
 #include <stdio.h>
 
 int kvlist_read(char* libpath, map_t* db, char* keyfield);
@@ -11,7 +11,7 @@ int kvlist_write(char* libpath, map_t* db);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtcstring.c"
+#include "zc_cstring.c"
 #include <limits.h>
 
 int kvlist_read(char* libpath, map_t* db, char* keyfield)

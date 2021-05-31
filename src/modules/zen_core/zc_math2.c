@@ -1,9 +1,5 @@
-/*
-  Milan Toth's 2D math functions
- */
-
-#ifndef math2_h
-#define math2_h
+#ifndef zc_math2_h
+#define zc_math2_h
 
 #include <math.h>
 #include <stdint.h>
@@ -93,11 +89,11 @@ uint8_t   square_checkoverlapping(square2_t squarea, square2_t squareb);
 #include <float.h>
 
 #ifndef M_PI
-#define M_PI 3.14159265358979323846
+  #define M_PI 3.14159265358979323846
 #endif
 
 #ifndef M_PI_2
-#define M_PI_2 3.14159265358979323846 * 2
+  #define M_PI_2 3.14159265358979323846 * 2
 #endif
 
 /* creates vector2 */

@@ -5,9 +5,9 @@
 #ifndef editor_h
 #define editor_h
 
-#include "mtbitmap.c"
-#include "mtmap.c"
-#include "mtvector.c"
+#include "zc_bitmap.c"
+#include "zc_map.c"
+#include "zc_vector.c"
 
 void  editor_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop, char* cover);
 int   editor_get_metadata(const char* path, map_t* map);
@@ -23,10 +23,10 @@ bm_t* editor_get_image(const char* path);
 #include "libavformat/avformat.h"
 #include "libavutil/imgutils.h"
 #include "libswscale/swscale.h"
-#include "mtcstring.c"
-#include "mtgraphics.c"
-#include "mtlog.c"
-#include "mtmemory.c"
+#include "zc_cstring.c"
+#include "zc_graphics.c"
+#include "zc_log.c"
+#include "zc_memory.c"
 #include <limits.h>
 
 void editor_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop, char* cover)

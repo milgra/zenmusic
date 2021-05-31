@@ -1,9 +1,5 @@
-/*
-  Milan Toth's 3D math functions
- */
-
-#ifndef __c36__math3__
-#define __c36__math3__
+#ifndef zc_math3_h
+#define zc_math3_h
 
 #include <math.h>
 #include <stdio.h>

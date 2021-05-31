@@ -1,8 +1,8 @@
 #ifndef ui_songlist_h
 #define ui_songlist_h
 
-#include "mtmap.c"
 #include "view.c"
+#include "zc_map.c"
 
 void ui_songlist_select(int index);
 void ui_songlist_select_all();

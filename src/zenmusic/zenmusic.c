@@ -5,13 +5,6 @@
 #include "evrecorder.c"
 #include "files.c"
 #include "library.c"
-#include "mtcallback.c"
-#include "mtchannel.c"
-#include "mtcstring.c"
-#include "mtcstrpath.c"
-#include "mtlog.c"
-#include "mtmap.c"
-#include "mtstring.c"
 #include "player.c"
 #include "remote.c"
 #include "tg_css.c"
@@ -26,6 +19,13 @@
 #include "visible.c"
 #include "wm_connector.c"
 #include "wm_event.c"
+#include "zc_callback.c"
+#include "zc_channel.c"
+#include "zc_cstring.c"
+#include "zc_cstrpath.c"
+#include "zc_log.c"
+#include "zc_map.c"
+#include "zc_string.c"
 #include <SDL.h>
 #include <getopt.h>
 #include <limits.h>

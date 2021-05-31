@@ -2,7 +2,7 @@
 #ifndef fb_h
 #define fb_h
 
-#include "mtmemory.c"
+#include "zc_memory.c"
 #include <GL/glew.h>
 #include <string.h>
 

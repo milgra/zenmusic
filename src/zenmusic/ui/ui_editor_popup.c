@@ -1,8 +1,8 @@
 #ifndef ui_editor_popup_h
 #define ui_editor_popup_h
 
-#include "mtmap.c"
 #include "view.c"
+#include "zc_map.c"
 
 void ui_editor_popup_attach(view_t* view);
 void ui_editor_popup_show();
@@ -13,9 +13,6 @@ void ui_editor_popup_show();
 
 #include "config.c"
 #include "editor.c"
-#include "mtcallback.c"
-#include "mtcstring.c"
-#include "mtvector.c"
 #include "text.c"
 #include "tg_css.c"
 #include "tg_text.c"
@@ -29,6 +26,9 @@ void ui_editor_popup_show();
 #include "vh_list_head.c"
 #include "vh_list_item.c"
 #include "vh_textinput.c"
+#include "zc_callback.c"
+#include "zc_cstring.c"
+#include "zc_vector.c"
 #include <string.h>
 
 void    ui_editor_popup_set_songs(vec_t* vec);

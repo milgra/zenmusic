@@ -14,12 +14,12 @@ void ui_lib_init_popup_set_library();
 
 #include "callbacks.c"
 #include "config.c"
-#include "mtcallback.c"
 #include "text.c"
 #include "tg_text.c"
 #include "ui_manager.c"
 #include "vh_button.c"
 #include "vh_textinput.c"
+#include "zc_callback.c"
 
 struct _ui_lib_init_popup_t
 {

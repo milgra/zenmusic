@@ -1,7 +1,7 @@
 #ifndef db_h
 #define db_h
 
-#include "mtmap.c"
+#include "zc_map.c"
 
 void db_init();
 void db_read(char* libpath);
@@ -23,10 +23,10 @@ void     db_reset();
 
 #include "kvlist.c"
 #include "library.c"
-#include "mtcstring.c"
-#include "mtcstrpath.c"
-#include "mtlog.c"
-#include "mtvector.c"
+#include "zc_cstring.c"
+#include "zc_cstrpath.c"
+#include "zc_log.c"
+#include "zc_vector.c"
 #include <ctype.h>
 #include <limits.h>
 

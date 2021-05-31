@@ -11,11 +11,11 @@ void ui_visualizer_update_video();
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "mtcallback.c"
 #include "player.c"
 #include "vh_anim.c"
 #include "vh_button.c"
 #include "vh_roll.c"
+#include "zc_callback.c"
 
 struct vizualizer_t
 {

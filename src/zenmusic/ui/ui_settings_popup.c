@@ -1,8 +1,8 @@
 #ifndef ui_settings_popup_h
 #define ui_settings_popup_h
 
-#include "mtmap.c"
 #include "view.c"
+#include "zc_map.c"
 
 void ui_settings_popup_attach(view_t* view);
 void ui_settings_popup_update();
@@ -15,7 +15,6 @@ void ui_settings_popup_show();
 
 #include "callbacks.c"
 #include "config.c"
-#include "mtcallback.c"
 #include "selection.c"
 #include "tg_css.c"
 #include "tg_text.c"
@@ -26,6 +25,7 @@ void ui_settings_popup_show();
 #include "vh_list.c"
 #include "vh_list_head.c"
 #include "vh_list_item.c"
+#include "zc_callback.c"
 
 void ui_settings_popup_on_header_field_select(view_t* view, char* id, ev_t ev);
 void ui_settings_popup_on_header_field_insert(view_t* view, int src, int tgt);
