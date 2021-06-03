@@ -19,7 +19,7 @@ void ui_load(float width, float height);
 #include "ui_editor_popup.c"
 #include "ui_filter_bar.c"
 #include "ui_filter_popup.c"
-#include "ui_lib_change_popup.c"
+#include "ui_inputfield_popup.c"
 #include "ui_lib_init_popup.c"
 #include "ui_manager.c"
 #include "ui_play_controls.c"
@@ -78,7 +78,7 @@ void ui_load(float width, float height)
   ui_activity_popup_attach(view_base);
   ui_settings_popup_attach(view_base);
   ui_song_menu_popup_attach(view_base);
-  ui_lib_change_popup_attach(view_base);
+  ui_inputfield_popup_attach(view_base);
 
   // setup views
 

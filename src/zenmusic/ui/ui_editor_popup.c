@@ -127,6 +127,8 @@ void ui_editor_popup_attach(view_t* view)
 
   vh_button_add(acceptbtn, VH_BUTTON_NORMAL, but_cb);
   vh_button_add(rejectbtn, VH_BUTTON_NORMAL, but_cb);
+  vh_button_add(uploadbtn, VH_BUTTON_NORMAL, but_cb);
+  vh_button_add(newfieldbtn, VH_BUTTON_NORMAL, but_cb);
 
   tg_text_add(head_view);
   tg_text_set(head_view, "Editing 1 data", ts);
@@ -159,6 +161,12 @@ void ui_editor_popup_on_button_down(void* userdata, void* data)
   if (strcmp(view->id, "editor_popup_reject_btn") == 0)
   {
     ui_popup_switcher_toggle("song_editor_popup_page");
+  }
+  if (strcmp(view->id, "uploadbtn") == 0)
+  {
+  }
+  if (strcmp(view->id, "newfieldbtn") == 0)
+  {
   }
 }
 

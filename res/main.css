@@ -889,6 +889,13 @@
     top: 190px;
 }
 
+#inp_popup {
+    width: 600px;
+    height: 180px;
+    margin: auto;
+    top: 190px;
+}
+
 .visuchange_btn_bck {
     width: 30px;
     height: 30px;

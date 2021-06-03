@@ -41,6 +41,7 @@ void ui_popup_switcher_attach(view_t* baseview)
   VADDR(ups.popup_names, cstr_fromcstring("settings_popup_page"));
   VADDR(ups.popup_names, cstr_fromcstring("decision_popup_page"));
   VADDR(ups.popup_names, cstr_fromcstring("simple_popup_page"));
+  VADDR(ups.popup_names, cstr_fromcstring("inp_popup_page"));
 
   for (int index = 0; index < ups.popup_names->length; index++)
   {

@@ -1,8 +1,10 @@
 first version
 
+editor popup - image upload, new field button, buttons, fix
+mandatory fields, tags
+delete nem mukodik
 artist/genre filter mukodjon
 utf8 case insensitive space insensitive comparison
-editor popup - image upload, new field button, buttons, fix
 editor popup masodik openre megy csak cover art view
 visu lepegeto fix
 scroll fix
@@ -20,7 +22,6 @@ popup item scroll csak egermozgas utan reagal
 scroll kozben kimozgatott egerkor beragad a content
 activity-re kattintva songlist ugorjon aktualis szamra
 ures cover art-ra kattintva lehessen uploadolni, telire full screen
-delete nem mukodik
 
 ideas
 

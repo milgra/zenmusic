@@ -20,7 +20,7 @@ void ui_settings_popup_show();
 #include "tg_text.c"
 #include "ui_alert_popup.c"
 #include "ui_decision_popup.c"
-#include "ui_lib_change_popup.c"
+#include "ui_inputfield_popup.c"
 #include "ui_popup_switcher.c"
 #include "vh_list.c"
 #include "vh_list_head.c"
@@ -219,6 +219,14 @@ void ui_settings_popup_on_accept_remote(void* userdata, void* data)
   callbacks_call("on_change_remote", NULL);
 }
 
+void ui_settings_popup_on_accept_library(void* userdata, void* data)
+{
+  char* path_cs = str_cstring(data);
+
+  callbacks_call("on_change_library", path_cs);
+  REL(path_cs);
+}
+
 // items
 
 void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
@@ -230,8 +238,15 @@ void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* c
   switch (index)
   {
   case 0:
-    ui_lib_change_popup_show();
+  {
+    //ui_lib_change_popup_show();
+
+    cb_t* acc_cb = cb_new(ui_settings_popup_on_accept_library, NULL);
+
+    ui_inputfield_popup_show("Use library at", acc_cb, NULL);
+
     break;
+  }
   case 1:
   {
     int   enabled = config_get_bool("organize_lib");
