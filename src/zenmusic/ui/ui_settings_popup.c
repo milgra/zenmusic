@@ -242,8 +242,8 @@ void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* c
     //ui_lib_change_popup_show();
 
     cb_t* acc_cb = cb_new(ui_settings_popup_on_accept_library, NULL);
-
     ui_inputfield_popup_show("Use library at", acc_cb, NULL);
+    REL(acc_cb);
 
     break;
   }

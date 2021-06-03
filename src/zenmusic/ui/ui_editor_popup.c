@@ -18,6 +18,7 @@ void ui_editor_popup_show();
 #include "tg_text.c"
 #include "ui_alert_popup.c"
 #include "ui_decision_popup.c"
+#include "ui_inputfield_popup.c"
 #include "ui_manager.c"
 #include "ui_popup_switcher.c"
 #include "ui_songlist.c"
@@ -88,14 +89,14 @@ se_cell_t* uise_cell_new(char* id, int size, int index)
 
 void ui_editor_popup_attach(view_t* view)
 {
-  view_t* head_view   = view_get_subview(view, "song_editor_header");
-  view_t* list_view   = view_get_subview(view, "editorlist");
-  view_t* cover_view  = view_get_subview(view, "coverview");
-  view_t* acceptbtn   = view_get_subview(view, "editor_popup_accept_btn");
-  view_t* rejectbtn   = view_get_subview(view, "editor_popup_reject_btn");
-  view_t* uploadbtn   = view_get_subview(view, "uploadbtn");
-  view_t* newfieldbtn = view_get_subview(view, "newfieldbtn");
-  cb_t*   but_cb      = cb_new(ui_editor_popup_on_button_down, NULL);
+  view_t* head_view  = view_get_subview(view, "song_editor_header");
+  view_t* list_view  = view_get_subview(view, "editorlist");
+  view_t* cover_view = view_get_subview(view, "coverview");
+  view_t* acceptbtn  = view_get_subview(view, "editor_popup_accept_btn");
+  view_t* rejectbtn  = view_get_subview(view, "editor_popup_reject_btn");
+  view_t* uploadbtn  = view_get_subview(view, "uploadbtn");
+  // view_t* newfieldbtn = view_get_subview(view, "newfieldbtn");
+  cb_t* but_cb = cb_new(ui_editor_popup_on_button_down, NULL);
 
   textstyle_t ts = {0};
   ts.font        = config_get("font_path");
@@ -122,13 +123,13 @@ void ui_editor_popup_attach(view_t* view)
   tg_text_add(uploadbtn);
   tg_text_set(uploadbtn, "add new image", ts);
 
-  tg_text_add(newfieldbtn);
-  tg_text_set(newfieldbtn, "add new field", ts);
+  // tg_text_add(newfieldbtn);
+  // tg_text_set(newfieldbtn, "add new field", ts);
 
   vh_button_add(acceptbtn, VH_BUTTON_NORMAL, but_cb);
   vh_button_add(rejectbtn, VH_BUTTON_NORMAL, but_cb);
   vh_button_add(uploadbtn, VH_BUTTON_NORMAL, but_cb);
-  vh_button_add(newfieldbtn, VH_BUTTON_NORMAL, but_cb);
+  // vh_button_add(newfieldbtn, VH_BUTTON_NORMAL, but_cb);
 
   tg_text_add(head_view);
   tg_text_set(head_view, "Editing 1 data", ts);
@@ -141,6 +142,13 @@ void ui_editor_popup_show()
   ui_editor_popup_set_songs(selected);
   ui_popup_switcher_toggle("song_editor_popup_page");
   REL(selected);
+}
+
+void ui_editor_popup_on_accept_cover(void* userdata, void* data)
+{
+  char* path_cs = str_cstring(data);
+  printf("ACCEPT %s\n", path_cs);
+  REL(path_cs);
 }
 
 void ui_editor_popup_on_button_down(void* userdata, void* data)
@@ -164,6 +172,9 @@ void ui_editor_popup_on_button_down(void* userdata, void* data)
   }
   if (strcmp(view->id, "uploadbtn") == 0)
   {
+    cb_t* acc_cb = cb_new(ui_editor_popup_on_accept_cover, NULL);
+    ui_inputfield_popup_show("Path to cover art image :", acc_cb, NULL);
+    REL(acc_cb);
   }
   if (strcmp(view->id, "newfieldbtn") == 0)
   {
