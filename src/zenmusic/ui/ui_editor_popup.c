@@ -11,8 +11,8 @@ void ui_editor_popup_show();
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "coder.c"
 #include "config.c"
-#include "editor.c"
 #include "text.c"
 #include "tg_css.c"
 #include "tg_text.c"
@@ -147,7 +147,20 @@ void ui_editor_popup_show()
 void ui_editor_popup_on_accept_cover(void* userdata, void* data)
 {
   char* path_cs = str_cstring(data);
-  printf("ACCEPT %s\n", path_cs);
+  // check if image is valid
+  bm_t* image = coder_get_image(path_cs);
+
+  if (image)
+  {
+    if (ep.cover) REL(ep.cover);
+    ep.cover = RET(path_cs);
+    coder_load_image_into(path_cs, ep.cover_view->texture.bitmap);
+    REL(image);
+  }
+  else
+  {
+    ui_alert_popup_show("Not a valid image file.");
+  }
   REL(path_cs);
 }
 
@@ -175,9 +188,6 @@ void ui_editor_popup_on_button_down(void* userdata, void* data)
     cb_t* acc_cb = cb_new(ui_editor_popup_on_accept_cover, NULL);
     ui_inputfield_popup_show("Path to cover art image :", acc_cb, NULL);
     REL(acc_cb);
-  }
-  if (strcmp(view->id, "newfieldbtn") == 0)
-  {
   }
 }
 
@@ -495,7 +505,7 @@ void ui_editor_popup_set_songs(vec_t* vec)
     char*  path = MGET(song, "file/path");
     char*  file = cstr_fromformat(100, "%s%s", config_get("lib_path"), path);
 
-    editor_get_album(file, ep.cover_view->texture.bitmap);
+    coder_get_album(file, ep.cover_view->texture.bitmap);
 
     REL(file);
     ep.cover_view->texture.changed = 1;
@@ -506,11 +516,23 @@ void ui_editor_popup_on_accept()
 {
   ui_popup_switcher_toggle("song_editor_popup_page");
 
-  /* char* libpath = config_get("lib_path"); */
+  vec_t* selected = VNEW();
+  ui_songlist_get_selected(selected);
 
-  /* editor_update_metadata(libpath, ui.selected, changed, removed, cover); */
+  printf("SELECTED\n");
+  mem_describe(selected, 0);
+  printf("CHANGED\n");
+  mem_describe(ep.changed, 0);
+  printf("REMOVED\n");
+  mem_describe(ep.removed, 0);
+
+  REL(selected);
+
+  char* libpath = config_get("lib_path");
 
   // update metadata in media files
+
+  coder_update_metadata(libpath, selected, ep.changed, ep.removed, ep.cover);
 
   // update metadata in database
 

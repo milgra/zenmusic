@@ -37,14 +37,14 @@ void ui_inputfield_popup_attach(view_t* baseview)
 {
   if (uip.attached) return;
 
-  textstyle_t ts  = {0};
-  ts.font         = config_get("font_path");
-  ts.size         = 30.0;
-  ts.margin_right = 20;
-  ts.align        = TA_LEFT;
-  ts.textcolor    = 0x000000FF;
-  ts.backcolor    = 0;
-  ts.multiline    = 1;
+  textstyle_t ts = {0};
+  ts.font        = config_get("font_path");
+  ts.size        = 30.0;
+  ts.margin      = 5;
+  ts.align       = TA_LEFT;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0;
+  ts.multiline   = 1;
 
   view_t* acc_btn    = view_get_subview(baseview, "inp_popup_accept_btn");
   view_t* rej_btn    = view_get_subview(baseview, "inp_popup_reject_btn");
@@ -58,6 +58,8 @@ void ui_inputfield_popup_attach(view_t* baseview)
 
   vh_textinput_add(inputfield, "/home/youruser/Music", "", ts, NULL);
   vh_textinput_set_on_return(inputfield, ui_inputfield_popup_enter);
+
+  ts.align = TA_CENTER;
 
   vh_button_add(acc_btn, VH_BUTTON_NORMAL, acc_cb);
   vh_button_add(rej_btn, VH_BUTTON_NORMAL, rej_cb);

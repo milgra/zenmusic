@@ -22,7 +22,7 @@ void tg_css_add(view_t* view);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "editor.c"
+#include "coder.c"
 #include "zc_cstring.c"
 #include "zc_graphics.c"
 
@@ -45,9 +45,13 @@ void tg_css_gen(view_t* view)
         view_set_texture_bmp(view, bm);
       }
 
-      bm_t* bmap = editor_get_image(view->layout.background_image);
-      view_set_texture_bmp(view, bmap);
-      REL(bmap);
+      coder_load_image_into(view->layout.background_image, view->texture.bitmap);
+      view->texture.changed = 0;
+      view->texture.state   = TS_READY;
+
+      /* bm_t* bmap = coder_get_image(view->layout.background_image); */
+      /* view_set_texture_bmp(view, bmap); */
+      /* REL(bmap); */
     }
     else if (view->layout.background_color)
     {

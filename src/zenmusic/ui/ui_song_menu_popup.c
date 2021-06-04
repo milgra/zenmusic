@@ -11,6 +11,8 @@ void ui_song_menu_popup_attach(view_t* view);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "config.c"
+#include "database.c"
+#include "library.c"
 #include "text.c"
 #include "tg_text.c"
 #include "ui_decision_popup.c"
@@ -19,6 +21,7 @@ void ui_song_menu_popup_attach(view_t* view);
 #include "ui_songlist.c"
 #include "vh_list.c"
 #include "vh_list_item.c"
+#include "visible.c"
 
 struct ui_song_menu_popup_t
 {
@@ -57,7 +60,6 @@ void ui_song_menu_popup_attach(view_t* baseview)
 
 void ui_song_menu_popup_on_item_delete(void* userdata, void* data)
 {
-  printf("SONG MENU POPUP ITEM DELETE\n");
   vec_t* selected = VNEW();
   ui_songlist_get_selected(selected);
   mem_describe(selected, 0);
@@ -65,8 +67,10 @@ void ui_song_menu_popup_on_item_delete(void* userdata, void* data)
   for (int index = 0; index < selected->length; index++)
   {
     map_t* entry = selected->data[index];
-    //lib_delete_file(config_get("lib_path"), entry);
-    //db_remove_entry(entry);
+    lib_delete_file(config_get("lib_path"), entry);
+    db_remove_entry(entry);
+    visible_update();
+    ui_songlist_update();
   }
 
   REL(selected);

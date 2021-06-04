@@ -4,6 +4,7 @@
 #include "zc_map.c"
 
 void visible_init();
+void visible_update();
 
 map_t* visible_song_at_index(int index);
 int    visible_song_count();

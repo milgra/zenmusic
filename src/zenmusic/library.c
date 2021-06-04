@@ -16,7 +16,7 @@ void lib_analyze_files(ch_t* channel, map_t* files);
 #define __USE_XOPEN_EXTENDED 1 // needed for linux
 #include <ftw.h>
 
-#include "editor.c"
+#include "coder.c"
 #include "files.c"
 #include "zc_cstring.c"
 #include "zc_cstrpath.c"
@@ -156,7 +156,7 @@ int analyzer_thread(void* chptr)
 
       // read and add file and meta data
 
-      int res = editor_get_metadata(real, song);
+      int res = coder_get_metadata(real, song);
 
       if (res == 0)
       {

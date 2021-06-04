@@ -1,20 +1,17 @@
-/*
-  This module is based on ffplay.c so all bugfixes/updates to ffplay should be introduced to this module.
- */
-
-#ifndef editor_h
-#define editor_h
+#ifndef coder_h
+#define coder_h
 
 #include "zc_bitmap.c"
 #include "zc_map.c"
 #include "zc_vector.c"
 
-void  editor_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop, char* cover);
-int   editor_get_metadata(const char* path, map_t* map);
-int   editor_set_metadata(map_t* data, char* img_path);
-void  editor_get_album(const char* path, bm_t* bitmap);
-void  editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* drop, char* cover);
-bm_t* editor_get_image(const char* path);
+void  coder_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop, char* cover);
+int   coder_get_metadata(const char* path, map_t* map);
+int   coder_set_metadata(map_t* data, char* img_path);
+void  coder_get_album(const char* path, bm_t* bitmap);
+void  coder_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* drop, char* cover);
+bm_t* coder_get_image(const char* path);
+void  coder_load_image_into(const char* path, bm_t* bitmap);
 
 #endif
 
@@ -24,14 +21,15 @@ bm_t* editor_get_image(const char* path);
 #include "libavutil/imgutils.h"
 #include "libswscale/swscale.h"
 #include "zc_cstring.c"
+#include "zc_cstrpath.c"
 #include "zc_graphics.c"
 #include "zc_log.c"
 #include "zc_memory.c"
 #include <limits.h>
 
-void editor_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop, char* cover)
+void coder_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop, char* cover)
 {
-  /* printf("editor update metadata for songs:\n"); */
+  /* printf("coder update metadata for songs:\n"); */
   /* mem_describe(songs, 0); */
   /* printf("\ndata:\n"); */
   /* mem_describe(data, 0); */
@@ -43,11 +41,14 @@ void editor_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* dro
   {
     map_t* song = songs->data[index];
     char*  path = MGET(song, "file/path");
-    editor_update_song_metadata(libpath, path, data, drop, cover);
+
+    coder_clone_song(libpath, path)
+
+    // coder_update_song_metadata(libpath, path, data, drop, cover);
   }
 }
 
-int editor_get_metadata(const char* path, map_t* map)
+int coder_get_metadata(const char* path, map_t* map)
 {
   assert(path != NULL);
   assert(map != NULL);
@@ -123,7 +124,7 @@ int editor_get_metadata(const char* path, map_t* map)
       }
       else
       {
-        printf("editor_get_metadata no stream information found!!!\n");
+        printf("coder_get_metadata no stream information found!!!\n");
         MPUT(map, "file/duration", cstr_fromcstring("0"));
       }
 
@@ -151,22 +152,22 @@ int editor_get_metadata(const char* path, map_t* map)
     }
     else
     {
-      LOG("editor : skpping %s, no media context present", path);
+      LOG("coder : skpping %s, no media context present", path);
     }
 
     avformat_close_input(&pFormatCtx);
   }
   else
   {
-    LOG("editor : skipping %s, probably not a media file", path);
+    LOG("coder : skipping %s, probably not a media file", path);
   }
 
   return retv;
 }
 
-void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* drop, char* cover_image)
+void coder_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* drop, char* cover_image)
 {
-  LOG("editor_update_song_metadata for %s\n", path);
+  LOG("coder_update_song_metadata for %s %s\n", path, cover_image);
 
   // create temporary name
 
@@ -187,8 +188,8 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
   char* oldpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", libpath, path);
   char* newpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", libpath, tmp);
 
-  //printf("oldpath %s\n", oldpath);
-  //printf("newpath %s\n", newpath);
+  printf("oldpath %s\n", oldpath);
+  printf("newpath %s\n", newpath);
 
   // open cover art first
 
@@ -200,17 +201,20 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
 
   if (cover_image)
   {
-    //LOG("editor_set_metadata opening image file %s\n", cover_image);
+    LOG("coder_set_metadata opening image file %s\n", cover_image);
 
     cover_context = avformat_alloc_context();
     res           = avformat_open_input(&cover_context, cover_image, 0, 0);
 
     if (res >= 0)
     {
+      printf("cover avformat opened\n");
+
       res = avformat_find_stream_info(cover_context, 0);
 
       if (res >= 0)
       {
+        printf("cover stream info found\n");
 
         cover_packet       = av_packet_alloc();
         cover_packet->data = NULL;
@@ -227,45 +231,43 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
         }
       }
       else
-        LOG("ERROR editor_set_metadata cannot find stream info : %s\n", cover_image);
+        LOG("ERROR coder_set_metadata cannot find stream info : %s\n", cover_image);
     }
     else
-      LOG("ERROR editor_set_metadata cannot open image file : %s\n", cover_image);
+      LOG("ERROR coder_set_metadata cannot open image file : %s\n", cover_image);
   }
 
   // open source file
 
   AVFormatContext* src_ctx = avformat_alloc_context();
 
-  res = avformat_open_input(&src_ctx,
-                            oldpath,
-                            0,
-                            0);
+  res = avformat_open_input(&src_ctx, oldpath, 0, 0);
 
   if (res >= 0)
   {
-    res = avformat_find_stream_info(src_ctx,
-                                    0);
+    printf("input file opened\n");
+
+    res = avformat_find_stream_info(src_ctx, 0);
 
     if (res >= 0)
     {
-      AVFormatContext* out_ctx;
-      AVOutputFormat*  out_fmt = av_guess_format(NULL,
-                                                tmp,
-                                                NULL);
+      printf("stream info found\n");
 
-      res = avformat_alloc_output_context2(&out_ctx,
-                                           out_fmt,
-                                           NULL,
-                                           newpath);
+      AVFormatContext* out_ctx;
+      AVOutputFormat*  out_fmt = av_guess_format(NULL, tmp, NULL);
+
+      res = avformat_alloc_output_context2(&out_ctx, out_fmt, NULL, newpath);
 
       if (res >= 0)
       {
+        printf("output context alloced\n");
+
         // creating streams present in input file except cover art
 
         for (unsigned i = 0; i < src_ctx->nb_streams; i++)
         {
           int dispos = src_ctx->streams[i]->disposition;
+
           // skip if we have new image for cover art and stream is cover art stream
           char skip = (dispos & AV_DISPOSITION_ATTACHED_PIC) == 1 && cover_cparam;
 
@@ -277,23 +279,23 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
             {
               if (param->codec_type == AVMEDIA_TYPE_VIDEO)
               {
-                //printf("Video Codec: resolution %d x %d\n", param->width, param->height);
+                printf("Video Codec: resolution %d x %d\n", param->width, param->height);
               }
               else if (param->codec_type == AVMEDIA_TYPE_AUDIO)
               {
-                //printf("Audio Codec: %d channels, sample rate %d\n", param->channels, param->sample_rate);
+                printf("Audio Codec: %d channels, sample rate %d\n", param->channels, param->sample_rate);
               }
-              //printf("Codec %s ID %d bit_rate %ld\n", codec->long_name, codec->id, param->bit_rate);
+              printf("Codec %s ID %d bit_rate %ld\n", codec->long_name, codec->id, param->bit_rate);
 
-              AVStream* ostream = avformat_new_stream(out_ctx,
-                                                      codec);
+              AVStream* ostream = avformat_new_stream(out_ctx, codec);
 
-              avcodec_parameters_copy(ostream->codecpar,
-                                      src_ctx->streams[i]->codecpar);
+              avcodec_parameters_copy(ostream->codecpar, src_ctx->streams[i]->codecpar);
 
               ostream->codecpar->codec_tag = 0;
             }
           }
+          else
+            printf("skipping cover art stream\n");
         }
 
         // copy metadata in old file to new file
@@ -302,8 +304,8 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
 
         AVDictionaryEntry* tag = NULL;
 
-        // printf("existing tags:\n");
-        // while ((tag = av_dict_get(out_ctx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) printf("%s : %s\n", tag->key, tag->value);
+        printf("existing tags:\n");
+        while ((tag = av_dict_get(out_ctx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) printf("%s : %s\n", tag->key, tag->value);
 
         // update metadata in new file
 
@@ -334,15 +336,15 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
         if (!(out_ctx->oformat->flags & AVFMT_NOFILE))
         {
 
-          avio_open(&out_ctx->pb,
-                    newpath,
-                    AVIO_FLAG_WRITE);
+          avio_open(&out_ctx->pb, newpath, AVIO_FLAG_WRITE);
 
-          res = avformat_init_output(out_ctx,
-                                     NULL);
+          printf("new path opened\n");
 
-          if (res >= 0)
+          res = avformat_init_output(out_ctx, NULL);
+
+          if (res > 0)
           {
+            printf("avformat output inited\n");
 
             // create cover art image stream before writing header
 
@@ -351,28 +353,28 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
               AVCodec* codec = avcodec_find_encoder(cover_cparam->codec_id);
               if (codec)
               {
-                AVStream* ostream = avformat_new_stream(out_ctx,
-                                                        codec);
+                AVStream* ostream = avformat_new_stream(out_ctx, codec);
 
                 cover_packet->stream_index = ostream->index;
 
                 printf("creating new stream for new cover, index : %i\n", ostream->index);
-                avcodec_parameters_copy(ostream->codecpar,
-                                        cover_cparam);
+                avcodec_parameters_copy(ostream->codecpar, cover_cparam);
 
-                ostream->codecpar->codec_tag = 0;
+                ostream->codecpar->codec_tag = cover_cparam->codec_tag;
                 ostream->disposition |= AV_DISPOSITION_ATTACHED_PIC;
               }
             }
 
-            res = avformat_write_header(out_ctx,
-                                        NULL);
+            res = avformat_write_header(out_ctx, NULL);
 
             if (res >= 0)
             {
+              printf("header written\n");
+
               AVPacket* src_pkt = av_packet_alloc();
 
               av_init_packet(src_pkt);
+
               src_pkt->data = NULL;
               src_pkt->size = 0;
 
@@ -387,7 +389,7 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
 
                 if (!skip)
                 {
-                  //src_pkt->stream_index = 0;
+                  src_pkt->stream_index = 0;
                   av_write_frame(out_ctx, src_pkt);
                 }
                 else
@@ -402,7 +404,7 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
 
                 res = av_write_frame(out_ctx, cover_packet);
 
-                if (res < 0) LOG("ERROR : editor_set_metadata : cannot write cover art image packet\n");
+                if (res < 0) LOG("ERROR : coder_set_metadata : cannot write cover art image packet\n");
 
                 // cleanup
                 av_packet_free(&cover_packet);
@@ -420,40 +422,157 @@ void editor_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* 
               // rename new file to old name
 
               if (rename(newpath, oldpath) != 0)
-                LOG("ERROR : editor_set_metadata : cannot rename new file to old name\n");
+                LOG("ERROR : coder_set_metadata : cannot rename new file to old name\n");
               else
                 printf("UPDATE SUCCESS\n");
             }
             else
-              LOG("ERROR : editor_set_metadata : cannot write header\n");
+              LOG("ERROR : coder_set_metadata : cannot write header\n");
           }
           else
-            LOG("ERROR : editor_set_metadata : cannot init output\n");
+            LOG("ERROR : coder_set_metadata : cannot init output\n");
 
           avio_close(out_ctx->pb);
         }
         else
-          LOG("ERROR : editor_set_metadata : avformat needs no file\n");
+          LOG("ERROR : coder_set_metadata : avformat needs no file\n");
       }
       else
-        LOG("ERROR : editor_set_metadata : cannot allocate output context\n");
+        LOG("ERROR : coder_set_metadata : cannot allocate output context\n");
     }
     else
-      LOG("ERROR : editor_set_metadata : cannot find stream info\n");
+      LOG("ERROR : coder_set_metadata : cannot find stream info\n");
   }
   else
-    LOG("ERROR : editor_set_metadata : cannot open input file\n");
+    LOG("ERROR : coder_set_metadata : cannot open input file\n");
 
   REL(tmp);
   REL(oldpath);
   REL(newpath);
 }
 
-void editor_get_album(const char* path, bm_t* bitmap)
+void coder_clone_song(char* libpath, char* path)
+{
+  LOG("coder_clone_song for %s\n", path);
+
+  char* ext  = cstr_path_extension(path);
+  char* name = cstr_path_filename(path);
+
+  char* oldpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", libpath, path);
+  char* newpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s_tmp%s", libpath, name, ext);
+
+  printf("oldpath %s\n", oldpath);
+  printf("newpath %s\n", newpath);
+
+  REL(ext);
+  REL(name);
+
+  // open file for decode
+
+  AVFormatContext* dec_ctx = avformat_alloc_context();
+
+  if (avformat_open_input(&dec_ctx, oldpath, 0, 0) >= 0)
+  {
+    printf("Input opened for decoding");
+
+    AVFormatContext* enc_ctx;
+    AVOutputFormat*  enc_fmt = av_guess_format(NULL, newpath, NULL);
+
+    if (avformat_alloc_output_context2(&enc_ctx, enc_fmt, NULL, newpath))
+    {
+      printf("Output context allocated\n");
+
+      if (!(enc_ctx->oformat->flags & AVFMT_NOFILE))
+      {
+        printf("Output file will be provided by caller.\n");
+
+        if (avio_open(&enc_ctx->pb, newpath, AVIO_FLAG_WRITE) >= 0)
+        {
+          printf("Output file created.\n");
+
+          if (avformat_init_output(enc_ctx, NULL) >= 0)
+          {
+            printf("Output inited.\n");
+
+            // create all stream in the encoder context that are present in the decoder context
+
+            printf("Copying stream structure...\n");
+
+            for (unsigned si = 0; si < dec_ctx->nb_streams; si++)
+            {
+              AVCodecParameters* param = dec_ctx->streams[si]->codecpar;
+              const AVCodec*     codec = avcodec_find_encoder(dec_ctx->streams[si]->codecpar->codec_id);
+
+              if (codec)
+              {
+                printf("Stream no %i Codec %s ID %d bit_rate %ld\n", si, codec->long_name, codec->id, param->bit_rate);
+
+                switch (param->codec_type)
+                {
+                case AVMEDIA_TYPE_VIDEO: printf("Video Codec: resolution %d x %d\n", param->width, param->height); break;
+                case AVMEDIA_TYPE_AUDIO: printf("Audio Codec: %d channels, sample rate %d\n", param->channels, param->sample_rate); break;
+                default: printf("Other codec: %i\n", param->codec_type); break;
+                }
+
+                // create stream in encoder context with codec
+                AVStream* enc_stream = avformat_new_stream(enc_ctx, codec);
+                avcodec_parameters_copy(enc_stream->codecpar, param);
+                enc_stream->codecpar->codec_tag = param->codec_tag; //  do we need this?
+              }
+              else
+                printf("No encoder found for stream no %i\n", si);
+            }
+
+            // copy packets from decoder context to encoder context
+
+            AVPacket* dec_pkt = av_packet_alloc();
+
+            av_init_packet(dec_pkt);
+
+            dec_pkt->data = NULL;
+            dec_pkt->size = 0;
+
+            // copy all packets from old file to new file with the exception of cover art image
+
+            while (av_read_frame(dec_ctx, dec_pkt) == 0)
+            {
+              printf("%i %i", dec_pkt->stream_index, dec_pkt->size);
+
+              av_write_frame(enc_ctx, dec_pkt);
+              dec_pkt->data = NULL;
+              dec_pkt->size = 0;
+            }
+
+            // close output file and cleanup
+
+            av_packet_free(&dec_pkt);
+            av_write_trailer(enc_ctx);
+
+            avformat_close_input(&dec_ctx);
+            avformat_free_context(dec_ctx);
+            avformat_free_context(enc_ctx);
+          }
+          else
+            printf("Cannot init output.\n");
+        }
+        else
+          printf("Cannot open file for encode %s\n", newpath);
+      }
+      else
+        printf("Output is a fileless codec.");
+    }
+    else
+      printf("Cannot allocate output context for %s\n", newpath);
+  }
+  else
+    printf("Cannot open file for decode %s\n", oldpath);
+}
+
+void coder_get_album(const char* path, bm_t* bitmap)
 {
   assert(path != NULL);
 
-  printf("editor_get_album %s %i %i\n", path, bitmap->w, bitmap->h);
+  printf("coder_get_album %s %i %i\n", path, bitmap->w, bitmap->h);
 
   int i, ret = 0;
 
@@ -539,90 +658,166 @@ void editor_get_album(const char* path, bm_t* bitmap)
   }
 }
 
-bm_t* editor_get_image(const char* path)
+bm_t* coder_get_image(const char* path)
 {
   int i, ret = 0;
 
   AVFormatContext* src_ctx = avformat_alloc_context();
 
   /* // open the specified path */
-  if (avformat_open_input(&src_ctx, path, NULL, NULL) != 0)
+  if (avformat_open_input(&src_ctx, path, NULL, NULL) == 0)
   {
-    printf("avformat_open_input() failed");
-  }
-
-  // find the first attached picture, if available
-  for (i = 0; i < src_ctx->nb_streams; i++)
-  {
-    if (src_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
+    // find the first attached picture, if available
+    for (i = 0; i < src_ctx->nb_streams; i++)
     {
-      AVCodecParameters* param = src_ctx->streams[i]->codecpar;
-
-      const AVCodec*  codec        = avcodec_find_decoder(param->codec_id);
-      AVCodecContext* codecContext = avcodec_alloc_context3(codec);
-
-      avcodec_parameters_to_context(codecContext, param);
-      avcodec_open2(codecContext, codec, NULL);
-
-      AVPacket* packet = av_packet_alloc();
-      AVFrame*  frame  = av_frame_alloc();
-
-      while (av_read_frame(src_ctx, packet) >= 0)
+      if (src_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
       {
-        avcodec_send_packet(codecContext, packet);
-      }
+        AVCodecParameters* param = src_ctx->streams[i]->codecpar;
 
-      avcodec_receive_frame(codecContext, frame);
+        const AVCodec*  codec        = avcodec_find_decoder(param->codec_id);
+        AVCodecContext* codecContext = avcodec_alloc_context3(codec);
 
-      static unsigned sws_flags = SWS_BICUBIC;
+        avcodec_parameters_to_context(codecContext, param);
+        avcodec_open2(codecContext, codec, NULL);
 
-      struct SwsContext* img_convert_ctx = sws_getContext(frame->width,
-                                                          frame->height,
-                                                          frame->format,
-                                                          frame->width,
-                                                          frame->height,
-                                                          AV_PIX_FMT_RGBA,
-                                                          sws_flags,
-                                                          NULL,
-                                                          NULL,
-                                                          NULL);
+        AVPacket* packet = av_packet_alloc();
+        AVFrame*  frame  = av_frame_alloc();
 
-      if (img_convert_ctx != NULL)
-      {
-        bm_t* bitmap = bm_new(frame->width, frame->height);
+        while (av_read_frame(src_ctx, packet) >= 0)
+        {
+          avcodec_send_packet(codecContext, packet);
+        }
 
-        uint8_t* scaledpixels[1];
-        scaledpixels[0] = malloc(bitmap->w * bitmap->h * 4);
+        avcodec_receive_frame(codecContext, frame);
 
-        uint8_t* pixels[4];
-        int      pitch[4];
+        static unsigned sws_flags = SWS_BICUBIC;
 
-        pitch[0] = bitmap->w * 4;
-        sws_scale(img_convert_ctx,
-                  (const uint8_t* const*)frame->data,
-                  frame->linesize,
-                  0,
-                  frame->height,
-                  scaledpixels,
-                  pitch);
+        struct SwsContext* img_convert_ctx = sws_getContext(frame->width,
+                                                            frame->height,
+                                                            frame->format,
+                                                            frame->width,
+                                                            frame->height,
+                                                            AV_PIX_FMT_RGBA,
+                                                            sws_flags,
+                                                            NULL,
+                                                            NULL,
+                                                            NULL);
 
-        gfx_rect(bitmap, 0, 0, bitmap->w, bitmap->h, 0xFF0000FF, 0);
+        if (img_convert_ctx != NULL)
+        {
+          bm_t* bitmap = bm_new(frame->width, frame->height);
 
-        gfx_insert_rgba(bitmap,
-                        scaledpixels[0],
-                        bitmap->w,
-                        bitmap->h,
-                        0,
-                        0);
+          uint8_t* scaledpixels[1];
+          scaledpixels[0] = malloc(bitmap->w * bitmap->h * 4);
 
-        sws_freeContext(img_convert_ctx);
+          uint8_t* pixels[4];
+          int      pitch[4];
 
-        return bitmap;
+          pitch[0] = bitmap->w * 4;
+          sws_scale(img_convert_ctx,
+                    (const uint8_t* const*)frame->data,
+                    frame->linesize,
+                    0,
+                    frame->height,
+                    scaledpixels,
+                    pitch);
+
+          gfx_rect(bitmap, 0, 0, bitmap->w, bitmap->h, 0xFF0000FF, 0);
+
+          gfx_insert_rgba(bitmap,
+                          scaledpixels[0],
+                          bitmap->w,
+                          bitmap->h,
+                          0,
+                          0);
+
+          sws_freeContext(img_convert_ctx);
+
+          return bitmap;
+        }
       }
     }
   }
 
   return NULL;
+}
+
+void coder_load_image_into(const char* path, bm_t* bitmap)
+{
+  int i, ret = 0;
+
+  AVFormatContext* src_ctx = avformat_alloc_context();
+
+  /* // open the specified path */
+  if (avformat_open_input(&src_ctx, path, NULL, NULL) == 0)
+  {
+    // find the first attached picture, if available
+    for (i = 0; i < src_ctx->nb_streams; i++)
+    {
+      if (src_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
+      {
+        AVCodecParameters* param = src_ctx->streams[i]->codecpar;
+
+        const AVCodec*  codec        = avcodec_find_decoder(param->codec_id);
+        AVCodecContext* codecContext = avcodec_alloc_context3(codec);
+
+        avcodec_parameters_to_context(codecContext, param);
+        avcodec_open2(codecContext, codec, NULL);
+
+        AVPacket* packet = av_packet_alloc();
+        AVFrame*  frame  = av_frame_alloc();
+
+        while (av_read_frame(src_ctx, packet) >= 0)
+        {
+          avcodec_send_packet(codecContext, packet);
+        }
+
+        avcodec_receive_frame(codecContext, frame);
+
+        static unsigned sws_flags = SWS_BICUBIC;
+
+        struct SwsContext* img_convert_ctx = sws_getContext(frame->width,
+                                                            frame->height,
+                                                            frame->format,
+                                                            bitmap->w,
+                                                            bitmap->h,
+                                                            AV_PIX_FMT_RGBA,
+                                                            sws_flags,
+                                                            NULL,
+                                                            NULL,
+                                                            NULL);
+
+        if (img_convert_ctx != NULL)
+        {
+          uint8_t* scaledpixels[1];
+          scaledpixels[0] = malloc(bitmap->w * bitmap->h * 4);
+
+          uint8_t* pixels[4];
+          int      pitch[4];
+
+          pitch[0] = bitmap->w * 4;
+          sws_scale(img_convert_ctx,
+                    (const uint8_t* const*)frame->data,
+                    frame->linesize,
+                    0,
+                    frame->height,
+                    scaledpixels,
+                    pitch);
+
+          gfx_rect(bitmap, 0, 0, bitmap->w, bitmap->h, 0xFF0000FF, 0);
+
+          gfx_insert_rgba(bitmap,
+                          scaledpixels[0],
+                          bitmap->w,
+                          bitmap->h,
+                          0,
+                          0);
+
+          sws_freeContext(img_convert_ctx);
+        }
+      }
+    }
+  }
 }
 
 // get duration
