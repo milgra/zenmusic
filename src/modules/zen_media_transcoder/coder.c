@@ -462,9 +462,9 @@ void coder_clone_song(char* libpath, char* path)
   char* ext  = cstr_path_extension(path); // REL 0
   char* name = cstr_path_filename(path);  // REL 1
 
-  char* oldname = cstr_fromformat(PATH_MAX + NAME_MAX, "%s.%s", name, ext);                 // REL 2
-  char* oldpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", libpath, path);              // REL 3
-  char* newpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s_tmp.%s", libpath, name, ext); // REL 4
+  char* oldname = cstr_fromformat(PATH_MAX + NAME_MAX, "%s.%s", name, ext);        // REL 2
+  char* oldpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", libpath, path);     // REL 3
+  char* newpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s.tmp", libpath, path); // REL 4
 
   printf("oldpath %s\n", oldpath);
   printf("newpath %s\n", newpath);
