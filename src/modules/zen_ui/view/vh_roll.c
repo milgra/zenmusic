@@ -24,6 +24,7 @@ void vh_roll_evt(view_t* view, ev_t ev)
   {
     vh_roll_t* vh    = view->handler_data;
     r2_t       frame = view->frame.global;
+
     if (!vh->active)
     {
       if (ev.x >= frame.x &&
@@ -35,7 +36,13 @@ void vh_roll_evt(view_t* view, ev_t ev)
         (*vh->roll_in->fp)(vh->roll_in->userdata, view);
       }
     }
-    else
+  }
+  else if (ev.type == EV_MMOVE_OUT)
+  {
+    vh_roll_t* vh    = view->handler_data;
+    r2_t       frame = view->frame.global;
+
+    if (vh->active)
     {
       if (ev.x < frame.x ||
           ev.x > frame.x + frame.w ||

@@ -91,7 +91,7 @@ void ui_visualizer_update_video()
 void ui_visualizer_on_roll_in(void* userdata, void* data)
 {
   vh_anim_alpha(uiv.visuleftbtnbck, 0.0, 1.0, 10, AT_LINEAR);
-  vh_anim_alpha(uiv.visurightbtnbck, 1.0, 0.0, 10, AT_LINEAR);
+  vh_anim_alpha(uiv.visurightbtnbck, 0.0, 1.0, 10, AT_LINEAR);
 }
 
 void ui_visualizer_on_roll_out(void* userdata, void* data)
