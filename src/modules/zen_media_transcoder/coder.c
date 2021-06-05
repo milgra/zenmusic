@@ -195,6 +195,8 @@ void coder_load_cover_into(const char* path, bm_t* bitmap)
 
   printf("coder_get_album %s %i %i\n", path, bitmap->w, bitmap->h);
 
+  gfx_rect(bitmap, 0, 0, bitmap->w, bitmap->h, 0, 1);
+
   int i, ret = 0;
 
   AVFormatContext* src_ctx = avformat_alloc_context();

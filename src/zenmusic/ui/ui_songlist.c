@@ -161,10 +161,10 @@ void ui_songlist_refresh()
 
 void ui_songlist_toggle_pause(int state)
 {
-  if (state)
-    sl.color_s = 0xFF5555FF;
-  else
-    sl.color_s = 0x55FF55FF;
+  /* if (state) */
+  /*   sl.color_s = 0xFF5555FF; */
+  /* else */
+  /*   sl.color_s = 0x55FF55FF; */
 
   // view_t* item = vh_list_item_for_index(sl.view, sl.index_s);
 

@@ -5,11 +5,9 @@ mandatory fields, tags - date legyen default mezo editorban ha nincs akkor is
 artist/genre filter mukodjon, fix space problem, case sensitiveness in search
 log window nagyobb, kisebb szoveggel, multiline items
 utf8 case insensitive space insensitive comparison
-editor popup masodik openre megy csak cover art view
+
 automata tesztek!!
 fix leaks
-popup item scroll csak egermozgas utan reagal
-pause color problem
 
 ideas
 

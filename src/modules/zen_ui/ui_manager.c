@@ -124,7 +124,7 @@ void ui_manager_event(ev_t ev)
   }
   else if (ev.type == EV_SCROLL)
   {
-    if (uim.implqueue->length == 0) view_coll_touched(uim.root, ev, uim.implqueue);
+    view_coll_touched(uim.root, ev, uim.implqueue);
 
     for (int i = uim.implqueue->length - 1; i > -1; i--)
     {

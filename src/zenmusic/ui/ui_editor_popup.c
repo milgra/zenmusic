@@ -133,6 +133,9 @@ void ui_editor_popup_attach(view_t* view)
 
   tg_text_add(head_view);
   tg_text_set(head_view, "Editing 1 data", ts);
+
+  // force texture initialization on cover view
+  cover_view->tex_gen(cover_view);
 }
 
 void ui_editor_popup_show()
@@ -499,17 +502,14 @@ void ui_editor_popup_set_songs(vec_t* vec)
 
   // load cover
 
-  if (ep.cover_view->texture.bitmap)
-  {
-    map_t* song = vec->data[0];
-    char*  path = MGET(song, "file/path");
-    char*  file = cstr_fromformat(100, "%s%s", config_get("lib_path"), path);
+  map_t* song = vec->data[0];
+  char*  path = MGET(song, "file/path");
+  char*  file = cstr_fromformat(100, "%s%s", config_get("lib_path"), path);
 
-    coder_load_cover_into(file, ep.cover_view->texture.bitmap);
+  coder_load_cover_into(file, ep.cover_view->texture.bitmap);
 
-    REL(file);
-    ep.cover_view->texture.changed = 1;
-  }
+  REL(file);
+  ep.cover_view->texture.changed = 1;
 }
 
 void ui_editor_popup_on_accept()
