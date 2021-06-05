@@ -79,7 +79,6 @@ void ui_filter_bar_show_filters(void* userdata, void* data)
 }
 void ui_filter_bar_clear_search(void* userdata, void* data)
 {
-  printf("CLEAR\n");
   vh_textinput_set_text(ufb.songlist_filter_bar, "");
   ui_manager_activate(ufb.songlist_filter_bar);
 }

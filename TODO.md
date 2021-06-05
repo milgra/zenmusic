@@ -1,10 +1,9 @@
 first version
 
-meta/file remove from songlist header
 mandatory fields, tags - date legyen default mezo editorban ha nincs akkor is
-artist/genre filter mukodjon, fix space problem, case sensitiveness in search
+meta/file remove from songlist header
+artist/genre filter mukodjon
 log window nagyobb, kisebb szoveggel, multiline items
-utf8 case insensitive space insensitive comparison
 
 automata tesztek!!
 fix leaks
@@ -71,8 +70,9 @@ Zen Wifi
 - floating wifi manager
 - zen + w?
 
-Zen Files
+Zen Media File Manager
 
+- basket instead of clipboard copy/move basket
 - file viewer and manager
 - preview area, info area, binary area?
 - spaces toggles autostart

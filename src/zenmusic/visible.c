@@ -21,6 +21,7 @@ void visible_set_filter(char* text);
 #if __INCLUDE_LEVEL__ == 0
 
 #include "database.c"
+#include "utf8.h"
 #include "zc_cstring.c"
 
 struct _visible_t
@@ -249,9 +250,9 @@ void visible_filter()
 {
   int ei, ki; // entry, key index
 
-  map_t* fields = visible_query_fields(vis.filter);
-  char*  value  = NULL;
-  char*  query  = NULL;
+  // map_t* fields = visible_query_fields(vis.filter);
+  char* value = NULL;
+  char* query = NULL;
 
   vec_reset(vis.songs);
 
@@ -267,16 +268,16 @@ void visible_filter()
     map_t* entry = vis.tmp1->data[ei];
     vec_reset(vis.tmp2);
 
-    if (fields)
-    {
-      // use query fields
-      map_keys(fields, vis.tmp2);
-    }
-    else
-    {
-      // use all fields
-      map_keys(entry, vis.tmp2);
-    }
+    /* if (fields) */
+    /* { */
+    /*   // use query fields */
+    /*   map_keys(fields, vis.tmp2); */
+    /* } */
+    /* else */
+    /* { */
+    // use all fields
+    map_keys(entry, vis.tmp2);
+    /* } */
 
     for (ki = 0;
          ki < vis.tmp2->length;
@@ -287,12 +288,12 @@ void visible_filter()
 
       if (value)
       {
-        if (fields)
-          query = MGET(fields, field);
-        else
-          query = vis.filter;
+        /* if (fields) */
+        /*   query = MGET(fields, field); */
+        /* else */
+        query = vis.filter;
 
-        if (strstr(value, query))
+        if (utf8casestr(value, query))
         {
           vec_add(vis.songs, entry);
           break;
@@ -307,7 +308,7 @@ void visible_filter()
     }
   }
 
-  if (fields) REL(fields);
+  // if (fields) REL(fields);
 
   visible_gen_genres();
   visible_gen_artists();

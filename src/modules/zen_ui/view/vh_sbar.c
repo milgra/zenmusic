@@ -118,7 +118,7 @@ void vh_sbar_evt(view_t* view, ev_t ev)
       bm_t* bm = view->texture.bitmap;
       bm_reset(bm);
 
-      gfx_rect(bm, 0, 0, bm->w, bm->h, 0xFF0000FF, 0);
+      gfx_rect(bm, 0, 0, bm->w, bm->h, 0x00000055, 0);
 
       if (vh->type == SBAR_V)
       {
