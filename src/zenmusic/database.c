@@ -13,6 +13,9 @@ void db_update(map_t* map);
 int db_organize_entry(char* libpath, map_t* db, map_t* entry);
 int db_organize(char* libpath, map_t* db);
 
+vec_t* db_get_genres();
+vec_t* db_get_artists();
+
 map_t*   db_get_db();
 uint32_t db_count();
 void     db_reset();
@@ -220,6 +223,80 @@ int db_organize(char* libpath, map_t* db)
   REL(paths);
 
   return changed;
+}
+
+int db_comp_text(void* left, void* right)
+{
+  char* la = left;
+  char* ra = right;
+
+  return strcmp(la, ra);
+}
+
+vec_t* db_get_genres()
+{
+  int ei, gi; // entry, genre index
+
+  vec_t* songs  = VNEW();
+  map_t* genres = MNEW();
+  vec_t* result = VNEW();
+
+  map_values(db, songs);
+
+  printf("SONG COUNT %i %i\n", db->count, songs->length);
+
+  for (ei = 0;
+       ei < songs->length;
+       ei++)
+  {
+    map_t* entry = songs->data[ei];
+    char*  genre = MGET(entry, "meta/genre");
+
+    if (genre)
+    {
+      MPUT(genres, genre, genre);
+    }
+  }
+
+  map_values(genres, result);
+  vec_sort(result, VSD_ASC, db_comp_text);
+
+  printf("GENRES:\n");
+  mem_describe(songs, 0);
+
+  REL(genres);
+  REL(songs);
+
+  return result;
+}
+
+vec_t* db_get_artists()
+{
+  int ei;
+
+  vec_t* songs   = VNEW();
+  vec_t* result  = VNEW();
+  map_t* artists = MNEW();
+
+  map_values(db, songs);
+
+  for (ei = 0;
+       ei < songs->length;
+       ei++)
+  {
+    map_t* entry  = songs->data[ei];
+    char*  artist = MGET(entry, "meta/artist");
+
+    if (artist) MPUT(artists, artist, artist);
+  }
+
+  map_values(artists, result);
+  vec_sort(result, VSD_ASC, db_comp_text);
+
+  REL(artists);
+  REL(songs);
+
+  return result;
 }
 
 #endif

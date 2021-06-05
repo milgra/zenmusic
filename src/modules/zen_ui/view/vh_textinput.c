@@ -399,7 +399,28 @@ void vh_textinput_set_text(view_t* view, char* text)
   }
   vec_reset(data->glyph_v);
 
-  str_addbytearray(data->text_s, text);
+  // text_s setup
+  // TODO create function from this to reuse
+
+  if (text)
+  {
+    str_addbytearray(data->text_s, text);
+
+    for (int i = 0; i < data->text_s->length; i++)
+    {
+      str_t* charstr = str_new();
+      str_addcodepoint(charstr, data->text_s->codepoints[i]);
+      char view_id[100];
+      snprintf(view_id, 100, "%sglyph%i", view->id, data->glyph_index++);
+      view_t* glyph_view = view_new(view_id, (r2_t){0, 0, 0, 0});
+      vh_anim_add(glyph_view);
+
+      VADD(data->glyph_v, glyph_view);
+
+      REL(charstr);
+    }
+  }
+
   vh_textinput_upd(view);
 
   if (data->on_text) (*data->on_text)(view);

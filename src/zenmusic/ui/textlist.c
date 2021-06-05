@@ -51,6 +51,10 @@ void textlist_update(textlist_t* tl)
   vh_list_refresh(tl->view);
 }
 
+void textlist_set_datasource(textlist_t* tl, vec_t* items)
+{
+}
+
 void on_textitem_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
 {
   vh_litem_t* vh = itemview->handler_data;

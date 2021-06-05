@@ -12,6 +12,7 @@ void ui_filter_popup_show();
 
 #include "callbacks.c"
 #include "config.c"
+#include "database.c"
 #include "textlist.c"
 #include "tg_text.c"
 #include "ui_filter_bar.c"
@@ -40,9 +41,9 @@ void ui_filter_popup_attach(view_t* baseview)
   ts.align        = TA_RIGHT;
   ts.margin_right = 20;
 
-  ufp.genrelist  = textlist_new(view_get_subview(baseview, "genrelist"), visible_get_genres(), ts, ui_filter_popup_on_genre_select);
+  ufp.genrelist  = textlist_new(view_get_subview(baseview, "genrelist"), db_get_genres(), ts, ui_filter_popup_on_genre_select);
   ts.align       = TA_LEFT;
-  ufp.artistlist = textlist_new(view_get_subview(baseview, "artistlist"), visible_get_artists(), ts, ui_filter_popup_on_artist_select);
+  ufp.artistlist = textlist_new(view_get_subview(baseview, "artistlist"), db_get_artists(), ts, ui_filter_popup_on_artist_select);
 }
 
 void ui_filter_popup_show()
@@ -57,7 +58,7 @@ void ui_filter_popup_on_genre_select(int index)
 {
   printf("on genre select %i\n", index);
 
-  vec_t* genres = visible_get_genres();
+  vec_t* genres = db_get_genres();
   char*  genre  = genres->data[index];
   // callbacks_call("on_genre_selected", genre);
 
@@ -65,14 +66,15 @@ void ui_filter_popup_on_genre_select(int index)
 
   visible_set_filter(query);
   ui_songlist_update();
-  ui_filter_bar_show_query(query);
+  //ui_filter_bar_show_query(query);
+  ui_filter_bar_show_query(genre);
 }
 
 void ui_filter_popup_on_artist_select(int index)
 {
   printf("on artist select %i\n", index);
 
-  vec_t* artists = visible_get_artists();
+  vec_t* artists = db_get_artists();
   char*  artist  = artists->data[index];
   // callbacks_call("on_artist_selected", artist);
 
@@ -80,7 +82,8 @@ void ui_filter_popup_on_artist_select(int index)
 
   visible_set_filter(query);
   ui_songlist_update();
-  ui_filter_bar_show_query(query);
+  //ui_filter_bar_show_query(query);
+  ui_filter_bar_show_query(artist);
 }
 
 #endif

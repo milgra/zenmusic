@@ -1,15 +1,18 @@
-first version
+******************************
+ZEN MUSIC PLAYER AND ORGANIZER
+******************************
 
+filter shouldn't affect filters popup
 mandatory fields, tags - date legyen default mezo editorban ha nincs akkor is
 meta/file remove from songlist header
-artist/genre filter mukodjon
 log window nagyobb, kisebb szoveggel, multiline items
-
 automata tesztek!!
 fix leaks
 
 ideas
 
+backspace del jobban animalt legyen
+animalt delete filter delnel
 android auto fullscreen visualizer
 inertia scroll kozben kimozgatott egerkor beragad a content
 activity-re kattintva songlist ugorjon aktualis szamra?
@@ -53,8 +56,9 @@ ZEN MULTIMEDIA DESKTOP ENVIRONMENT
 Productivity centered distraction free environment
 
 - no notifications
-- no distracting ui elements
+- no unused ( distracting ) ui elements
 - minimalistic and beautiful design
+- zen key = meta key = WIN/MAC/custom key
 
 Zen desktop
 
@@ -72,7 +76,7 @@ Zen Wifi
 
 Zen Media File Manager
 
-- basket instead of clipboard copy/move basket
+- copy/move basket, preview works on them
 - file viewer and manager
 - preview area, info area, binary area?
 - spaces toggles autostart
@@ -81,16 +85,14 @@ Zen Media File Manager
 - shows zen music/image/video libs
 - info/hex tab
 - binary files shows up immediately as hex in media viewer
-- clipboard rect - drag multiple files, preview those files
 
-Zen Music
+Zen Music Player And Organizer
 
-- music player and manager
 - zen + m?
 
-Zen Image
+Zen Visual Viewer And Orgranizer
 
-- image/video viewer and manager
+- image/video viewer and organizer
 - zen + i?
 
 Zen Words
@@ -104,10 +106,7 @@ Zen Video
 - replacement for kdenlive/gimp
 - replacement for adobe premier with wine
 - replacement for photoshop with wine
-
-Zen Audio
-
-- music editor
+- new ui around shotcut?
 
 For now
 
