@@ -148,7 +148,7 @@ void ui_editor_popup_on_accept_cover(void* userdata, void* data)
 {
   char* path_cs = str_cstring(data);
   // check if image is valid
-  bm_t* image = coder_get_image(path_cs);
+  bm_t* image = coder_load_image(path_cs);
 
   if (image)
   {
@@ -505,7 +505,7 @@ void ui_editor_popup_set_songs(vec_t* vec)
     char*  path = MGET(song, "file/path");
     char*  file = cstr_fromformat(100, "%s%s", config_get("lib_path"), path);
 
-    coder_get_album(file, ep.cover_view->texture.bitmap);
+    coder_load_cover_into(file, ep.cover_view->texture.bitmap);
 
     REL(file);
     ep.cover_view->texture.changed = 1;

@@ -156,7 +156,7 @@ int analyzer_thread(void* chptr)
 
       // read and add file and meta data
 
-      int res = coder_get_metadata(real, song);
+      int res = coder_load_metadata_into(real, song);
 
       if (res == 0)
       {

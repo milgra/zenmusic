@@ -1,9 +1,14 @@
 bin/zenmusicdev -c /home/milgra/Downloads/ZMTestConfig -s testrecord.rec  
 bin/zenmusicdev -c /home/milgra/Downloads/ZMTestConfig -p testrecord.rec  
 
+Functionality :
 
 add cover to  mp3, mp4, m4a withot cover
 add cover to mpo3, mp4, m4a with cover
+
+metadata field modification
+metadata field creation
+metadata field deletion
 
 # Zen Music music player and organizer test protocol
 # All tests are recorded and automated with the command line session recorder options
