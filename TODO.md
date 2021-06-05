@@ -2,26 +2,22 @@ first version
 
 meta/file remove from songlist header
 mandatory fields, tags - date legyen default mezo editorban ha nincs akkor is
-artist/genre filter mukodjon
+artist/genre filter mukodjon, fix space problem, case sensitiveness in search
 log window nagyobb, kisebb szoveggel, multiline items
 utf8 case insensitive space insensitive comparison
 editor popup masodik openre megy csak cover art view
-scroll fix
-video play fix
--c -l relative path-tal is mukodjon! - base path
 automata tesztek!!
 fix leaks
-metadata update eseten sulyos leak, a hatterben tortenjen, analyzer kozben is lehessen mar bongeszni
-fix space problem, case sensitiveness in search
-songlist refactor
 popup item scroll csak egermozgas utan reagal
-scroll kozben kimozgatott egerkor beragad a content
-activity-re kattintva songlist ugorjon aktualis szamra
-ures cover art-ra kattintva lehessen uploadolni, telire full screen
-
+pause color problem
 
 ideas
 
+android auto fullscreen visualizer
+inertia scroll kozben kimozgatott egerkor beragad a content
+activity-re kattintva songlist ugorjon aktualis szamra?
+ures cover art-ra kattintva lehessen uploadolni, telire full screen
+metadata update a hatterben tortenjen, analyzer kozben is lehessen mar bongeszni
 avoid guess format, check the content
 horizontally maximized textfields
 dark mode

@@ -129,8 +129,18 @@ void init(int width, int height, char* path)
   char* html_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/main.html", res_path);
   char* font_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/Baloo.ttf", res_path);
 
+  // if cfg path is relative extend it to absolute
+
+  if (cfg_path[0] != '/')
+  {
+    char* fin_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", path, cfg_path);
+    REL(cfg_path);
+    cfg_path = fin_path;
+  }
+
   // print path info to console
 
+  printf("base path     : %s\n", path);
   printf("config path   : %s\n", cfg_path);
   printf("resource path : %s\n", res_path);
   printf("css path      : %s\n", css_path);

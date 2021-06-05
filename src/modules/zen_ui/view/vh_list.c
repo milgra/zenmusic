@@ -317,6 +317,10 @@ void vh_list_evt(view_t* view, ev_t ev)
       vh->htimeout = 0;
       vh_sbar_close(vh->hscr);
     }
+
+    vh->bot_index = vh->tail_index;
+    vh->top_index = vh->head_index;
+    vh_list_update_scrollbars(view);
   }
   else if (ev.type == EV_SCROLL)
   {
@@ -391,11 +395,10 @@ void vh_list_scroll_v(view_t* view, void* userdata, float ratio)
   vh_list_t* vh        = listview->handler_data;
   int        new_index = (int)((float)vh->item_count * ratio);
 
-  if (new_index > 0 && new_index < vh->item_count)
+  if (new_index != vh->head_index && new_index > 0 && new_index < vh->item_count)
   {
     vh->head_index = new_index;
     vh_list_refresh(listview);
-    vh_list_update_scrollbars(listview);
   }
 }
 

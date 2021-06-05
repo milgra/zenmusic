@@ -10,6 +10,8 @@ metadata field modification
 metadata field creation
 metadata field deletion
 
+metadata update leak
+
 # Zen Music music player and organizer test protocol
 # All tests are recorded and automated with the command line session recorder options
 # Please re-record a test case if you created a test-breaking change
