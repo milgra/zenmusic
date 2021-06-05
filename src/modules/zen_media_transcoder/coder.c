@@ -27,7 +27,7 @@ void  coder_load_image_into(const char* path, bm_t* bitmap);
 #include "zc_memory.c"
 #include <limits.h>
 
-void coder_clone_song(char* libpath, char* path);
+void coder_clone_song(char* libpath, char* path, char* cover_path);
 
 void coder_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop, char* cover)
 {
@@ -46,7 +46,7 @@ void coder_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop
     map_t* song = songs->data[index];
     char*  path = MGET(song, "file/path");
 
-    coder_clone_song(libpath, path);
+    coder_clone_song(libpath, path, "/home/milgra/Projects/zenmusic/svg/freebsd.png");
 
     // coder_update_song_metadata(libpath, path, data, drop, cover);
   }
@@ -455,9 +455,9 @@ void coder_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* d
   REL(newpath);
 }
 
-void coder_clone_song(char* libpath, char* path)
+void coder_clone_song(char* libpath, char* path, char* cover_path)
 {
-  LOG("coder_clone_song for %s\n", path);
+  LOG("coder_clone_song for %s cover %s\n", path, cover_path);
 
   char* ext  = cstr_path_extension(path); // REL 0
   char* name = cstr_path_filename(path);  // REL 1
@@ -499,20 +499,20 @@ void coder_clone_song(char* libpath, char* path)
           {
             printf("Output file created.\n");
 
-            av_dump_format(enc_ctx, 0, newpath, 1);
-
             //
             // create all streams in the encoder context that are present in the decoder context
             //
 
             printf("Copying stream structure...\n");
 
-            int dec_enc_strm[10] = {0};
+            int dec_enc_strm[10]   = {0};
+            int dec_cov_strm_index = -1;
 
-            for (unsigned si = 0; si < dec_ctx->nb_streams; si++)
+            for (int si = 0; si < dec_ctx->nb_streams; si++)
             {
               AVCodecParameters* param = dec_ctx->streams[si]->codecpar;
               const AVCodec*     codec = avcodec_find_encoder(dec_ctx->streams[si]->codecpar->codec_id);
+              int                cover = dec_ctx->streams[si]->disposition & AV_DISPOSITION_ATTACHED_PIC;
 
               if (codec)
               {
@@ -525,16 +525,25 @@ void coder_clone_song(char* libpath, char* path)
                 default: printf("Other codec: %i\n", param->codec_type); break;
                 }
 
-                // create stream in encoder context with codec
+                if (cover_path && cover)
+                {
+                  dec_cov_strm_index = si;
+                  printf("Skipping cover stream, index : %i\n", dec_cov_strm_index);
+                }
+                else
+                {
+                  // create stream in encoder context with codec
 
-                AVStream* enc_stream = avformat_new_stream(enc_ctx, codec);
-                avcodec_parameters_copy(enc_stream->codecpar, param);
-                enc_stream->codecpar->codec_tag = param->codec_tag; //  do we need this?
+                  AVStream* enc_stream = avformat_new_stream(enc_ctx, codec);
+                  avcodec_parameters_copy(enc_stream->codecpar, param);
+                  enc_stream->codecpar->codec_tag = param->codec_tag; //  do we need this?
 
-                // store stream index mapping
-                dec_enc_strm[si] = enc_stream->index;
+                  // store stream index mapping
 
-                printf("Mapping decoder stream index %i to encoder stream index %i\n", si, enc_stream->index);
+                  dec_enc_strm[si] = enc_stream->index;
+
+                  printf("Mapping decoder stream index %i to encoder stream index %i\n", si, enc_stream->index);
+                }
               }
               else
                 printf("No encoder found for stream no %i\n", si);
@@ -544,52 +553,58 @@ void coder_clone_song(char* libpath, char* path)
             // create cover art stream
             //
 
-            AVFormatContext* cov_ctx       = avformat_alloc_context();
+            AVFormatContext* cov_ctx       = NULL;
             int              cov_dec_index = 0;
             int              cov_enc_index = 0;
 
-            if (avformat_open_input(&cov_ctx, "/home/milgra/Projects/zenmusic/svg/freebsd.png", 0, 0) >= 0)
+            if (cover_path)
             {
-              printf("Cover opened for decoding\n");
+              cov_ctx = avformat_alloc_context(); // FREE 2
 
-              if (avformat_find_stream_info(cov_ctx, 0) >= 0)
+              if (avformat_open_input(&cov_ctx, cover_path, 0, 0) >= 0)
               {
-                printf("Cover stream info found, stream count %i\n", cov_ctx->nb_streams);
+                printf("Cover opened for decoding\n");
 
-                // find stream info
-
-                for (int si = 0; si < cov_ctx->nb_streams; si++)
+                if (avformat_find_stream_info(cov_ctx, 0) >= 0)
                 {
-                  AVCodecParameters* param = cov_ctx->streams[si]->codecpar;
-                  const AVCodec*     codec = avcodec_find_encoder(cov_ctx->streams[si]->codecpar->codec_id);
+                  printf("Cover stream info found, stream count %i\n", cov_ctx->nb_streams);
 
-                  if (codec)
+                  // find stream info
+
+                  for (int si = 0; si < cov_ctx->nb_streams; si++)
                   {
-                    printf("Cover stream no %i Codec %s ID %d bit_rate %ld\n", si, codec->long_name, codec->id, param->bit_rate);
+                    AVCodecParameters* param = cov_ctx->streams[si]->codecpar;
+                    const AVCodec*     codec = avcodec_find_encoder(cov_ctx->streams[si]->codecpar->codec_id);
 
-                    switch (param->codec_type)
+                    if (codec)
                     {
-                    case AVMEDIA_TYPE_VIDEO: printf("Video Codec: resolution %d x %d\n", param->width, param->height); break;
-                    case AVMEDIA_TYPE_AUDIO: printf("Audio Codec: %d channels, sample rate %d\n", param->channels, param->sample_rate); break;
-                    default: printf("Other codec: %i\n", param->codec_type); break;
+                      printf("Cover stream no %i Codec %s ID %d bit_rate %ld\n", si, codec->long_name, codec->id, param->bit_rate);
+
+                      switch (param->codec_type)
+                      {
+                      case AVMEDIA_TYPE_VIDEO: printf("Video Codec: resolution %d x %d\n", param->width, param->height); break;
+                      case AVMEDIA_TYPE_AUDIO: printf("Audio Codec: %d channels, sample rate %d\n", param->channels, param->sample_rate); break;
+                      default: printf("Other codec: %i\n", param->codec_type); break;
+                      }
+
+                      // create stream in encoder context with codec
+
+                      if (param->codec_type == AVMEDIA_TYPE_VIDEO)
+                      {
+                        AVStream* enc_stream = avformat_new_stream(enc_ctx, codec);
+                        avcodec_parameters_copy(enc_stream->codecpar, param);
+                        enc_stream->codecpar->codec_tag = param->codec_tag; //  do we need this?
+                        enc_stream->disposition |= AV_DISPOSITION_ATTACHED_PIC;
+
+                        cov_dec_index = si;
+                        cov_enc_index = enc_stream->index;
+
+                        printf("Mapping cover stream index %i to encoder stream index %i\n", cov_dec_index, cov_enc_index);
+                      }
                     }
-
-                    // create stream in encoder context with codec
-
-                    if (param->codec_type == AVMEDIA_TYPE_VIDEO)
-                    {
-                      AVStream* enc_stream = avformat_new_stream(enc_ctx, codec);
-                      avcodec_parameters_copy(enc_stream->codecpar, param);
-                      enc_stream->codecpar->codec_tag = param->codec_tag; //  do we need this?
-
-                      cov_dec_index = si;
-                      cov_enc_index = enc_stream->index;
-
-                      printf("Mapping cover stream index %i to encoder stream index %i\n", cov_dec_index, cov_enc_index);
-                    }
+                    else
+                      printf("No encoder found for stream no %i\n", si);
                   }
-                  else
-                    printf("No encoder found for stream no %i\n", si);
                 }
               }
             }
@@ -615,34 +630,44 @@ void coder_clone_song(char* libpath, char* path)
 
                 // copy all packets from old file to new file with the exception of cover art image
 
-                int last_di = 0; // last decoder index
-                int last_ei = 0; // last encoder index
-                int last_pc = 0; // last packet count
-                int last_by = 0; // last sum bytes
+                int last_di = -1; // last decoder index
+                int last_ei = 0;  // last encoder index
+                int last_pc = 0;  // last packet count
+                int last_by = 0;  // last sum bytes
 
                 while (av_read_frame(dec_ctx, dec_pkt) == 0)
                 {
-                  int enc_index = dec_enc_strm[dec_pkt->stream_index];
-
-                  if (dec_pkt->stream_index == last_di)
+                  if (cover_path && dec_pkt->stream_index == dec_cov_strm_index)
                   {
-                    last_by += dec_pkt->size;
-                    last_pc += 1;
-                    last_ei = enc_index;
+                    printf("Skipping original cover packets.\n");
                   }
                   else
                   {
-                    printf("Stream written, dec index : %i enc index : %i packets : %i sum : %i bytes\n", last_di, last_ei, last_pc, last_by);
-                    last_di = dec_pkt->stream_index;
-                    last_ei = enc_index;
-                    last_pc = 0;
-                    last_by = 0;
-                  }
 
-                  dec_pkt->stream_index = enc_index;
-                  av_write_frame(enc_ctx, dec_pkt);
-                  dec_pkt->data = NULL;
-                  dec_pkt->size = 0;
+                    if (last_di == -1) last_di = dec_pkt->stream_index;
+
+                    int enc_index = dec_enc_strm[dec_pkt->stream_index];
+
+                    if (dec_pkt->stream_index == last_di)
+                    {
+                      last_by += dec_pkt->size;
+                      last_pc += 1;
+                      last_ei = enc_index;
+                    }
+                    else
+                    {
+                      printf("Stream written, dec index : %i enc index : %i packets : %i sum : %i bytes\n", last_di, last_ei, last_pc, last_by);
+                      last_di = dec_pkt->stream_index;
+                      last_ei = enc_index;
+                      last_pc = 0;
+                      last_by = 0;
+                    }
+
+                    dec_pkt->stream_index = enc_index;
+                    av_write_frame(enc_ctx, dec_pkt);
+                    dec_pkt->data = NULL;
+                    dec_pkt->size = 0;
+                  }
                 }
 
                 printf("Stream written, dec index : %i enc index : %i packets : %i sum : %i bytes\n", last_di, last_ei, last_pc, last_by);
@@ -650,22 +675,25 @@ void coder_clone_song(char* libpath, char* path)
                 last_pc = 0;
                 last_by = 0;
 
-                // write cover packets
-
-                while (av_read_frame(cov_ctx, dec_pkt) == 0)
+                if (cover_path)
                 {
-                  if (dec_pkt->stream_index == cov_dec_index)
-                  {
-                    last_by += dec_pkt->size;
-                    last_pc += 1;
-                    dec_pkt->stream_index = cov_enc_index;
-                    av_write_frame(enc_ctx, dec_pkt);
-                  }
+                  // write cover packets
 
-                  dec_pkt->data = NULL;
-                  dec_pkt->size = 0;
+                  while (av_read_frame(cov_ctx, dec_pkt) == 0)
+                  {
+                    if (dec_pkt->stream_index == cov_dec_index)
+                    {
+                      last_by += dec_pkt->size;
+                      last_pc += 1;
+                      dec_pkt->stream_index = cov_enc_index;
+                      av_write_frame(enc_ctx, dec_pkt);
+                    }
+
+                    dec_pkt->data = NULL;
+                    dec_pkt->size = 0;
+                  }
+                  printf("Cover stream written, dec index : %i enc index : %i packets : %i sum : %i bytes\n", cov_dec_index, cov_enc_index, last_pc, last_by);
                 }
-                printf("Cover stream written, dec index : %i enc index : %i packets : %i sum : %i bytes\n", cov_dec_index, cov_enc_index, last_pc, last_by);
 
                 // close output file and cleanup
 
@@ -677,6 +705,8 @@ void coder_clone_song(char* libpath, char* path)
             }
             else
               printf("Cannot init output.\n");
+
+            if (cov_ctx) avformat_free_context(cov_ctx);
 
             avio_close(enc_ctx->pb); // CLOSE 0
           }

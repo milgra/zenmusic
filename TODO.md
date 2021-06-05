@@ -22,8 +22,10 @@ scroll kozben kimozgatott egerkor beragad a content
 activity-re kattintva songlist ugorjon aktualis szamra
 ures cover art-ra kattintva lehessen uploadolni, telire full screen
 
+
 ideas
 
+avoid guess format, check the content
 horizontally maximized textfields
 dark mode
 save shuffle state, last played song, last played position
