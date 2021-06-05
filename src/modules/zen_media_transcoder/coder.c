@@ -469,12 +469,12 @@ void coder_clone_song(char* libpath, char* path)
   printf("oldpath %s\n", oldpath);
   printf("newpath %s\n", newpath);
 
-  REL(ext);
-  REL(name);
+  REL(name); // REL 1
+  REL(ext);  // REL 0
 
   // open file for decode
 
-  AVFormatContext* dec_ctx = avformat_alloc_context();
+  AVFormatContext* dec_ctx = avformat_alloc_context(); // FREE 0
 
   if (avformat_open_input(&dec_ctx, oldpath, 0, 0) >= 0)
   {
@@ -487,7 +487,7 @@ void coder_clone_song(char* libpath, char* path)
       AVFormatContext* enc_ctx;
       AVOutputFormat*  enc_fmt = av_guess_format(NULL, oldname, NULL);
 
-      if (avformat_alloc_output_context2(&enc_ctx, enc_fmt, NULL, newpath) >= 0)
+      if (avformat_alloc_output_context2(&enc_ctx, enc_fmt, NULL, newpath) >= 0) // FREE 1
       {
         printf("Output context allocated\n");
 
@@ -495,9 +495,11 @@ void coder_clone_song(char* libpath, char* path)
         {
           printf("Output file will be provided by caller.\n");
 
-          if (avio_open(&enc_ctx->pb, newpath, AVIO_FLAG_WRITE) >= 0)
+          if (avio_open(&enc_ctx->pb, newpath, AVIO_FLAG_WRITE) >= 0) // CLOSE 0
           {
             printf("Output file created.\n");
+
+            av_dump_format(enc_ctx, 0, newpath, 1);
 
             //
             // create all streams in the encoder context that are present in the decoder context
@@ -642,7 +644,9 @@ void coder_clone_song(char* libpath, char* path)
                   dec_pkt->data = NULL;
                   dec_pkt->size = 0;
                 }
+
                 printf("Stream written, dec index : %i enc index : %i packets : %i sum : %i bytes\n", last_di, last_ei, last_pc, last_by);
+
                 last_pc = 0;
                 last_by = 0;
 
@@ -667,31 +671,39 @@ void coder_clone_song(char* libpath, char* path)
 
                 av_packet_free(&dec_pkt);
                 av_write_trailer(enc_ctx);
-
-                avformat_close_input(&dec_ctx);
-                avformat_free_context(dec_ctx);
-                avformat_free_context(enc_ctx);
               }
               else
                 printf("Cannot write header.\n");
             }
             else
               printf("Cannot init output.\n");
+
+            avio_close(enc_ctx->pb); // CLOSE 0
           }
           else
             printf("Cannot open file for encode %s\n", newpath);
         }
         else
           printf("Output is a fileless codec.");
+
+        avformat_free_context(enc_ctx); // FREE 1
       }
       else
         printf("Cannot allocate output context for %s\n", oldname);
     }
     else
       printf("Cannot find stream info\n");
+
+    avformat_close_input(&dec_ctx);
   }
   else
     printf("Cannot open file for decode %s\n", oldpath);
+
+  avformat_free_context(dec_ctx); // FREE 0
+
+  REL(oldname); // REL 2
+  REL(oldpath); // REL 3
+  REL(newpath); // REL 4
 }
 
 void coder_get_album(const char* path, bm_t* bitmap)
