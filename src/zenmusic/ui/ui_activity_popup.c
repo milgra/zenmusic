@@ -37,7 +37,7 @@ void ui_activity_popup_log(char* log)
 
   char* last = act.logs->data[0];
 
-  if (last && log[0] == ' ' && last[0] == ' ')
+  if (last && strstr(log, "progress"))
   {
     vec_replaceatindex(act.logs, log, 0);
   }
@@ -66,7 +66,7 @@ void ui_activity_popup_attach(view_t* baseview)
 
   textstyle_t ts = {0};
   ts.font        = config_get("font_path");
-  ts.size        = 30.0;
+  ts.size        = 25.0;
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0x0;
   ts.align       = TA_LEFT;

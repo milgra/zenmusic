@@ -192,7 +192,7 @@ int analyzer_thread(void* chptr)
     if (ratio != ratio_new)
     {
       ratio = ratio_new;
-      LOG(" lib : analyzer progress : %i%%", ratio);
+      LOG("lib : analyzer progress : %i%%", ratio);
     }
   }
 

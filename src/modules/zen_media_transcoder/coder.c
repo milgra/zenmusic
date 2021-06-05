@@ -27,7 +27,7 @@ void  coder_load_image_into(const char* path, bm_t* bitmap);
 #include "zc_memory.c"
 #include <limits.h>
 
-void coder_clone_song(char* libpath, char* path, char* cover_path);
+void coder_clone_song(char* libpath, char* path, char* cover_path, map_t* data, vec_t* drop);
 
 void coder_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop, char* cover)
 {
@@ -46,7 +46,7 @@ void coder_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop
     map_t* song = songs->data[index];
     char*  path = MGET(song, "file/path");
 
-    coder_clone_song(libpath, path, "/home/milgra/Projects/zenmusic/svg/freebsd.png");
+    coder_clone_song(libpath, path, "/home/milgra/Projects/zenmusic/svg/freebsd.png", data, drop);
 
     // coder_update_song_metadata(libpath, path, data, drop, cover);
   }
@@ -455,7 +455,7 @@ void coder_update_song_metadata(char* libpath, char* path, map_t* data, vec_t* d
   REL(newpath);
 }
 
-void coder_clone_song(char* libpath, char* path, char* cover_path)
+void coder_clone_song(char* libpath, char* path, char* cover_path, map_t* data, vec_t* drop)
 {
   LOG("coder_clone_song for %s cover %s\n", path, cover_path);
 
@@ -609,6 +609,39 @@ void coder_clone_song(char* libpath, char* path, char* cover_path)
               }
             }
 
+            //
+            // create metadata
+            //
+
+            av_dict_copy(&enc_ctx->metadata, dec_ctx->metadata, 0);
+
+            AVDictionaryEntry* tag    = NULL;
+            vec_t*             fields = VNEW();
+
+            printf("Existing tags:\n");
+            while ((tag = av_dict_get(enc_ctx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) printf("%s : %s\n", tag->key, tag->value);
+
+            map_keys(data, fields);
+
+            for (int fi = 0; fi < fields->length; fi++)
+            {
+              char* field = fields->data[fi];
+              char* value = MGET(data, field);
+
+              av_dict_set(&enc_ctx->metadata, field, value, 0);
+
+              printf("added/updated %s to %s\n", field, value);
+            }
+
+            for (int fi = 0; fi < drop->length; fi++)
+            {
+              char* field = drop->data[fi];
+
+              av_dict_set(&enc_ctx->metadata, field, NULL, 0);
+
+              printf("removed %s\n", field);
+            }
+
             if (avformat_init_output(enc_ctx, NULL) > 0)
             {
               printf("Output inited.\n");
@@ -708,7 +741,7 @@ void coder_clone_song(char* libpath, char* path, char* cover_path)
 
             if (cov_ctx) avformat_free_context(cov_ctx);
 
-            avio_close(enc_ctx->pb); // CLOSE 0
+            if (avio_close(enc_ctx->pb) >= 0) printf("Closed target file.\n"); // CLOSE 0
           }
           else
             printf("Cannot open file for encode %s\n", newpath);

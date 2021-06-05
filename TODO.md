@@ -1,7 +1,7 @@
 first version
 
-editor popup - image upload, new field button, buttons, fix
 mandatory fields, tags
+log window nagyobb, kisebb szoveggel, multiline items
 artist/genre filter mukodjon
 utf8 case insensitive space insensitive comparison
 editor popup masodik openre megy csak cover art view
