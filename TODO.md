@@ -1,15 +1,13 @@
 first version
 
-mandatory fields, tags
+meta/file remove from songlist header
+mandatory fields, tags - date legyen default mezo editorban ha nincs akkor is
 artist/genre filter mukodjon
 log window nagyobb, kisebb szoveggel, multiline items
 utf8 case insensitive space insensitive comparison
 editor popup masodik openre megy csak cover art view
 scroll fix
-toggle buttons fix
 video play fix
-meta/file remove from songlist header
-mandatory tags - date legyen default mezo editorban ha nincs akkor is
 -c -l relative path-tal is mukodjon! - base path
 automata tesztek!!
 fix leaks

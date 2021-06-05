@@ -99,15 +99,16 @@ void vh_button_evt(view_t* view, ev_t ev)
       if (vh->state == VH_BUTTON_UP)
       {
         vh->state = VH_BUTTON_DOWN;
-        if (vh->offview) vh_anim_alpha(vh->offview, 0.0, 1.0, 10, AT_LINEAR);
-        if (vh->onview) vh_anim_alpha(vh->onview, 1.0, 0.0, 10, AT_LINEAR);
+        if (vh->offview) vh_anim_alpha(vh->offview, 1.0, 0.0, 10, AT_LINEAR);
+        if (vh->onview) vh_anim_alpha(vh->onview, 0.0, 1.0, 10, AT_LINEAR);
       }
       else
       {
         vh->state = VH_BUTTON_UP;
-        if (vh->offview) vh_anim_alpha(vh->offview, 1.0, 0.0, 10, AT_LINEAR);
-        if (vh->onview) vh_anim_alpha(vh->onview, 0.0, 1.0, 10, AT_LINEAR);
+        if (vh->offview) vh_anim_alpha(vh->offview, 0.0, 1.0, 10, AT_LINEAR);
+        if (vh->onview) vh_anim_alpha(vh->onview, 1.0, 0.0, 10, AT_LINEAR);
       }
+
       if (vh->event) (*vh->event->fp)(vh->event->userdata, view);
     }
     else
