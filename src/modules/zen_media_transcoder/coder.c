@@ -27,6 +27,8 @@ void  coder_load_image_into(const char* path, bm_t* bitmap);
 #include "zc_memory.c"
 #include <limits.h>
 
+void coder_clone_song(char* libpath, char* path);
+
 void coder_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop, char* cover)
 {
   /* printf("coder update metadata for songs:\n"); */
@@ -39,10 +41,12 @@ void coder_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop
 
   for (int index = 0; index < songs->length; index++)
   {
+    printf("UPDATE SONGS %i INDEX %i\n", songs->length, index);
+
     map_t* song = songs->data[index];
     char*  path = MGET(song, "file/path");
 
-    coder_clone_song(libpath, path)
+    coder_clone_song(libpath, path);
 
     // coder_update_song_metadata(libpath, path, data, drop, cover);
   }
@@ -455,11 +459,12 @@ void coder_clone_song(char* libpath, char* path)
 {
   LOG("coder_clone_song for %s\n", path);
 
-  char* ext  = cstr_path_extension(path);
-  char* name = cstr_path_filename(path);
+  char* ext  = cstr_path_extension(path); // REL 0
+  char* name = cstr_path_filename(path);  // REL 1
 
-  char* oldpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", libpath, path);
-  char* newpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s_tmp%s", libpath, name, ext);
+  char* oldname = cstr_fromformat(PATH_MAX + NAME_MAX, "%s.%s", name, ext);                 // REL 2
+  char* oldpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", libpath, path);              // REL 3
+  char* newpath = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s_tmp.%s", libpath, name, ext); // REL 4
 
   printf("oldpath %s\n", oldpath);
   printf("newpath %s\n", newpath);
@@ -473,30 +478,34 @@ void coder_clone_song(char* libpath, char* path)
 
   if (avformat_open_input(&dec_ctx, oldpath, 0, 0) >= 0)
   {
-    printf("Input opened for decoding");
+    printf("Input opened for decoding\n");
 
-    AVFormatContext* enc_ctx;
-    AVOutputFormat*  enc_fmt = av_guess_format(NULL, newpath, NULL);
-
-    if (avformat_alloc_output_context2(&enc_ctx, enc_fmt, NULL, newpath))
+    if (avformat_find_stream_info(dec_ctx, 0) >= 0)
     {
-      printf("Output context allocated\n");
+      printf("Input stream info found, stream count %i\n", dec_ctx->nb_streams);
 
-      if (!(enc_ctx->oformat->flags & AVFMT_NOFILE))
+      AVFormatContext* enc_ctx;
+      AVOutputFormat*  enc_fmt = av_guess_format(NULL, oldname, NULL);
+
+      if (avformat_alloc_output_context2(&enc_ctx, enc_fmt, NULL, newpath) >= 0)
       {
-        printf("Output file will be provided by caller.\n");
+        printf("Output context allocated\n");
 
-        if (avio_open(&enc_ctx->pb, newpath, AVIO_FLAG_WRITE) >= 0)
+        if (!(enc_ctx->oformat->flags & AVFMT_NOFILE))
         {
-          printf("Output file created.\n");
+          printf("Output file will be provided by caller.\n");
 
-          if (avformat_init_output(enc_ctx, NULL) >= 0)
+          if (avio_open(&enc_ctx->pb, newpath, AVIO_FLAG_WRITE) >= 0)
           {
-            printf("Output inited.\n");
+            printf("Output file created.\n");
 
-            // create all stream in the encoder context that are present in the decoder context
+            //
+            // create all streams in the encoder context that are present in the decoder context
+            //
 
             printf("Copying stream structure...\n");
+
+            int dec_enc_strm[10] = {0};
 
             for (unsigned si = 0; si < dec_ctx->nb_streams; si++)
             {
@@ -515,54 +524,171 @@ void coder_clone_song(char* libpath, char* path)
                 }
 
                 // create stream in encoder context with codec
+
                 AVStream* enc_stream = avformat_new_stream(enc_ctx, codec);
                 avcodec_parameters_copy(enc_stream->codecpar, param);
                 enc_stream->codecpar->codec_tag = param->codec_tag; //  do we need this?
+
+                // store stream index mapping
+                dec_enc_strm[si] = enc_stream->index;
+
+                printf("Mapping decoder stream index %i to encoder stream index %i\n", si, enc_stream->index);
               }
               else
                 printf("No encoder found for stream no %i\n", si);
             }
 
-            // copy packets from decoder context to encoder context
+            //
+            // create cover art stream
+            //
 
-            AVPacket* dec_pkt = av_packet_alloc();
+            AVFormatContext* cov_ctx       = avformat_alloc_context();
+            int              cov_dec_index = 0;
+            int              cov_enc_index = 0;
 
-            av_init_packet(dec_pkt);
-
-            dec_pkt->data = NULL;
-            dec_pkt->size = 0;
-
-            // copy all packets from old file to new file with the exception of cover art image
-
-            while (av_read_frame(dec_ctx, dec_pkt) == 0)
+            if (avformat_open_input(&cov_ctx, "/home/milgra/Projects/zenmusic/svg/freebsd.png", 0, 0) >= 0)
             {
-              printf("%i %i", dec_pkt->stream_index, dec_pkt->size);
+              printf("Cover opened for decoding\n");
 
-              av_write_frame(enc_ctx, dec_pkt);
-              dec_pkt->data = NULL;
-              dec_pkt->size = 0;
+              if (avformat_find_stream_info(cov_ctx, 0) >= 0)
+              {
+                printf("Cover stream info found, stream count %i\n", cov_ctx->nb_streams);
+
+                // find stream info
+
+                for (int si = 0; si < cov_ctx->nb_streams; si++)
+                {
+                  AVCodecParameters* param = cov_ctx->streams[si]->codecpar;
+                  const AVCodec*     codec = avcodec_find_encoder(cov_ctx->streams[si]->codecpar->codec_id);
+
+                  if (codec)
+                  {
+                    printf("Cover stream no %i Codec %s ID %d bit_rate %ld\n", si, codec->long_name, codec->id, param->bit_rate);
+
+                    switch (param->codec_type)
+                    {
+                    case AVMEDIA_TYPE_VIDEO: printf("Video Codec: resolution %d x %d\n", param->width, param->height); break;
+                    case AVMEDIA_TYPE_AUDIO: printf("Audio Codec: %d channels, sample rate %d\n", param->channels, param->sample_rate); break;
+                    default: printf("Other codec: %i\n", param->codec_type); break;
+                    }
+
+                    // create stream in encoder context with codec
+
+                    if (param->codec_type == AVMEDIA_TYPE_VIDEO)
+                    {
+                      AVStream* enc_stream = avformat_new_stream(enc_ctx, codec);
+                      avcodec_parameters_copy(enc_stream->codecpar, param);
+                      enc_stream->codecpar->codec_tag = param->codec_tag; //  do we need this?
+
+                      cov_dec_index = si;
+                      cov_enc_index = enc_stream->index;
+
+                      printf("Mapping cover stream index %i to encoder stream index %i\n", cov_dec_index, cov_enc_index);
+                    }
+                  }
+                  else
+                    printf("No encoder found for stream no %i\n", si);
+                }
+              }
             }
 
-            // close output file and cleanup
+            if (avformat_init_output(enc_ctx, NULL) > 0)
+            {
+              printf("Output inited.\n");
 
-            av_packet_free(&dec_pkt);
-            av_write_trailer(enc_ctx);
+              // write header
 
-            avformat_close_input(&dec_ctx);
-            avformat_free_context(dec_ctx);
-            avformat_free_context(enc_ctx);
+              if (avformat_write_header(enc_ctx, NULL) >= 0)
+              {
+                printf("Header written\n");
+
+                // copy packets from decoder context to encoder context
+
+                AVPacket* dec_pkt = av_packet_alloc();
+
+                av_init_packet(dec_pkt);
+
+                dec_pkt->data = NULL;
+                dec_pkt->size = 0;
+
+                // copy all packets from old file to new file with the exception of cover art image
+
+                int last_di = 0; // last decoder index
+                int last_ei = 0; // last encoder index
+                int last_pc = 0; // last packet count
+                int last_by = 0; // last sum bytes
+
+                while (av_read_frame(dec_ctx, dec_pkt) == 0)
+                {
+                  int enc_index = dec_enc_strm[dec_pkt->stream_index];
+
+                  if (dec_pkt->stream_index == last_di)
+                  {
+                    last_by += dec_pkt->size;
+                    last_pc += 1;
+                    last_ei = enc_index;
+                  }
+                  else
+                  {
+                    printf("Stream written, dec index : %i enc index : %i packets : %i sum : %i bytes\n", last_di, last_ei, last_pc, last_by);
+                    last_di = dec_pkt->stream_index;
+                    last_ei = enc_index;
+                    last_pc = 0;
+                    last_by = 0;
+                  }
+
+                  dec_pkt->stream_index = enc_index;
+                  av_write_frame(enc_ctx, dec_pkt);
+                  dec_pkt->data = NULL;
+                  dec_pkt->size = 0;
+                }
+                printf("Stream written, dec index : %i enc index : %i packets : %i sum : %i bytes\n", last_di, last_ei, last_pc, last_by);
+                last_pc = 0;
+                last_by = 0;
+
+                // write cover packets
+
+                while (av_read_frame(cov_ctx, dec_pkt) == 0)
+                {
+                  if (dec_pkt->stream_index == cov_dec_index)
+                  {
+                    last_by += dec_pkt->size;
+                    last_pc += 1;
+                    dec_pkt->stream_index = cov_enc_index;
+                    av_write_frame(enc_ctx, dec_pkt);
+                  }
+
+                  dec_pkt->data = NULL;
+                  dec_pkt->size = 0;
+                }
+                printf("Cover stream written, dec index : %i enc index : %i packets : %i sum : %i bytes\n", cov_dec_index, cov_enc_index, last_pc, last_by);
+
+                // close output file and cleanup
+
+                av_packet_free(&dec_pkt);
+                av_write_trailer(enc_ctx);
+
+                avformat_close_input(&dec_ctx);
+                avformat_free_context(dec_ctx);
+                avformat_free_context(enc_ctx);
+              }
+              else
+                printf("Cannot write header.\n");
+            }
+            else
+              printf("Cannot init output.\n");
           }
           else
-            printf("Cannot init output.\n");
+            printf("Cannot open file for encode %s\n", newpath);
         }
         else
-          printf("Cannot open file for encode %s\n", newpath);
+          printf("Output is a fileless codec.");
       }
       else
-        printf("Output is a fileless codec.");
+        printf("Cannot allocate output context for %s\n", oldname);
     }
     else
-      printf("Cannot allocate output context for %s\n", newpath);
+      printf("Cannot find stream info\n");
   }
   else
     printf("Cannot open file for decode %s\n", oldpath);

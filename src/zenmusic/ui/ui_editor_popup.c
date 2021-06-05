@@ -526,13 +526,13 @@ void ui_editor_popup_on_accept()
   printf("REMOVED\n");
   mem_describe(ep.removed, 0);
 
-  REL(selected);
-
   char* libpath = config_get("lib_path");
 
   // update metadata in media files
 
   coder_update_metadata(libpath, selected, ep.changed, ep.removed, ep.cover);
+
+  REL(selected);
 
   // update metadata in database
 

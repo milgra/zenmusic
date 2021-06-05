@@ -1,7 +1,7 @@
 #include "callbacks.c"
+#include "coder.c"
 #include "config.c"
 #include "database.c"
-#include "editor.c"
 #include "evrecorder.c"
 #include "files.c"
 #include "library.c"
