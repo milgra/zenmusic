@@ -200,7 +200,7 @@ void ui_editor_popup_create_table()
 {
   VADDR(ep.cols, uise_cell_new("key", 120, 0));
   VADDR(ep.cols, uise_cell_new("value", 360, 1));
-  VADDR(ep.cols, uise_cell_new("delete", 80, 2));
+  // VADDR(ep.cols, uise_cell_new("delete", 80, 2));
 
   // create header
 
@@ -351,7 +351,7 @@ void ui_editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, 
     ep.textstyle.backcolor = 0xFF0000AA;
     tg_text_set(vh_litem_get_cell(itemview, "key"), key, ep.textstyle);
     tg_text_set(vh_litem_get_cell(itemview, "value"), value, ep.textstyle);
-    tg_text_set(vh_litem_get_cell(itemview, "delete"), "Remove", ep.textstyle);
+    //tg_text_set(vh_litem_get_cell(itemview, "delete"), "Remove", ep.textstyle);
 
     VADD(ep.removed, key);
   }
@@ -468,7 +468,7 @@ void ui_editor_popup_create_items()
     ep.textstyle.backcolor = color2;
     tg_text_set(vh_litem_get_cell(item, "value"), value, ep.textstyle);
 
-    if (key[0] != 'f') tg_text_set(vh_litem_get_cell(item, "delete"), "Delete", ep.textstyle);
+    // if (key[0] != 'f') tg_text_set(vh_litem_get_cell(item, "delete"), "Delete", ep.textstyle);
 
     VADD(ep.items, item);
   }

@@ -1,6 +1,7 @@
 CC = clang
 OBJDIRDEV = bin/obj/dev
 OBJDIRREL = bin/obj/rel
+VERSION = 1
 
 SOURCES = \
 	$(wildcard src/modules/*.c) \
@@ -59,21 +60,27 @@ LDFLAGS = \
 OBJECTSDEV := $(addprefix $(OBJDIRDEV)/,$(SOURCES:.c=.o))
 OBJECTSREL := $(addprefix $(OBJDIRREL)/,$(SOURCES:.c=.o))
 
-#zenmusic: deps $(OBJECTS)
+inc: 
+	$(shell ./version.sh "$$(cat version.num)" > version.num)
 
-rel: $(OBJECTSREL)
+
+rel: inc linkrel
+
+dev: inc linkdev
+
+linkrel: $(OBJECTSREL)
 	$(CC) $^ -o bin/zenmusic $(LDFLAGS)
 
-dev: $(OBJECTSDEV)
+linkdev: $(OBJECTSDEV)
 	$(CC) $^ -o bin/zenmusicdev $(LDFLAGS)
 
 $(OBJECTSDEV): $(OBJDIRDEV)/%.o: %.c
 	mkdir -p $(@D)
-	$(CC) -c $< -o $@ $(CFLAGS) -g -DDEBUG -DVERSION=$(shell date "+%y%m%d%H%M")
+	$(CC) -c $< -o $@ $(CFLAGS) -g -DDEBUG -DVERSION=$(VERSION) -DBUILD=$(shell cat version.num)
 
 $(OBJECTSREL): $(OBJDIRREL)/%.o: %.c
 	mkdir -p $(@D)
-	$(CC) -c $< -o $@ $(CFLAGS) -O3 -DVERSION=$(shell date "+%y%m%d%H%M")
+	$(CC) -c $< -o $@ $(CFLAGS) -O3 -DVERSION=$(VERSION) -DBUILD=$(shell cat version.num)
 
 deps:
 	@sudo pkg install ffmpeg sdl2 glew

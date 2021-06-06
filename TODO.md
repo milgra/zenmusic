@@ -2,13 +2,14 @@
 ZEN MUSIC PLAYER AND ORGANIZER
 ******************************
 
-meta/file remove from songlist header, from metadata editor
+meta/file remove from songlist header
 log window nagyobb, kisebb szoveggel, multiline items
 automata tesztek!!
 fix leaks
 
 ideas
 
+set ui scaling from command line
 genre should filter on artists, "none" is needed
 genre is metal, artist is aborym mukodjon
 tags editor legyen metadata editorban
