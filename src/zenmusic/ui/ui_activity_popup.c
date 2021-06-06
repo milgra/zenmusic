@@ -73,10 +73,12 @@ void ui_activity_popup_attach(view_t* baseview)
   ts.margin      = 10.0;
 
   act.style = ts;
-  act.list  = textlist_new(listview, act.logs, ts, ui_activity_popup_select);
+  act.list  = textlist_new(listview, ts, ui_activity_popup_select);
   act.info  = infoview;
 
   act.style.align = TA_CENTER;
+
+  textlist_set_datasource(act.list, act.logs);
 }
 
 #endif

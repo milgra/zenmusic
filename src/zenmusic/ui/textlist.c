@@ -13,8 +13,9 @@ typedef struct _textlist_t
   void (*on_select)(int index);
 } textlist_t;
 
-textlist_t* textlist_new(view_t* view, vec_t* items, textstyle_t textstyle, void (*on_select)(int));
+textlist_t* textlist_new(view_t* view, textstyle_t textstyle, void (*on_select)(int));
 void        textlist_update(textlist_t* tl);
+void        textlist_set_datasource(textlist_t* tl, vec_t* items);
 
 #endif
 
@@ -27,12 +28,11 @@ void        textlist_update(textlist_t* tl);
 void    textlist_del(void* p);
 view_t* textlist_item_for_index(int index, void* data, view_t* listview, int* item_count);
 
-textlist_t* textlist_new(view_t* view, vec_t* items, textstyle_t textstyle, void (*on_select)(int))
+textlist_t* textlist_new(view_t* view, textstyle_t textstyle, void (*on_select)(int))
 {
   textlist_t* tl = mem_calloc(sizeof(textlist_t), "textlist", textlist_del, NULL);
 
   tl->view      = view;
-  tl->items     = items;
   tl->textstyle = textstyle;
   tl->on_select = on_select;
 
@@ -53,6 +53,7 @@ void textlist_update(textlist_t* tl)
 
 void textlist_set_datasource(textlist_t* tl, vec_t* items)
 {
+  tl->items = items;
 }
 
 void on_textitem_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)

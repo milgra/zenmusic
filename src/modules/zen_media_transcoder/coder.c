@@ -593,19 +593,15 @@ void coder_write_metadata(char* libpath, char* path, char* cover_path, map_t* da
             {
               char* field = fields->data[fi];
               char* value = MGET(data, field);
-
-              av_dict_set(&enc_ctx->metadata, field, value, 0);
-
-              printf("added/updated %s to %s\n", field, value);
+              av_dict_set(&enc_ctx->metadata, field + 5, value, 0);
+              printf("added/updated %s to %s\n", field + 5, value);
             }
 
             for (int fi = 0; fi < drop->length; fi++)
             {
               char* field = drop->data[fi];
-
-              av_dict_set(&enc_ctx->metadata, field, NULL, 0);
-
-              printf("removed %s\n", field);
+              av_dict_set(&enc_ctx->metadata, field + 5, NULL, 0);
+              printf("removed %s\n", field + 5);
             }
 
             if (avformat_init_output(enc_ctx, NULL) > 0)

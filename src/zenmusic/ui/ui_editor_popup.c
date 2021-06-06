@@ -87,6 +87,8 @@ se_cell_t* uise_cell_new(char* id, int size, int index)
   return cell;
 }
 
+char* mand_fields[] = {"artist", "album", "title", "date", "track", "disc", "genre", "tags", "comments", "encoder", "publisher", "copyright"};
+
 void ui_editor_popup_attach(view_t* view)
 {
   view_t* head_view  = view_get_subview(view, "song_editor_header");
@@ -407,19 +409,38 @@ void ui_editor_popup_create_items()
   vec_reset(ep.fields);
   vec_reset(ep.items);
 
+  // add mandatory fields and remaining fields
+
   // store song and extract fields
-  map_keys(ep.attributes, ep.fields);
+  vec_t* tmpfields = VNEW(); // REL 0
+  map_t* tmpmap    = MNEW(); // REL 1
 
-  // sort fields
-  vec_sort(ep.fields, VSD_DSC, ui_editor_popup_comp_text);
+  map_keys(ep.attributes, tmpfields);
 
-  ui_editor_popup_remove_str(ep.fields, "meta/artist");
-  ui_editor_popup_remove_str(ep.fields, "meta/album");
-  ui_editor_popup_remove_str(ep.fields, "meta/title");
+  for (int index = 0; index < tmpfields->length; index++)
+  {
+    char* key = tmpfields->data[index];
+    char* val = MGET(ep.attributes, key);
+    MPUT(tmpmap, key, val);
+  }
 
-  vec_ins(ep.fields, cstr_fromcstring("meta/title"), 0);
-  vec_ins(ep.fields, cstr_fromcstring("meta/album"), 0);
-  vec_ins(ep.fields, cstr_fromcstring("meta/artist"), 0);
+  for (int index = 0; index < sizeof(mand_fields) / sizeof(mand_fields[0]); index++)
+  {
+    char* field = cstr_fromformat(100, "meta/%s", mand_fields[index]); // REL 3
+    map_del(tmpmap, field);
+    VADD(ep.fields, field);
+    REL(field); // REL 3
+  }
+
+  vec_reset(tmpfields);
+  map_keys(tmpmap, tmpfields);
+  vec_sort(tmpfields, VSD_DSC, ui_editor_popup_comp_text);
+
+  // add remaining fields in tmpfields
+  vec_addinvector(ep.fields, tmpfields);
+
+  REL(tmpfields); // REL 0
+  REL(tmpmap);    // REL 1
 
   // reset list handler
   vh_list_reset(ep.list_view);
@@ -529,6 +550,8 @@ void ui_editor_popup_on_accept()
   char* libpath = config_get("lib_path");
 
   // update metadata in media files
+
+  // first remove prefix from fields
 
   coder_update_metadata(libpath, selected, ep.changed, ep.removed, ep.cover);
 

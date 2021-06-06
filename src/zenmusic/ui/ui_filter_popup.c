@@ -41,13 +41,15 @@ void ui_filter_popup_attach(view_t* baseview)
   ts.align        = TA_RIGHT;
   ts.margin_right = 20;
 
-  ufp.genrelist  = textlist_new(view_get_subview(baseview, "genrelist"), db_get_genres(), ts, ui_filter_popup_on_genre_select);
+  ufp.genrelist  = textlist_new(view_get_subview(baseview, "genrelist"), ts, ui_filter_popup_on_genre_select);
   ts.align       = TA_LEFT;
-  ufp.artistlist = textlist_new(view_get_subview(baseview, "artistlist"), db_get_artists(), ts, ui_filter_popup_on_artist_select);
+  ufp.artistlist = textlist_new(view_get_subview(baseview, "artistlist"), ts, ui_filter_popup_on_artist_select);
 }
 
 void ui_filter_popup_show()
 {
+  textlist_set_datasource(ufp.genrelist, db_get_genres());
+  textlist_set_datasource(ufp.artistlist, db_get_artists());
   textlist_update(ufp.genrelist);
   textlist_update(ufp.artistlist);
 

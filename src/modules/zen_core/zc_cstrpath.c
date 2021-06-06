@@ -67,6 +67,8 @@ char* cstr_path_filename(char* path)
     if (path[dotindex] == '.') break;
   }
 
+  if (dotindex == -1) dotindex = strlen(path) - 1;
+
   int slashindex;
   for (slashindex = strlen(path) - 1; slashindex > -1; --slashindex)
   {

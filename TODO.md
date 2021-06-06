@@ -2,15 +2,16 @@
 ZEN MUSIC PLAYER AND ORGANIZER
 ******************************
 
-filter shouldn't affect filters popup
-mandatory fields, tags - date legyen default mezo editorban ha nincs akkor is
-meta/file remove from songlist header
+meta/file remove from songlist header, from metadata editor
 log window nagyobb, kisebb szoveggel, multiline items
 automata tesztek!!
 fix leaks
 
 ideas
 
+genre should filter on artists, "none" is needed
+genre is metal, artist is aborym mukodjon
+tags editor legyen metadata editorban
 backspace del jobban animalt legyen
 animalt delete filter delnel
 android auto fullscreen visualizer
