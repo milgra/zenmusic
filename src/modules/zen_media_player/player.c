@@ -111,11 +111,11 @@ void player_set_position(float ratio)
 {
   if (is)
   {
-    printf("ratio %f\n", ratio);
-    printf("duration %f\n", player_duration());
     int newpos = (int)player_duration() * ratio;
     int diff   = (int)player_time() - newpos;
-    printf("newpos %i\n", newpos);
+    /* printf("ratio %f\n", ratio); */
+    /* printf("duration %f\n", player_duration()); */
+    /* printf("newpos %i\n", newpos); */
     stream_seek(is, (int64_t)(newpos * AV_TIME_BASE), (int64_t)(diff * AV_TIME_BASE), 0);
   }
 }

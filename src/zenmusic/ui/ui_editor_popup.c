@@ -198,8 +198,8 @@ void ui_editor_popup_on_button_down(void* userdata, void* data)
 
 void ui_editor_popup_create_table()
 {
-  VADDR(ep.cols, uise_cell_new("key", 120, 0));
-  VADDR(ep.cols, uise_cell_new("value", 360, 1));
+  VADDR(ep.cols, uise_cell_new("key", 140, 0));
+  VADDR(ep.cols, uise_cell_new("value", 380, 1));
   // VADDR(ep.cols, uise_cell_new("delete", 80, 2));
 
   // create header
@@ -525,7 +525,7 @@ void ui_editor_popup_set_songs(vec_t* vec)
 
   map_t* song = vec->data[0];
   char*  path = MGET(song, "file/path");
-  char*  file = cstr_fromformat(100, "%s%s", config_get("lib_path"), path);
+  char*  file = cstr_fromformat(100, "%s/%s", config_get("lib_path"), path);
 
   coder_load_cover_into(file, ep.cover_view->texture.bitmap);
 

@@ -8,6 +8,7 @@ fix leaks
 
 ideas
 
+input fieldek utolso valid erteket mutassak
 log window nagyobb, kisebb szoveggel, multiline items
 set ui scaling from command line
 genre should filter on artists, "none" is needed

@@ -243,8 +243,6 @@ vec_t* db_get_genres()
 
   map_values(db, songs);
 
-  printf("SONG COUNT %i %i\n", db->count, songs->length);
-
   for (ei = 0;
        ei < songs->length;
        ei++)
@@ -260,9 +258,6 @@ vec_t* db_get_genres()
 
   map_values(genres, result);
   vec_sort(result, VSD_ASC, db_comp_text);
-
-  printf("GENRES:\n");
-  mem_describe(songs, 0);
 
   REL(genres);
   REL(songs);
