@@ -8,6 +8,7 @@ fix leaks
 
 ideas
 
+escapere field editalas csukodjon be
 input fieldek utolso valid erteket mutassak
 log window nagyobb, kisebb szoveggel, multiline items
 set ui scaling from command line

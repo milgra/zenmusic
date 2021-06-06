@@ -76,7 +76,7 @@ linkdev: $(OBJECTSDEV)
 
 $(OBJECTSDEV): $(OBJDIRDEV)/%.o: %.c
 	mkdir -p $(@D)
-	$(CC) -c $< -o $@ $(CFLAGS) -g -DDEBUG -DVERSION=$(VERSION) -DBUILD=$(shell cat version.num)
+	$(CC) -c $< -o $@ $(CFLAGS) -g -DDEBUG -DVERSION=0 -DBUILD=0
 
 $(OBJECTSREL): $(OBJDIRREL)/%.o: %.c
 	mkdir -p $(@D)

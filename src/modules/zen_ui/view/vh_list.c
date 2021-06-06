@@ -534,18 +534,10 @@ void vh_list_set_header(view_t* view, view_t* headerview)
   RET(headerview);
   vh->header = headerview;
 
-  // add as subview
-  view_add(view, headerview);
+  // add as subview before scrollers
+  view_insert(view, headerview, 0);
 
   vh->head_pos = headerview->frame.local.h;
-
-  if (vh->vscr)
-  {
-    r2_t frame = vh->vscr->frame.local;
-    frame.y    = vh->head_pos;
-    frame.h    = frame.h - vh->head_pos;
-    view_set_frame(vh->vscr, frame);
-  }
 }
 
 #endif
