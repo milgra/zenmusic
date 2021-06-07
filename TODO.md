@@ -2,10 +2,10 @@
 ZEN MUSIC PLAYER AND ORGANIZER
 ******************************
 
-scroll knob meghulyult
 screenshot on printscreen during session record
 automata tesztek!!
 fix leaks
+scroll knob meghulyult
 full screenkor nem erzekel jobbra, maximize button rossz fullscreen
 
 ideas
