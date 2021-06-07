@@ -30,6 +30,7 @@ songlist
  - song list should be scrollable
  - song list should show valid values
  - columns should be resizable/rearrangable
+ - scrollable rectangle should be under table header, over bottom scroller and visualizer, left to right scroller
 
 play controls
 

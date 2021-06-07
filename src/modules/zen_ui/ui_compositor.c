@@ -389,17 +389,17 @@ void ui_compositor_render(uint32_t time, int width, int height, int tex_w, int t
       gl_draw_vertexes_in_framebuffer(TEX_CTX, last * 6, index * 6, reg_full, reg_full, SH_TEXTURE, 0, tex_w, tex_h);
   }
 
-  if (time > uic.upd_stamp)
-  {
-    printf("UI TX %.2f Mb/s VX %.2f Mb/s FPS %.2f\n",
-           uic.tex_bytes / UI_STAT_DELAY / (1024.0 * 1024.0),
-           uic.ver_bytes / UI_STAT_DELAY / (1024.0 * 1024.0),
-           uic.ren_frame / UI_STAT_DELAY);
-    uic.upd_stamp = time + UI_STAT_DELAY * 1000.0;
-    uic.tex_bytes = 0;
-    uic.ver_bytes = 0;
-    uic.ren_frame = 0;
-  }
+  /* if (time > uic.upd_stamp) */
+  /* { */
+  /*   printf("UI TX %.2f Mb/s VX %.2f Mb/s FPS %.2f\n", */
+  /*          uic.tex_bytes / UI_STAT_DELAY / (1024.0 * 1024.0), */
+  /*          uic.ver_bytes / UI_STAT_DELAY / (1024.0 * 1024.0), */
+  /*          uic.ren_frame / UI_STAT_DELAY); */
+  /*   uic.upd_stamp = time + UI_STAT_DELAY * 1000.0; */
+  /*   uic.tex_bytes = 0; */
+  /*   uic.ver_bytes = 0; */
+  /*   uic.ren_frame = 0; */
+  /* } */
 }
 
 /* void ui_compositor_render() */

@@ -20,6 +20,8 @@ map_t*   db_get_db();
 uint32_t db_count();
 void     db_reset();
 
+void db_update_metadata(char* path, map_t* changed, vec_t* removed);
+
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
@@ -292,6 +294,36 @@ vec_t* db_get_artists()
   REL(songs);
 
   return result;
+}
+
+void db_update_metadata(char* path, map_t* changed, vec_t* removed)
+{
+
+  map_t* song = MGET(db, path);
+  vec_t* keys = VNEW();
+  map_keys(changed, keys);
+
+  printf("before db update\n");
+  mem_describe(song, 0);
+
+  // update changed
+
+  for (int index = 0; index < keys->length; index++)
+  {
+    char* key = keys->data[index];
+    MPUT(song, key, MGET(changed, key));
+  }
+
+  // remove removed
+
+  for (int index = 0; index < removed->length; index++)
+  {
+    char* field = keys->data[index];
+    MDEL(song, field);
+  }
+
+  printf("after db update\n");
+  mem_describe(song, 0);
 }
 
 #endif

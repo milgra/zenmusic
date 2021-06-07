@@ -2,12 +2,19 @@
 ZEN MUSIC PLAYER AND ORGANIZER
 ******************************
 
+scroll knob meghulyult
 screenshot on printscreen during session record
 automata tesztek!!
 fix leaks
+full screenkor nem erzekel jobbra, maximize button rossz fullscreen
 
 ideas
 
+UI fps settingsbe
+szoveg tul font van vertikalisan soron belul
+freebsd logo nincs kozepen
+dragger a column field resizehoz
+select range should work
 escapere field editalas csukodjon be
 input fieldek utolso valid erteket mutassak
 log window nagyobb, kisebb szoveggel, multiline items

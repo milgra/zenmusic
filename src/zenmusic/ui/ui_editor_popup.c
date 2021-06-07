@@ -13,6 +13,7 @@ void ui_editor_popup_show();
 
 #include "coder.c"
 #include "config.c"
+#include "database.c"
 #include "text.c"
 #include "tg_css.c"
 #include "tg_text.c"
@@ -537,54 +538,38 @@ void ui_editor_popup_on_accept()
 {
   ui_popup_switcher_toggle("song_editor_popup_page");
 
-  vec_t* selected = VNEW();
-  ui_songlist_get_selected(selected);
+  vec_t* songs = VNEW(); // REL 0
+  ui_songlist_get_selected(songs);
 
-  printf("SELECTED\n");
-  mem_describe(selected, 0);
-  printf("CHANGED\n");
-  mem_describe(ep.changed, 0);
-  printf("REMOVED\n");
-  mem_describe(ep.removed, 0);
+  /* printf("SELECTED\n"); */
+  /* mem_describe(selected, 0); */
+  /* printf("CHANGED\n"); */
+  /* mem_describe(ep.changed, 0); */
+  /* printf("REMOVED\n"); */
+  /* mem_describe(ep.removed, 0); */
 
   char* libpath = config_get("lib_path");
 
   // update metadata in media files
 
-  // first remove prefix from fields
+  for (int index = 0; index < songs->length; index++)
+  {
+    map_t* song = songs->data[index];
+    char*  path = MGET(song, "file/path");
 
-  coder_update_metadata(libpath, selected, ep.changed, ep.removed, ep.cover);
+    int result = coder_write_metadata(libpath, path, ep.cover, ep.changed, ep.removed);
+    if (result >= 0)
+    {
+      // modify song in db also if metadata is successfully written into file
+      db_update_metadata(path, ep.changed, ep.removed);
+    }
+  }
 
-  REL(selected);
+  db_write(libpath);
 
-  // update metadata in database
+  REL(songs);
 
-  // organize library ( if path has to change )
-
-  /* map_t* old_data = ui_editor_popup_get_old_data(); */
-  /* map_t* new_data = ui_editor_popup_get_new_data(); */
-
-  /* // update modified entity in database */
-  /* vec_t* keys = VNEW(); */
-  /* map_keys(new_data, keys); */
-  /* for (int index = 0; index < keys->length; index++) */
-  /* { */
-  /*   char* key    = keys->data[index]; */
-  /*   char* oldval = MGET(old_data, key); */
-  /*   char* newval = MGET(new_data, key); */
-
-  /*   if (strcmp(oldval, newval) != 0) */
-  /*   { */
-  /*     printf("%s changed from %s to %s, writing to db\n", key, oldval, newval); */
-  /*     MPUT(old_data, key, newval); */
-  /*   } */
-  /* } */
-
-  /* // notify main namespace to organize and save metadata and database */
-  /* callbacks_call("on_save_entry", old_data); */
-
-  /* // reload song list */
-  /* ui_songlist_refresh(); */
+  ui_songlist_refresh();
 }
 
 #endif

@@ -138,7 +138,7 @@ int analyzer_thread(void* chptr)
       time_t now;
       time(&now);
       struct tm ts = *localtime(&now);
-      strftime(time_str, 80, "%Y-%m-%d %H:%M:%S", &ts);
+      strftime(time_str, 80, "%Y-%m-%d %H:%M", &ts);
 
       // add file data
 

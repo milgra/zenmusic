@@ -9,7 +9,7 @@ bm_t* coder_load_image(const char* path);
 void  coder_load_image_into(const char* path, bm_t* bitmap);
 void  coder_load_cover_into(const char* path, bm_t* bitmap);
 int   coder_load_metadata_into(const char* path, map_t* map);
-void  coder_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop, char* cover);
+int   coder_write_metadata(char* libpath, char* path, char* cover_path, map_t* data, vec_t* drop);
 
 #endif
 
@@ -24,8 +24,6 @@ void  coder_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* dro
 #include "zc_log.c"
 #include "zc_memory.c"
 #include <limits.h>
-
-void coder_write_metadata(char* libpath, char* path, char* cover_path, map_t* data, vec_t* drop);
 
 bm_t* coder_load_image(const char* path)
 {
@@ -398,37 +396,18 @@ int coder_load_metadata_into(const char* path, map_t* map)
   return retv;
 }
 
-void coder_update_metadata(char* libpath, vec_t* songs, map_t* data, vec_t* drop, char* cover)
-{
-  /* printf("coder update metadata for songs:\n"); */
-  /* mem_describe(songs, 0); */
-  /* printf("\ndata:\n"); */
-  /* mem_describe(data, 0); */
-  /* printf("\ndrop:\n"); */
-  /* mem_describe(drop, 0); */
-  /* printf("\ncover %s\n", cover); */
-
-  for (int index = 0; index < songs->length; index++)
-  {
-    printf("UPDATE SONGS %i INDEX %i\n", songs->length, index);
-
-    map_t* song = songs->data[index];
-    char*  path = MGET(song, "file/path");
-
-    coder_write_metadata(libpath, path, "/home/milgra/Projects/zenmusic/svg/freebsd.png", data, drop);
-  }
-}
-
-void coder_write_metadata(char* libpath, char* path, char* cover_path, map_t* data, vec_t* drop)
+int coder_write_metadata(char* libpath, char* path, char* cover_path, map_t* data, vec_t* drop)
 {
   LOG("coder_write_metadata for %s cover %s\n", path, cover_path);
+
+  int success = 0; // indicate that everything went well after closing the avio channel
 
   char* ext  = cstr_path_extension(path); // REL 0
   char* name = cstr_path_filename(path);  // REL 1
 
-  char* old_name = cstr_fromformat(PATH_MAX + NAME_MAX, "%s.%s", name, ext);        // REL 2
-  char* old_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", libpath, path);     // REL 3
-  char* new_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s.tmp", libpath, path); // REL 4
+  char* old_name = cstr_fromformat(PATH_MAX + NAME_MAX, "%s.%s", name, ext);         // REL 2
+  char* old_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", libpath, path);     // REL 3
+  char* new_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s.tmp", libpath, path); // REL 4
 
   printf("old_path %s\n", old_path);
   printf("new_path %s\n", new_path);
@@ -462,8 +441,6 @@ void coder_write_metadata(char* libpath, char* path, char* cover_path, map_t* da
           if (avio_open(&enc_ctx->pb, new_path, AVIO_FLAG_WRITE) >= 0) // CLOSE 0
           {
             printf("Output file created.\n");
-
-            int success = 0; // indicate that everything went well after closing the avio channel
 
             //
             // create all streams in the encoder context that are present in the decoder context
@@ -739,6 +716,11 @@ void coder_write_metadata(char* libpath, char* path, char* cover_path, map_t* da
   REL(old_name); // REL 2
   REL(old_path); // REL 3
   REL(new_path); // REL 4
+
+  if (success)
+    return 0;
+  else
+    return -1;
 }
 
 #endif

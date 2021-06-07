@@ -89,25 +89,25 @@ void ui_songlist_attach(view_t* base)
 
   // create columns
 
-  VADDR(sl.columns, sl_cell_new("ind", 50, 0));
-  VADDR(sl.columns, sl_cell_new("artist", 300, 1));
+  VADDR(sl.columns, sl_cell_new("ind", 60, 0));
+  VADDR(sl.columns, sl_cell_new("artist", 200, 1));
   VADDR(sl.columns, sl_cell_new("album", 200, 2));
-  VADDR(sl.columns, sl_cell_new("title", 300, 3));
-  VADDR(sl.columns, sl_cell_new("date", 150, 4));
+  VADDR(sl.columns, sl_cell_new("title", 350, 3));
+  VADDR(sl.columns, sl_cell_new("date", 70, 4));
   VADDR(sl.columns, sl_cell_new("genre", 150, 5));
-  VADDR(sl.columns, sl_cell_new("track", 150, 6));
-  VADDR(sl.columns, sl_cell_new("disc", 150, 7));
-  VADDR(sl.columns, sl_cell_new("duration", 100, 8));
-  VADDR(sl.columns, sl_cell_new("channels", 100, 9));
+  VADDR(sl.columns, sl_cell_new("track", 60, 6));
+  VADDR(sl.columns, sl_cell_new("disc", 60, 7));
+  VADDR(sl.columns, sl_cell_new("time", 50, 8));
+  VADDR(sl.columns, sl_cell_new("ch", 30, 9));
   VADDR(sl.columns, sl_cell_new("bit rate", 100, 10));
-  VADDR(sl.columns, sl_cell_new("sample rate", 100, 11));
-  VADDR(sl.columns, sl_cell_new("play count", 150, 12));
-  VADDR(sl.columns, sl_cell_new("skip count", 150, 13));
+  VADDR(sl.columns, sl_cell_new("sample", 80, 11));
+  VADDR(sl.columns, sl_cell_new("plays", 55, 12));
+  VADDR(sl.columns, sl_cell_new("skips", 55, 13));
   VADDR(sl.columns, sl_cell_new("added", 150, 14));
-  VADDR(sl.columns, sl_cell_new("last played", 150, 15));
-  VADDR(sl.columns, sl_cell_new("last skipped", 150, 16));
-  VADDR(sl.columns, sl_cell_new("media type", 150, 17));
-  VADDR(sl.columns, sl_cell_new("container", 150, 18));
+  VADDR(sl.columns, sl_cell_new("last played", 155, 15));
+  VADDR(sl.columns, sl_cell_new("last skipped", 155, 16));
+  VADDR(sl.columns, sl_cell_new("type", 80, 17));
+  VADDR(sl.columns, sl_cell_new("ext", 80, 18));
 
   VADDR(sl.fields, cstr_fromcstring("index"));
   VADDR(sl.fields, cstr_fromcstring("meta/artist"));
