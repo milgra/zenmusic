@@ -66,7 +66,7 @@ inc:
 
 rel: inc linkrel
 
-dev: inc linkdev
+dev: linkdev
 
 linkrel: $(OBJECTSREL)
 	$(CC) $^ -o bin/zenmusic $(LDFLAGS)

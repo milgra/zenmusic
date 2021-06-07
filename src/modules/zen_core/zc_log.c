@@ -12,7 +12,7 @@ void log_set_proxy(void (*proxy)(char*));
 
 #include "zc_vector.c"
 
-#define LOG_SIZE 150
+#define LOG_SIZE 400
 
 struct _zc_log_t
 {
