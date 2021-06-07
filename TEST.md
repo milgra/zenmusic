@@ -3,10 +3,13 @@
 ---
 
 How to record a session :
-bin/zenmusicdev -c /home/milgra/Downloads/ZMTestConfig -s testrecord.rec  
+bin/zenmusicdev -c /home/milgra/Downloads/ZMTestConfig -s ../tst testrecord.rec  
 
 How to play a session :
-bin/zenmusicdev -c /home/milgra/Downloads/ZMTestConfig -p testrecord.rec  
+bin/zenmusicdev -c /home/milgra/Downloads/ZMTestConfig -p ../tst   
+
+How to check for memory leaks :
+valgrind --leak-check=full --show-leak-kinds=all --suppressions=valgrind.supp bin/zenmusicdev
 
 ---
 

@@ -61,13 +61,9 @@ static int lib_file_data_step(const char* fpath, const struct stat* sb, int tfla
 
   if (tflag == FTW_F)
   {
-    // TODO use macro for database name
-    if (strstr(fpath, "zenmusic") == NULL)
-    {
-      char* size = cstr_fromformat(20, "%li", sb->st_size);
-      MPUT(lib.files, fpath + strlen(lib.path) + 1, size); // use relative path as path
-      REL(size);
-    }
+    char* size = cstr_fromformat(20, "%li", sb->st_size);
+    MPUT(lib.files, fpath + strlen(lib.path) + 1, size); // use relative path as path
+    REL(size);
   }
 
   return 0; /* To tell nftw() to continue */

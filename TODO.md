@@ -3,6 +3,7 @@ ZEN MUSIC PLAYER AND ORGANIZER
 ******************************
 
 screenshot on printscreen during session record
+settings, log lista elemek tordeljek a szoveget dinamikusan
 automata tesztek!!
 fix leaks
 scroll knob meghulyult

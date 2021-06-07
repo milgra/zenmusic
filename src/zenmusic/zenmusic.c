@@ -76,10 +76,10 @@ int main(int argc, char* argv[])
   while ((option = getopt_long(argc, argv, "c:l:r:s:p:", long_options, &option_index)) != -1)
   {
     if (option != '?') printf("parsing option %c value: %s\n", option, optarg);
-    if (option == 'c') zm.cfg_par = cstr_fromcstring(optarg);
-    if (option == 'r') zm.res_par = cstr_fromcstring(optarg);
-    if (option == 's') zm.rec_par = cstr_fromcstring(optarg);
-    if (option == 'p') zm.rep_par = cstr_fromcstring(optarg);
+    if (option == 'c') zm.cfg_par = cstr_fromcstring(optarg); // REL 0
+    if (option == 'r') zm.res_par = cstr_fromcstring(optarg); // REL 1
+    if (option == 's') zm.rec_par = cstr_fromcstring(optarg); // REL 2
+    if (option == 'p') zm.rep_par = cstr_fromcstring(optarg); // REL 3
     if (option == '?')
     {
       printf("zenmusic v210505 by Milan Toth\nCommand line options:\n");
@@ -118,36 +118,28 @@ void init(int width, int height, char* path)
 
   // init paths
 
+  char* wrk_path = cstr_path_normalize(path, NULL); // REL 0
+
 #ifndef DEBUG
-  char* res_path = zm.res_par ? zm.res_par : cstr_fromcstring("/usr/local/share/zenmusic");
+  char* res_path = zm.res_par ? cstr_path_normalize(zm.res_par, wrk_path) : cstr_fromcstring("/usr/local/share/zenmusic"); // REL 1
 #else
-  char* res_path = zm.res_par ? zm.res_par : cstr_fromformat(PATH_MAX + NAME_MAX, "%s../res", path);
+  char* res_path = zm.res_par ? cstr_path_normalize(zm.res_par, wrk_path) : cstr_path_normalize("../res", wrk_path); // REL 1
 #endif
-  char* cfg_path = zm.cfg_par ? zm.cfg_par : cstr_fromformat(PATH_MAX + NAME_MAX, "%s/.config/zenmusic", getenv("HOME"));
 
-  char* css_path  = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/main.css", res_path);
-  char* html_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/main.html", res_path);
-  char* font_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/Baloo.ttf", res_path);
-
-  // if cfg path is relative extend it to absolute
-
-  if (cfg_path[0] != '/')
-  {
-    char* fin_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", path, cfg_path);
-    REL(cfg_path);
-    cfg_path = fin_path;
-  }
+  char* cfgdir_path = zm.cfg_par ? cstr_path_normalize(zm.cfg_par, wrk_path) : cstr_path_normalize("~/.config/zenmusic", getenv("HOME")); // REL 2
+  char* css_path    = cstr_path_append(res_path, "main.css");                                                                             // REL 3
+  char* html_path   = cstr_path_append(res_path, "main.html");                                                                            // REL 4
+  char* font_path   = cstr_path_append(res_path, "Baloo.ttf");                                                                            // REL 5
+  char* cfg_path    = cstr_path_append(cfgdir_path, "config.kvl");                                                                        // REL 6
 
   // print path info to console
 
-  printf("base path     : %s\n", path);
+  printf("working path     : %s\n", wrk_path);
   printf("config path   : %s\n", cfg_path);
   printf("resource path : %s\n", res_path);
   printf("css path      : %s\n", css_path);
   printf("html path     : %s\n", html_path);
   printf("font path     : %s\n", font_path);
-
-  char* fin_cfg_path = cstr_add_path_component(cfg_path, "config.kvl");
 
   // init config
 
@@ -159,11 +151,12 @@ void init(int width, int height, char* path)
 
   // read config, it overwrites defaults if exists
 
-  config_read(fin_cfg_path);
+  config_read(cfg_path);
 
   // init non-configurable defaults
 
-  config_set("cfg_path", fin_cfg_path);
+  config_set("wrk_path", wrk_path);
+  config_set("cfg_path", cfg_path);
   config_set("css_path", css_path);
   config_set("html_path", html_path);
   config_set("font_path", font_path);
@@ -385,11 +378,9 @@ void on_change_library(void* userdata, void* data)
 
   // construct path if needed
 
-  lib_path = cstr_path_extend_tilde(new_path);
+  lib_path = cstr_path_normalize(new_path, config_get("wrk_path"));
 
-  // remove slash if needed
-
-  if (lib_path[strlen(lib_path) - 1] == '/') lib_path[strlen(lib_path) - 1] = '\0';
+  printf("new path %s lib path %s\n", new_path, lib_path);
 
   // change library if exists
 

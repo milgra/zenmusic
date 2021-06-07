@@ -46,7 +46,7 @@ void db_read(char* libpath)
 {
   assert(libpath != NULL);
 
-  char* dbpath = cstr_fromformat(PATH_MAX + NAME_MAX, "/%s/zenmusic.kvl", libpath); // REL 0
+  char* dbpath = cstr_path_append(libpath, "zenmusic.kvl"); // REL 0
 
   LOG("db : reading db %s", dbpath);
 

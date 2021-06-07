@@ -30,6 +30,7 @@ void ui_editor_popup_show();
 #include "vh_textinput.c"
 #include "zc_callback.c"
 #include "zc_cstring.c"
+#include "zc_cstrpath.c"
 #include "zc_vector.c"
 #include <string.h>
 
@@ -526,7 +527,7 @@ void ui_editor_popup_set_songs(vec_t* vec)
 
   map_t* song = vec->data[0];
   char*  path = MGET(song, "file/path");
-  char*  file = cstr_fromformat(100, "%s/%s", config_get("lib_path"), path);
+  char*  file = cstr_path_append(config_get("lib_path"), path);
 
   coder_load_cover_into(file, ep.cover_view->texture.bitmap);
 
