@@ -38,6 +38,7 @@ void gl_del_texture(uint32_t i);
 void gl_new_texture(uint32_t i, int width, int height);
 void gl_upload_vertexes(fb_t* fb);
 void gl_upload_to_texture(int page, int x, int y, int w, int h, void* data);
+void gl_save_framebuffer(bm_t* bm);
 void gl_clear_framebuffer(int page, float r, float g, float b, float a);
 void gl_draw_vertexes_in_framebuffer(int page, int start, int end, glrect_t source_region, glrect_t target_region, gl_sha_typ_t shader, int domask, int tex_w, int tex_h);
 void gl_draw_framebuffer_in_framebuffer(int src_ind, int tgt_ind, glrect_t source_region, glrect_t target_region, glrect_t window, gl_sha_typ_t shader);
@@ -366,6 +367,11 @@ void gl_upload_to_texture(int page, int x, int y, int w, int h, void* data)
   gltex_t texture = gl.textures[page];
   glActiveTexture(GL_TEXTURE0 + texture.index);
   glTexSubImage2D(GL_TEXTURE_2D, 0, x, y, w, h, GL_RGBA, GL_UNSIGNED_BYTE, data);
+}
+
+void gl_save_framebuffer(bm_t* bm)
+{
+  glReadPixels(0, 0, bm->w, bm->h, GL_RGBA, GL_UNSIGNED_BYTE, bm->data);
 }
 
 void gl_clear_framebuffer(int page, float r, float g, float b, float a)

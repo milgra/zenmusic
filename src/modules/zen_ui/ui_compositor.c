@@ -39,6 +39,7 @@ void ui_compositor_upd_alpha(int index, float alpha);
 void ui_compositor_upd_region(int index, r2_t frame, r2_t region);
 
 void ui_compositor_render(uint32_t time, int width, int height, int wpwr, int hpwr);
+void ui_compositor_render_to_bmp(bm_t* bitmap);
 
 #endif
 
@@ -400,6 +401,12 @@ void ui_compositor_render(uint32_t time, int width, int height, int tex_w, int t
   /*   uic.ver_bytes = 0; */
   /*   uic.ren_frame = 0; */
   /* } */
+}
+
+void ui_compositor_render_to_bmp(bm_t* bm)
+{
+  // proxy render_to_bmp to current backend which is opengl right now
+  gl_save_framebuffer(bm);
 }
 
 /* void ui_compositor_render() */

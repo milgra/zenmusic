@@ -10,12 +10,14 @@ void  coder_load_image_into(const char* path, bm_t* bitmap);
 void  coder_load_cover_into(const char* path, bm_t* bitmap);
 int   coder_load_metadata_into(const char* path, map_t* map);
 int   coder_write_metadata(char* libpath, char* path, char* cover_path, map_t* data, vec_t* drop);
+int   coder_write_png(char* path, bm_t* bm);
 
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
 #include "libavformat/avformat.h"
+#include "libavutil/avutil.h"
 #include "libavutil/imgutils.h"
 #include "libswscale/swscale.h"
 #include "zc_cstring.c"
@@ -721,6 +723,75 @@ int coder_write_metadata(char* libpath, char* path, char* cover_path, map_t* dat
     return 0;
   else
     return -1;
+}
+
+int coder_write_png(char* path, bm_t* bm)
+{
+  printf("WRITE\n");
+  int ret;
+
+  AVCodec* codec = avcodec_find_encoder(AV_CODEC_ID_PNG);
+  if (!codec)
+  {
+    printf("Codec not found\n");
+    exit(1);
+  }
+
+  AVCodecContext* enc_ctx = avcodec_alloc_context3(codec);
+  if (!enc_ctx)
+  {
+    printf("Could not allocate video codec context\n");
+    exit(1);
+  }
+
+  enc_ctx->width     = bm->w;
+  enc_ctx->height    = bm->h;
+  enc_ctx->time_base = (AVRational){1, 25};
+  enc_ctx->pix_fmt   = AV_PIX_FMT_RGBA;
+
+  if (avcodec_open2(enc_ctx, codec, NULL) < 0)
+  {
+    printf("Could not open codec\n");
+    exit(1);
+  }
+
+  AVFrame* frame_in = av_frame_alloc();
+  frame_in->format  = AV_PIX_FMT_RGBA;
+  frame_in->width   = bm->w;
+  frame_in->height  = bm->h;
+
+  av_image_fill_arrays(frame_in->data, frame_in->linesize, bm->data, AV_PIX_FMT_RGBA, bm->w, bm->h, 1);
+
+  AVPacket pkt = {.data = NULL, .size = 0};
+  av_init_packet(&pkt);
+
+  ret = avcodec_send_frame(enc_ctx, frame_in);
+  if (ret < 0)
+  {
+    fprintf(stderr, "Error sending a frame for encoding\n");
+    exit(1);
+  }
+
+  while (ret >= 0)
+  {
+    ret = avcodec_receive_packet(enc_ctx, &pkt);
+    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
+      return -1;
+    else if (ret < 0)
+    {
+      fprintf(stderr, "Error during encoding\n");
+      exit(1);
+    }
+
+    printf("Write packet %3" PRId64 " (size=%5d)\n", pkt.pts, pkt.size);
+    FILE* file = fopen(path, "wb");
+    fwrite(pkt.data, 1, pkt.size, file);
+    fclose(file);
+    av_packet_unref(&pkt);
+  }
+
+  avcodec_close(enc_ctx);
+  return 0;
 }
 
 #endif

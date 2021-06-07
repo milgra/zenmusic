@@ -9,6 +9,7 @@
 #include "remote.c"
 #include "tg_css.c"
 #include "ui.c"
+#include "ui_compositor.c"
 #include "ui_filter_bar.c"
 #include "ui_lib_init_popup.c"
 #include "ui_manager.c"
@@ -279,16 +280,18 @@ void update(ev_t ev)
   }
   else if (zm.rec_par)
   {
+    // record all events except time
     evrec_record(ev);
   }
 
   if (!zm.rep_par)
   {
+    // normal event flow when not replaying
     ui_manager_event(ev);
   }
   else
   {
-    // filter out all events except time
+    // replay mode, filter out all events except time
     if (ev.type == EV_TIME)
     {
       // get recorded events
@@ -302,6 +305,21 @@ void update(ev_t ev)
       ui_manager_event(ev);
     }
   }
+
+  /* if (zm.rep_par || zm.rec_par) */
+  /* { */
+  if (ev.type == EV_KDOWN && ev.keycode == SDLK_PRINTSCREEN)
+  {
+    // save screenshot on printscreen when recording or replaying
+    view_t* root   = ui_manager_get_root();
+    r2_t    rf     = root->frame.local;
+    bm_t*   screen = bm_new(rf.w, rf.h); // REL 0
+    ui_compositor_render_to_bmp(screen);
+    char* path = cstr_path_append(config_get("lib_path"), "screenshot.png"); // REL 1
+    coder_write_png(path, screen);
+    REL(screen);
+  }
+  /* } */
 }
 
 // render, called once per frame

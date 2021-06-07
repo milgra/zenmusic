@@ -10,12 +10,13 @@
 #include "view.c"
 #include "wm_event.c"
 
-void ui_manager_init(int width, int height);
-void ui_manager_event(ev_t event);
-void ui_manager_add(view_t* view);
-void ui_manager_remove(view_t* view);
-void ui_manager_render(uint32_t time);
-void ui_manager_activate(view_t* view);
+void    ui_manager_init(int width, int height);
+void    ui_manager_event(ev_t event);
+void    ui_manager_add(view_t* view);
+void    ui_manager_remove(view_t* view);
+void    ui_manager_render(uint32_t time);
+void    ui_manager_activate(view_t* view);
+view_t* ui_manager_get_root();
 
 #endif
 
@@ -194,6 +195,11 @@ void ui_manager_render(uint32_t time)
     resend = 0;
   }
   ui_generator_render(time);
+}
+
+view_t* ui_manager_get_root()
+{
+  return uim.root;
 }
 
 #endif
