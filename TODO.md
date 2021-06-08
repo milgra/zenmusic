@@ -2,15 +2,15 @@
 ZEN MUSIC PLAYER AND ORGANIZER
 ******************************
 
-png kinyirja inditast
-settings, log lista elemek tordeljek a szoveget dinamikusan
 automata tesztek!!
 fix leaks
-scroll knob meghulyult
-full screenkor nem erzekel jobbra, maximize button rossz fullscreen
 
 ideas
 
+scroll knob meghulyult
+full screenkor nem erzekel jobbra, maximize button rossz fullscreen
+resize last cell
+autosize settings cells
 scroller event normalization to avoid lag
 UI fps settingsbe
 szoveg tul font van vertikalisan soron belul

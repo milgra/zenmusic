@@ -77,7 +77,7 @@ void ui_settings_popup_attach(view_t* baseview)
   // create columns
 
   VADDR(uisp.columns, uisp_cell_new("key", 200, 0));
-  VADDR(uisp.columns, uisp_cell_new("value", 460, 1));
+  VADDR(uisp.columns, uisp_cell_new("value", 800, 1));
 
   // add header handler
 
@@ -289,7 +289,7 @@ view_t* ui_settings_popup_create_item()
   char       idbuffer[100] = {0};
   snprintf(idbuffer, 100, "uispist_item%i", item_cnt++);
 
-  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 640, 50});
+  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 1000, 50});
 
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, ui_settings_popup_on_item_select);

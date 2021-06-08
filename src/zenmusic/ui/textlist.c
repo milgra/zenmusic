@@ -100,8 +100,30 @@ view_t* textlist_item_for_index(int index, void* data, view_t* listview, int* it
 
   tl->textstyle.backcolor = color;
 
+  int    h;
+  str_t* str = str_new(); // REL 0
+  str_addbytearray(str, tl->items->data[index]);
+  text_measure(str, tl->textstyle, item->frame.local.w, &h);
+  REL(str);
+
+  if (h < 35) h = 35;
+
+  printf("ITEM %i %s\n", h, tl->items->data[index]);
+
+  view_t* cell = vh_litem_get_cell(item, "cell");
+
+  r2_t frame = item->frame.local;
+  frame.h    = h;
+
+  view_set_frame(item, frame);
+
+  frame   = cell->frame.local;
+  frame.h = h;
+
+  view_set_frame(cell, frame);
+
   vh_litem_upd_index(item, index);
-  tg_text_set(vh_litem_get_cell(item, "cell"), tl->items->data[index], tl->textstyle);
+  tg_text_set(cell, tl->items->data[index], tl->textstyle);
 
   return item;
 }

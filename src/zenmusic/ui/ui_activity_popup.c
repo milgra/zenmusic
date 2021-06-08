@@ -66,11 +66,12 @@ void ui_activity_popup_attach(view_t* baseview)
 
   textstyle_t ts = {0};
   ts.font        = config_get("font_path");
-  ts.size        = 25.0;
+  ts.size        = 30.0;
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0x0;
   ts.align       = TA_LEFT;
   ts.margin      = 10.0;
+  ts.multiline   = 1;
 
   act.style = ts;
   act.list  = textlist_new(listview, ts, ui_activity_popup_select);
