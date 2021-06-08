@@ -18,6 +18,7 @@ struct _bm_t
 bm_t* bm_new(int the_w, int the_h);
 bm_t* bm_clone(bm_t* bm);
 void  bm_reset(bm_t* bm);
+bm_t* bm_flip_y(bm_t* bm);
 void  bm_describe(void* p, int level);
 
 #endif
@@ -58,6 +59,17 @@ bm_t* bm_clone(bm_t* the_bm)
 void bm_reset(bm_t* bm)
 {
   memset(bm->data, 0, bm->size);
+}
+
+bm_t* bm_flip_y(bm_t* bm)
+{
+  bm_t* tmp = bm_new(bm->w, bm->h);
+  for (int y = 0; y < bm->h; y++)
+  {
+    int src_y = bm->h - y - 1;
+    memcpy(tmp->data + y * bm->w * 4, bm->data + src_y * bm->w * 4, bm->w * 4);
+  }
+  return tmp;
 }
 
 void bm_describe(void* p, int level)

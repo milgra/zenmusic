@@ -437,11 +437,17 @@ void save_screenshot()
   view_t*    root   = ui_manager_get_root();
   r2_t       frame  = root->frame.local;
   bm_t*      screen = bm_new(frame.w, frame.h); // REL 0
+
   ui_compositor_render_to_bmp(screen);
-  char* name = cstr_fromformat(20, "screenshot%.3i.png", cnt++); // REL 1
-  char* path = cstr_path_append(config_get("lib_path"), name);   // REL 2
-  coder_write_png(path, screen);
-  REL(screen); // REL 0
-  REL(name);   // REL 1
-  REL(path);   // REL 2
+
+  char* name    = cstr_fromformat(20, "screenshot%.3i.png", cnt++); // REL 2
+  char* path    = cstr_path_append(config_get("lib_path"), name);   // REL 3
+  bm_t* flipped = bm_flip_y(screen);                                // REL 1
+
+  coder_write_png(path, flipped);
+
+  REL(screen);  // REL 0
+  REL(flipped); // REL 1
+  REL(name);    // REL 2
+  REL(path);    // REL 3
 }
