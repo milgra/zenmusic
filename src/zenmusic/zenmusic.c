@@ -181,13 +181,17 @@ void init(int width, int height, char* path)
   else
     load_library();
 
+  if (zm.rec_par) printf("***RECORDING SESSION***\n");
+
   // init cursor if replay
 
   if (zm.rep_par)
   {
+    printf("***REPLAYING SESSION***\n");
     zm.rep_cur                          = view_new("rep_cur", ((r2_t){10, 10, 10, 10}));
     zm.rep_cur->exclude                 = 0;
     zm.rep_cur->layout.background_color = 0xFF0000FF;
+    zm.rep_cur->needs_touch             = 0;
     tg_css_add(zm.rep_cur);
     ui_manager_add(zm.rep_cur);
   }
