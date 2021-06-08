@@ -299,7 +299,7 @@ int coder_load_metadata_into(const char* path, map_t* map)
     if (pFormatCtx)
     {
       AVOutputFormat* format = av_guess_format(NULL, path, NULL);
-      if (format)
+      if (format && format->mime_type)
       {
         char* slash = strstr(format->mime_type, "/");
 

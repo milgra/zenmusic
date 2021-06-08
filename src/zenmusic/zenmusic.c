@@ -221,8 +221,11 @@ void update(ev_t ev)
   }
   else
   {
-    // record all events besides time
-    evrec_record(ev);
+    if (zm.rec_par)
+    {
+      // record all events besides time
+      evrec_record(ev);
+    }
   }
 
   // in case of replay only send time events
