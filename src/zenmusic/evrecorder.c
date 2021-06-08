@@ -26,14 +26,14 @@ struct evrec_t
 void evrec_init_recorder(char* path)
 {
   FILE* file = fopen(path, "w");
-  if (!file) printf("evrec : cannot open file %s\n", path);
+  if (!file) printf("evrec recorder : cannot open file %s\n", path);
   rec.file = file;
 }
 
 void evrec_init_player(char* path)
 {
   FILE* file = fopen(path, "r");
-  if (!file) printf("evrec : cannot open file %s\n", path);
+  if (!file) printf("evrec player : cannot open file %s\n", path);
 
   rec.file   = file;
   rec.events = VNEW();

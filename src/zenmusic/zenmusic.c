@@ -112,8 +112,6 @@ void init(int width, int height, char* path)
   player_init();
   visible_init();
   callbacks_init();
-  if (zm.rec_par) evrec_init_recorder(zm.rec_par);
-  if (zm.rep_par) evrec_init_player(zm.rep_par);
 
   // init callbacks
 
@@ -136,6 +134,8 @@ void init(int width, int height, char* path)
   char* html_path   = cstr_path_append(res_path, "main.html");                                                                            // REL 4
   char* font_path   = cstr_path_append(res_path, "Baloo.ttf");                                                                            // REL 5
   char* cfg_path    = cstr_path_append(cfgdir_path, "config.kvl");                                                                        // REL 6
+  char* rec_path    = zm.rec_par ? cstr_path_normalize(zm.rec_par, wrk_path) : NULL;                                                      // REL 7
+  char* rep_path    = zm.rep_par ? cstr_path_normalize(zm.rep_par, wrk_path) : NULL;                                                      // REL 8
 
   // print path info to console
 
@@ -165,6 +165,11 @@ void init(int width, int height, char* path)
   config_set("css_path", css_path);
   config_set("html_path", html_path);
   config_set("font_path", font_path);
+
+  // init recording/playing
+
+  if (zm.rec_par) evrec_init_recorder(rec_path);
+  if (zm.rep_par) evrec_init_player(rep_path);
 
   // load ui from descriptors
 

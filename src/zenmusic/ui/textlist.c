@@ -108,8 +108,6 @@ view_t* textlist_item_for_index(int index, void* data, view_t* listview, int* it
 
   if (h < 35) h = 35;
 
-  printf("ITEM %i %s\n", h, tl->items->data[index]);
-
   view_t* cell = vh_litem_get_cell(item, "cell");
 
   r2_t frame = item->frame.local;
