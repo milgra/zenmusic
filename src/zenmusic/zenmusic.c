@@ -220,7 +220,7 @@ void update(ev_t ev)
     if (zm.rep_par)
     {
       // get recorded events
-      ev_t* recev;
+      ev_t* recev = NULL;
       while ((recev = evrec_replay(ev.time)) != NULL)
       {
         ui_manager_event(*recev);

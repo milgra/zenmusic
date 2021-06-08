@@ -94,16 +94,17 @@ void evrec_record(ev_t ev)
 
 ev_t* evrec_replay(uint32_t time)
 {
-  // no need to check overflow, last event will be the close
-
-  ev_t* event = rec.events->data[rec.index];
-
-  // printf("time %u event time %u event type %i\n", time, event->time, event->type);
-
-  if (event->time < time)
+  if (rec.index < rec.events->length)
   {
-    rec.index++;
-    return event;
+    ev_t* event = rec.events->data[rec.index];
+
+    // printf("time %u event time %u event type %i\n", time, event->time, event->type);
+
+    if (event->time < time)
+    {
+      rec.index++;
+      return event;
+    }
   }
 
   return NULL;

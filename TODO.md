@@ -7,6 +7,7 @@ fix leaks
 
 ideas
 
+mi tortenik ha play kozben van organize?
 scroll knob meghulyult
 full screenkor nem erzekel jobbra, maximize button rossz fullscreen
 resize last cell
