@@ -2,7 +2,7 @@
 ZEN MUSIC PLAYER AND ORGANIZER
 ******************************
 
-screenshot on printscreen during session record
+png kinyirja inditast
 settings, log lista elemek tordeljek a szoveget dinamikusan
 automata tesztek!!
 fix leaks
@@ -11,6 +11,7 @@ full screenkor nem erzekel jobbra, maximize button rossz fullscreen
 
 ideas
 
+scroller event normalization to avoid lag
 UI fps settingsbe
 szoveg tul font van vertikalisan soron belul
 freebsd logo nincs kozepen

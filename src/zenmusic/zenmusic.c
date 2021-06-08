@@ -43,6 +43,10 @@ void load_library();
 void on_change_remote(void* userdata, void* data);
 void on_change_library(void* userdata, void* data);
 void on_change_organize(void* userdata, void* data);
+void get_analyzed_songs();
+void get_remote_events();
+void update_player();
+void save_screenshot();
 
 struct
 {
@@ -200,99 +204,11 @@ void update(ev_t ev)
 {
   if (ev.type == EV_TIME)
   {
-    map_t* entry;
+    get_analyzed_songs();
+    get_remote_events();
+    update_player();
 
-    // get analyzed song entries
-
-    while ((entry = ch_recv(zm.lib_ch)))
-    {
-      char* path = MGET(entry, "file/path");
-
-      if (strcmp(path, "//////") != 0)
-      {
-        // store entry in db
-
-        db_add_entry(path, entry);
-
-        if (db_count() % 100 == 0)
-        {
-          // filter and sort current db and show in ui partial analysis result
-
-          visible_set_sortfield("meta/artist", 0);
-          ui_songlist_refresh();
-        }
-      }
-      else
-      {
-        db_write(config_get("lib_path"));
-
-        if (config_get_bool("organize_lib"))
-        {
-          // organize db if needed
-
-          int succ = db_organize(config_get("lib_path"), db_get_db());
-          if (succ == 0) db_write(config_get("lib_path"));
-        }
-
-        visible_set_sortfield("meta/artist", 0);
-        ui_songlist_refresh();
-      }
-
-      // cleanup, ownership was passed with the channel from analyzer
-
-      REL(entry);
-    }
-
-    // get remote events
-
-    char* buffer = NULL;
-    if ((buffer = ch_recv(zm.rem_ch)))
-    {
-      if (buffer[0] == '0') ui_play_pause();
-      if (buffer[0] == '1') ui_play_prev();
-      if (buffer[0] == '2') ui_play_next();
-    }
-
-    // update player
-
-    int finished = player_refresh();
-
-    if (finished)
-    {
-      // increase play count of song
-
-      char*  path  = player_get_path();
-      map_t* entry = MGET(db_get_db(), path);
-
-      if (entry)
-      {
-        char* play_count_s = MGET(entry, "file/play_count");
-        int   play_count_i = 0;
-
-        if (play_count_s != NULL) play_count_i = atoi(play_count_s);
-        play_count_i += 1;
-        MPUTR(entry, "file/play_count", cstr_fromformat(10, "%i", play_count_i));
-        db_write(config_get("lib_path"));
-      }
-
-      ui_play_next();
-    }
-  }
-  else if (zm.rec_par)
-  {
-    // record all events except time
-    evrec_record(ev);
-  }
-
-  if (!zm.rep_par)
-  {
-    // normal event flow when not replaying
-    ui_manager_event(ev);
-  }
-  else
-  {
-    // replay mode, filter out all events except time
-    if (ev.type == EV_TIME)
+    if (zm.rep_par)
     {
       // get recorded events
       ev_t* recev;
@@ -301,24 +217,20 @@ void update(ev_t ev)
         ui_manager_event(*recev);
         view_set_frame(zm.rep_cur, (r2_t){recev->x, recev->y, 10, 10});
       }
-      // finally send time event
-      ui_manager_event(ev);
     }
   }
+  else
+  {
+    // record all events besides time
+    evrec_record(ev);
+  }
+
+  // in case of replay only send time events
+  if (!zm.rep_par || ev.type == EV_TIME) ui_manager_event(ev);
 
   /* if (zm.rep_par || zm.rec_par) */
   /* { */
-  if (ev.type == EV_KDOWN && ev.keycode == SDLK_PRINTSCREEN)
-  {
-    // save screenshot on printscreen when recording or replaying
-    view_t* root   = ui_manager_get_root();
-    r2_t    rf     = root->frame.local;
-    bm_t*   screen = bm_new(rf.w, rf.h); // REL 0
-    ui_compositor_render_to_bmp(screen);
-    char* path = cstr_path_append(config_get("lib_path"), "screenshot.png"); // REL 1
-    coder_write_png(path, screen);
-    REL(screen);
-  }
+  if (ev.type == EV_KDOWN && ev.keycode == SDLK_PRINTSCREEN) save_screenshot();
   /* } */
 }
 
@@ -425,4 +337,104 @@ void on_change_organize(void* userdata, void* data)
     if (succ == 0) db_write(config_get("lib_path"));
     ui_songlist_refresh();
   }
+}
+
+void get_analyzed_songs()
+{
+  map_t* entry;
+
+  // get analyzed song entries
+
+  while ((entry = ch_recv(zm.lib_ch)))
+  {
+    char* path = MGET(entry, "file/path");
+
+    if (strcmp(path, "//////") != 0)
+    {
+      // store entry in db
+
+      db_add_entry(path, entry);
+
+      if (db_count() % 100 == 0)
+      {
+        // filter and sort current db and show in ui partial analysis result
+
+        visible_set_sortfield("meta/artist", 0);
+        ui_songlist_refresh();
+      }
+    }
+    else
+    {
+      db_write(config_get("lib_path"));
+
+      if (config_get_bool("organize_lib"))
+      {
+        // organize db if needed
+
+        int succ = db_organize(config_get("lib_path"), db_get_db());
+        if (succ == 0) db_write(config_get("lib_path"));
+      }
+
+      visible_set_sortfield("meta/artist", 0);
+      ui_songlist_refresh();
+    }
+
+    // cleanup, ownership was passed with the channel from analyzer
+
+    REL(entry);
+  }
+}
+
+void get_remote_events()
+{
+  char* buffer = NULL;
+  if ((buffer = ch_recv(zm.rem_ch)))
+  {
+    if (buffer[0] == '0') ui_play_pause();
+    if (buffer[0] == '1') ui_play_prev();
+    if (buffer[0] == '2') ui_play_next();
+  }
+}
+
+void update_player()
+{
+  // update player
+
+  int finished = player_refresh();
+
+  if (finished)
+  {
+    // increase play count of song
+
+    char*  path  = player_get_path();
+    map_t* entry = MGET(db_get_db(), path);
+
+    if (entry)
+    {
+      char* play_count_s = MGET(entry, "file/play_count");
+      int   play_count_i = 0;
+
+      if (play_count_s != NULL) play_count_i = atoi(play_count_s);
+      play_count_i += 1;
+      MPUTR(entry, "file/play_count", cstr_fromformat(10, "%i", play_count_i));
+      db_write(config_get("lib_path"));
+    }
+
+    ui_play_next();
+  }
+}
+
+void save_screenshot()
+{
+  static int cnt    = 0;
+  view_t*    root   = ui_manager_get_root();
+  r2_t       frame  = root->frame.local;
+  bm_t*      screen = bm_new(frame.w, frame.h); // REL 0
+  ui_compositor_render_to_bmp(screen);
+  char* name = cstr_fromformat(20, "screenshot%.3i.png", cnt++); // REL 1
+  char* path = cstr_path_append(config_get("lib_path"), name);   // REL 2
+  coder_write_png(path, screen);
+  REL(screen); // REL 0
+  REL(name);   // REL 1
+  REL(path);   // REL 2
 }
