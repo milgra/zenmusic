@@ -29,7 +29,7 @@ int   coder_write_png(char* path, bm_t* bm);
 
 bm_t* coder_load_image(const char* path)
 {
-  int i, ret = 0;
+  bm_t* bitmap = NULL;
 
   AVFormatContext* src_ctx = avformat_alloc_context();
 
@@ -37,11 +37,11 @@ bm_t* coder_load_image(const char* path)
   if (avformat_open_input(&src_ctx, path, NULL, NULL) == 0)
   {
     // find the first attached picture, if available
-    for (i = 0; i < src_ctx->nb_streams; i++)
+    for (int index = 0; index < src_ctx->nb_streams; index++)
     {
-      if (src_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
+      if (src_ctx->streams[index]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
       {
-        AVCodecParameters* param = src_ctx->streams[i]->codecpar;
+        AVCodecParameters* param = src_ctx->streams[index]->codecpar;
 
         const AVCodec*  codec        = avcodec_find_decoder(param->codec_id);
         AVCodecContext* codecContext = avcodec_alloc_context3(codec);
@@ -49,8 +49,8 @@ bm_t* coder_load_image(const char* path)
         avcodec_parameters_to_context(codecContext, param);
         avcodec_open2(codecContext, codec, NULL);
 
-        AVPacket* packet = av_packet_alloc();
-        AVFrame*  frame  = av_frame_alloc();
+        AVPacket* packet = av_packet_alloc(); // FREE 0
+        AVFrame*  frame  = av_frame_alloc();  // FREE 1
 
         while (av_read_frame(src_ctx, packet) >= 0)
         {
@@ -74,7 +74,7 @@ bm_t* coder_load_image(const char* path)
 
         if (img_convert_ctx != NULL)
         {
-          bm_t* bitmap = bm_new(frame->width, frame->height);
+          bitmap = bm_new(frame->width, frame->height);
 
           uint8_t* scaledpixels[1];
           scaledpixels[0] = malloc(bitmap->w * bitmap->h * 4);
@@ -104,28 +104,29 @@ bm_t* coder_load_image(const char* path)
 
           return bitmap;
         }
+
+        av_frame_free(&frame);   // FREE 0
+        av_packet_free(&packet); // FREE 1
       }
     }
   }
 
-  return NULL;
+  return bitmap;
 }
 
 void coder_load_image_into(const char* path, bm_t* bitmap)
 {
-  int i, ret = 0;
-
   AVFormatContext* src_ctx = avformat_alloc_context();
 
   /* // open the specified path */
   if (avformat_open_input(&src_ctx, path, NULL, NULL) == 0)
   {
     // find the first attached picture, if available
-    for (i = 0; i < src_ctx->nb_streams; i++)
+    for (int index = 0; index < src_ctx->nb_streams; index++)
     {
-      if (src_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
+      if (src_ctx->streams[index]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
       {
-        AVCodecParameters* param = src_ctx->streams[i]->codecpar;
+        AVCodecParameters* param = src_ctx->streams[index]->codecpar;
 
         const AVCodec*  codec        = avcodec_find_decoder(param->codec_id);
         AVCodecContext* codecContext = avcodec_alloc_context3(codec);
@@ -184,6 +185,9 @@ void coder_load_image_into(const char* path, bm_t* bitmap)
 
           sws_freeContext(img_convert_ctx);
         }
+
+        av_frame_free(&frame);   // FREE 0
+        av_packet_free(&packet); // FREE 1
       }
     }
   }
@@ -277,6 +281,8 @@ void coder_load_cover_into(const char* path, bm_t* bitmap)
                          0);
         }
       }
+
+      av_frame_free(&frame); // FREE 0
     }
   }
 }
@@ -595,7 +601,7 @@ int coder_write_metadata(char* libpath, char* path, char* cover_path, map_t* dat
 
                 // copy packets from decoder context to encoder context
 
-                AVPacket* dec_pkt = av_packet_alloc();
+                AVPacket* dec_pkt = av_packet_alloc(); // FREE 0
 
                 av_init_packet(dec_pkt);
 
@@ -727,71 +733,71 @@ int coder_write_metadata(char* libpath, char* path, char* cover_path, map_t* dat
 
 int coder_write_png(char* path, bm_t* bm)
 {
-  printf("WRITE\n");
-  int ret;
-
+  int      success;
   AVCodec* codec = avcodec_find_encoder(AV_CODEC_ID_PNG);
-  if (!codec)
+  if (codec)
   {
-    printf("Codec not found\n");
-    exit(1);
-  }
-
-  AVCodecContext* enc_ctx = avcodec_alloc_context3(codec);
-  if (!enc_ctx)
-  {
-    printf("Could not allocate video codec context\n");
-    exit(1);
-  }
-
-  enc_ctx->width     = bm->w;
-  enc_ctx->height    = bm->h;
-  enc_ctx->time_base = (AVRational){1, 25};
-  enc_ctx->pix_fmt   = AV_PIX_FMT_RGBA;
-
-  if (avcodec_open2(enc_ctx, codec, NULL) < 0)
-  {
-    printf("Could not open codec\n");
-    exit(1);
-  }
-
-  AVFrame* frame_in = av_frame_alloc();
-  frame_in->format  = AV_PIX_FMT_RGBA;
-  frame_in->width   = bm->w;
-  frame_in->height  = bm->h;
-
-  av_image_fill_arrays(frame_in->data, frame_in->linesize, bm->data, AV_PIX_FMT_RGBA, bm->w, bm->h, 1);
-
-  AVPacket pkt = {.data = NULL, .size = 0};
-  av_init_packet(&pkt);
-
-  ret = avcodec_send_frame(enc_ctx, frame_in);
-  if (ret < 0)
-  {
-    fprintf(stderr, "Error sending a frame for encoding\n");
-    exit(1);
-  }
-
-  while (ret >= 0)
-  {
-    ret = avcodec_receive_packet(enc_ctx, &pkt);
-    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
-      return -1;
-    else if (ret < 0)
+    AVCodecContext* enc_ctx = avcodec_alloc_context3(codec); // FREE 0
+    if (enc_ctx)
     {
-      fprintf(stderr, "Error during encoding\n");
-      exit(1);
+      enc_ctx->width     = bm->w;
+      enc_ctx->height    = bm->h;
+      enc_ctx->time_base = (AVRational){1, 25};
+      enc_ctx->pix_fmt   = AV_PIX_FMT_RGBA;
+
+      if (avcodec_open2(enc_ctx, codec, NULL) >= 0) // CLOSE 0
+      {
+        AVFrame* frame_in = av_frame_alloc(); // FREE 1
+        frame_in->format  = AV_PIX_FMT_RGBA;
+        frame_in->width   = bm->w;
+        frame_in->height  = bm->h;
+
+        av_image_fill_arrays(frame_in->data,
+                             frame_in->linesize,
+                             bm->data,
+                             AV_PIX_FMT_RGBA,
+                             bm->w,
+                             bm->h,
+                             1);
+
+        AVPacket pkt;
+        pkt.data = NULL;
+        pkt.size = 0;
+        av_init_packet(&pkt);
+
+        if (avcodec_send_frame(enc_ctx, frame_in) >= 0)
+        {
+          if (avcodec_receive_packet(enc_ctx, &pkt) >= 0)
+          {
+            FILE* file = fopen(path, "wb");
+            fwrite(pkt.data, 1, pkt.size, file);
+            fclose(file);
+            av_packet_unref(&pkt);
+          }
+          else
+            printf("Error during encoding\n");
+        }
+        else
+          printf("Error during encoding\n");
+
+        av_frame_free(&frame_in); // FREE 1
+        avcodec_close(enc_ctx);   // CLOSE 0
+      }
+      else
+        printf("Could not open codec\n");
+
+      av_free(enc_ctx); // FREE 0
     }
-
-    printf("Write packet %3" PRId64 " (size=%5d)\n", pkt.pts, pkt.size);
-    FILE* file = fopen(path, "wb");
-    fwrite(pkt.data, 1, pkt.size, file);
-    fclose(file);
-    av_packet_unref(&pkt);
+    else
+      printf("Could not allocate video codec context\n");
   }
+  else
+    printf("Codec not found\n");
 
-  avcodec_close(enc_ctx);
-  return 0;
+  if (success)
+    return 0;
+  else
+    return -1;
 }
 
 #endif
