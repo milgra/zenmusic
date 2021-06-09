@@ -4,6 +4,9 @@ ZEN MUSIC PLAYER AND ORGANIZER
 
 automata tesztek!!
 fix leaks
+test doc
+user manual
+tech doc
 
 ideas
 

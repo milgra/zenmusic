@@ -60,18 +60,10 @@ LDFLAGS = \
 OBJECTSDEV := $(addprefix $(OBJDIRDEV)/,$(SOURCES:.c=.o))
 OBJECTSREL := $(addprefix $(OBJDIRREL)/,$(SOURCES:.c=.o))
 
-inc: 
-	$(shell ./version.sh "$$(cat version.num)" > version.num)
-
-
-rel: inc linkrel
-
-dev: linkdev
-
-linkrel: $(OBJECTSREL)
+rel: $(OBJECTSREL)
 	$(CC) $^ -o bin/zenmusic $(LDFLAGS)
 
-linkdev: $(OBJECTSDEV)
+dev: $(OBJECTSDEV)
 	$(CC) $^ -o bin/zenmusicdev $(LDFLAGS)
 
 $(OBJECTSDEV): $(OBJDIRDEV)/%.o: %.c
@@ -82,12 +74,21 @@ $(OBJECTSREL): $(OBJDIRREL)/%.o: %.c
 	mkdir -p $(@D)
 	$(CC) -c $< -o $@ $(CFLAGS) -O3 -DVERSION=$(VERSION) -DBUILD=$(shell cat version.num)
 
-deps:
-	@sudo pkg install ffmpeg sdl2 glew
-
 clean:
 	rm -f $(OBJECTSDEV) zenmusic
 	rm -f $(OBJECTSREL) zenmusic
+
+deps:
+	@sudo pkg install ffmpeg sdl2 glew
+
+vjump: 
+	$(shell ./version.sh "$$(cat version.num)" > version.num)
+
+rectest:
+	$(shell ./test_rec.sh)
+
+runtest:
+	$(shell ./test_run.sh)
 
 install: rel
 	/usr/bin/install -c -s -m 755 bin/zenmusic /usr/local/bin
