@@ -10,6 +10,9 @@ tech doc
 
 ideas
 
+activity window keret vekonyit
+filters window update
+right click - jump to current song
 mi tortenik ha play kozben van organize?
 scroll knob meghulyult
 full screenkor nem erzekel jobbra, maximize button rossz fullscreen

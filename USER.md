@@ -4,3 +4,6 @@ Welcome to Zen Music music player & organizer!
 2. First start
 3. Playing music
 4. Editing/Organizing music
+
+
+tag-based playlists

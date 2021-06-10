@@ -236,7 +236,7 @@ void ui_about_popup_attach(view_t* baseview)
   VADD(donl.items, donateitem_create(4));
   VADD(donl.items, donateitem_create(5));
 
-  char* version = cstr_fromformat(200, "Zen Music by Milan Toth\nv%i.%i beta\nFree and Open Source Software.", VERSION, BUILD);
+  char* version = cstr_fromformat(200, "Zen Music v%i.%i beta\nby Milan Toth\nFree and Open Source Software.", VERSION, BUILD);
 
   donateitem_update_row(donl.items->data[0], 0, version);
   donateitem_update_row(donl.items->data[1], 1, "Support on Patreon");

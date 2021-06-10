@@ -64,49 +64,56 @@ void vh_textinput_upd(view_t* view)
 
     for (int i = 0; i < text_s->length; i++)
     {
-      glyph_t g  = glyphs[i];
-      view_t* gv = data->glyph_v->data[i];
+      glyph_t g = glyphs[i];
 
-      if (g.w > 0 && g.h > 0)
+      if (i < data->glyph_v->length)
       {
-        r2_t f  = gv->frame.local;
-        r2_t nf = (r2_t){g.x, g.y, g.w, g.h};
-        if (f.w == 0 || f.h == 0)
+
+        view_t* gv = data->glyph_v->data[i];
+
+        if (g.w > 0 && g.h > 0)
         {
-          bm_t* texture = bm_new(g.w, g.h);
+          r2_t f  = gv->frame.local;
+          r2_t nf = (r2_t){g.x, g.y, g.w, g.h};
+          if (f.w == 0 || f.h == 0)
+          {
+            bm_t* texture = bm_new(g.w, g.h);
 
-          text_render_glyph(g, data->style, texture);
+            text_render_glyph(g, data->style, texture);
 
-          view_set_texture_bmp(gv, texture);
+            view_set_texture_bmp(gv, texture);
 
-          gv->exclude = 0; // do we have to have 0 as default?!?!
+            gv->exclude = 0; // do we have to have 0 as default?!?!
 
-          view_add(view, gv);
+            view_add(view, gv);
 
-          view_set_frame(gv, nf);
+            view_set_frame(gv, nf);
 
-          // open
-          r2_t sf = nf;
-          sf.x    = 0.0;
-          sf.y    = 0.0;
-          nf.x    = 0.0;
-          nf.y    = 0.0;
-          sf.w    = 0.0;
+            // open
+            r2_t sf = nf;
+            sf.x    = 0.0;
+            sf.y    = 0.0;
+            nf.x    = 0.0;
+            nf.y    = 0.0;
+            sf.w    = 0.0;
 
-          vh_anim_region(gv, sf, nf, 10, AT_EASE);
+            vh_anim_region(gv, sf, nf, 10, AT_EASE);
 
-          view_set_region(gv, sf);
-        }
-        else
-        {
-          r2_t rf = nf;
-          rf.x    = 0;
-          rf.y    = 0;
-          view_set_region(gv, rf);
-          vh_anim_finish(gv);
-          vh_anim_frame(gv, gv->frame.local, nf, 10, AT_EASE);
+            view_set_region(gv, sf);
+          }
+          else
+          {
+            r2_t rf = nf;
+            rf.x    = 0;
+            rf.y    = 0;
+            view_set_region(gv, rf);
+            vh_anim_finish(gv);
+            vh_anim_frame(gv, gv->frame.local, nf, 10, AT_EASE);
+          }
         }
       }
+      else
+        printf("glyph and string count mismatch\n");
     }
 
     // update cursor position
