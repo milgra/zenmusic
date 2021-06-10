@@ -10,6 +10,7 @@ tech doc
 
 ideas
 
+lib init popupon legyen cancel button ami kilepteti alkalmazast
 space should update play/pause button
 cover art should be blank when selecting multiple songs
 activity window keret vekonyit

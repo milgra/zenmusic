@@ -68,6 +68,7 @@ If you see SCREENSHOT take a screenshot by pressing PRTINSCREEN button
  - click on settings icon ( vertical bars ), settings popup should show up, it should show correct values SCREENSHOT
  - click on library path, cancel popup
  - click on library path, switch to lib2 at ../tst/test/lib2 ( library gets read in the background, will be checked after session )
+ - click on library path, switch to lib1 at ../tst/test/lib1  ( library gets read in the background, will be checked after session )
  - library browser' content should change SCREENSHOT
  - click on organize library, cancel popup
  - click on organize library, accept popup ( library gets re-organized in the background, will be checked after session )
@@ -91,7 +92,7 @@ If you see SCREENSHOT take a screenshot by pressing PRTINSCREEN button
  - click on comments field, add "best song"
  - click on accept button ( media file is updated in the background )
 
-- in library browser, select second song, click on tag editor
+ - in library browser, select second song, click on tag editor
  - click on "add new image"
  - click on cancel
  - click on "add new image"
