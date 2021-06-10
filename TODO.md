@@ -10,6 +10,8 @@ tech doc
 
 ideas
 
+space should update play/pause button
+cover art should be blank when selecting multiple songs
 activity window keret vekonyit
 filters window update
 right click - jump to current song

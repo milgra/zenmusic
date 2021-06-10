@@ -153,22 +153,26 @@ void ui_editor_popup_show()
 
 void ui_editor_popup_on_accept_cover(void* userdata, void* data)
 {
-  char* path_cs = str_cstring(data);
+  char* path_cs    = str_cstring(data);                                    // REL 0
+  char* path_final = cstr_path_normalize(path_cs, config_get("wrk_path")); // REL 1
   // check if image is valid
-  bm_t* image = coder_load_image(path_cs);
+  bm_t* image = coder_load_image(path_final);
+
+  printf("PATH %s\n", path_final);
 
   if (image)
   {
     if (ep.cover) REL(ep.cover);
-    ep.cover = RET(path_cs);
-    coder_load_image_into(path_cs, ep.cover_view->texture.bitmap);
+    ep.cover = RET(path_final);
+    coder_load_image_into(path_final, ep.cover_view->texture.bitmap);
     REL(image);
   }
   else
   {
     ui_alert_popup_show("Not a valid image file.");
   }
-  REL(path_cs);
+  REL(path_cs);    // REL 0
+  REL(path_final); // REL 1
 }
 
 void ui_editor_popup_on_button_down(void* userdata, void* data)

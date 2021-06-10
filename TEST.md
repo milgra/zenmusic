@@ -1,86 +1,155 @@
 # Zen Music music player and organizer test protocol
 
+Before creating a pull request first check for leaks around your modification with valgrind(freebsd) or valgrind/address sanitizer(linux)
+Then create a release build with gmake/make rel.
+Then start a test session with gmake/make runtest.
+Check the diff log after test session finished. Only the dates in zemusic.kvl should differ, media files, library structure and screenshots shouldn't differ.
+
 ---
 
-How to record a session :
-bin/zenmusicdev -c /home/milgra/Downloads/ZMTestConfig -s ../tst testrecord.rec  
+How to record a test session :
 
-How to play a session :
-bin/zenmusicdev -c /home/milgra/Downloads/ZMTestConfig -p ../tst   
+gmake/make rectest
+
+or
+
+bin/zenmusic -r ../res -c ../tst/test/cfg -s ../tst/session.rec  
+
+How to run a test session :
+
+gmake/make runtest
+
+or
+
+bin/zenmusic -r ../res -c ../tst/test/cfg -p ../tst/session.rec  
 
 How to check for memory leaks :
-valgrind --leak-check=full --show-leak-kinds=all --suppressions=valgrind.supp bin/zenmusicdev
 
----
+valgrind ( freebsd/linux )
 
-start with no config file
+valgrind --leak-check=full --show-leak-kinds=all --suppressions=tst/valgrind.supp bin/zenmusicdev
 
- - default config should be created
- - explicit config file should be created if added as option
- - library popup should show up
- - library popup should show error in case of invalid library
- - library popup should disappear in case of valid library
- - library should be read, songs should be analyzed
- - log should be visible in activity view
+address sanitizer ( linux )
 
-start with config file and library
+TODO
 
- - library should be read, songs should be analyzed, lib state and db state should be synced
- - (add, remove, rename songs and check if they are noticed after restart )
+## Protocol
 
-songlist
+If you are re-recording the main test session, follow this protocol.
+If you add a new feature please add it to a proper place in the protocol.
+If you see SCREENSHOT take a screenshot by pressing PRTINSCREEN button
 
+1. start with no config file
+
+ - library popup should show up SCREENSHOT
+ - enter "invalid", library popup should show error in case of invalid library SCREENSHOT
+ - enter "../tst/test/lib1", library popup should disappear in case of valid library, library should be read, songs should be analyzed
+ - last log message should be visible in main display - SCREENSHOT
+ - click on main display, activity log popup should appear, should show logs - SCREENSHOT
+ - click outside activity log popup
+
+2. library browser
+
+ - song list should show valid values SCREENSHOT
  - song list should be scrollable
- - song list should show valid values
- - columns should be resizable/rearrangable
- - scrollable rectangle should be under table header, over bottom scroller and visualizer, left to right scroller
+ - scroll to top
+ - columns should be resizable/rearrangable SCREENSHOT
+ - scroll song list next to bottom visualizer rectangles, over right and bottom scroller to see if they don't block events
 
-play controls
+3. filtering
 
- - volume control knob should work with scroll, click, move
- - mute button should work
- - shuffle button should work
- - prev/next button should work
- - play/pause button should work
- - seek control knob should work with scroll, click, move
- - time display should work
- - song playing should work
- - video playing should work
- - cover art viewer should work
- - visualizer should work
- - play count/skin count/last played/last skipped should work
-
-filter
-
- - filters button should work
- - filter bar should work
+ - filters button should pop up filters popup SCREENSHOT
+ - gerne/altist can be selected, it should show up in filter bar SCREENSHOT
+ - filter bar should be selectable, editable, it should filter library browser
  - clean filter bar button should work
- - entering text in filter bar should work
 
-settings
+4. settings
 
- - settings popup should show up
- - settings popup should show correct values
- - toggling organize lib should organize lib
- - toggling remote control should toggle remote control
- - changing library path should change library
+ - click on settings icon ( vertical bars ), settings popup should show up, it should show correct values SCREENSHOT
+ - click on library path, cancel popup
+ - click on library path, switch to lib2 at ../tst/test/lib2 ( library gets read in the background, will be checked after session )
+ - library browser' content should change SCREENSHOT
+ - click on organize library, cancel popup
+ - click on organize library, accept popup ( library gets re-organized in the background, will be checked after session )
+ - click on remote control, cancel popup
+ - click on remote control, accept popup ( TODO - test somehow!!! )
+ - click on config path, popup should show up SCREENSHOT
+ - cancel popup, click outside settings popup
 
-about popup
+5. about popup
 
- - clicking on links should open them in the browser
+ - click on about icon ( heart ), about popup should show up SCREENSHOT
+ - click on support on patrean, popup should pop up SCREENSHOT
+ - accept popup, click outside about popup
 
-metadata editing
+6. metadata editor
 
- - check if cover art is visible
- - add cover to mp3, mp4, m4a withot cover, check resulting song
- - add cover to mpo3, mp4, m4a with cover, check resulting song
+ - click on tag editor button ( horizontal bars ), popup should show up, it should show correct values SCREENSHOT
+ - click on cancel button, popup should disappear
+ - click on tag editor button again
+ - click on date field, add 1974
+ - click on comments field, add "best song"
+ - click on accept button ( media file is updated in the background )
 
- - metadata field modification, check resulting song, check db
- - metadata field creation, check resulting song, check db
- - metadata field deletion, check resulting song, check db
+- in library browser, select second song, click on tag editor
+ - click on "add new image"
+ - click on cancel
+ - click on "add new image"
+ - enter ../tst/vader.jpeg
+ - click on accept, image shoudl show up in cover view SCREENSHOT
+ - click on accept, text should fit in warning popup SCREENSHOT
+ - click on reject warning popup
+ - click on accept, accept warning popup
+ - tag editor popup should disappear
 
- - metadata update leak, check leaks after heavy metadata updates
+ - in library browser, select third song
+ - in Artist field, type in "Adele"
+ - accept edit, library browser row should be updated, SCREENSHOT ( song gets reorganized in the background, will be checked after session )
 
-ui renderer
+7. library context popup
 
- - test texture resize and reset, texture overflow and reset
+ - right click on fourth song
+ - click select all SCREENSHOT
+ - right click on selection
+ - click edit song info
+ - editor popup with multiple items should appear, album art should be blank, SCREENSHOT
+ - click cancel
+ - click on last song
+ - click on delete
+ - click on reject
+ - click on last song
+ - click on delete
+ - click on accept ( shong gets deleted from library ,will be checked after session )
+ - song should disappear from list, log should be visible in main display SCREENSHOT
+
+8. ui renderer
+
+ - switch to full screen and back with keys ( CMD+F ) SCREENSHOT when in normal size ( texture map gets reset in background )
+ - switch to full screen and back with full screen button SCREENSHOT when in normal size ( texture map gets reset in background )
+
+9. play controls
+
+ - double click on ADELE_SIL in library, after 2 second, pause with SPACE, time displays should work, main display should show song info SCREENSHOT
+ - press play and press play again after 2 seconds SCREENSHOT
+
+ *THE FOLLOWING CANT BE CONFIRMED AUTOMATICALLY*
+
+ - double click on what else is there, video should be visible in cover art view
+ - double click on Odyssey, song should be hearable, visualizer active
+ - move mouse over visualizer rects, switch visualization
+ - seek forward and backward over play button with scroll
+ - seek forward and backward by pressing on seek ring around play btn
+ - seek forward and backward by dragging on seek ring aroung play button
+ - press mute button, press again - audio should disappear and re-appear
+ - set volume by scrolling over volume knob
+ - set volume by pressing on volume ring
+ - set volume by dragging on volume ring
+ - press prev/next button, songs should start playing
+ - press shuffle button, press prev/next button, songs should be played randomly
+ - play count/skin count/last played/last skkipped should be updated in library browser
+
+Post-test checks
+
+ - config file should be present under config directory, should contain correct values
+ - library structure should mirror what you did under the session
+ - database file should contain correct values
