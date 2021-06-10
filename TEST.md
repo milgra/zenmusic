@@ -130,7 +130,7 @@ If you see SCREENSHOT take a screenshot by pressing PRTINSCREEN button
 
 9. play controls
 
- - double click on ADELE_SIL in library, after 2 second, pause with SPACE, time displays should work, main display should show song info SCREENSHOT
+ - double click on ADELE_SIL in library, move mouse continuously to avoid inactiveness skipping in recorder, after 2 seconds, pause with SPACE, time displays should work, main display should show song info SCREENSHOT
  - press play and press play again after 2 seconds SCREENSHOT
 
  *THE FOLLOWING CANT BE CONFIRMED AUTOMATICALLY*

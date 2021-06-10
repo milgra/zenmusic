@@ -10,6 +10,7 @@ tech doc
 
 ideas
 
+cursor indicator in replay is under other layers
 lib init popupon legyen cancel button ami kilepteti alkalmazast
 space should update play/pause button
 cover art should be blank when selecting multiple songs

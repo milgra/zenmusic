@@ -18,9 +18,12 @@ ev_t* evrec_replay(uint32_t time);
 
 struct evrec_t
 {
-  FILE*  file;
-  vec_t* events;
-  int    index;
+  FILE*    file;
+  vec_t*   events;
+  int      index;
+  uint32_t delay;
+  uint32_t lasttime; // last event's timestamp
+  uint32_t normtime; // normalized time
 } rec = {0};
 
 void evrec_init_recorder(char* path)
@@ -96,14 +99,19 @@ void evrec_close()
 
 void evrec_record(ev_t ev)
 {
-  if (ev.type == EV_MMOVE) fprintf(rec.file, "%u mmove\n%i %i %f %f %i\n", ev.time, ev.x, ev.y, ev.dx, ev.dy, ev.drag);
-  if (ev.type == EV_MDOWN) fprintf(rec.file, "%u mdown\n%i %i %i %i %i %i\n", ev.time, ev.x, ev.y, ev.button, ev.dclick, ev.ctrl_down, ev.shift_down);
-  if (ev.type == EV_MUP) fprintf(rec.file, "%u mup\n%i %i %i %i %i %i\n", ev.time, ev.x, ev.y, ev.button, ev.dclick, ev.ctrl_down, ev.shift_down);
-  if (ev.type == EV_SCROLL) fprintf(rec.file, "%u scroll\n%f %f\n", ev.time, ev.dx, ev.dy);
-  if (ev.type == EV_KDOWN) fprintf(rec.file, "%u kdown\n%i\n", ev.time, ev.keycode);
-  if (ev.type == EV_KUP) fprintf(rec.file, "%u kup\n%i\n", ev.time, ev.keycode);
-  if (ev.type == EV_TEXT) fprintf(rec.file, "%u text\n%s\n", ev.time, ev.text);
-  if (ev.type == EV_RESIZE) fprintf(rec.file, "%u resize\n%i %i\n", ev.time, ev.w, ev.h);
+  // normalize time to skip inactive parts of the test
+  if (rec.lasttime > 0 && ev.time > rec.lasttime + 1000) rec.delay += ev.time - rec.lasttime;
+  rec.lasttime = ev.time;
+  rec.normtime = ev.time - rec.delay;
+
+  if (ev.type == EV_MMOVE) fprintf(rec.file, "%u mmove\n%i %i %f %f %i\n", rec.normtime, ev.x, ev.y, ev.dx, ev.dy, ev.drag);
+  if (ev.type == EV_MDOWN) fprintf(rec.file, "%u mdown\n%i %i %i %i %i %i\n", rec.normtime, ev.x, ev.y, ev.button, ev.dclick, ev.ctrl_down, ev.shift_down);
+  if (ev.type == EV_MUP) fprintf(rec.file, "%u mup\n%i %i %i %i %i %i\n", rec.normtime, ev.x, ev.y, ev.button, ev.dclick, ev.ctrl_down, ev.shift_down);
+  if (ev.type == EV_SCROLL) fprintf(rec.file, "%u scroll\n%f %f\n", rec.normtime, ev.dx, ev.dy);
+  if (ev.type == EV_KDOWN) fprintf(rec.file, "%u kdown\n%i\n", rec.normtime, ev.keycode);
+  if (ev.type == EV_KUP) fprintf(rec.file, "%u kup\n%i\n", rec.normtime, ev.keycode);
+  if (ev.type == EV_TEXT) fprintf(rec.file, "%u text\n%s\n", rec.normtime, ev.text);
+  if (ev.type == EV_RESIZE) fprintf(rec.file, "%u resize\n%i %i\n", rec.normtime, ev.w, ev.h);
 }
 
 ev_t* evrec_replay(uint32_t time)

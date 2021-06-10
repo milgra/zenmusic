@@ -85,10 +85,10 @@ vjump:
 	$(shell ./version.sh "$$(cat version.num)" > version.num)
 
 rectest:
-	$(shell ./tst/test_rec.sh)
+	$(shell tst/test_rec.sh)
 
 runtest:
-	$(shell ./tst/test_run.sh)
+	$(shell tst/test_run.sh)
 
 install: rel
 	/usr/bin/install -c -s -m 755 bin/zenmusic /usr/local/bin
