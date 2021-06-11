@@ -39,16 +39,28 @@ If you are re-recording the main test session, follow this protocol.
 If you add a new feature please add it to a proper place in the protocol.
 If you see SCREENSHOT take a screenshot by pressing PRTINSCREEN button
 
+SESSION 0
+
 1. start with no config file
 
+ - start app with valid res_path and cfg_path, cfg_path shouldn't contain any config file
  - library popup should show up SCREENSHOT
+ - press reject button, app should close
+ - answer "y" in terminal to "Record another session?"
+
+SESSION 1
+
+2. start with no config file ( cfg_path shouldn't contain any config file )
+
+ - start app with valid res_path and cfg_path, cfg_path shouldn't contain any config file
+ - library popup should who up
  - enter "invalid", library popup should show error in case of invalid library SCREENSHOT
  - enter "../tst/test/lib1", library popup should disappear in case of valid library, library should be read, songs should be analyzed
  - last log message should be visible in main display - SCREENSHOT
  - click on main display, activity log popup should appear, should show logs - SCREENSHOT
  - click outside activity log popup
 
-2. library browser
+3. library browser
 
  - song list should show valid values SCREENSHOT
  - song list should be scrollable
@@ -56,14 +68,14 @@ If you see SCREENSHOT take a screenshot by pressing PRTINSCREEN button
  - columns should be resizable/rearrangable SCREENSHOT
  - scroll song list next to bottom visualizer rectangles, over right and bottom scroller to see if they don't block events
 
-3. filtering
+4. filtering
 
  - filters button should pop up filters popup SCREENSHOT
  - gerne/altist can be selected, it should show up in filter bar SCREENSHOT
  - filter bar should be selectable, editable, it should filter library browser
  - clean filter bar button should work
 
-4. settings
+5. settings
 
  - click on settings icon ( vertical bars ), settings popup should show up, it should show correct values SCREENSHOT
  - click on library path, cancel popup
@@ -76,14 +88,22 @@ If you see SCREENSHOT take a screenshot by pressing PRTINSCREEN button
  - click on remote control, accept popup ( TODO - test somehow!!! )
  - click on config path, popup should show up SCREENSHOT
  - cancel popup, click outside settings popup
+ - click on close app icon
+ - answer "y" in terminal to "Record another session?"
 
-5. about popup
+SESSION 2
+
+6. start with existing cfg file and existing organized library
+
+ - start app with valid res_path and cfg_path and existing, organized library
+
+7. about popup
 
  - click on about icon ( heart ), about popup should show up SCREENSHOT
  - click on support on patrean, popup should pop up SCREENSHOT
  - accept popup, click outside about popup
 
-6. metadata editor
+8. metadata editor
 
  - click on tag editor button ( horizontal bars ), popup should show up, it should show correct values SCREENSHOT
  - click on cancel button, popup should disappear
@@ -107,7 +127,7 @@ If you see SCREENSHOT take a screenshot by pressing PRTINSCREEN button
  - in Artist field, type in "Adele"
  - accept edit, library browser row should be updated, SCREENSHOT ( song gets reorganized in the background, will be checked after session )
 
-7. library context popup
+9. library context popup
 
  - right click on fourth song
  - click select all SCREENSHOT
@@ -123,12 +143,12 @@ If you see SCREENSHOT take a screenshot by pressing PRTINSCREEN button
  - click on accept ( shong gets deleted from library ,will be checked after session )
  - song should disappear from list, log should be visible in main display SCREENSHOT
 
-8. ui renderer
+10. ui renderer
 
  - switch to full screen and back with keys ( CMD+F ) SCREENSHOT when in normal size ( texture map gets reset in background )
  - switch to full screen and back with full screen button SCREENSHOT when in normal size ( texture map gets reset in background )
 
-9. play controls
+11. play controls
 
  - double click on ADELE_SIL in library, move mouse continuously to avoid inactiveness skipping in recorder, after 2 seconds, pause with SPACE, time displays should work, main display should show song info SCREENSHOT
  - press play and press play again after 2 seconds SCREENSHOT
