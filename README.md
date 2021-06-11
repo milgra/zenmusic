@@ -3,8 +3,7 @@
 
 ![alt text](svg/screenshot.jpeg)
 
-Zen Music is inspired by the golden era iTunes and the tracker module players of the early 90's.
-
+Zen Music is inspired by the 2000's era iTunes and the tracker music players of the early 90's.
 
 ## Features ##
 

@@ -1,9 +1,6 @@
 # Zen Music music player, organizer and visualizer development roadmap
 
-
-*******
-ROADMAP
-*******
+## ROADMAP
 
 ******************************
 ZEN MUSIC PLAYER AND ORGANIZER
