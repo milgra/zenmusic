@@ -23,7 +23,9 @@ while [ $res = "y" ]; do
     ((cnt+=1))
     
     bin/zenmusic -r $res_path -c $cfg_path -s $ses_path
-    echo Record another session? y/n
+
+    echo "Record another session? y/n"
+
     read res
 
 done

@@ -19,6 +19,7 @@ void ui_lib_init_popup_set_library();
 #include "ui_manager.c"
 #include "vh_button.c"
 #include "vh_textinput.c"
+#include "wm_connector.c"
 #include "zc_callback.c"
 
 struct _ui_lib_init_popup_t
@@ -43,7 +44,8 @@ void ui_lib_init_popup_attach(view_t* baseview)
 
   cb_t* cb_btn_press = cb_new(ui_lib_init_on_button_down, NULL);
 
-  vh_button_add(view_get_subview(baseview, "acceptlibbtn"), VH_BUTTON_NORMAL, cb_btn_press);
+  vh_button_add(view_get_subview(baseview, "lib_init_accept_btn"), VH_BUTTON_NORMAL, cb_btn_press);
+  vh_button_add(view_get_subview(baseview, "lib_init_reject_btn"), VH_BUTTON_NORMAL, cb_btn_press);
 
   textstyle_t ts  = {0};
   ts.font         = ulip.fontpath;
@@ -78,7 +80,8 @@ void ui_lib_init_on_button_down(void* userdata, void* data)
 {
   char* id = ((view_t*)data)->id;
 
-  if (strcmp(id, "acceptlibbtn") == 0) ui_lib_init_popup_set_library(NULL);
+  if (strcmp(id, "lib_init_accept_btn") == 0) ui_lib_init_popup_set_library(NULL);
+  if (strcmp(id, "lib_init_reject_btn") == 0) wm_close();
 }
 
 void ui_lib_init_popup_show(char* text)
