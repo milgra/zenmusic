@@ -2,7 +2,7 @@
 
 Before creating a pull request first check for leaks around your modification with valgrind(freebsd) or valgrind/address sanitizer(linux)
 Then create a release build with gmake/make rel.
-Then start a test session with gmake/make runtest.
+Then run all test sessions with gmake/make runtest.
 Check the diff log after test session finished. Only the dates in zemusic.kvl should differ, media files, library structure and screenshots shouldn't differ.
 
 ---
