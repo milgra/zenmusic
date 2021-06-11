@@ -11,10 +11,27 @@ cp -r tst/start tst/test
 
 echo "STARTING TEST SESSION"
 
-bin/zenmusic -r ../res -c ../tst/test/cfg -p ../tst/session.rec
+cnt=0
+
+while true; do
+    
+    res_path="../res"
+    cfg_path="../tst/test/cfg"
+    ses_path="../tst/session$cnt.rec"
+    abs_path="tst/session$cnt.rec"
+
+    ((cnt+=1))
+
+    if test -f $abs_path; then
+	bin/zenmusic -r $res_path -c $cfg_path -p $ses_path
+    else
+	break
+    fi
+    
+done
 
 # compare result and test folders
 
 echo "TEST RESULTS"
 
-diff -r result test
+diff -r tst/result tst/test

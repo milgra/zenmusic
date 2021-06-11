@@ -1,3 +1,10 @@
+# Zen Music music player, organizer and visualizer development roadmap
+
+
+*******
+ROADMAP
+*******
+
 ******************************
 ZEN MUSIC PLAYER AND ORGANIZER
 ******************************
@@ -10,6 +17,7 @@ tech doc
 
 ideas
 
+working select/copy/paste in textfields
 cursor indicator in replay is under other layers
 lib init popupon legyen cancel button ami kilepteti alkalmazast
 space should update play/pause button

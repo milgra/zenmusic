@@ -1,4 +1,4 @@
-# Zen Music music player and organizer #
+# Zen Music music player, organizer and visualizer
 "touch your music"
 
 ![alt text](svg/screenshot.jpeg)

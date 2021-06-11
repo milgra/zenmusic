@@ -1,4 +1,4 @@
-Welcome to Zen Music music player & organizer!
+Welcome to Zen Music music player, organizer and visualizer!
 
 1. Introduction
 2. First start

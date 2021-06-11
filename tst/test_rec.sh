@@ -2,7 +2,7 @@
 
 # first copy start folder structure to result folder
 
-echo  "COPYING start TO test"
+echo "COPYING start TO test"
 
 rm -r tst/test
 cp -r tst/start tst/test
@@ -11,8 +11,25 @@ cp -r tst/start tst/test
 
 echo "STARTING RECORDING SESSION"
 
-bin/zenmusic -r ../res -c ../tst/test/cfg -s ../tst/session.rec
+cnt=0
+res="y"
+
+while [ $res = "y" ]; do
+
+    res_path="../res"
+    cfg_path="../tst/test/cfg"
+    ses_path="../tst/session$cnt.rec"
+    
+    ((cnt+=1))
+    
+    bin/zenmusic -r $res_path -c $cfg_path -s $ses_path
+    echo Record another session? y/n
+    read res
+
+done
 
 echo "RENAMING test to result"
 
-mv test result
+mv tst/test tst/result
+
+echo "RECORDING FINISHED"
