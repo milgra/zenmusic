@@ -5,6 +5,7 @@
 echo "COPYING start TO test"
 
 rm -r tst/test
+rm -r tst/result
 cp -r tst/start tst/test
 
 # execute record session on result folder

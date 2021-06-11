@@ -106,6 +106,7 @@ SESSION 2
 8. metadata editor
 
  - click on tag editor button ( horizontal bars ), popup should show up, it should show correct values SCREENSHOT
+ - check path, it should be relative path after organized enabled SCREENSHOT
  - click on cancel button, popup should disappear
  - click on tag editor button again
  - click on date field, add 1974
@@ -123,7 +124,7 @@ SESSION 2
  - click on accept, accept warning popup
  - tag editor popup should disappear
 
- - in library browser, select third song
+ - in library browser, select ADELE nocover metadata
  - in Artist field, type in "Adele"
  - accept edit, library browser row should be updated, SCREENSHOT ( song gets reorganized in the background, will be checked after session )
 
@@ -155,7 +156,7 @@ SESSION 2
 
  *THE FOLLOWING CANT BE CONFIRMED AUTOMATICALLY*
 
- - double click on what else is there, video should be visible in cover art view
+ - double click on ROYKSOPP, video should be visible in cover art view
  - double click on Odyssey, song should be hearable, visualizer active
  - move mouse over visualizer rects, switch visualization
  - seek forward and backward over play button with scroll

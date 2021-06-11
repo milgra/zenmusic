@@ -17,6 +17,7 @@ tech doc
 
 ideas
 
+filter selection scrolls item 0 under header
 working select/copy/paste in textfields
 cursor indicator in replay is under other layers
 lib init popupon legyen cancel button ami kilepteti alkalmazast
