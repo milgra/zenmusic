@@ -14,6 +14,10 @@ tech doc
 
 ideas
 
+esc should finish metadata editing
+deselect should work, select range should work
+scroll to with a single click on the scrollbar
+prev button in shuffle mode should jump to previously played song
 filter selection scrolls item 0 under header
 working select/copy/paste in textfields
 cursor indicator in replay is under other layers

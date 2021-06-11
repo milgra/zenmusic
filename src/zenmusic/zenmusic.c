@@ -65,6 +65,8 @@ struct
 
 int main(int argc, char* argv[])
 {
+  printf("Zen Music v%i.%i beta by Milan Toth\n", VERSION, BUILD);
+
   const struct option long_options[] =
       {
           {"resources", optional_argument, 0, 'r'},
@@ -87,7 +89,6 @@ int main(int argc, char* argv[])
     if (option == 'p') zm.rep_par = cstr_fromcstring(optarg); // REL 3
     if (option == '?')
     {
-      printf("zenmusic v210505 by Milan Toth\nCommand line options:\n");
       printf("-c --config= [config file] \t use config file for session\n");
       printf("-r --resources= [resources folder] \t use resources dir for session\n");
       printf("-s --record= [recorder file] \t record session to file\n");
