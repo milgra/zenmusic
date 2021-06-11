@@ -12,7 +12,7 @@ Zen Music is a music player, organizer and visualizer inspired by the 2000's era
 - library auto-organization ( if enabled )
 - activity window and human-readable database for transparent operation
 
-Read the user manual for further information : [User's Manual](USER.md)
+Read the user guide for further information : [Open User Guide](USER.md)
 
 ## Installation ##
 
@@ -21,9 +21,9 @@ Read the user manual for further information : [User's Manual](USER.md)
 ```
 git clone https://github.com/milgra/zenmusic.git
 cd zenmusic
-gmake deps
+sudo gmake deps
 gmake rel
-gmake install
+sudo gmake install
 ```
 
 ### Linux ###
@@ -36,8 +36,8 @@ ffmpeg sdl2 glew
 ```
 git clone https://github.com/milgra/zenmusic.git
 cd zenmusic
-gmake rel
-gmake install
+make rel
+sudo make install
 ```
 
 ## User Guide ##
