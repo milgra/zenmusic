@@ -13,7 +13,6 @@ small changes are stored in zmusdb_upd, merged after start
 
 zmusdb is a key-value-list kvl file
 
-
 ui -
 gl-connector layer - the higher layers sending triangles to it with texture ids, renders these triangles with textures
 ui_compositor - collects view rectangles, puts view textures into texture maps, sends textures and vertexes to gl_connector layer

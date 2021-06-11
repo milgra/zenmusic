@@ -1,21 +1,18 @@
-# Zen Music music player, organizer and visualizer
-"touch your music"
+# Zen Music
+
+Zen Music is a music player, organizer and visualizer inspired by the 2000's era iTunes and the tracker music players of the early 90's.
 
 ![alt text](svg/screenshot.jpeg)
 
-Zen Music is inspired by the 2000's era iTunes and the tracker music players of the early 90's.
-
 ## Features ##
 
-- standalone UI renderer with slick, lag-free 60 fps smooth and momentum scrolling
 - retro-minimalistic UI
-- always visible frequency and scope analyzer overlays
-- status line and activity window for full transparency
-- library auto-organizing ( if enabled )
-- human readable text-based database for transparency & easy modification
+- beautiful and smooth UX experience
+- always-on frequency and scope analyzer visualizers
+- library auto-organization ( if enabled )
+- activity window and human-readable database for transparent operation
 
-Video introduction
-
+Read the user manual for further information : [User's Manual](USER.md)
 
 ## Installation ##
 
@@ -24,57 +21,54 @@ Video introduction
 ```
 git clone https://github.com/milgra/zenmusic.git
 cd zenmusic
-make install
+gmake deps
+gmake rel
+gmake install
 ```
 
 ### Linux ###
 
+install the following packages :
+
+ffmpeg sdl2 glew
+
+
 ```
 git clone https://github.com/milgra/zenmusic.git
 cd zenmusic
+gmake rel
+gmake install
 ```
-
-modify include paths in makefile to use your distribution's path
-
-```
-make install
-```
-
-### Windows ###
-
-download latest build from here :  
-unzip  
-start zenmusic exe from extracted folder  
-
 
 ## User Guide ##
 
 [Open User Guide](USER.md)
 
-
 ## Feedback ##
 
 Please report issues and add feature requests here on github.
 
-
-## Libraries used ##
+## Libraries used - Thanks for creating these! ##
 
 - FFMPEG / media parsing
 - SDL2 / window/graphics context handling
 - stb_truetype / text generation
+- Neil Hanning's utf8.h / case-insensitive utf8 comparison
 
-
-## Programs used ##
+## Programs used - Thanks for creating these! ##
 
 - Inkscape for the icons
 - GNU Emacs for programming
 - FreeBSD for development platform
 
-
 ## Contribute ##
 
 Contributors are welcome!
 
-Technical video introduction
+## Tech Guide ##
 
-[Tech Guide](USER.md)
+[Tech Guide](TECH.md)
+
+## Roadmap ##
+
+[Roadmap](ROAD.md)
