@@ -5,303 +5,327 @@ Welcome to Zen Music player, organizer and visualizer! I put a lot of effort in 
 Table of contents 
 
 **1. First start**
+**2. The Main Interface**
+**3. The toolbar**
+**4. The library browser**
+**5. The search/filter bar**
+**6. The visualizer overlays**
+**7. Controlling the application**
+**8. Controlling playback**
+**9. Handling the library browser**
+**10. The search/filter bar**
+**11. Supporting user interfaces**
+**12. The metadata/tag editor**
+**13. The settings viewer/editor**
+**14. The about popup**
+**15. The activity popup*
+**16. Remote control*
+**17. Creating song collections**
+**18. Command line arguments**
 
-Open a terminal window or your favorite application launcher and type
+**1. First start**
 
-```
-zenmusic
-```
+     Open a terminal window or your favorite application launcher and type
 
-The application will show you the library selector popup page.
-Click on the red button if you want to quit the application.
-If you want to continue. enter the path to the folder on your machine where you store your music/music videos and click on the green button.
-[note: in the near future a file browser popup will be added to this part] 
-Zen Music will parse your library and create a database from your songs. During parsing the parsed songs will be shown in the library browser.
+     ```
+     zenmusic
+     ```
 
+     The application will show you the library selector popup page.
+     Click on the red button if you want to quit the application.
+     If you want to continue. enter the path to the folder on your machine where you store your music/music videos and click on the green button.
+     [note: in the near future a file browser popup will be added to this part] 
+     Zen Music will parse your library and create a database from your songs. During parsing the parsed songs will be shown in the library browser.
+    
 **2. The Main Interface**
 
-Zen Music's main user interface has four main parts :
+     Zen Music's main user interface has four main parts :
 
-- The toolbar
-- The library browser
-- The search/filter bar
-- The visualizer overlays
+     - The toolbar
+     - The library browser
+     - The search/filter bar
+     - The visualizer overlays
 
 **3. The toolbar**
 
-The toolbar contains the controller buttons and information displays.
+     The toolbar contains the controller buttons and information displays.
 
-Buttons from left to right :
+     Buttons from left to right :
 
-1. close application button
-2. the play/pause/seek multifunctional controller knob
-3. previous song button
-4. toggle shuffle button
-5. next song button
-6. settings button
-7. about button
-8. metadata editor button
-9. the mute/unmute/volume multifunctional controller knob
-10. the maximize button
+     1. close application button
+     2. the play/pause/seek multifunctional controller knob
+     3. previous song button
+     4. toggle shuffle button
+     5. next song button
+     6. settings button
+     7. about button
+     8. metadata editor button
+     9. the mute/unmute/volume multifunctional controller knob
+     10. the maximize button
 
-Information displays from the left to right :
+     Information displays from the left to right :
 
-1. Current playtime of song
-2. Song length
-3. Remaining playtime of song
+     1. Current playtime of song
+     2. Song length
+     3. Remaining playtime of song
 
 **4. The library browser**
 
-The library browser contains all songs and important file/metadata information about your songs in your library.
+     The library browser contains all songs and important file/metadata information about your songs in your library.
 
 **5. The search/filter bar**
 
-The search/filter bar has three parts :
+     The search/filter bar has three parts :
 
-- the genre/artist selector button
-- the search/filter input field
-- the clean search/filter input field button
+     - the genre/artist selector button
+     - the search/filter input field
+     - the clean search/filter input field button
 
 **6. The visualizer overlays**
 
-The left and the right rectangle are the visualization overlays, the rectangle on the center is the cover art/music video viewer.
+     The left and the right rectangle are the visualization overlays, the rectangle on the center is the cover art/music video viewer.
 
 **7. Controlling the application**
 
-To exit the application :
+     To exit the application :
 
-Click on the close application button
+     Click on the close application button
 
-To maximize/minimize the application :
+     To maximize/minimize the application :
 
-Click on the maximize button
+     Click on the maximize button
 
 **8. Controlling playback**
 
-To start playing a song :
+     To start playing a song :
 
-a. Double click on its item in the library browser
+     a. Double click on its item in the library browser
 
-or
+     or
 
-b. If no song is active in the toolbar info displays then press the center of the play/pause/seek knob and the active song in the library browser starts playing.
+     b. If no song is active in the toolbar info displays then press the center of the play/pause/seek knob and the active song in the library browser starts playing.
 
-To pause the current song :
+     To pause the current song :
 
-a. Press the center of the play/pause/seek knob
+     a. Press the center of the play/pause/seek knob
 
-or
+     or
+     
+     b. Press SPACE
 
-b. Press SPACE
+     To seek/fast forward/rewind the song :
 
-To seek/fast forward/rewind the song :
+     a. scroll over the play/pause/seek knob
 
-a. scroll over the play/pause/seek knob
+     or
 
-or
+     b. click on the outer ring of the play/pause/seek knob
 
-b. click on the outer ring of the play/pause/seek knob
+     or
 
-or
+     c. drag on the outer ring of the play/pause/seek knob
 
-c. drag on the outer ring of the play/pause/seek knob
+     A green overlay over the selected song item indicates that it is the active song item.
 
-A green overlay over the selected song item indicates that it is the active song item.
+     To play the previous song :
 
-To play the previous song :
+     Click on the "previous song" button
 
-Click on the "previous song" button
+     To play the next song :
 
-To play the next song :
+     Click on the "next song" button
 
-Click on the "next song" button
+     To toggle shuffle mode :
 
-To toggle shuffle mode :
+     Click on the "shuffle songs" button
 
-Click on the "shuffle songs" button
+     If shuffle is toggled the next/prev song buttons will play randomly selected songs.
 
-If shuffle is toggled the next/prev song buttons will play randomly selected songs.
+     To mute audio output :
 
-To mute audio output :
+     Press the center of mute/unmute/volume knob
 
-Press the center of mute/unmute/volume knob
+     To unmute audio output :
 
-To unmute audio output :
+     Press the center of mute/unmute/volume knob
 
-Press the center of mute/unmute/volume knob
+     How to set volume :
 
-How to set volume :
+     a. scroll over the mute/unmute/volume knob
 
-a. scroll over the mute/unmute/volume knob
+     or
 
-or
+     b. click on the outer ring of the mute/unmute/volume knob
 
-b. click on the outer ring of the mute/unmute/volume knob
+     or
 
-or
-
-c. drag on the outer ring of the mute/unmute/volume knob
+     c. drag on the outer ring of the mute/unmute/volume knob
 
 **9. Handling the library browser**
 
-To scroll the song list :
+     To scroll the song list :
 
-a. scroll over the list
+     a. scroll over the list
 
-or
+     or
 
-b. click on the invisible scrollbar area on the right edge of the song list ( vertical ) or bottom edge of the song list ( horizontal )
+     b. click on the invisible scrollbar area on the right edge of the song list ( vertical ) or bottom edge of the song list ( horizontal )
 
-or
+     or
 
-c. drag on the invisible scrollbar area on the right edge of the song list ( vertical ) or bottom edge of the song list ( horizontal )
+     c. drag on the invisible scrollbar area on the right edge of the song list ( vertical ) or bottom edge of the song list ( horizontal )
 
-To resize the column
+     To resize the column
 
-Drag on the right edge of the header cell you want to resize.
+     Drag on the right edge of the header cell you want to resize.
 
-To rearrange the columns :
+     To rearrange the columns :
 
-Drag and drop the header cell onto an other cell
+     Drag and drop the header cell onto an other cell
 
-To select multiple songs :
+     To select multiple songs :
 
-a. press CTRL while clicking over an item
+     a. press CTRL while clicking over an item
 
-b. do a right click on a song and click on select/deselect 
+     b. do a right click on a song and click on select/deselect 
 
-To select ranges of songs :
+     To select ranges of songs :
 
-a. press SHIFT while clicking over an item
+     a. press SHIFT while clicking over an item
 
-b. do a right click on a song and click on select range
+     b. do a right click on a song and click on select range
 
-How to select all songs :
+     How to select all songs :
 
-right click on a song and click on select all
+     right click on a song and click on select all
 
-How to initiate metadata editing for a song :
+     How to initiate metadata editing for a song :
 
-right click on a song and click on edit song info
+     right click on a song and click on edit song info
 
-How to delete a song :
+     How to delete a song :
 
-right click on a song and select delete song
+     right click on a song and select delete song
 
 **10. The search/filter bar**
 
-To browse among the genres and artist you have in your library :
+      To browse among the genres and artist you have in your library :
 
-click on the genre/artist selector button and select a genre/artist. It will be added to the search/filter input field.
+      click on the genre/artist selector button and select a genre/artist. It will be added to the search/filter input field.
 
-To enter search term manually :
+      To enter search term manually :
 
-click in the search/filter input field and enter an arbitrary text
+      click in the search/filter input field and enter an arbitrary text
 
-To clean serach/filter field :
+      To clean serach/filter field :
 
-click on the clean search/filter field button
+      click on the clean search/filter field button
 
 **11. Supporting user interfaces**
 
-Zen Music's supporting user interface are the following :
+      Zen Music's supporting user interface are the following :
 
-- The metadata/tag editor
-- The settings viewer/editor
-- The about popup
-- The activity popup
+      - The metadata/tag editor
+      - The settings viewer/editor
+      - The about popup
+      - The activity popup
 
 **12. The metadata/tag editor**
 
-To start metadata editing :
+      To start metadata editing :
 
-a. right click on a song in the library browser and click on edit song info
+      a. right click on a song in the library browser and click on edit song info
 
-or
+      or
 
-b. select multiple songs in the library browser and right click and click on edit song info
+      b. select multiple songs in the library browser and right click and click on edit song info
 
-or
+      or
 
-c. select a song in the library browser and click on metadata editor button in the toolbar
+      c. select a song in the library browser and click on metadata editor button in the toolbar
 
-The table view contains all known information about the song, in the upper part shows the metadata/tags encoded in the media file itself, the lower, pink part shows the file data and miscellaneous info about the song.
+      The table view contains all known information about the song, in the upper part shows the metadata/tags encoded in the media file itself, the lower,
+      pink part shows the file data and miscellaneous info about the song.
 
-The cover art viewer in the upper right corner shows the cover art if available.
+      The cover art viewer in the upper right corner shows the cover art if available.
 
-How to edit metadata :
+      How to edit metadata :
 
-click on the metadata you want to edit, delete back with backspace, enter custom text with the keyboard and press ESCAPE or click outside of the field. then click on accept button in the lower right corner of the metadata editor.
+      click on the metadata you want to edit, delete back with backspace, enter custom text with the keyboard and press ESCAPE or click outside of the field.
+      then click on accept button in the lower right corner of the metadata editor.
 
-How to update cover art :
+      How to update cover art :
 
-Click on add new image button and enter absolute path of image, then accept or press ENTER. Then click on accept button in the lower right corner of the metadata editor.
+      Click on add new image button and enter absolute path of image, then accept or press ENTER. Then click on accept button in the lower right corner of the metadata editor.
 
 **13. The settings viewer/editor**
 
-How to activate :
+      How to activate :
 
-click on the settings button in the main toolbar
+      click on the settings button in the main toolbar
 
-How to change library :
+      How to change library :
 
-click on the Library Path item. Enter a valid path in the textfield of the popup, then press accept button.
+      click on the Library Path item. Enter a valid path in the textfield of the popup, then press accept button.
 
-How to enable automatic library organization :
+      How to enable automatic library organization :
 
-click on Organize Library item. click on accept button.
+      click on Organize Library item. click on accept button.
 
-How to enable remote control :
+      How to enable remote control :
 
-click on Remote Control item
+      click on Remote Control item
 
 **14. The about popup**
 
-How to activate :
+      How to activate :
 
-click on the about popup button in the main toolbar.
+      click on the about popup button in the main toolbar.
 
-click on any item to open the corresponding functionality in the browser.
+      click on any item to open the corresponding functionality in the browser.
 
 **15. The activity popup**
 
-How to activate :
+      How to activate :
 
-- click on the main info display in the toolbar
+      - click on the main info display in the toolbar
 
 **16. Remote control**
 
-It is possible to remote control Zen Music.
+      It is possible to remote control Zen Music.
+      
+      How to enable the feautr :
 
-How to enable the feautr :
+      In settings popup, click on Remote Control, click on accept.
 
-In settings popup, click on Remote Control, click on accept.
+      How to use the feature :
 
-How to use the feature :
+      Zen Music opens up an UDP port on 23723. Send 1 byte packets to this port, 0x00 to play/pause 0x01 to play previous song, 0x02 to play next song
 
-Zen Music opens up an UDP port on 23723. Send 1 byte packets to this port, 0x00 to play/pause 0x01 to play previous song, 0x02 to play next song
+      For example, my i3 config for remote control looks like this :
 
-For example, my i3 config for remote control looks like this :
+      ```
+      bindsym $mod+F10 exec echo -n "0" | nc -4u -w0 localhost 23723	
+      bindsym $mod+F9 exec echo -n "1" | nc -4u -w0 localhost 23723
+      bindsym $mod+F11 exec echo -n "2" | nc -4u -w0 localhost 23723
 
-```
-bindsym $mod+F10 exec echo -n "0" | nc -4u -w0 localhost 23723
-bindsym $mod+F9 exec echo -n "1" | nc -4u -w0 localhost 23723
-bindsym $mod+F11 exec echo -n "2" | nc -4u -w0 localhost 23723
+      ```
 
-```
-
-In KDE/GNOME you can also bind keys to commands.
+      In KDE/GNOME you can also bind keys to commands.
 
 **17. Creating song collections**
 
-Zen Music doesn't have playlists but you can do something similar. You can add tags to songs in the metadata editor, so if you want for example a playlist for monday, select all the songs you want to include at once or one-by-one and add "monday" to the tags field. Then if you search for "monday" in the search field it will show all songs with "monday" tag. Feel free to add more values to tags field using comma as separator.
+      Zen Music doesn't have playlists but you can do something similar. You can add tags to songs in the metadata editor,
+      so if you want for example a playlist for monday, select all the songs you want to include at once or one-by-one and
+      add "monday" to the tags field. Then if you search for "monday" in the search field it will show all songs with "monday" tag.
+      Feel free to add more values to tags field using comma as separator.
 
 **18. Command line arguments**
 
-```
--c --config= [config file]	 	 use config file for session
--r --resources= [resources folder] 	 use resources dir for session
--s --record= [recorder file] 		 record session to file
--p --replay= [recorder file] 		 replay session from file
--f --frame= [widthxheight] 		 initial window dimension
-```
+      ```
+      -c --config= [config file]	 	 use config file for session
+      -r --resources= [resources folder] 	 use resources dir for session
+      -s --record= [recorder file] 		 record session to file
+      -p --replay= [recorder file] 		 replay session from file
+      -f --frame= [widthxheight] 		 initial window dimension
+      ```

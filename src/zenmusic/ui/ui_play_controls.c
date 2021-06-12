@@ -18,7 +18,6 @@ void ui_play_update_volume(float ratio);
 
 #if __INCLUDE_LEVEL__ == 0
 
-#include "callbacks.c"
 #include "config.c"
 #include "player.c"
 #include "tg_knob.c"

@@ -7,17 +7,14 @@ SOURCES = \
 	$(wildcard src/modules/*.c) \
 	$(wildcard src/modules/zen_core/*.c) \
 	$(wildcard src/modules/zen_wm/*.c) \
-	$(wildcard src/modules/data/*.c) \
-	$(wildcard src/modules/file/*.c) \
 	$(wildcard src/modules/image/*.c) \
 	$(wildcard src/modules/zen_media_player/*.c) \
 	$(wildcard src/modules/zen_media_transcoder/*.c) \
-	$(wildcard src/modules/zen_text/*.c) \
-	$(wildcard src/modules/html/*.c) \
-	$(wildcard src/modules/net/*.c) \
 	$(wildcard src/modules/zen_ui/*.c) \
 	$(wildcard src/modules/zen_ui/gl/*.c) \
 	$(wildcard src/modules/zen_ui/view/*.c) \
+	$(wildcard src/modules/zen_ui/text/*.c) \
+	$(wildcard src/modules/zen_ui/html/*.c) \
 	$(wildcard src/zenmusic/*.c) \
 	$(wildcard src/zenmusic/ui/*.c)
 
@@ -28,17 +25,14 @@ CFLAGS = \
 	-Isrc/modules \
 	-Isrc/modules/zen_core \
 	-Isrc/modules/zen_wm \
-	-Isrc/modules/data \
-	-Isrc/modules/file \
-	-Isrc/modules/net \
-	-Isrc/modules/zen_text \
-	-Isrc/modules/html \
 	-Isrc/modules/image \
 	-Isrc/modules/zen_media_player \
 	-Isrc/modules/zen_media_transcoder \
 	-Isrc/modules/zen_ui \
 	-Isrc/modules/zen_ui/gl \
 	-Isrc/modules/zen_ui/view \
+	-Isrc/modules/zen_ui/text \
+	-Isrc/modules/zen_ui/html \
 	-Isrc/zenmusic \
 	-Isrc/zenmusic/ui
 

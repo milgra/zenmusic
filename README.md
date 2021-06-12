@@ -72,3 +72,7 @@ Contributors are welcome!
 ## Roadmap ##
 
 [Roadmap](ROAD.md)
+
+## License ##
+
+VLC is released under the GPLv2 (or later) license.

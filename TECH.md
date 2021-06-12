@@ -1,4 +1,25 @@
-# Zen Music technical information #
+# Zen Music technical information
+for contributors and developers
+
+1. Overview
+
+Zen Music is a pure C project written in [headerless C](https://github.com/milgra/headerlessc).
+It uses the ffmpeg library for media decoding/encoding/transcoding, SDL2 library for window and audio handling and OpenGL context creation.
+It uses a custom UI renderer called Zen UI, it is backed by OpenGL at the moment, Vulkan backend is on the roadmap.
+It uses the Zen Core library for memory management, map/vector/bitmap container implementations, utf8 string and math functions.
+
+2. Program structure
+
+Graphics stack :
+
+[OS][OPENGL] -> [SDL2] -> [ZEN_WM] -> [ZEN UI] -> ui.c -> ui controllers
+
+Media stack :
+
+[OS] -> [SDL2][ffmpeg] -> [ZEN MEDIA PLAYER][ZEN MEDIA TRANSCODER] -> zenmusic.c
+
+
+
 
 1. Structure  
 2. Development  

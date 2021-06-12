@@ -62,13 +62,11 @@ void ui_filter_popup_on_genre_select(int index)
 
   vec_t* genres = db_get_genres();
   char*  genre  = genres->data[index];
-  // callbacks_call("on_genre_selected", genre);
 
   char* query = cstr_fromformat(100, "genre is %s", genre);
 
   visible_set_filter(query);
   ui_songlist_update();
-  //ui_filter_bar_show_query(query);
   ui_filter_bar_show_query(genre);
 }
 
@@ -78,13 +76,11 @@ void ui_filter_popup_on_artist_select(int index)
 
   vec_t* artists = db_get_artists();
   char*  artist  = artists->data[index];
-  // callbacks_call("on_artist_selected", artist);
 
   char* query = cstr_fromformat(100, "artist is %s", artist);
 
   visible_set_filter(query);
   ui_songlist_update();
-  //ui_filter_bar_show_query(query);
   ui_filter_bar_show_query(artist);
 }
 

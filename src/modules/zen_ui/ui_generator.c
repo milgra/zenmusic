@@ -3,9 +3,6 @@
   Monitors views for changes, renders their content in the background, updates compositor state based on view state.
   All views have to be added to ui_generator, hierarchy is not handled.
 
-  views  ->
-  events -> ui_generator -> ui_compositor -> gl_connector -> GPU
-
  */
 
 #ifndef ui_generator_h

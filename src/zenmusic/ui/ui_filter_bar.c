@@ -14,7 +14,6 @@ void ui_filter_bar_show_query(char* text);
 void ui_filter_bar_show_filters(void* userdata, void* data);
 void ui_filter_bar_clear_search(void* userdata, void* data);
 
-#include "callbacks.c"
 #include "config.c"
 #include "ui_filter_popup.c"
 #include "ui_manager.c"
@@ -64,8 +63,6 @@ void ui_filter_bar_attach(view_t* baseview)
 void ui_filter_bar_filter(view_t* view)
 {
   str_t* text = vh_textinput_get_text(view);
-
-  // callbacks_call("on_filter_songs", text);
 
   char* ctext = str_cstring(text);
 

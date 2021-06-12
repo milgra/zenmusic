@@ -1,9 +1,3 @@
-/*
-  UI Manager Module for Zen Multimedia Desktop System
-  Collects root windows, dispatches events to them, readds them to UI Generator is view chain is changed.
-  
- */
-
 #ifndef ui_manager_h
 #define ui_manager_h
 
