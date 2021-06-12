@@ -1,4 +1,4 @@
-# Zen Music music player and organizer test protocol
+# Zen Music test protocol
 
 Before creating a pull request first check for leaks around your modification with valgrind(freebsd) or valgrind/address sanitizer(linux)
 Then create a release build with gmake/make rel.
@@ -143,7 +143,7 @@ SESSION 2
  - click on delete
  - click on accept ( shong gets deleted from library ,will be checked after session )
  - song should disappear from list, log should be visible in main display SCREENSHOT
-
+>
 10. ui renderer
 
  - switch to full screen and back with keys ( CMD+F ) SCREENSHOT when in normal size ( texture map gets reset in background )
@@ -175,3 +175,9 @@ Post-test checks
  - config file should be present under config directory, should contain correct values
  - library structure should mirror what you did under the session
  - database file should contain correct values
+
+What should be ensured after recording a new session
+
+ - lib 1 should be organized, artist - album folders should be created
+ - metadata should reflex what was done in the session
+ - play/skip counters should work, last player/last skipped should work

@@ -1,149 +1,75 @@
-# Zen Music music player, organizer and visualizer development roadmap
+# Zen Music development roadmap
 
-## ROADMAP
+**before release**
 
-******************************
-ZEN MUSIC PLAYER AND ORGANIZER
-******************************
+ - cursor indicator in replay is under other layers
+ - deselect should work, select range should work
+ - filters window visual update
+ - thinner activity window frame
+ - check organize during playing
+ - check select all during filtering
+ - scroll over knob problem fix
+ - vertical alignment of text is too on the top
+ - base view resize during full screen for mouse detection, search-filter text align to middle
+ - full screen button works strange
+ - select range should work
+ - freebsd logo should be in the center
+ - dragger visual aid for column field resize
+ - update backspace animation in textfields
+ - filters popup : genre select should filter artists, "none" item is needed
+ - play/skip counter should work, last played/last skipped should work
+ - set window dimensions with command line parameters
+ - library popups should show actual pathes
+ - scroll on press on edge of list
+ - scroller event normalization to avoid lag when dragging
+ - "go to current song" menu item in song context menu
+ - cover art should be blank when selecting multiple songs
+ - space should update play/pause button
+ - filter selection scrolls item 0 under header
+ - ESC should finish input field editing
+ - track numbers 2 should preceed 11
+ - clear button to all input fields
+ - automated tests
+ - fix leaks
 
-automata tesztek!!
-fix leaks
-test doc
-user manual
-tech doc
+**near future**
 
-ideas
+ - ui scaling should be settable by command line parameters
+ - moving mouse during inertia scroll causes scroll to stuck in some cases
+ - save shuffle state, current song, current position, current volume on exit, use them on start
+ - filtering with logical operators - genre is metal, year is not 2000
+ - normalize css - remove unused classes, snyc element and tag and class names
+ - text style should come from css
+ - remove non-standard css and html (type=button, blocks=true)
+ - log should fill up from up to down, should show time
+ - rdft visalizer should show left/right channels in left/right visu viewwer
+ - modify rdft to show more lower range
+ - full screen cover art/video playing
+ - full screen visualizer
+ - file browser popup for library selection and cover art selection
+ - analog VU meter visualizer
+ - volume fade in/out on play/pause/next/prev
+ - use xy_new and xy_del everywhere for objects that have to be released
+ - solve last column resize problem
+ - select/copy/paste in textfields
+ - prev button in shuffle mode should jump to previously played song
 
-esc should finish metadata editing
-deselect should work, select range should work
-scroll to with a single click on the scrollbar
-prev button in shuffle mode should jump to previously played song
-filter selection scrolls item 0 under header
-working select/copy/paste in textfields
-cursor indicator in replay is under other layers
-lib init popupon legyen cancel button ami kilepteti alkalmazast
-space should update play/pause button
-cover art should be blank when selecting multiple songs
-activity window keret vekonyit
-filters window update
-right click - jump to current song
-mi tortenik ha play kozben van organize?
-scroll knob meghulyult
-full screenkor nem erzekel jobbra, maximize button rossz fullscreen
-resize last cell
-autosize settings cells
-scroller event normalization to avoid lag
-UI fps settingsbe
-szoveg tul font van vertikalisan soron belul
-freebsd logo nincs kozepen
-dragger a column field resizehoz
-select range should work
-escapere field editalas csukodjon be
-input fieldek utolso valid erteket mutassak
-log window nagyobb, kisebb szoveggel, multiline items
-set ui scaling from command line
-genre should filter on artists, "none" is needed
-genre is metal, artist is aborym mukodjon
-tags editor legyen metadata editorban
-backspace del jobban animalt legyen
-animalt delete filter delnel
-android auto fullscreen visualizer
-inertia scroll kozben kimozgatott egerkor beragad a content
-activity-re kattintva songlist ugorjon aktualis szamra?
-ures cover art-ra kattintva lehessen uploadolni, telire full screen
-metadata update a hatterben tortenjen, analyzer kozben is lehessen mar bongeszni
-avoid guess format, check the content
-horizontally maximized textfields
-dark mode
-save shuffle state, last played song, last played position
-query engine
-on cover/video click open big cover/video view"
-log sor elejen legyen ora perc, fentrol le mukodjon
-test module playing also
-text style is cssbol jojjon
-rdft ne logaritmikus legyen, alig latszik a kozep tartomany
-search/filter history ( use filters for playlists)
-songs from one year ago this day - history browser?
-statisztikak - top 10 leghallgatottabb, milyen genre-t hallgatsz foleg elmult 1 honap, stb - statistics browser
-textinput autoscroller
-rdft left/right channel
-full screen visualizers
-save small changes to a delta database, add it to the big one at startup
-amit releaselni kell, csinalodjon new-val!
-speed up font rendering by using glyph indexes instead of codepoints
-grid-based warping of video/album cover based on frequence ( bass in the center )
-andromeda: monolith-like particle visu
-switch between multiple glyph views in paragraph/one multiglyph view in paragraph  
-sanitize css - textfields came class, etc
-remove non-standard css and html (type=button, blocks)
-analog mutatos output meterek is visualizacioban
-glossy effekt
-scroll-ra lehessen novelni/csokkenteni visuals meretet
-cortex as visualizer - level gen based on freq, LEFT/DOWN!!!
-volume fade in/out, cover arton is mute/play next eseten
+**inbetween future**
 
+ - statistics - top 10 most listened artist, song, genre, last month, last year, etc - stats browser
+ - songs from one year ago this day - history browser
+ - dark mode
+ - metadata update should happen in the backgroun to stop ui lag
+ - vertical limit for paragraphs to avoid texture map overrun
+ - settings cell autosize?
 
-**********************************
-ZEN MULTIMEDIA DESKTOP ENVIRONMENT
-**********************************
+**far future**
 
-Productivity centered distraction free environment
-
-- no notifications
-- no unused ( distracting ) ui elements
-- minimalistic and beautiful design
-- zen key = meta key = WIN/MAC/custom key
-
-Zen desktop
-
-- tiling window manager
-- workspace oriented
-- shortcut oriented
-- zen key brings up workspaces and shortcuts ( wifi, drives, kbd )
-- zen + space brings up launcher ( dmenu )
-- clipboard widget
-
-Zen Wifi
-
-- floating wifi manager
-- zen + w?
-
-Zen Media File Manager
-
-- copy/move basket, preview works on them
-- file viewer and manager
-- preview area, info area, binary area?
-- spaces toggles autostart
-- zen + f?
-- flat tree listing ( like programming packages )
-- shows zen music/image/video libs
-- info/hex tab
-- binary files shows up immediately as hex in media viewer
-
-Zen Music Player And Organizer
-
-- zen + m?
-
-Zen Visual Viewer And Orgranizer
-
-- image/video viewer and organizer
-- zen + i?
-
-Zen Words
-
-- markdown based word processor
-- zen + w?
-
-Zen Video
-
-- image/video editor
-- replacement for kdenlive/gimp
-- replacement for adobe premier with wine
-- replacement for photoshop with wine
-- new ui around shotcut?
-
-For now
-
-wine based photoshop
-wine based premiere
-wine based cubase
+ - library analyzer should avoid extension-based analyzation, use something deeper
+ - cerebral cortex as interactive visualizer - on left/right press start game
+ - andromeda : monolith 64K demo like particle visualizer	     
+ - grid-based warping of video/album cover based on frequency ( bass in the center )
+ - speed up font rendering by using glyph indexes instead of codepoints
+ - vh_textinput should seamlessly switch between texture paragraph and glpyh-based paragraph
+ - vh_textinput autoscroller, vertical and horizontal
+ - Android Auto support with full screen visualizer for kick-ass experience

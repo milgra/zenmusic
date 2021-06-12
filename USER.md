@@ -6,7 +6,7 @@ Table of contents
 
 **1. First start**
 
-Open a terminal window or your favorite launcher application and type
+Open a terminal window or your favorite application launcher and type
 
 ```
 zenmusic
@@ -20,7 +20,7 @@ Zen Music will parse your library and create a database from your songs. During 
 
 **2. The Main Interface**
 
-Zen Music's main user interface has three main parts :
+Zen Music's main user interface has four main parts :
 
 - The toolbar
 - The library browser
@@ -76,7 +76,7 @@ To maximize/minimize the application :
 
 Click on the maximize button
 
-**8. Controlling playback
+**8. Controlling playback**
 
 To start playing a song :
 
@@ -237,7 +237,7 @@ How to update cover art :
 
 Click on add new image button and enter absolute path of image, then accept or press ENTER. Then click on accept button in the lower right corner of the metadata editor.
 
-**13. The settings viewer/editor
+**13. The settings viewer/editor**
 
 How to activate :
 

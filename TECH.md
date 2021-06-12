@@ -1,4 +1,4 @@
-# Zen Music music player, organizer and visualizer technical information #
+# Zen Music technical information #
 
 1. Structure  
 2. Development  
