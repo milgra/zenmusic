@@ -95,20 +95,18 @@ Click on the maximize button
 
 ## 8. Controlling playback
 
-**To start playing a song**  
+**To play a song**  
 a. Double click on its item in the library browser  
-or  
-b. If no song is active in the toolbar info displays then press the center of the play/pause/seek knob and the active song in the library browser starts playing.  
-To pause the current song :  
+b. Click on the center of the play/pause/seek knob to continue playing current song ( if paused )  
+c. Press SPACE to continue playing current song ( if paused )  
+
+**To pause the current song**
 a. Press the center of the play/pause/seek knob  
-or  
-b. Press SPACE
+b. Press SPACE  
 
 **To seek/fast forward/rewind the song**  
-a. scroll over the play/pause/seek knob  
-or  
-b. click on the outer ring of the play/pause/seek knob  
-or  
+a. scroll over the play/pause/seek knob    
+b. click on the outer ring of the play/pause/seek knob    
 c. drag on the outer ring of the play/pause/seek knob  
 
 A green overlay over the selected song item indicatesd that it is the active song item.  
@@ -131,18 +129,14 @@ Press the center of mute/unmute/volume knob
 
 **How to set volume**  
 a. scroll over the mute/unmute/volume knob   
-or  
 b. click on the outer ring of the mute/unmute/volume knob  
-or  
 c. drag on the outer ring of the mute/unmute/volume knob  
 
 ## 9. Handling the library browser
 
 **To scroll the song list**  
 a. scroll over the list  
-or  
 b. click on the invisible scrollbar area on the right edge of the song list ( vertical ) or bottom edge of the song list ( horizontal )  
-or  
 c. drag on the invisible scrollbar area on the right edge of the song list ( vertical ) or bottom edge of the song list ( horizontal )  
 
 **To resize the column**  
@@ -192,9 +186,7 @@ Zen Music's supporting user interface are the following :
 
 **To start metadata editing**  
 a. right click on a song in the library browser and click on edit song info  
-or  
-b. select multiple songs in the library browser and right click and click on edit song info  
-or  
+b. select multiple songs in the library browser and right click and click on edit song info   
 c. select a song in the library browser and click on metadata editor button in the toolbar  
 
 The table view contains all known information about the song, in the upper part shows the metadata/tags encoded in the media file itself, the lower, pink part shows the file data and miscellaneous info about the song.
