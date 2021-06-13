@@ -31,6 +31,7 @@
  - clear button to all input fields
  - automated tests
  - fix leaks
+ - youtube video
 
 **near future**
 
