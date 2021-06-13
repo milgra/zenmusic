@@ -2,7 +2,7 @@
 
 Welcome to Zen Music player, organizer and visualizer! I put a lot of effort in the making of this application and I hope that using this application fills your heart with warmth, pride and childlike joy!
 
-** Table of contents **
+**Table of contents**
 
 1. First start  
 2. The Main Interface  
@@ -33,7 +33,7 @@ zenmusic
 
 The application will show you the library selector popup page.  
 Click on the red button if you want to quit the application.  
-If you want to continue. enter the path to the folder on your machine where you store your music/music videos and click on the green button.  
+If you want to continue, enter the path to the folder on your machine where you store your music/music videos and click on the green button.  
 [note: in the near future a file browser popup will be added to this part]   
 Zen Music will parse your library and create a database from your songs. During parsing the parsed songs will be shown in the library browser.  
  
