@@ -100,7 +100,7 @@ a. Double click on its item in the library browser
 b. Click on the center of the play/pause/seek knob to continue playing current song ( if paused )  
 c. Press SPACE to continue playing current song ( if paused )  
 
-**To pause the current song**
+**To pause the current song**  
 a. Press the center of the play/pause/seek knob  
 b. Press SPACE  
 
@@ -222,7 +222,7 @@ click on any item to open the corresponding functionality in the browser.
 ## 15. The activity popup
 
 **How to activate**  
-- click on the main info display in the toolbar
+click on the main info display in the toolbar
 
 ## 16. Remote control
 

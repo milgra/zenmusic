@@ -88,11 +88,11 @@ Please follow these guidelines :
 - use clang format before commiting/after file save
 - use zen_core functions and containers and memory handling
 - create a new test for any new feature you add
-- if you mofify existing code be sure that a test covers your modification
+- if you modify existing code be sure that a test covers your modification
 - always run all tests before push
 - always run valgrind and check for leaks before push
 
-To create a dev build, tpye
+To create a dev build, type
 
 ```
 gmake dev

@@ -1,6 +1,6 @@
 # Zen Music
 
-Zen Music is a music player, organizer and visualizer inspired by the 2000's era iTunes and the tracker music players of the early 90's.
+Zen Music is a music player, visualizer and organizer inspired by the 2000's era iTunes and the tracker music players of the early 90's.
 
 ![alt text](svg/screenshot.jpeg)
 
@@ -71,7 +71,7 @@ Contributors are welcome!
 
 ## Roadmap ##
 
-[Roadmap](dor/ROAD.md)
+[Roadmap](doc/ROAD.md)
 
 ## License ##
 
