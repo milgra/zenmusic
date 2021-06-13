@@ -35,6 +35,7 @@ kvlist.c -> database.c
 
 ```
 bin - build directory and built executable files
+doc - documentation
 res - resources, html, css and images for the ui
 src - code source files
  modules - external modules
@@ -68,7 +69,7 @@ Entering point is in zenmusic.c. It inits Zen WM module that inits SDL2 and open
 - render - render UI
 - destroy - cleans up memory
 
-Internal state change happens in response to a UI event or timer event. All events are coming from Zen WM. In update they got send to the UI and all views.
+Internal state change happens in response to a UI event or timer event. All events are coming from Zen WM. In update they are sent to the UI and all views.
 The views change their state based on the events and may call callbacks.
 View related logic is in the corresponding view controller. For example, metadata editing logic in in src/zenmusic/ui/ui_editor_popup.c .
 

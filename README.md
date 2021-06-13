@@ -12,7 +12,7 @@ Zen Music is a music player, organizer and visualizer inspired by the 2000's era
 - library auto-organization ( if enabled )
 - activity window and human-readable database for transparent operation
 
-Read the user guide for further information : [Open User Guide](USER.md)
+Read the user guide for further information : [Open User Guide](doc/USER.md)
 
 ## Installation ##
 
@@ -42,7 +42,7 @@ sudo make install
 
 ## User Guide ##
 
-[Open User Guide](USER.md)
+[Open User Guide](doc/USER.md)
 
 ## Feedback ##
 
@@ -67,11 +67,11 @@ Contributors are welcome!
 
 ## Tech Guide ##
 
-[Tech Guide](TECH.md)
+[Tech Guide](doc/TECH.md)
 
 ## Roadmap ##
 
-[Roadmap](ROAD.md)
+[Roadmap](dor/ROAD.md)
 
 ## License ##
 
