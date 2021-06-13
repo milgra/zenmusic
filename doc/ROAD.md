@@ -15,7 +15,6 @@
  - select range should work
  - freebsd logo should be in the center
  - dragger visual aid for column field resize
- - update backspace animation in textfields
  - filters popup : genre select should filter artists, "none" item is needed
  - play/skip counter should work, last played/last skipped should work
  - set window dimensions with command line parameters

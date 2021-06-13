@@ -152,8 +152,8 @@ void vh_textinput_upd(view_t* view)
 
     if (data->style.align == TA_LEFT)
     {
-      crsr_f.x = data->style.margin;
-      crsr_f.y = data->style.margin;
+      crsr_f.x = data->style.margin_left;
+      crsr_f.y = data->style.margin || data->style.margin_top;
       if (data->style.valign == VA_CENTER) crsr_f.y = frame.h / 2 - crsr_f.h / 2;
       if (data->style.valign == VA_BOTTOM) crsr_f.y = frame.h - data->style.margin_bottom - crsr_f.h;
     }
@@ -172,7 +172,8 @@ void vh_textinput_upd(view_t* view)
       if (data->style.valign == VA_BOTTOM) crsr_f.y = frame.h - data->style.margin_bottom - crsr_f.h;
     }
 
-    view_set_frame(data->cursor_v, crsr_f);
+    vh_anim_finish(data->cursor_v);
+    vh_anim_frame(data->cursor_v, data->cursor_v->frame.local, crsr_f, 10, AT_EASE);
   }
 
   //textinput_render_glyphs(glyphs, text_s->length, style, bitmap);
