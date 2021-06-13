@@ -4,176 +4,144 @@ Welcome to Zen Music player, organizer and visualizer! I put a lot of effort in 
 
 Table of contents 
 
-**1. First start**
-**2. The Main Interface**
-**3. The toolbar**
-**4. The library browser**
-**5. The search/filter bar**
-**6. The visualizer overlays**
-**7. Controlling the application**
-**8. Controlling playback**
-**9. Handling the library browser**
-**10. The search/filter bar**
-**11. Supporting user interfaces**
-**12. The metadata/tag editor**
-**13. The settings viewer/editor**
-**14. The about popup**
-**15. The activity popup*
-**16. Remote control*
-**17. Creating song collections**
-**18. Command line arguments**
+**1. First start**  
+**2. The Main Interface**  
+**3. The toolbar**  
+**4. The library browser**  
+**5. The search/filter bar**  
+**6. The visualizer overlays**  
+**7. Controlling the application**  
+**8. Controlling playback**  
+**9. Handling the library browser**  
+**10. The search/filter bar**  
+**11. Supporting user interfaces**  
+**12. The metadata/tag editor**  
+**13. The settings viewer/editor**  
+**14. The about popup**  
+**15. The activity popup**  
+**16. Remote control**  
+**17. Creating song collections**  
+**18. Command line arguments**  
 
 **1. First start**
 
-     Open a terminal window or your favorite application launcher and type
+Open a terminal window or your favorite application launcher and type
 
-     ```
-     zenmusic
-     ```
+```
+zenmusic
+```
 
-     The application will show you the library selector popup page.
-     Click on the red button if you want to quit the application.
-     If you want to continue. enter the path to the folder on your machine where you store your music/music videos and click on the green button.
-     [note: in the near future a file browser popup will be added to this part] 
-     Zen Music will parse your library and create a database from your songs. During parsing the parsed songs will be shown in the library browser.
+The application will show you the library selector popup page.
+Click on the red button if you want to quit the application.
+If you want to continue. enter the path to the folder on your machine where you store your music/music videos and click on the green button.
+[note: in the near future a file browser popup will be added to this part] 
+Zen Music will parse your library and create a database from your songs. During parsing the parsed songs will be shown in the library browser.
     
 **2. The Main Interface**
 
-     Zen Music's main user interface has four main parts :
+Zen Music's main user interface has four main parts :
 
-     - The toolbar
-     - The library browser
-     - The search/filter bar
-     - The visualizer overlays
+- The toolbar
+- The library browser
+- The search/filter bar
+- The visualizer overlays
 
 **3. The toolbar**
 
-     The toolbar contains the controller buttons and information displays.
+The toolbar contains the controller buttons and information displays.
 
-     Buttons from left to right :
+Buttons from left to right :
 
-     1. close application button
-     2. the play/pause/seek multifunctional controller knob
-     3. previous song button
-     4. toggle shuffle button
-     5. next song button
-     6. settings button
-     7. about button
-     8. metadata editor button
-     9. the mute/unmute/volume multifunctional controller knob
-     10. the maximize button
+1. close application button
+2. the play/pause/seek multifunctional controller knob
+3. previous song button
+4. toggle shuffle button
+5. next song button
+6. settings button
+7. about button
+8. metadata editor button
+9. the mute/unmute/volume multifunctional controller knob
+10. the maximize button
 
-     Information displays from the left to right :
+Information displays from the left to right :
 
-     1. Current playtime of song
-     2. Song length
-     3. Remaining playtime of song
+1. Current playtime of song
+2. Song length
+3. Remaining playtime of song
 
 **4. The library browser**
 
-     The library browser contains all songs and important file/metadata information about your songs in your library.
+The library browser contains all songs and important file/metadata information about your songs in your library.
 
 **5. The search/filter bar**
 
-     The search/filter bar has three parts :
+The search/filter bar has three parts :
 
-     - the genre/artist selector button
-     - the search/filter input field
-     - the clean search/filter input field button
+- the genre/artist selector button
+- the search/filter input field
+- the clean search/filter input field button
 
 **6. The visualizer overlays**
 
-     The left and the right rectangle are the visualization overlays, the rectangle on the center is the cover art/music video viewer.
+The left and the right rectangle are the visualization overlays, the rectangle on the center is the cover art/music video viewer.
 
 **7. Controlling the application**
 
-     To exit the application :
-
-     Click on the close application button
-
-     To maximize/minimize the application :
-
-     Click on the maximize button
+To exit the application :
+Click on the close application button
+To maximize/minimize the application :
+Click on the maximize button
 
 **8. Controlling playback**
 
-     To start playing a song :
+To start playing a song :
+a. Double click on its item in the library browser
+or
+b. If no song is active in the toolbar info displays then press the center of the play/pause/seek knob and the active song in the library browser starts playing.
+To pause the current song :
+a. Press the center of the play/pause/seek knob
+or
+b. Press SPACE
+To seek/fast forward/rewind the song :
+a. scroll over the play/pause/seek knob
+or
+b. click on the outer ring of the play/pause/seek knob
+or
+c. drag on the outer ring of the play/pause/seek knob
+A green overlay over the selected song item indicatesd that it is the active song item.
 
-     a. Double click on its item in the library browser
+To play the previous song :
+Click on the "previous song" button
 
-     or
+To play the next song :
+Click on the "next song" button
 
-     b. If no song is active in the toolbar info displays then press the center of the play/pause/seek knob and the active song in the library browser starts playing.
+To toggle shuffle mode :
+Click on the "shuffle songs" button
+If shuffle is toggled the next/prev song buttons will play randomly selected songs.
 
-     To pause the current song :
+To mute audio output :
+Press the center of mute/unmute/volume knob
 
-     a. Press the center of the play/pause/seek knob
+To unmute audio output :
+Press the center of mute/unmute/volume knob
 
-     or
-     
-     b. Press SPACE
-
-     To seek/fast forward/rewind the song :
-
-     a. scroll over the play/pause/seek knob
-
-     or
-
-     b. click on the outer ring of the play/pause/seek knob
-
-     or
-
-     c. drag on the outer ring of the play/pause/seek knob
-
-     A green overlay over the selected song item indicates that it is the active song item.
-
-     To play the previous song :
-
-     Click on the "previous song" button
-
-     To play the next song :
-
-     Click on the "next song" button
-
-     To toggle shuffle mode :
-
-     Click on the "shuffle songs" button
-
-     If shuffle is toggled the next/prev song buttons will play randomly selected songs.
-
-     To mute audio output :
-
-     Press the center of mute/unmute/volume knob
-
-     To unmute audio output :
-
-     Press the center of mute/unmute/volume knob
-
-     How to set volume :
-
-     a. scroll over the mute/unmute/volume knob
-
-     or
-
-     b. click on the outer ring of the mute/unmute/volume knob
-
-     or
-
-     c. drag on the outer ring of the mute/unmute/volume knob
+How to set volume :
+a. scroll over the mute/unmute/volume knob
+or
+b. click on the outer ring of the mute/unmute/volume knob
+or
+c. drag on the outer ring of the mute/unmute/volume knob
 
 **9. Handling the library browser**
 
-     To scroll the song list :
+To scroll the song list :
 
-     a. scroll over the list
-
-     or
-
-     b. click on the invisible scrollbar area on the right edge of the song list ( vertical ) or bottom edge of the song list ( horizontal )
-
-     or
-
-     c. drag on the invisible scrollbar area on the right edge of the song list ( vertical ) or bottom edge of the song list ( horizontal )
+a. scroll over the list
+or
+b. click on the invisible scrollbar area on the right edge of the song list ( vertical ) or bottom edge of the song list ( horizontal )
+or
+c. drag on the invisible scrollbar area on the right edge of the song list ( vertical ) or bottom edge of the song list ( horizontal )
 
      To resize the column
 
