@@ -65,6 +65,7 @@ segment2_t v2_collide_and_fragment(v2_t transa, v2_t basisa, v2_t transb, v2_t b
 segment2_t segment2_init(v2_t trans, v2_t basis);
 
 r2_t r2_expand(r2_t rect, float d);
+int  r2_equals(r2_t r1, r2_t r2);
 
 #define kSquareOverlappingNone 0
 #define kSquareOverlappingInside 1
@@ -513,6 +514,11 @@ r2_t r2_expand(r2_t rect, float d)
   rect.h += 2 * d;
 
   return rect;
+}
+
+int r2_equals(r2_t r1, r2_t r2)
+{
+  return (r1.x == r2.x && r1.y == r2.y && r1.w == r2.w && r1.h == r2.h);
 }
 
 segment2_t

@@ -58,7 +58,7 @@ void vh_textinput_upd(view_t* view)
 
   if (text_s->length > 0)
   {
-    glyph_t* glyphs = malloc(sizeof(glyph_t) * text_s->length);
+    glyph_t* glyphs = malloc(sizeof(glyph_t) * text_s->length); // REL 0
     for (int i = 0; i < text_s->length; i++) glyphs[i].cp = text_s->codepoints[i];
     text_layout(glyphs, text_s->length, data->style, frame.w, frame.h);
 
@@ -68,7 +68,6 @@ void vh_textinput_upd(view_t* view)
 
       if (i < data->glyph_v->length)
       {
-
         view_t* gv = data->glyph_v->data[i];
 
         if (g.w > 0 && g.h > 0)
@@ -107,8 +106,12 @@ void vh_textinput_upd(view_t* view)
             rf.x    = 0;
             rf.y    = 0;
             view_set_region(gv, rf);
-            vh_anim_finish(gv);
-            vh_anim_frame(gv, gv->frame.local, nf, 10, AT_EASE);
+
+            if (!r2_equals(rf, gv->frame.region))
+            {
+              vh_anim_finish(gv);
+              vh_anim_frame(gv, gv->frame.local, nf, 10, AT_EASE);
+            }
           }
         }
       }
@@ -132,7 +135,7 @@ void vh_textinput_upd(view_t* view)
 
     // view_set_frame(data->cursor_v, crsr_f);
 
-    free(glyphs);
+    free(glyphs); // REL 0
   }
   else
   {

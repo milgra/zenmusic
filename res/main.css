@@ -692,6 +692,7 @@
     height: 35px;
     border-radius: 10px;
     background-color: #FFFFFFFF;
+    overflow: hidden;
 }
 
 .ch_lib_if {
