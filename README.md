@@ -75,4 +75,4 @@ Contributors are welcome!
 
 ## License ##
 
-Zen Music is released under the GPLv2 (or later) license.
+Zen Music is released under the GPLv3 (or later) license.

@@ -18,10 +18,9 @@ Zen desktop
 - zen + space brings up launcher ( dmenu )
 - clipboard widget
 
-Zen Wifi
+Zen Music Player, Visualizer And Organizer
 
-- floating wifi manager
-- zen + w?
+- zen + m?
 
 Zen Media File Manager
 
@@ -35,14 +34,15 @@ Zen Media File Manager
 - info/hex tab
 - binary files shows up immediately as hex in media viewer
 
-Zen Music Player, Visualizer And Organizer
-
-- zen + m?
-
-Zen Visual Viewer And Orgranizer
+Zen Image Library
 
 - image/video viewer and organizer
 - zen + i?
+
+Zen Wifi
+
+- floating wifi manager
+- zen + w?
 
 Zen Words
 
