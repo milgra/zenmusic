@@ -75,4 +75,4 @@ Contributors are welcome!
 
 ## License ##
 
-VLC is released under the GPLv2 (or later) license.
+Zen Music is released under the GPLv2 (or later) license.
