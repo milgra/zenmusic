@@ -31,7 +31,7 @@ kvlist.c -> database.c
 	    config.c
 ```
 
-##3. Project structure##
+## 3. Project structure ##
 
 ```
 bin - build directory and built executable files
@@ -44,7 +44,7 @@ svg - media source files
 tst - recorded test sessions and test working directory
 ```
  
-##4. Zen Music Logic##
+## 4. Zen Music Logic ##
 
 ```
 callbacks.c - callback collector & invocator
