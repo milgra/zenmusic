@@ -143,157 +143,122 @@ b. click on the invisible scrollbar area on the right edge of the song list ( ve
 or
 c. drag on the invisible scrollbar area on the right edge of the song list ( vertical ) or bottom edge of the song list ( horizontal )
 
-     To resize the column
+To resize the column :
+Drag on the right edge of the header cell you want to resize.
 
-     Drag on the right edge of the header cell you want to resize.
+To rearrange the columns :
+Drag and drop the header cell onto an other cell
 
-     To rearrange the columns :
+To select multiple songs :
+a. press CTRL while clicking over an item
+b. do a right click on a song and click on select/deselect 
 
-     Drag and drop the header cell onto an other cell
+To select ranges of songs :
+a. press SHIFT while clicking over an item
+b. do a right click on a song and click on select range
 
-     To select multiple songs :
+How to select all songs :
+right click on a song and click on select all
 
-     a. press CTRL while clicking over an item
+How to initiate metadata editing for a song :
+right click on a song and click on edit song info
 
-     b. do a right click on a song and click on select/deselect 
-
-     To select ranges of songs :
-
-     a. press SHIFT while clicking over an item
-
-     b. do a right click on a song and click on select range
-
-     How to select all songs :
-
-     right click on a song and click on select all
-
-     How to initiate metadata editing for a song :
-
-     right click on a song and click on edit song info
-
-     How to delete a song :
-
-     right click on a song and select delete song
+How to delete a song :
+right click on a song and select delete song
 
 **10. The search/filter bar**
 
-      To browse among the genres and artist you have in your library :
+To browse among the genres and artist you have in your library :
+click on the genre/artist selector button and select a genre/artist. It will be added to the search/filter input field.
 
-      click on the genre/artist selector button and select a genre/artist. It will be added to the search/filter input field.
+To enter search term manually :
+click in the search/filter input field and enter an arbitrary text
 
-      To enter search term manually :
-
-      click in the search/filter input field and enter an arbitrary text
-
-      To clean serach/filter field :
-
-      click on the clean search/filter field button
+To clean serach/filter field :
+click on the clean search/filter field button
 
 **11. Supporting user interfaces**
 
-      Zen Music's supporting user interface are the following :
+Zen Music's supporting user interface are the following :
 
-      - The metadata/tag editor
-      - The settings viewer/editor
-      - The about popup
-      - The activity popup
+- The metadata/tag editor
+- The settings viewer/editor
+- The about popup
+- The activity popup
 
 **12. The metadata/tag editor**
 
-      To start metadata editing :
+To start metadata editing :
+a. right click on a song in the library browser and click on edit song info
+or
+b. select multiple songs in the library browser and right click and click on edit song info
+or
+c. select a song in the library browser and click on metadata editor button in the toolbar
 
-      a. right click on a song in the library browser and click on edit song info
+The table view contains all known information about the song, in the upper part shows the metadata/tags encoded in the media file itself, the lower, pink part shows the file data and miscellaneous info about the song.
 
-      or
+The cover art viewer in the upper right corner shows the cover art if available.
 
-      b. select multiple songs in the library browser and right click and click on edit song info
+How to edit metadata :
+click on the metadata you want to edit, delete back with backspace, enter custom text with the keyboard and press ESCAPE or click outside of the field. then click on accept button in the lower right corner of the metadata editor.
 
-      or
-
-      c. select a song in the library browser and click on metadata editor button in the toolbar
-
-      The table view contains all known information about the song, in the upper part shows the metadata/tags encoded in the media file itself, the lower,
-      pink part shows the file data and miscellaneous info about the song.
-
-      The cover art viewer in the upper right corner shows the cover art if available.
-
-      How to edit metadata :
-
-      click on the metadata you want to edit, delete back with backspace, enter custom text with the keyboard and press ESCAPE or click outside of the field.
-      then click on accept button in the lower right corner of the metadata editor.
-
-      How to update cover art :
-
-      Click on add new image button and enter absolute path of image, then accept or press ENTER. Then click on accept button in the lower right corner of the metadata editor.
+How to update cover art :
+Click on add new image button and enter absolute path of image, then accept or press ENTER. Then click on accept button in the lower right corner of the metadata editor.
 
 **13. The settings viewer/editor**
 
-      How to activate :
+How to activate :
+click on the settings button in the main toolbar
 
-      click on the settings button in the main toolbar
+How to change library :
+click on the Library Path item. Enter a valid path in the textfield of the popup, then press accept button.
 
-      How to change library :
+How to enable automatic library organization :
+click on Organize Library item. click on accept button.
 
-      click on the Library Path item. Enter a valid path in the textfield of the popup, then press accept button.
-
-      How to enable automatic library organization :
-
-      click on Organize Library item. click on accept button.
-
-      How to enable remote control :
-
-      click on Remote Control item
+How to enable remote control :
+click on Remote Control item
 
 **14. The about popup**
 
-      How to activate :
-
-      click on the about popup button in the main toolbar.
-
-      click on any item to open the corresponding functionality in the browser.
+How to activate :
+click on the about popup button in the main toolbar.
+click on any item to open the corresponding functionality in the browser.
 
 **15. The activity popup**
 
-      How to activate :
-
-      - click on the main info display in the toolbar
+How to activate :
+- click on the main info display in the toolbar
 
 **16. Remote control**
 
-      It is possible to remote control Zen Music.
+It is possible to remote control Zen Music.
       
-      How to enable the feautr :
+How to enable the feature :
+In settings popup, click on Remote Control, click on accept.
 
-      In settings popup, click on Remote Control, click on accept.
+How to use the feature :
+Zen Music opens up an UDP port on 23723. Send 1 byte packets to this port, 0x00 to play/pause 0x01 to play previous song, 0x02 to play next song
 
-      How to use the feature :
+For example, my i3 config for remote control looks like this :
+```
+bindsym $mod+F10 exec echo -n "0" | nc -4u -w0 localhost 23723	
+bindsym $mod+F9 exec echo -n "1" | nc -4u -w0 localhost 23723
+bindsym $mod+F11 exec echo -n "2" | nc -4u -w0 localhost 23723
+```
 
-      Zen Music opens up an UDP port on 23723. Send 1 byte packets to this port, 0x00 to play/pause 0x01 to play previous song, 0x02 to play next song
-
-      For example, my i3 config for remote control looks like this :
-
-      ```
-      bindsym $mod+F10 exec echo -n "0" | nc -4u -w0 localhost 23723	
-      bindsym $mod+F9 exec echo -n "1" | nc -4u -w0 localhost 23723
-      bindsym $mod+F11 exec echo -n "2" | nc -4u -w0 localhost 23723
-
-      ```
-
-      In KDE/GNOME you can also bind keys to commands.
+In KDE/GNOME you can also bind keys to commands.
 
 **17. Creating song collections**
 
-      Zen Music doesn't have playlists but you can do something similar. You can add tags to songs in the metadata editor,
-      so if you want for example a playlist for monday, select all the songs you want to include at once or one-by-one and
-      add "monday" to the tags field. Then if you search for "monday" in the search field it will show all songs with "monday" tag.
-      Feel free to add more values to tags field using comma as separator.
+Zen Music doesn't have playlists but you can do something similar. You can add tags to songs in the metadata editor, so if you want for example a playlist for monday, select all the songs you want to include at once or one-by-one and add "monday" to the tags field. Then if you search for "monday" in the search field it will show all songs with "monday" tag. Feel free to add more values to tags field using comma as separator.
 
 **18. Command line arguments**
 
-      ```
-      -c --config= [config file]	 	 use config file for session
-      -r --resources= [resources folder] 	 use resources dir for session
-      -s --record= [recorder file] 		 record session to file
-      -p --replay= [recorder file] 		 replay session from file
-      -f --frame= [widthxheight] 		 initial window dimension
-      ```
+```
+-c --config= [config file]	 	 use config file for session
+-r --resources= [resources folder] 	 use resources dir for session
+-s --record= [recorder file] 		 record session to file
+-p --replay= [recorder file] 		 replay session from file
+-f --frame= [widthxheight] 		 initial window dimension
+```
