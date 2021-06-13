@@ -87,15 +87,15 @@ The left and the right rectangle are the visualization overlays, the rectangle o
 
 **7. Controlling the application**
 
-**To exit the application**
+**To exit the application**  
 Click on the close application button
 
-**To maximize/minimize the application**
+**To maximize/minimize the application**  
 Click on the maximize button
 
 **8. Controlling playback**
 
-**To start playing a song**
+**To start playing a song**  
 a. Double click on its item in the library browser  
 or  
 b. If no song is active in the toolbar info displays then press the center of the play/pause/seek knob and the active song in the library browser starts playing.  
@@ -104,7 +104,7 @@ a. Press the center of the play/pause/seek knob
 or  
 b. Press SPACE
 
-**To seek/fast forward/rewind the song**
+**To seek/fast forward/rewind the song**  
 a. scroll over the play/pause/seek knob  
 or  
 b. click on the outer ring of the play/pause/seek knob  
@@ -113,23 +113,23 @@ c. drag on the outer ring of the play/pause/seek knob
 
 A green overlay over the selected song item indicatesd that it is the active song item.  
 
-**To play the previous song**
+**To play the previous song**  
 Click on the "previous song" button  
 
-**To play the next song**
+**To play the next song**  
 Click on the "next song" button  
 
-**To toggle shuffle mode**
+**To toggle shuffle mode**  
 Click on the "shuffle songs" button   
 If shuffle is toggled the next/prev song buttons will play randomly selected songs.  
 
-**To mute audio output**
+**To mute audio output**  
 Press the center of mute/unmute/volume knob  
 
-**To unmute audio output**
+**To unmute audio output**  
 Press the center of mute/unmute/volume knob  
 
-**How to set volume**
+**How to set volume**  
 a. scroll over the mute/unmute/volume knob   
 or  
 b. click on the outer ring of the mute/unmute/volume knob  
@@ -138,45 +138,45 @@ c. drag on the outer ring of the mute/unmute/volume knob
 
 **9. Handling the library browser**
 
-**To scroll the song list**
+**To scroll the song list**  
 a. scroll over the list  
 or  
 b. click on the invisible scrollbar area on the right edge of the song list ( vertical ) or bottom edge of the song list ( horizontal )  
 or  
 c. drag on the invisible scrollbar area on the right edge of the song list ( vertical ) or bottom edge of the song list ( horizontal )  
 
-**To resize the column**
+**To resize the column**  
 Drag on the right edge of the header cell you want to resize.  
 
-**To rearrange the columns**
+**To rearrange the columns**  
 Drag and drop the header cell onto an other cell
 
-**To select multiple songs**
+**To select multiple songs**  
 a. press CTRL while clicking over an item  
 b. do a right click on a song and click on select/deselect   
 
-**To select ranges of songs**
+**To select ranges of songs**  
 a. press SHIFT while clicking over an item  
 b. do a right click on a song and click on select range  
 
-**How to select all songs**
+**How to select all songs**  
 right click on a song and click on select all
 
-**How to initiate metadata editing for a song**
+**How to initiate metadata editing for a song**  
 right click on a song and click on edit song info
 
-**How to delete a song**
+**How to delete a song**  
 right click on a song and select delete song
 
 **10. The search/filter bar**
 
-**To browse among the genres and artist you have in your library**
+**To browse among the genres and artist you have in your library**  
 click on the genre/artist selector button and select a genre/artist. It will be added to the search/filter input field.
 
-**To enter search term manually**
+**To enter search term manually**  
 click in the search/filter input field and enter an arbitrary text
 
-**To clean serach/filter field**
+**To clean serach/filter field**  
 click on the clean search/filter field button
 
 **11. Supporting user interfaces**
@@ -190,7 +190,7 @@ Zen Music's supporting user interface are the following :
 
 **12. The metadata/tag editor**
 
-**To start metadata editing**
+**To start metadata editing**  
 a. right click on a song in the library browser and click on edit song info  
 or  
 b. select multiple songs in the library browser and right click and click on edit song info  
@@ -201,45 +201,45 @@ The table view contains all known information about the song, in the upper part 
 
 The cover art viewer in the upper right corner shows the cover art if available.
 
-**How to edit metadata**
+**How to edit metadata**  
 click on the metadata you want to edit, delete back with backspace, enter custom text with the keyboard and press ESCAPE or click outside of the field. then click on accept button in the lower right corner of the metadata editor.
 
-**How to update cover art**
+**How to update cover art**  
 Click on add new image button and enter absolute path of image, then accept or press ENTER. Then click on accept button in the lower right corner of the metadata editor.
 
 **13. The settings viewer/editor**
 
-**How to activate**
+**How to activate**  
 click on the settings button in the main toolbar
 
-**How to change library**
+**How to change library**  
 click on the Library Path item. Enter a valid path in the textfield of the popup, then press accept button.
 
-**How to enable automatic library organization**
+**How to enable automatic library organization**  
 click on Organize Library item. click on accept button.
 
-**How to enable remote control**
+**How to enable remote control**  
 click on Remote Control item
 
 **14. The about popup**
 
-**How to activate**
+**How to activate**  
 click on the about popup button in the main toolbar.
 click on any item to open the corresponding functionality in the browser.
 
 **15. The activity popup**
 
-**How to activate**
+**How to activate**  
 - click on the main info display in the toolbar
 
-**16. Remote control**
+**16. Remote control**  
 
 It is possible to remote control Zen Music.
       
-**How to enable the feature**
+**How to enable the feature**  
 In settings popup, click on Remote Control, click on accept.
 
-**How to use the feature**
+**How to use the feature**  
 Zen Music opens up an UDP port on 23723. Send 1 byte packets to this port, 0x00 to play/pause 0x01 to play previous song, 0x02 to play next song
 
 For example, my i3 config for remote control looks like this :
