@@ -403,10 +403,20 @@ void vh_textinput_set_text(view_t* view, char* text)
 
   // remove glyphs
 
-  for (int i = 0; i < data->glyph_v->length; i++)
+  for (int i = data->glyph_v->length - 1; i > -1; i--)
   {
     view_t* gv = data->glyph_v->data[i];
-    view_remove(view, gv);
+
+    r2_t sf = gv->frame.local;
+    r2_t ef = sf;
+    sf.x    = 0.0;
+    sf.y    = 0.0;
+    ef.x    = 0.0;
+    ef.y    = 0.0;
+    ef.w    = 0.0;
+
+    vh_anim_region(gv, sf, ef, 10 + i, AT_EASE);
+    vh_anim_set_event(gv, view, vh_textinput_on_glyph_close);
   }
   vec_reset(data->glyph_v);
 

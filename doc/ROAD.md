@@ -2,6 +2,8 @@
 
 **before release**
 
+ - input field into vh list in popups
+ - editor popup freeze on empty list
  - cursor indicator in replay is under other layers
  - deselect should work, select range should work
  - filters window visual update
