@@ -47,7 +47,7 @@ void    ui_editor_popup_input_cell_value_changed(view_t* inputview);
 void    ui_editor_popup_input_cell_edit_finished(view_t* inputview);
 
 view_t* ui_editor_popup_editorcell_item_for_index(int index, void* userdata, view_t* listview, int* item_count);
-void    ui_editor_popup_on_text(view_t* view);
+void    ui_editor_popup_on_text(view_t* view, void* userdata);
 
 struct _ui_editor_popup_t
 {
@@ -195,7 +195,7 @@ view_t* ui_editor_popup_editorcell_item_for_index(int index, void* userdata, vie
     return NULL;
 }
 
-void ui_editor_popup_on_text(view_t* view)
+void ui_editor_popup_on_text(view_t* view, void* userdata)
 {
   printf("ON TEXT %f %f\n", ep.editor_input->frame.local.w, ep.editor_list->frame.local.w);
   if (ep.editor_input->frame.local.w > ep.editor_list->frame.local.w)

@@ -26,7 +26,7 @@ void    ui_inputfield_popup_reject(void* userdata, void* data);
 void    ui_inputfield_popup_enter(view_t* view);
 void    ui_inputfield_on_button_down(void* userdata, void* data);
 view_t* ui_inputfield_item_for_index(int index, void* userdata, view_t* listview, int* item_count);
-void    ui_inputfield_on_text(view_t* view);
+void    ui_inputfield_on_text(view_t* view, void* userdata);
 
 struct _ui_inputfield_popup_t
 {
@@ -103,7 +103,7 @@ view_t* ui_inputfield_item_for_index(int index, void* userdata, view_t* listview
     return NULL;
 }
 
-void ui_inputfield_on_text(view_t* view)
+void ui_inputfield_on_text(view_t* view, void* userdata)
 {
   if (uip.inputfield->frame.local.w > uip.listview->frame.local.w)
   {

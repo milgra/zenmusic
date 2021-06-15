@@ -19,7 +19,7 @@ typedef struct _vh_textinput_t
   char        active;
   void*       userdata;
 
-  void (*on_text)(view_t* view);
+  void (*on_text)(view_t* view, void* data);
   void (*on_return)(view_t* view);
   void (*on_activate)(view_t* view);
   void (*on_deactivate)(view_t* view);
@@ -34,7 +34,7 @@ void vh_textinput_add(view_t*     view,
 str_t* vh_textinput_get_text(view_t* view);
 void   vh_textinput_set_text(view_t* view, char* text);
 void   vh_textinput_activate(view_t* view, char state);
-void   vh_textinput_set_on_text(view_t* view, void (*event)(view_t*));
+void   vh_textinput_set_on_text(view_t* view, void (*event)(view_t*, void*));
 void   vh_textinput_set_on_return(view_t* view, void (*event)(view_t*));
 void   vh_textinput_set_on_activate(view_t* view, void (*event)(view_t*));
 void   vh_textinput_set_on_deactivate(view_t* view, void (*event)(view_t*));
@@ -305,7 +305,7 @@ void vh_textinput_evt(view_t* view, ev_t ev)
 
     vh_textinput_upd(view);
 
-    if (data->on_text) (*data->on_text)(view);
+    if (data->on_text) (*data->on_text)(view, data->userdata);
   }
   else if (ev.type == EV_KDOWN)
   {
@@ -328,7 +328,7 @@ void vh_textinput_evt(view_t* view, ev_t ev)
       vh_anim_set_event(glyph_view, view, vh_textinput_on_glyph_close);
 
       vh_textinput_upd(view);
-      if (data->on_text) (*data->on_text)(view);
+      if (data->on_text) (*data->on_text)(view, data->userdata);
     }
     if (ev.keycode == SDLK_RETURN)
     {
@@ -488,7 +488,7 @@ void vh_textinput_set_text(view_t* view, char* text)
 
   vh_textinput_upd(view);
 
-  if (data->on_text) (*data->on_text)(view);
+  if (data->on_text) (*data->on_text)(view, data->userdata);
 }
 
 str_t* vh_textinput_get_text(view_t* view)
@@ -497,7 +497,7 @@ str_t* vh_textinput_get_text(view_t* view)
   return data->text_s;
 }
 
-void vh_textinput_set_on_text(view_t* view, void (*event)(view_t*))
+void vh_textinput_set_on_text(view_t* view, void (*event)(view_t*, void* data))
 {
   vh_textinput_t* data = view->handler_data;
   data->on_text        = event;

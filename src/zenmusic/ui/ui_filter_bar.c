@@ -22,7 +22,7 @@ void ui_filter_bar_clear_search(void* userdata, void* data);
 #include "vh_textinput.c"
 #include "visible.c"
 
-void ui_filter_bar_filter(view_t* view);
+void ui_filter_bar_filter(view_t* view, void* userdata);
 
 struct _ui_filter_bar_t
 {
@@ -59,7 +59,7 @@ void ui_filter_bar_attach(view_t* baseview)
   //vh_textinput_set_on_activate(ufb.songlist_filter_bar, ui_on_filter_activate);
 }
 
-void ui_filter_bar_filter(view_t* view)
+void ui_filter_bar_filter(view_t* view, void* userdata)
 {
   str_t* text = vh_textinput_get_text(view);
 
