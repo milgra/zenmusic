@@ -28,6 +28,7 @@ void ui_editor_popup_show();
 #include "vh_list_head.c"
 #include "vh_list_item.c"
 #include "vh_textinput.c"
+#include "vh_textinput_scroller.c"
 #include "zc_callback.c"
 #include "zc_cstring.c"
 #include "zc_cstrpath.c"
@@ -57,9 +58,7 @@ struct _ui_editor_popup_t
   view_t* head_view;  // header veiw
   view_t* cover_view; // cover view
 
-  view_t* editor_view;  // editor cell view
-  view_t* editor_input; // editor cell inputfield
-  view_t* editor_list;  // editor cell listview
+  view_t* textinput;
 
   map_t* attributes; // current attributes in table
 
@@ -103,15 +102,20 @@ char* mand_fields[] = {"artist", "album", "title", "date", "track", "disc", "gen
 
 void ui_editor_popup_attach(view_t* view)
 {
-  view_t* head_view    = view_get_subview(view, "song_editor_header");
-  view_t* list_view    = view_get_subview(view, "editorlist");
-  view_t* cover_view   = view_get_subview(view, "coverview");
-  view_t* acceptbtn    = view_get_subview(view, "editor_popup_accept_btn");
-  view_t* rejectbtn    = view_get_subview(view, "editor_popup_reject_btn");
-  view_t* uploadbtn    = view_get_subview(view, "uploadbtn");
-  view_t* editor_view  = view_get_subview(view, "editor_inputfield_back");
-  view_t* editor_list  = view_get_subview(view, "editor_listview");
-  view_t* editor_input = view_get_subview(view, "editor_inputfield");
+  view_t* head_view  = view_get_subview(view, "song_editor_header");
+  view_t* list_view  = view_get_subview(view, "editorlist");
+  view_t* cover_view = view_get_subview(view, "coverview");
+  view_t* acceptbtn  = view_get_subview(view, "editor_popup_accept_btn");
+  view_t* rejectbtn  = view_get_subview(view, "editor_popup_reject_btn");
+  view_t* uploadbtn  = view_get_subview(view, "uploadbtn");
+
+  view_t* textinput = view_get_subview(view, "editor_textinput_scroller");
+  RET(textinput);
+  r2_t frame = textinput->frame.local;
+  frame.x    = 0;
+  frame.y    = 0;
+  view_set_frame(textinput, frame);
+  view_remove(view_get_subview(view, "song_editor_list_back"), textinput);
 
   // view_t* newfieldbtn = view_get_subview(view, "newfieldbtn");
   cb_t* but_cb = cb_new(ui_editor_popup_on_button_down, NULL);
@@ -128,42 +132,22 @@ void ui_editor_popup_attach(view_t* view)
   ep.list_view  = list_view;
   ep.cover_view = cover_view;
 
-  ep.editor_input = editor_input;
-  ep.editor_list  = editor_list;
-  ep.editor_view  = editor_view;
-  ep.fields       = VNEW();
-  ep.textstyle    = ts;
-  ep.items        = VNEW();
-  ep.attributes   = MNEW();
-  ep.changed      = MNEW();
-  ep.removed      = VNEW();
-  ep.cover        = NULL;
-  ep.cols         = VNEW();
-
-  // cell editor input view
-
-  RET(ep.editor_input);
-  view_remove(view_get_subview(view, "editor_inputfield_back"), ep.editor_input);
+  ep.textinput  = textinput;
+  ep.fields     = VNEW();
+  ep.textstyle  = ts;
+  ep.items      = VNEW();
+  ep.attributes = MNEW();
+  ep.changed    = MNEW();
+  ep.removed    = VNEW();
+  ep.cover      = NULL;
+  ep.cols       = VNEW();
 
   ts.autosize = AS_AUTO;
-  vh_textinput_add(ep.editor_input, "editor cell", "", ts, NULL);
+
+  vh_textinput_scroller_add(textinput, "editor cell", "", ts, NULL);
+  vh_textinput_set_on_deactivate(vh_textinput_scroller_get_input_view(textinput), ui_editor_popup_input_cell_edit_finished);
+
   ts.autosize = AS_FIX;
-  vh_textinput_set_on_text(ep.editor_input, ui_editor_popup_on_text);
-  vh_textinput_set_on_deactivate(ep.editor_input, ui_editor_popup_input_cell_edit_finished); // listen for text editing finish
-
-  vh_list_add(ep.editor_list,
-              ((vh_list_inset_t){0}),
-              ui_editor_popup_editorcell_item_for_index,
-              NULL,
-              NULL);
-
-  vh_button_add(view_get_subview(view, "editor_clear_btn"), VH_BUTTON_NORMAL, but_cb);
-
-  r2_t frame = ep.editor_view->frame.local;
-  frame.x    = 0;
-  frame.y    = 0;
-  view_set_frame(ep.editor_view, frame);
-  view_remove(view_get_subview(view, "song_editor_list_back"), ep.editor_view);
 
   //
 
@@ -185,24 +169,6 @@ void ui_editor_popup_attach(view_t* view)
 
   // force texture initialization on cover view
   cover_view->tex_gen(cover_view);
-}
-
-view_t* ui_editor_popup_editorcell_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
-{
-  if (index == 0)
-    return ep.editor_input;
-  else
-    return NULL;
-}
-
-void ui_editor_popup_on_text(view_t* view, void* userdata)
-{
-  printf("ON TEXT %f %f\n", ep.editor_input->frame.local.w, ep.editor_list->frame.local.w);
-  if (ep.editor_input->frame.local.w > ep.editor_list->frame.local.w)
-  {
-    vh_list_set_item_width(ep.editor_list, ep.editor_input->frame.local.w);
-    vh_list_scroll_to_x_poisiton(ep.editor_list, ep.editor_list->frame.local.w - ep.editor_input->frame.local.w);
-  }
 }
 
 void ui_editor_popup_show()
@@ -262,14 +228,6 @@ void ui_editor_popup_on_button_down(void* userdata, void* data)
     cb_t* acc_cb = cb_new(ui_editor_popup_on_accept_cover, NULL);
     ui_inputfield_popup_show("Path to cover art image :", acc_cb, NULL);
     REL(acc_cb);
-  }
-  if (strcmp(view->id, "editor_clear_btn") == 0)
-  {
-    vh_list_set_item_width(ep.editor_list, ep.editor_input->frame.local.w);
-    vh_list_scroll_to_x_poisiton(ep.editor_list, 0);
-    vh_textinput_set_text(ep.editor_input, "");
-    vh_textinput_activate(ep.editor_input, 1);
-    ui_manager_activate(ep.editor_input);
   }
 }
 
@@ -413,16 +371,15 @@ void ui_editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, 
     /* view_t* inputcell = view_new(id, cell->view->frame.local); */
 
     ep.textstyle.backcolor = color1;
-    vh_textinput_set_text(ep.editor_input, value);
+    vh_textinput_set_text(vh_textinput_scroller_get_input_view(ep.textinput), value);
     /* vh_textinput_set_on_deactivate(inputcell, ui_editor_popup_input_cell_edit_finished); // listen for text editing finish */
 
     ep.editor_key = key;
 
-    vh_textinput_activate(ep.editor_input, 1); // activate text input
-    ui_manager_activate(ep.editor_input);      // set text input as event receiver
+    vh_textinput_scroller_activate(ep.textinput, 1); // activate text input
 
-    vh_list_lock_scroll(ep.list_view, 1);                 // lock scrolling of list to avoid going out screen
-    vh_litem_rpl_cell(itemview, "value", ep.editor_view); // replacing simple text cell with input cell
+    vh_list_lock_scroll(ep.list_view, 1);               // lock scrolling of list to avoid going out screen
+    vh_litem_rpl_cell(itemview, "value", ep.textinput); // replacing simple text cell with input cell
 
     /* REL(id); */
   }
@@ -443,7 +400,7 @@ void ui_editor_popup_input_cell_edit_finished(view_t* inputview)
   /* vh_textinput_t* data = inputview->handler_data; */
 
   /* char* key  = data->userdata; */
-  char* text = str_cstring(vh_textinput_get_text(ep.editor_input));
+  char* text = str_cstring(vh_textinput_scroller_get_text(ep.textinput));
 
   MPUT(ep.changed, ep.editor_key, text);
 
@@ -464,7 +421,7 @@ void ui_editor_popup_input_cell_edit_finished(view_t* inputview)
 
   REL(id);
 
-  vh_textinput_set_text(ep.editor_input, "");
+  vh_textinput_set_text(vh_textinput_scroller_get_input_view(ep.textinput), "");
 }
 
 int ui_editor_popup_comp_text(void* left, void* right)
