@@ -14,6 +14,8 @@ void ui_play_index(int index);
 void ui_play_update_position(float ratio);
 void ui_play_update_volume(float ratio);
 
+void ui_play_jump_to();
+
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
@@ -186,6 +188,11 @@ void ui_play_on_button_down(void* userdata, void* data)
   if (strcmp(id, "nextbtn") == 0) ui_play_next();
   if (strcmp(id, "prevbtn") == 0) ui_play_index(uipc.lastindex - 1);
   if (strcmp(id, "shufflebtn") == 0) ui_toggle_shuffle();
+}
+
+void ui_play_jump_to()
+{
+  ui_songlist_select_and_show(uipc.lastindex);
 }
 
 #endif

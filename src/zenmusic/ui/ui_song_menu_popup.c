@@ -17,6 +17,7 @@ void ui_song_menu_popup_attach(view_t* view);
 #include "tg_text.c"
 #include "ui_decision_popup.c"
 #include "ui_editor_popup.c"
+#include "ui_play_controls.c"
 #include "ui_popup_switcher.c"
 #include "ui_songlist.c"
 #include "vh_list.c"
@@ -50,8 +51,9 @@ void ui_song_menu_popup_attach(view_t* baseview)
   VADD(slp.items, ui_song_menu_popupitem_create(0, "Select/Deselect"));
   VADD(slp.items, ui_song_menu_popupitem_create(1, "Select Range"));
   VADD(slp.items, ui_song_menu_popupitem_create(2, "Select All"));
-  VADD(slp.items, ui_song_menu_popupitem_create(3, "Edit Song Info"));
-  VADD(slp.items, ui_song_menu_popupitem_create(4, "Delete Song"));
+  VADD(slp.items, ui_song_menu_popupitem_create(3, "Jump to current song"));
+  VADD(slp.items, ui_song_menu_popupitem_create(4, "Edit Song Info"));
+  VADD(slp.items, ui_song_menu_popupitem_create(5, "Delete Song"));
 
   // add list handler to view
 
@@ -83,8 +85,9 @@ void ui_song_menu_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* 
   if (index == 0) ui_songlist_select(index);
   if (index == 1) ui_songlist_select_range(index);
   if (index == 2) ui_songlist_select_all();
-  if (index == 3) ui_editor_popup_show();
-  if (index == 4)
+  if (index == 3) ui_play_jump_to();
+  if (index == 4) ui_editor_popup_show();
+  if (index == 5)
   {
     cb_t* acc_cb = cb_new(ui_song_menu_popup_on_item_delete, NULL);
     ui_decision_popup_show("Are you sure you want to delete x items?", acc_cb, NULL);

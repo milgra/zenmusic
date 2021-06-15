@@ -21,7 +21,6 @@
  - library popups should show actual pathes
  - scroll on press on edge of list
  - scroller event normalization to avoid lag when dragging
- - "go to current song" menu item in song context menu
  - cover art should be blank when selecting multiple songs
  - space should update play/pause button
  - filter selection scrolls item 0 under header
