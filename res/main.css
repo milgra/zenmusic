@@ -705,8 +705,13 @@
     overflow: hidden;
 }
 
+.ch_lib_lv {
+    width: 350px;
+    height: 100%;
+}
+
 .ch_lib_if {
-    width: 100%;
+    width: 350px;
     height: 100%;
 }
 

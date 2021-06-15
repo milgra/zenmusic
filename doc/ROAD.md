@@ -73,6 +73,5 @@
  - grid-based warping of video/album cover based on frequency ( bass in the center )
  - speed up font rendering by using glyph indexes instead of codepoints
  - vh_textinput should seamlessly switch between texture paragraph and glpyh-based paragraph
- - vh_textinput autoscroller, vertical and horizontal
  - Android Auto support with full screen visualizer for kick-ass experience
  - Vulkan backend for Zen UI

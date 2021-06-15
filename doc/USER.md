@@ -22,6 +22,7 @@ Welcome to Zen Music player, visualizer and organizer! I put a lot of effort in 
 16. Remote control  
 17. Creating song collections  
 18. Command line arguments  
+19. Customizing the user interface
 
 ## 1. First start
 
@@ -232,7 +233,8 @@ It is possible to remote control Zen Music.
 In settings popup, click on Remote Control, click on accept.
 
 **How to use the feature**  
-Zen Music opens up an UDP port on 23723. Send 1 byte packets to this port, 0x00 to play/pause 0x01 to play previous song, 0x02 to play next song
+Zen Music opens up an UDP port on 23723. ( The port is configurable in the config file )
+Send 1 byte packets to this port, 0x00 to play/pause 0x01 to play previous song, 0x02 to play next song
 
 For example, my i3 config for remote control looks like this :
 ```
@@ -256,3 +258,7 @@ Zen Music doesn't have playlists but you can do something similar. You can add t
 -p --replay= [recorder file] 		 replay session from file
 -f --frame= [widthxheight] 		 initial window dimension
 ```
+
+## 19. Customizing the user interface
+
+The user interface uses html for structure description and css for design description. The location of the two file is under settings. Feel free to modify them, but beware, the html/css parser is very strict, follow strictly the original files syntax to achieve success. Also some parts are generated from code and cannot be set by css, I will wire out those parts soon.

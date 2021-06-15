@@ -70,7 +70,9 @@ void text_break_glyphs(
     int         count,
     textstyle_t style,
     int         wth,
-    int*        hth);
+    int         hth,
+    int*        nwth,
+    int*        nhth);
 
 void text_align_glyphs(glyph_t*    glyphs,
                        int         count,
@@ -91,14 +93,16 @@ void text_layout(glyph_t*    glyphs,
                  int         count,
                  textstyle_t style,
                  int         wth,
-                 int         hth);
+                 int         hth,
+                 int*        nwth,
+                 int*        nhth);
 
 void text_render(
     str_t*      text,
     textstyle_t style,
     bm_t*       bitmap);
 
-void text_measure(str_t* text, textstyle_t style, int w, int* h);
+void text_measure(str_t* text, textstyle_t style, int w, int h, int* nw, int* nh);
 
 #endif
 
@@ -162,7 +166,9 @@ void text_break_glyphs(
     int         count,
     textstyle_t style,
     int         wth,
-    int*        hth)
+    int         hth,
+    int*        nwth,
+    int*        nhth)
 {
 
   stbtt_fontinfo* font = MGET(fonts, style.font);
@@ -265,23 +271,27 @@ void text_break_glyphs(
     // store glyph
     glyphs[index] = glyph;
 
-    if (cp == '\n' || cp == '\r' || (xpos > wth && style.multiline))
+    if (style.multiline)
     {
-      if (xpos > wth && style.multiline)
+      if (cp == '\n' || cp == '\r' || xpos > wth)
       {
-        // check if we already fell back to this index, break word if yes
-        if (spc_a == spc_p)
-          index -= 1;
-        else
-          index = spc_a;
-        spc_p = spc_a;
+        if (xpos > wth)
+        {
+          // check if we already fell back to this index, break word if yes
+          if (spc_a == spc_p)
+            index -= 1;
+          else
+            index = spc_a;
+          spc_p = spc_a;
+        }
+        xpos = 0.0;
+        ypos += (float)lineh * scale;
       }
-      xpos = 0.0;
-      ypos += (float)lineh * scale;
     }
   }
 
-  *hth = ypos;
+  *nwth = xpos;
+  *nhth = ypos;
 }
 
 void text_align_glyphs(glyph_t*    glyphs,
@@ -476,18 +486,19 @@ void text_layout(glyph_t*    glyphs,
                  int         count,
                  textstyle_t style,
                  int         wth,
-                 int         hth)
+                 int         hth,
+                 int*        nwth,
+                 int*        nhth)
 {
   if (style.margin_left == 0 && style.margin > 0) style.margin_left = style.margin;
   if (style.margin_right == 0 && style.margin > 0) style.margin_right = style.margin;
   if (style.margin_top == 0 && style.margin > 0) style.margin_top = style.margin;
   if (style.margin_bottom == 0 && style.margin > 0) style.margin_bottom = style.margin;
 
-  int w  = wth - style.margin_right - style.margin_left;
-  int h  = hth - style.margin_top - style.margin_bottom;
-  int nh = 0;
+  int w = wth - style.margin_right - style.margin_left;
+  int h = hth - style.margin_top - style.margin_bottom;
 
-  text_break_glyphs(glyphs, count, style, w, &nh);
+  text_break_glyphs(glyphs, count, style, w, h, nwth, nhth);
   text_align_glyphs(glyphs, count, style, w, h);
   text_shift_glyphs(glyphs, count, style);
 }
@@ -500,18 +511,21 @@ void text_render(
   glyph_t* glyphs = malloc(sizeof(glyph_t) * text->length);
   for (int i = 0; i < text->length; i++) glyphs[i].cp = text->codepoints[i];
 
-  text_layout(glyphs, text->length, style, bitmap->w, bitmap->h);
+  int nw;
+  int nh;
+
+  text_layout(glyphs, text->length, style, bitmap->w, bitmap->h, &nw, &nh);
   text_render_glyphs(glyphs, text->length, style, bitmap);
 
   free(glyphs);
 }
 
-void text_measure(str_t* text, textstyle_t style, int w, int* h)
+void text_measure(str_t* text, textstyle_t style, int w, int h, int* nw, int* nh)
 {
   glyph_t* glyphs = malloc(sizeof(glyph_t) * text->length);
   for (int i = 0; i < text->length; i++) glyphs[i].cp = text->codepoints[i];
 
-  text_break_glyphs(glyphs, text->length, style, w, h);
+  text_break_glyphs(glyphs, text->length, style, w, h, nw, nh);
 
   free(glyphs);
 }

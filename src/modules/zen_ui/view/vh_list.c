@@ -28,9 +28,10 @@ typedef struct _vh_list_t
 
   char lock_scroll;
 
-  float item_wth; // width of all items
-  float item_pos; // horizontal position of all items
-  float head_pos; // vertical position of head ( for refresh )
+  float item_wth;     // width of all items
+  float item_pos;     // horizontal position of all items
+  float item_tgt_pos; // target item pos for animated horizontal scrol
+  float head_pos;     // vertical position of head ( for refresh )
 
   // scrollers
 
@@ -61,6 +62,8 @@ void    vh_list_refresh(view_t* view);
 view_t* vh_list_item_for_index(view_t* view, int index);
 void    vh_list_lock_scroll(view_t* view, char state);
 void    vh_list_scroll_to_index(view_t* view, int index);
+void    vh_list_scroll_to_x_poisiton(view_t* view, float position);
+void    vh_list_set_item_width(view_t* view, float width);
 
 #endif
 
@@ -266,23 +269,35 @@ void vh_list_evt(view_t* view, ev_t ev)
       view_t* head = vec_head(vh->items);
       view_t* tail = vec_tail(vh->items);
 
+      char move = 0;
       // horizontal bounce
 
       if (vh->item_pos > 0.0001)
       {
         vh->item_pos += -vh->item_pos / 5.0;
+        move = 1;
       }
       else if (vh->item_pos + vh->item_wth < view->frame.local.w - vh->inset.r)
       {
         if (vh->item_wth > view->frame.local.w - vh->inset.r)
         {
           vh->item_pos += (view->frame.local.w - vh->inset.r - vh->item_wth - vh->item_pos) / 5.0;
+          move = 1;
         }
         else if (vh->item_pos < -0.0001)
         {
           vh->item_pos += -vh->item_pos / 5.0;
+          move = 1;
         }
       }
+      else if (vh->item_tgt_pos < vh->item_pos - 0.0001 || vh->item_tgt_pos > vh->item_pos + 0.0001)
+      {
+        vh->item_pos += (vh->item_tgt_pos - vh->item_pos) / 4;
+        move = 1;
+        printf("%f\n", vh->item_tgt_pos);
+      }
+
+      if (move) vh_list_move(view, 0);
 
       // vertical bounce
 
@@ -300,10 +315,6 @@ void vh_list_evt(view_t* view, ev_t ev)
         {
           vh_list_move(view, -head->frame.local.y / 5.0);
         }
-      }
-      else if (vh->item_pos > 0.001 || vh->item_pos < -0.0001)
-      {
-        vh_list_move(view, 0);
       }
     }
     // close scrollbars
@@ -422,6 +433,21 @@ void vh_list_scroll_to_index(view_t* view, int index)
     vh->head_pos = vh->header ? vh->header->frame.local.h : 0;
     vh_list_update_scrollbars(view);
   }
+}
+
+void vh_list_scroll_to_x_poisiton(view_t* view, float position)
+{
+  vh_list_t* vh = view->handler_data;
+
+  if (position > 0) position = 0;
+  vh->item_tgt_pos = position;
+  vh_list_move(view, 0);
+}
+
+void vh_list_set_item_width(view_t* view, float width)
+{
+  vh_list_t* vh = view->handler_data;
+  vh->item_wth  = width;
 }
 
 void vh_list_reset(view_t* view)

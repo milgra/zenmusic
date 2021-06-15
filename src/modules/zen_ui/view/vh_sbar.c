@@ -68,7 +68,7 @@ void vh_sbar_evt(view_t* view, ev_t ev)
           // dot state
           ratio = (float)vh->step / ((float)vh->steps / 3.0);
           bm_reset(bm);
-          if (vh->delta > 0) gfx_rect(bm, 0, 0, bm->w, bm->h, 0x00000055, 0);
+          if (vh->delta > 0) gfx_rect(bm, 0, 0, bm->w, bm->h, 0x00000022, 0);
 
           if (vh->type == SBAR_V)
           {
@@ -87,7 +87,7 @@ void vh_sbar_evt(view_t* view, ev_t ev)
           // bar state
           ratio = (float)(vh->step - vh->steps / 3) / (float)(vh->steps / 3 * 2);
           bm_reset(bm);
-          if (vh->delta > 0) gfx_rect(bm, 0, 0, bm->w, bm->h, 0x00000055, 0);
+          if (vh->delta > 0) gfx_rect(bm, 0, 0, bm->w, bm->h, 0x00000022, 0);
 
           float size = vh->size * ratio;
           float pos  = vh->pos + vh->size / 2 - size / 2;
@@ -118,7 +118,7 @@ void vh_sbar_evt(view_t* view, ev_t ev)
       bm_t* bm = view->texture.bitmap;
       bm_reset(bm);
 
-      gfx_rect(bm, 0, 0, bm->w, bm->h, 0x00000055, 0);
+      gfx_rect(bm, 0, 0, bm->w, bm->h, 0x00000022, 0);
 
       if (vh->type == SBAR_V)
       {

@@ -12,6 +12,7 @@ typedef struct _vh_textinput_t
   vec_t*  glyph_v;  // glpyh views
   view_t* cursor_v; // cursor view
   view_t* holder_v; // placeholder text view
+  r2_t    frame_s;  // starting frame for autosize minimal values
 
   int         glyph_index;
   textstyle_t style;
@@ -60,7 +61,37 @@ void vh_textinput_upd(view_t* view)
   {
     glyph_t* glyphs = malloc(sizeof(glyph_t) * text_s->length); // REL 0
     for (int i = 0; i < text_s->length; i++) glyphs[i].cp = text_s->codepoints[i];
-    text_layout(glyphs, text_s->length, data->style, frame.w, frame.h);
+    int nw;
+    int nh;
+    text_layout(glyphs, text_s->length, data->style, frame.w, frame.h, &nw, &nh);
+
+    // resize frame if needed
+    if (data->style.autosize == AS_AUTO)
+    {
+      frame = view->frame.local;
+      if (nw > frame.w)
+      {
+        frame.w = nw;
+        view_set_frame(view, frame);
+      }
+      if (nw <= frame.w)
+      {
+        if (nw <= data->frame_s.w) nw = data->frame_s.w;
+        frame.w = nw;
+        view_set_frame(view, frame);
+      }
+      if (nh > frame.h)
+      {
+        frame.h = nh;
+        view_set_frame(view, frame);
+      }
+      if (nh <= frame.h)
+      {
+        if (nh <= data->frame_s.h) nh = data->frame_s.h;
+        frame.h = nh;
+        view_set_frame(view, frame);
+      }
+    }
 
     for (int i = 0; i < text_s->length; i++)
     {
@@ -144,7 +175,9 @@ void vh_textinput_upd(view_t* view)
     // get line height
     glyph_t glyph;
     glyph.cp = ' ';
-    text_layout(&glyph, 1, data->style, frame.w, frame.h);
+    int nw;
+    int nh;
+    text_layout(&glyph, 1, data->style, frame.w, frame.h, &nw, &nh);
 
     r2_t crsr_f = {0};
     crsr_f.w    = 2;
@@ -326,6 +359,8 @@ void vh_textinput_add(view_t*     view,
 
   data->style    = textstyle;
   data->userdata = userdata;
+
+  data->frame_s = view->frame.local;
 
   view->needs_key  = 1; // backspace event
   view->needs_text = 1; // unicode text event

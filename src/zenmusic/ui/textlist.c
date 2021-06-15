@@ -100,23 +100,24 @@ view_t* textlist_item_for_index(int index, void* data, view_t* listview, int* it
 
   tl->textstyle.backcolor = color;
 
-  int    h;
   str_t* str = str_new(); // REL 0
   str_addbytearray(str, tl->items->data[index]);
-  text_measure(str, tl->textstyle, item->frame.local.w, &h);
+  int nw;
+  int nh;
+  text_measure(str, tl->textstyle, item->frame.local.w, item->frame.local.h, &nw, &nh);
   REL(str);
 
-  if (h < 35) h = 35;
+  if (nh < 35) nh = 35;
 
   view_t* cell = vh_litem_get_cell(item, "cell");
 
   r2_t frame = item->frame.local;
-  frame.h    = h;
+  frame.h    = nh;
 
   view_set_frame(item, frame);
 
   frame   = cell->frame.local;
-  frame.h = h;
+  frame.h = nh;
 
   view_set_frame(cell, frame);
 

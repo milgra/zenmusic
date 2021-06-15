@@ -63,7 +63,7 @@ void ui_song_infos_update_time(double time, double left, double dur)
 
   uisi.textstyle.align        = TA_LEFT;
   uisi.textstyle.margin_right = 0;
-  uisi.textstyle.margin_left  = 17;
+  uisi.textstyle.margin_left  = 18;
 
   snprintf(timebuff, 20, "%.2i:%.2i", dmin, dsec);
   tg_text_set(uisi.song_length_view, timebuff, uisi.textstyle);
