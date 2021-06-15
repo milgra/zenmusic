@@ -11,6 +11,7 @@ void    ui_manager_remove(view_t* view);
 void    ui_manager_render(uint32_t time);
 void    ui_manager_activate(view_t* view);
 view_t* ui_manager_get_root();
+void    ui_manager_resize_to_root(view_t* view);
 
 #endif
 
@@ -194,6 +195,14 @@ void ui_manager_render(uint32_t time)
 view_t* ui_manager_get_root()
 {
   return uim.root;
+}
+
+void ui_manager_resize_to_root(view_t* view)
+{
+  r2_t f = uim.root->frame.local;
+
+  view_set_frame(view, (r2_t){0.0, 0.0, (float)f.w, (float)f.h});
+  view_layout(view);
 }
 
 #endif

@@ -10,6 +10,7 @@ void ui_popup_switcher_toggle(char* id);
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "ui_manager.c"
 #include "vh_anim.c"
 #include "vh_touch.c"
 #include "zc_cstring.c"
@@ -92,6 +93,9 @@ void ui_popup_switcher_toggle_baseview(view_t* view)
   }
   else
   {
+    // resize first if main view is resized
+    ui_manager_resize_to_root(view);
+
     r2_t basef = ups.baseview->frame.local;
 
     view_t* btnview = view->views->data[0];

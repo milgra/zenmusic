@@ -32,8 +32,7 @@ struct _ui_filter_bar_t
 
 void ui_filter_bar_attach(view_t* baseview)
 {
-  ufb.songlist_filter_bar                          = view_get_subview(baseview, "filterfield");
-  ufb.songlist_filter_bar->layout.background_color = 0xFFFFFFFF;
+  ufb.songlist_filter_bar = view_get_subview(baseview, "filterfield");
 
   textstyle_t ts  = {0};
   ts.font         = config_get("font_path");
@@ -41,7 +40,7 @@ void ui_filter_bar_attach(view_t* baseview)
   ts.margin_right = 20;
   ts.align        = TA_LEFT;
   ts.textcolor    = 0x000000FF;
-  ts.backcolor    = 0xFFFFFFFF;
+  ts.backcolor    = 0xFFFF00FF;
 
   view_t* clearbtn  = view_get_subview(baseview, "clearbtn");
   view_t* filterbtn = view_get_subview(baseview, "filterbtn");

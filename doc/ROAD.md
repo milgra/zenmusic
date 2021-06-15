@@ -12,7 +12,6 @@
  - check select all during filtering
  - scroll over knob problem fix
  - vertical alignment of text is too on the top
- - base view resize during full screen for mouse detection, search-filter text align to middle
  - full screen button works strange
  - select range should work
  - freebsd logo should be in the center
