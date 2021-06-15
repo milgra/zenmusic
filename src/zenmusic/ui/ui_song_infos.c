@@ -34,6 +34,7 @@ void ui_song_infos_attach(view_t* baseview)
   ts.size         = 30.0;
   ts.textcolor    = 0x000000FF;
   ts.backcolor    = 0;
+  ts.multiline    = 1;
 
   uisi.song_info_view      = view_get_subview(baseview, "song_info");
   uisi.song_time_view      = view_get_subview(baseview, "song_info_time");
