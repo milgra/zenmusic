@@ -2,7 +2,6 @@
 
 **before release**
 
- - input field into vh list in popups
  - editor popup freeze on empty list
  - cursor indicator in replay is under other layers
  - deselect should work, select range should work
@@ -26,9 +25,7 @@
  - cover art should be blank when selecting multiple songs
  - space should update play/pause button
  - filter selection scrolls item 0 under header
- - ESC should finish input field editing
  - track numbers 2 should preceed 11
- - clear button to all input fields
  - automated tests
  - fix leaks
  - youtube video

@@ -334,6 +334,11 @@ void vh_textinput_evt(view_t* view, ev_t ev)
     {
       if (data->on_return) (*data->on_return)(view);
     }
+    if (ev.keycode == SDLK_ESCAPE)
+    {
+      vh_textinput_activate(view, 0);
+      if (data->on_deactivate) (*data->on_deactivate)(view);
+    }
   }
   else if (ev.type == EV_TIME)
   {
@@ -444,16 +449,18 @@ void vh_textinput_set_text(view_t* view, char* text)
   {
     view_t* gv = data->glyph_v->data[i];
 
-    r2_t sf = gv->frame.local;
-    r2_t ef = sf;
-    sf.x    = 0.0;
-    sf.y    = 0.0;
-    ef.x    = 0.0;
-    ef.y    = 0.0;
-    ef.w    = 0.0;
+    view_remove(view, gv);
 
-    vh_anim_region(gv, sf, ef, 10 + i, AT_EASE);
-    vh_anim_set_event(gv, view, vh_textinput_on_glyph_close);
+    /* r2_t sf = gv->frame.local; */
+    /* r2_t ef = sf; */
+    /* sf.x    = 0.0; */
+    /* sf.y    = 0.0; */
+    /* ef.x    = 0.0; */
+    /* ef.y    = 0.0; */
+    /* ef.w    = 0.0; */
+
+    /* vh_anim_region(gv, sf, ef, 10 + i, AT_EASE); */
+    /* vh_anim_set_event(gv, view, vh_textinput_on_glyph_close); */
   }
   vec_reset(data->glyph_v);
 
