@@ -2,6 +2,7 @@
 
 **before release**
 
+ - use zen_callback in all view handlers
  - editor popup freeze on empty list
  - cursor indicator in replay is under other layers
  - deselect should work, select range should work
