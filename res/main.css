@@ -94,6 +94,7 @@
     background-color: #FFFFFFFF;
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 
 #toolbar {
@@ -664,7 +665,7 @@
 }
 
 #lib_init_page_back {
-    width: 560px;
+    width: 600px;
     height: 180px;
     margin: auto;
 }
@@ -679,7 +680,7 @@
 .ch_lib_if_back {
     bottom: 10px;
     left: 10px;
-    width: 400px;
+    width: 445px;
     height: 35px;
     border-radius: 10px;
     background-color: #FFFFFFFF;
@@ -687,12 +688,12 @@
 }
 
 .ch_lib_lv {
-    width: 350px;
+    width: 400px;
     height: 100%;
 }
 
 .ch_lib_if {
-    width: 350px;
+    width: 400px;
     height: 100%;
 }
 

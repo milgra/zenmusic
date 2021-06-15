@@ -216,6 +216,7 @@ void ui_about_popup_attach(view_t* baseview)
   donl.textstyle.size      = 30.0;
   donl.textstyle.textcolor = 0x000000FF;
   donl.textstyle.backcolor = 0xF5F5F5FF;
+  donl.textstyle.multiline = 1;
 
   // create fields
 

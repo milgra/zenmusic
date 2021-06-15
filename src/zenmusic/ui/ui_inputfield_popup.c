@@ -16,18 +16,23 @@ void ui_inputfield_popup_show(char* text, cb_t* acc_cb, cb_t* rej_cb);
 #include "ui_manager.c"
 #include "ui_popup_switcher.c"
 #include "vh_button.c"
+#include "vh_list.c"
 #include "vh_textinput.c"
 #include "zc_cstring.c"
 #include "zc_vector.c"
 
-void ui_inputfield_popup_accept(void* userdata, void* data);
-void ui_inputfield_popup_reject(void* userdata, void* data);
-void ui_inputfield_popup_enter(view_t* view);
+void    ui_inputfield_popup_accept(void* userdata, void* data);
+void    ui_inputfield_popup_reject(void* userdata, void* data);
+void    ui_inputfield_popup_enter(view_t* view);
+void    ui_inputfield_on_button_down(void* userdata, void* data);
+view_t* ui_inputfield_item_for_index(int index, void* userdata, view_t* listview, int* item_count);
+void    ui_inputfield_on_text(view_t* view);
 
 struct _ui_inputfield_popup_t
 {
   char        attached;
   vec_t*      requests;
+  view_t*     listview;
   view_t*     textfield;
   view_t*     inputfield;
   textstyle_t textstyle;
@@ -44,34 +49,83 @@ void ui_inputfield_popup_attach(view_t* baseview)
   ts.align       = TA_LEFT;
   ts.textcolor   = 0x000000FF;
   ts.backcolor   = 0;
-  ts.multiline   = 1;
+  ts.multiline   = 0;
+  ts.autosize    = AS_AUTO;
 
-  view_t* acc_btn    = view_get_subview(baseview, "inp_popup_accept_btn");
-  view_t* rej_btn    = view_get_subview(baseview, "inp_popup_reject_btn");
+  view_t* acc_btn = view_get_subview(baseview, "inp_popup_accept_btn");
+  view_t* rej_btn = view_get_subview(baseview, "inp_popup_reject_btn");
+  view_t* clr_btn = view_get_subview(baseview, "inp_popup_clear_btn");
+
+  view_t* listview   = view_get_subview(baseview, "inp_popup_listview");
   view_t* textfield  = view_get_subview(baseview, "inp_popup_textfield");
   view_t* inputfield = view_get_subview(baseview, "inp_popup_inputfield");
-
-  cb_t* acc_cb = cb_new(ui_inputfield_popup_accept, NULL);
-  cb_t* rej_cb = cb_new(ui_inputfield_popup_reject, NULL);
 
   tg_text_add(textfield);
 
   vh_textinput_add(inputfield, "/home/youruser/Music", "", ts, NULL);
+  vh_textinput_set_on_text(inputfield, ui_inputfield_on_text);
   vh_textinput_set_on_return(inputfield, ui_inputfield_popup_enter);
 
-  ts.align = TA_CENTER;
+  ts.autosize  = AS_FIX;
+  ts.multiline = 1;
+  ts.align     = TA_CENTER;
 
-  vh_button_add(acc_btn, VH_BUTTON_NORMAL, acc_cb);
-  vh_button_add(rej_btn, VH_BUTTON_NORMAL, rej_cb);
+  cb_t* cb_btn_press = cb_new(ui_inputfield_on_button_down, NULL);
 
-  REL(acc_cb);
-  REL(rej_cb);
+  vh_button_add(acc_btn, VH_BUTTON_NORMAL, cb_btn_press);
+  vh_button_add(rej_btn, VH_BUTTON_NORMAL, cb_btn_press);
+  vh_button_add(clr_btn, VH_BUTTON_NORMAL, cb_btn_press);
 
   uip.textstyle  = ts;
+  uip.listview   = listview;
   uip.textfield  = textfield;
   uip.inputfield = inputfield;
   uip.attached   = 1;
   uip.requests   = VNEW();
+
+  vh_list_add(uip.listview,
+              ((vh_list_inset_t){0}),
+              ui_inputfield_item_for_index,
+              NULL,
+              NULL);
+
+  RET(inputfield);
+  view_remove(view_get_subview(baseview, "inp_popup_inputfield_back"), inputfield);
+
+  REL(cb_btn_press);
+}
+
+view_t* ui_inputfield_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
+{
+  if (index == 0)
+    return uip.inputfield;
+  else
+    return NULL;
+}
+
+void ui_inputfield_on_text(view_t* view)
+{
+  if (uip.inputfield->frame.local.w > uip.listview->frame.local.w)
+  {
+    vh_list_set_item_width(uip.listview, uip.inputfield->frame.local.w);
+    vh_list_scroll_to_x_poisiton(uip.listview, uip.listview->frame.local.w - uip.inputfield->frame.local.w);
+  }
+}
+
+void ui_inputfield_on_button_down(void* userdata, void* data)
+{
+  char* id = ((view_t*)data)->id;
+
+  if (strcmp(id, "inp_popup_accept_btn") == 0) ui_inputfield_popup_accept(NULL, NULL);
+  if (strcmp(id, "inp_popup_reject_btn") == 0) ui_inputfield_popup_reject(NULL, NULL);
+  if (strcmp(id, "inp_popup_clear_btn") == 0)
+  {
+    vh_list_set_item_width(uip.listview, uip.inputfield->frame.local.w);
+    vh_list_scroll_to_x_poisiton(uip.listview, 0);
+    vh_textinput_set_text(uip.inputfield, "");
+    vh_textinput_activate(uip.inputfield, 1);
+    ui_manager_activate(uip.inputfield);
+  }
 }
 
 void ui_inputfield_popup_shownext()
