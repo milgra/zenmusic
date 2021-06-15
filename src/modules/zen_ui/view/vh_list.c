@@ -340,6 +340,7 @@ void vh_list_evt(view_t* view, ev_t ev)
       if (ev.dx != 0.0)
       {
         vh->item_pos += ev.dx;
+        vh->item_tgt_pos = vh->item_pos;
 
         if (vh->htimeout == 0)
         {
