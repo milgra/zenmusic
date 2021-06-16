@@ -175,9 +175,15 @@ void ui_editor_popup_show()
 {
   vec_t* selected = VNEW();
   ui_songlist_get_selected(selected);
-  ui_editor_popup_set_songs(selected);
-  ui_popup_switcher_toggle("song_editor_popup_page");
-  REL(selected);
+
+  if (selected->length > 0)
+  {
+    ui_editor_popup_set_songs(selected);
+    ui_popup_switcher_toggle("song_editor_popup_page");
+    REL(selected);
+  }
+  else
+    ui_alert_popup_show("No songs are selected.");
 }
 
 void ui_editor_popup_on_accept_cover(void* userdata, void* data)

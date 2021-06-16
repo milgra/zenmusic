@@ -7,6 +7,7 @@
 void    ui_manager_init(int width, int height);
 void    ui_manager_event(ev_t event);
 void    ui_manager_add(view_t* view);
+void    ui_manager_add_to_top(view_t* view);
 void    ui_manager_remove(view_t* view);
 void    ui_manager_render(uint32_t time);
 void    ui_manager_activate(view_t* view);
@@ -29,6 +30,7 @@ struct _uim_t
   vec_t*  views;
   vec_t*  implqueue; // views selected by roll over
   vec_t*  explqueue; // views selected by click
+  int     keep_top;
 } uim = {0};
 
 void ui_manager_init(int width, int height)
@@ -160,7 +162,16 @@ void ui_manager_event(ev_t ev)
 
 void ui_manager_add(view_t* view)
 {
+  if (uim.keep_top)
+    view_insert(uim.root, view, uim.root->views->length - 1);
+  else
+    view_add(uim.root, view);
+}
+
+void ui_manager_add_to_top(view_t* view)
+{
   view_add(uim.root, view);
+  uim.keep_top = 1;
 }
 
 void ui_manager_remove(view_t* view)

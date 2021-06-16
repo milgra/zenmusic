@@ -197,6 +197,13 @@ void wm_init(void (*init)(int, int, char*),
               ev.type    = EV_KDOWN;
               ev.keycode = event.key.keysym.sym;
             }
+            else if (event.type == SDL_KEYUP)
+            {
+              //printf("Scancode: 0x%02X", event.key.keysym.scancode);
+              //printf(", Name: %s\n", SDL_GetKeyName(event.key.keysym.sym));
+              ev.type    = EV_KUP;
+              ev.keycode = event.key.keysym.sym;
+            }
             else if (event.type == SDL_TEXTINPUT)
             {
               ev.type = EV_TEXT;

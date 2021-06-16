@@ -196,10 +196,10 @@ void init(int width, int height, char* path)
     printf("***REPLAYING SESSION***\n");
     zm.rep_cur                          = view_new("rep_cur", ((r2_t){10, 10, 10, 10}));
     zm.rep_cur->exclude                 = 0;
-    zm.rep_cur->layout.background_color = 0xFF0000FF;
+    zm.rep_cur->layout.background_color = 0xFF000099;
     zm.rep_cur->needs_touch             = 0;
     tg_css_add(zm.rep_cur);
-    ui_manager_add(zm.rep_cur);
+    ui_manager_add_to_top(zm.rep_cur);
   }
 
   // cleanup
@@ -225,7 +225,10 @@ void update(ev_t ev)
       while ((recev = evrec_replay(ev.time)) != NULL)
       {
         ui_manager_event(*recev);
+
         view_set_frame(zm.rep_cur, (r2_t){recev->x, recev->y, 10, 10});
+
+        if (recev->type == EV_KDOWN && recev->keycode == SDLK_PRINTSCREEN) save_screenshot();
       }
     }
   }
@@ -233,18 +236,13 @@ void update(ev_t ev)
   {
     if (zm.rec_par)
     {
-      // record all events besides time
       evrec_record(ev);
+      if (ev.type == EV_KDOWN && ev.keycode == SDLK_PRINTSCREEN) save_screenshot();
     }
   }
 
   // in case of replay only send time events
   if (!zm.rep_par || ev.type == EV_TIME) ui_manager_event(ev);
-
-  /* if (zm.rep_par || zm.rec_par) */
-  /* { */
-  if (ev.type == EV_KDOWN && ev.keycode == SDLK_PRINTSCREEN) save_screenshot();
-  /* } */
 }
 
 // render, called once per frame
@@ -456,4 +454,6 @@ void save_screenshot()
   REL(flipped); // REL 1
   REL(name);    // REL 2
   REL(path);    // REL 3
+
+  if (zm.rep_par) view_set_frame(zm.rep_cur, frame);
 }

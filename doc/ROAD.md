@@ -2,9 +2,6 @@
 
 **before release**
 
- - editor popup freeze on empty list
- - editor popup finalize
- - cursor indicator in replay is under other layers
  - deselect should work, select range should work
  - filters window visual update
  - thinner activity window frame
