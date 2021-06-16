@@ -171,6 +171,7 @@ void ui_songlist_attach(view_t* base)
 
 void ui_songlist_update()
 {
+  selection_res();
   vh_list_reset(sl.view);
 }
 

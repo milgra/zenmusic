@@ -96,7 +96,7 @@ view_t* textlist_item_for_index(int index, void* data, view_t* listview, int* it
   *item_count = tl->items->length;
 
   view_t*  item  = textlist_create_item(tl);
-  uint32_t color = (index % 2 == 0) ? 0xFFFFFFFF : 0xFAFAFAFF;
+  uint32_t color = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
 
   tl->textstyle.backcolor = color;
 

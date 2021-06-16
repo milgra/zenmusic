@@ -3,10 +3,7 @@
 **before release**
 
  - deselect should work, select range should work
- - filters window visual update
- - thinner activity window frame
  - check organize during playing
- - check select all during filtering
  - scroll over knob problem fix
  - vertical alignment of text is too on the top
  - full screen button works strange

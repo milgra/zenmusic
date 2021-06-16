@@ -33,17 +33,18 @@ struct _ui_filter_popup_t
 
 void ui_filter_popup_attach(view_t* baseview)
 {
-  textstyle_t ts  = {0};
-  ts.font         = config_get("font_path");
-  ts.size         = 30.0;
-  ts.textcolor    = 0x000000FF;
-  ts.backcolor    = 0;
-  ts.align        = TA_RIGHT;
-  ts.margin_right = 20;
+  textstyle_t ts = {0};
+  ts.font        = config_get("font_path");
+  ts.size        = 30.0;
+  ts.textcolor   = 0x000000FF;
+  ts.backcolor   = 0;
+  ts.align       = TA_RIGHT;
 
-  ufp.genrelist  = textlist_new(view_get_subview(baseview, "genrelist"), ts, ui_filter_popup_on_genre_select);
-  ts.align       = TA_LEFT;
-  ufp.artistlist = textlist_new(view_get_subview(baseview, "artistlist"), ts, ui_filter_popup_on_artist_select);
+  ts.margin_right = 20;
+  ufp.genrelist   = textlist_new(view_get_subview(baseview, "genrelist"), ts, ui_filter_popup_on_genre_select);
+  ts.margin_left  = 20;
+  ts.align        = TA_LEFT;
+  ufp.artistlist  = textlist_new(view_get_subview(baseview, "artistlist"), ts, ui_filter_popup_on_artist_select);
 }
 
 void ui_filter_popup_show()
