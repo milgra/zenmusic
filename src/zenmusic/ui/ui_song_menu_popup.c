@@ -48,12 +48,12 @@ void ui_song_menu_popup_attach(view_t* baseview)
 
   // create items
 
-  VADD(slp.items, ui_song_menu_popupitem_create(0, "Select/Deselect"));
-  VADD(slp.items, ui_song_menu_popupitem_create(1, "Select Range"));
-  VADD(slp.items, ui_song_menu_popupitem_create(2, "Select All"));
+  VADD(slp.items, ui_song_menu_popupitem_create(0, "Select song"));
+  VADD(slp.items, ui_song_menu_popupitem_create(1, "Select range"));
+  VADD(slp.items, ui_song_menu_popupitem_create(2, "Select all"));
   VADD(slp.items, ui_song_menu_popupitem_create(3, "Jump to current song"));
-  VADD(slp.items, ui_song_menu_popupitem_create(4, "Edit Song Info"));
-  VADD(slp.items, ui_song_menu_popupitem_create(5, "Delete Song"));
+  VADD(slp.items, ui_song_menu_popupitem_create(4, "Edit selected songs"));
+  VADD(slp.items, ui_song_menu_popupitem_create(5, "Delete selected songs"));
 
   // add list handler to view
 
@@ -89,9 +89,14 @@ void ui_song_menu_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* 
   if (index == 4) ui_editor_popup_show();
   if (index == 5)
   {
-    cb_t* acc_cb = cb_new(ui_song_menu_popup_on_item_delete, NULL);
-    ui_decision_popup_show("Are you sure you want to delete x items?", acc_cb, NULL);
+    vec_t* selected = VNEW(); // REL 0
+    ui_songlist_get_selected(selected);
+
+    cb_t* acc_cb = cb_new(ui_song_menu_popup_on_item_delete, NULL); // REL 1
+    char* text   = cstr_fromformat(100, "Are you sure you want to delete %i items?", selected->length);
+    ui_decision_popup_show(text, acc_cb, NULL);
     REL(acc_cb);
+    REL(selected);
   }
 }
 

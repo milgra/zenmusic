@@ -39,6 +39,11 @@ Zen Image Library
 - image/video viewer and organizer
 - zen + i?
 
+Zen Control Center
+
+- html based layout
+- wifi, sound, display, etc controls can be added by html
+
 Zen Wifi
 
 - floating wifi manager

@@ -2,27 +2,26 @@
 
 **before release**
 
+ - ugralo scroll list
  - deselect should work, select range should work
  - check organize during playing
- - scroll over knob problem fix
  - vertical alignment of text is too on the top
- - select range should work
  - freebsd logo should be in the center
  - dragger visual aid for column field resize
  - play/skip counter should work, last played/last skipped should work
- - set window dimensions with command line parameters
  - library popups should show actual pathes
  - scroll on press on edge of list
  - scroller event normalization to avoid lag when dragging
  - filter selection scrolls item 0 under header
  - track numbers 2 should preceed 11
- - use zen_callback in all view handlers
  - automated tests
  - fix leaks
  - youtube video
 
 **near future**
 
+ - use zen_callback in all view handlers
+ - set window dimensions with command line parameters
  - filters popup : genre select should filter artists, "none" item is needed
  - ui scaling should be settable by command line parameters
  - moving mouse during inertia scroll causes scroll to stuck in some cases

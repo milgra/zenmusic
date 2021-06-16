@@ -98,7 +98,7 @@ void ui_songlist_attach(view_t* base)
   VADDR(sl.columns, sl_cell_new("track", 60, 6));
   VADDR(sl.columns, sl_cell_new("disc", 60, 7));
   VADDR(sl.columns, sl_cell_new("time", 50, 8));
-  VADDR(sl.columns, sl_cell_new("ch", 30, 9));
+  VADDR(sl.columns, sl_cell_new("ch", 40, 9));
   VADDR(sl.columns, sl_cell_new("bit rate", 100, 10));
   VADDR(sl.columns, sl_cell_new("sample", 80, 11));
   VADDR(sl.columns, sl_cell_new("plays", 55, 12));
@@ -266,7 +266,7 @@ void on_header_field_resize(view_t* view, char* id, int size)
 
 void ui_songlist_select(int index)
 {
-  selection_res();
+  // selection_res();
   selection_add(sl.index_s);
   vh_list_refresh(sl.view);
 }
@@ -288,8 +288,10 @@ void ui_songlist_select_all()
 void ui_songlist_get_selected(vec_t* vec)
 {
   // if selection is empty, select current index
-  if (selection_cnt() < 2) selection_add(sl.index_s);
-  selection_add_selection(visible_get_songs(), vec);
+  if (selection_cnt() > 0)
+  {
+    selection_add_selection(visible_get_songs(), vec);
+  }
 }
 
 void ui_songlist_select_and_show(int index)
@@ -330,12 +332,12 @@ void ui_songlist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, e
 
     ui_popup_switcher_toggle("song_popup_page");
 
-    if (selection_cnt() < 2)
-    {
-      selection_res();
-      selection_add(index);
-      vh_list_refresh(sl.view);
-    }
+    /* if (selection_cnt() < 2) */
+    /* { */
+    /*   selection_res(); */
+    /*   selection_add(index); */
+    /*   vh_list_refresh(sl.view); */
+    /* } */
   }
 }
 
