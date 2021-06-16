@@ -126,6 +126,17 @@ void vh_button_set_state(view_t* view, vh_button_state_t state)
 {
   vh_button_t* vh = view->handler_data;
   vh->state       = state;
+
+  if (state)
+  {
+    if (vh->offview) vh_anim_alpha(vh->offview, 1.0, 0.0, 10, AT_LINEAR);
+    if (vh->onview) vh_anim_alpha(vh->onview, 0.0, 1.0, 10, AT_LINEAR);
+  }
+  else
+  {
+    if (vh->offview) vh_anim_alpha(vh->offview, 0.0, 1.0, 10, AT_LINEAR);
+    if (vh->onview) vh_anim_alpha(vh->onview, 1.0, 0.0, 10, AT_LINEAR);
+  }
 }
 
 void vh_button_add(view_t* view, vh_button_type_t type, cb_t* event)

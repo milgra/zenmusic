@@ -119,11 +119,7 @@ void ui_load(float width, float height)
 void ui_on_key_down(void* userdata, void* data)
 {
   ev_t* ev = (ev_t*)data;
-  if (ev->keycode == SDLK_SPACE)
-  {
-    int state = player_toggle_pause();
-    ui_songlist_toggle_pause(state);
-  }
+  if (ev->keycode == SDLK_SPACE) ui_play_pause();
 }
 
 // button down event from descriptor html

@@ -15,7 +15,6 @@
  - library popups should show actual pathes
  - scroll on press on edge of list
  - scroller event normalization to avoid lag when dragging
- - space should update play/pause button
  - filter selection scrolls item 0 under header
  - track numbers 2 should preceed 11
  - use zen_callback in all view handlers

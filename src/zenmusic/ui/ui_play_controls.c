@@ -93,8 +93,6 @@ void ui_play_index(int index)
   if (uipc.lastindex < 0) uipc.lastindex = 0;
   if (uipc.lastindex < visible_song_count())
   {
-    vh_button_set_state(uipc.playbtn, VH_BUTTON_DOWN);
-
     ui_song_infos_show(uipc.lastindex);
     vec_t* songs   = visible_get_songs();
     map_t* songmap = songs->data[uipc.lastindex];
@@ -102,6 +100,8 @@ void ui_play_index(int index)
     player_play(path);
     player_set_volume(0.9);
     REL(path);
+
+    vh_button_set_state(uipc.playbtn, VH_BUTTON_DOWN);
   }
 }
 
@@ -127,7 +127,9 @@ void ui_play_prev()
 
 void ui_play_pause()
 {
-  player_toggle_pause();
+  int state = player_toggle_pause();
+  ui_songlist_toggle_pause(state);
+  vh_button_set_state(uipc.playbtn, state ? VH_BUTTON_UP : VH_BUTTON_DOWN);
 }
 
 void ui_toggle_shuffle()
