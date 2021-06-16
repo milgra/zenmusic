@@ -32,6 +32,7 @@ void ui_editor_popup_show();
 #include "zc_callback.c"
 #include "zc_cstring.c"
 #include "zc_cstrpath.c"
+#include "zc_graphics.c"
 #include "zc_vector.c"
 #include <string.h>
 
@@ -586,16 +587,21 @@ void ui_editor_popup_set_songs(vec_t* vec)
   tg_text_set(ep.head_view, text, ep.textstyle);
   REL(text);
 
-  // load cover
+  // reset cover
 
-  map_t* song = vec->data[0];
-  char*  path = MGET(song, "file/path");
-  char*  file = cstr_path_append(config_get("lib_path"), path);
+  gfx_rect(ep.cover_view->texture.bitmap, 0, 0, ep.cover_view->texture.bitmap->w, ep.cover_view->texture.bitmap->h, 0, 1);
 
-  coder_load_cover_into(file, ep.cover_view->texture.bitmap);
+  if (vec->length == 1)
+  {
+    map_t* song = vec->data[0];
+    char*  path = MGET(song, "file/path");
+    char*  file = cstr_path_append(config_get("lib_path"), path);
 
-  REL(file);
-  ep.cover_view->texture.changed = 1;
+    coder_load_cover_into(file, ep.cover_view->texture.bitmap);
+
+    REL(file);
+    ep.cover_view->texture.changed = 1;
+  }
 }
 
 void ui_editor_popup_on_accept()

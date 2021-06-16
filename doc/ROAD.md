@@ -10,13 +10,11 @@
  - select range should work
  - freebsd logo should be in the center
  - dragger visual aid for column field resize
- - filters popup : genre select should filter artists, "none" item is needed
  - play/skip counter should work, last played/last skipped should work
  - set window dimensions with command line parameters
  - library popups should show actual pathes
  - scroll on press on edge of list
  - scroller event normalization to avoid lag when dragging
- - cover art should be blank when selecting multiple songs
  - space should update play/pause button
  - filter selection scrolls item 0 under header
  - track numbers 2 should preceed 11
@@ -27,6 +25,7 @@
 
 **near future**
 
+ - filters popup : genre select should filter artists, "none" item is needed
  - ui scaling should be settable by command line parameters
  - moving mouse during inertia scroll causes scroll to stuck in some cases
  - save shuffle state, current song, current position, current volume on exit, use them on start

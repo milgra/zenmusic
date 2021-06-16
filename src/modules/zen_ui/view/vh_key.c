@@ -17,7 +17,7 @@ typedef struct _vh_key_t
 
 void vh_key_evt(view_t* view, ev_t ev)
 {
-  if (ev.type == EV_KDOWN || ev.type == EV_KUP)
+  if (ev.type == EV_KUP)
   {
     vh_key_t* vh = view->handler_data;
     (*vh->on_key->fp)(vh->on_key->userdata, &ev);
