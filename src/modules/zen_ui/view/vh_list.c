@@ -272,12 +272,12 @@ void vh_list_evt(view_t* view, ev_t ev)
       char move = 0;
       // horizontal bounce
 
-      if (vh->item_pos > 0.0001)
+      if (vh->item_pos > 0.0001) // left overflow
       {
         vh->item_pos += -vh->item_pos / 5.0;
         move = 1;
       }
-      else if (vh->item_pos + vh->item_wth < view->frame.local.w - vh->inset.r)
+      else if (vh->item_pos + vh->item_wth < view->frame.local.w - vh->inset.r) // right overflow
       {
         if (vh->item_wth > view->frame.local.w - vh->inset.r)
         {
@@ -290,11 +290,15 @@ void vh_list_evt(view_t* view, ev_t ev)
           move = 1;
         }
       }
-      else if (vh->item_tgt_pos < vh->item_pos - 0.0001 || vh->item_tgt_pos > vh->item_pos + 0.0001)
+      else if (vh->item_tgt_pos != FLT_MAX)
       {
-        vh->item_pos += (vh->item_tgt_pos - vh->item_pos) / 4;
-        move = 1;
-        printf("%f\n", vh->item_tgt_pos);
+        if (vh->item_tgt_pos < vh->item_pos - 0.0001 || vh->item_tgt_pos > vh->item_pos + 0.0001)
+        {
+          vh->item_pos += (vh->item_tgt_pos - vh->item_pos) / 4;
+          move = 1;
+        }
+        else
+          vh->item_tgt_pos = FLT_MAX;
       }
 
       if (move) vh_list_move(view, 0);
@@ -340,7 +344,6 @@ void vh_list_evt(view_t* view, ev_t ev)
       if (ev.dx != 0.0)
       {
         vh->item_pos += ev.dx;
-        vh->item_tgt_pos = vh->item_pos;
 
         if (vh->htimeout == 0)
         {
@@ -500,6 +503,7 @@ void vh_list_add(view_t*         view,
   vh->item_for_index = item_for_index;
   vh->item_recycle   = item_recycle;
   vh->inset          = inset;
+  vh->item_tgt_pos   = FLT_MAX;
 
   char* vid = cstr_fromformat(100, "%s%s", view->id, "vscr");
   char* hid = cstr_fromformat(100, "%s%s", view->id, "hscr");
