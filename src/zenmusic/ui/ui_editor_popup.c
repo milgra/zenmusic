@@ -358,40 +358,43 @@ void ui_editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, 
   char* key   = ep.fields->data[index];
   char* value = MGET(ep.attributes, key);
 
-  if (strcmp(cell->id, "value") == 0)
+  if (key[0] != 'f')
   {
-    printf("SELECTED %s\n", itemview->id);
-    uint32_t color1 = (index % 2 == 0) ? 0xFEFEFEFF : 0xEFEFEFFF;
 
-    /* ep.textstyle.backcolor = color1; */
-    ep.sel_item   = itemview;
-    ep.editor_col = color1;
+    if (strcmp(cell->id, "value") == 0)
+    {
+      uint32_t color1 = (index % 2 == 0) ? 0xFEFEFEFF : 0xEFEFEFFF;
 
-    /* char*   id        = cstr_fromformat(100, "%s%s%s", itemview->id, key, "edit"); // REL 0 */
-    /* view_t* inputcell = view_new(id, cell->view->frame.local); */
+      /* ep.textstyle.backcolor = color1; */
+      ep.sel_item   = itemview;
+      ep.editor_col = color1;
 
-    ep.textstyle.backcolor = color1;
-    vh_textinput_set_text(vh_textinput_scroller_get_input_view(ep.textinput), value);
-    /* vh_textinput_set_on_deactivate(inputcell, ui_editor_popup_input_cell_edit_finished); // listen for text editing finish */
+      /* char*   id        = cstr_fromformat(100, "%s%s%s", itemview->id, key, "edit"); // REL 0 */
+      /* view_t* inputcell = view_new(id, cell->view->frame.local); */
 
-    ep.editor_key = key;
+      ep.textstyle.backcolor = color1;
+      vh_textinput_set_text(vh_textinput_scroller_get_input_view(ep.textinput), value);
+      /* vh_textinput_set_on_deactivate(inputcell, ui_editor_popup_input_cell_edit_finished); // listen for text editing finish */
 
-    vh_textinput_scroller_activate(ep.textinput, 1); // activate text input
+      ep.editor_key = key;
 
-    vh_list_lock_scroll(ep.list_view, 1);               // lock scrolling of list to avoid going out screen
-    vh_litem_rpl_cell(itemview, "value", ep.textinput); // replacing simple text cell with input cell
+      vh_textinput_scroller_activate(ep.textinput, 1); // activate text input
 
-    /* REL(id); */
-  }
+      vh_list_lock_scroll(ep.list_view, 1);               // lock scrolling of list to avoid going out screen
+      vh_litem_rpl_cell(itemview, "value", ep.textinput); // replacing simple text cell with input cell
 
-  if (strcmp(cell->id, "delete") == 0)
-  {
-    ep.textstyle.backcolor = 0xFF0000AA;
-    tg_text_set(vh_litem_get_cell(itemview, "key"), key, ep.textstyle);
-    tg_text_set(vh_litem_get_cell(itemview, "value"), value, ep.textstyle);
-    //tg_text_set(vh_litem_get_cell(itemview, "delete"), "Remove", ep.textstyle);
+      /* REL(id); */
+    }
 
-    VADD(ep.removed, key);
+    if (strcmp(cell->id, "delete") == 0)
+    {
+      ep.textstyle.backcolor = 0xFF0000AA;
+      tg_text_set(vh_litem_get_cell(itemview, "key"), key, ep.textstyle);
+      tg_text_set(vh_litem_get_cell(itemview, "value"), value, ep.textstyle);
+      //tg_text_set(vh_litem_get_cell(itemview, "delete"), "Remove", ep.textstyle);
+
+      VADD(ep.removed, key);
+    }
   }
 }
 
@@ -402,7 +405,17 @@ void ui_editor_popup_input_cell_edit_finished(view_t* inputview)
   /* char* key  = data->userdata; */
   char* text = str_cstring(vh_textinput_scroller_get_text(ep.textinput));
 
-  MPUT(ep.changed, ep.editor_key, text);
+  char* value = MGET(ep.attributes, ep.editor_key);
+
+  if (strcmp(value, text) != 0)
+  {
+    MPUT(ep.changed, ep.editor_key, text);
+
+    if (strlen(text) > 0)
+      ep.editor_col = 0xAAFFAAFF;
+    else
+      ep.editor_col = 0xFFAAAAFF;
+  }
 
   // replace textinput cell with simple text cell
 

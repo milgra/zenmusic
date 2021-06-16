@@ -2,8 +2,8 @@
 
 **before release**
 
- - use zen_callback in all view handlers
  - editor popup freeze on empty list
+ - editor popup finalize
  - cursor indicator in replay is under other layers
  - deselect should work, select range should work
  - filters window visual update
@@ -26,6 +26,7 @@
  - space should update play/pause button
  - filter selection scrolls item 0 under header
  - track numbers 2 should preceed 11
+ - use zen_callback in all view handlers
  - automated tests
  - fix leaks
  - youtube video
