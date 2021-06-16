@@ -6,7 +6,6 @@
  - check organize during playing
  - scroll over knob problem fix
  - vertical alignment of text is too on the top
- - full screen button works strange
  - select range should work
  - freebsd logo should be in the center
  - dragger visual aid for column field resize

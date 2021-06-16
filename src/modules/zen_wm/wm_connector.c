@@ -270,14 +270,15 @@ void wm_close()
 
 void wm_toggle_fullscreen()
 {
-  int flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI | SDL_WINDOW_RESIZABLE;
+  int flags = SDL_GetWindowFlags(wm_window);
 
-  char fullscreen = SDL_GetWindowFlags(wm_window) & SDL_WINDOW_FULLSCREEN;
+  char fullscreen = SDL_GetWindowFlags(wm_window) & SDL_WINDOW_FULLSCREEN_DESKTOP;
+  flags ^= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
   if (fullscreen == 1)
     SDL_SetWindowFullscreen(wm_window, flags);
   else
-    SDL_SetWindowFullscreen(wm_window, flags | SDL_WINDOW_FULLSCREEN);
+    SDL_SetWindowFullscreen(wm_window, flags | SDL_WINDOW_FULLSCREEN_DESKTOP);
 }
 
 #endif
