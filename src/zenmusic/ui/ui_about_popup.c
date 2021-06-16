@@ -160,7 +160,7 @@ view_t* donateitem_create(int index)
 
     if (index == 5)
     {
-      view_t* imgview                  = view_new("bsdlogo", ((r2_t){130, 10, 200, 200}));
+      view_t* imgview                  = view_new("bsdlogo", ((r2_t){137, 10, 200, 200}));
       char*   respath                  = config_get("res_path");
       char*   imagepath                = cstr_fromformat(100, "%s/freebsd.png", respath);
       imgview->layout.background_image = imagepath;

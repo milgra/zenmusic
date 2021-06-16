@@ -311,6 +311,8 @@ void text_align_glyphs(glyph_t*    glyphs,
     if (style.valign == VA_CENTER) vs = (h - height) / 2.0;
     if (style.valign == VA_BOTTOM) vs = h - height;
 
+    vs = roundf(vs) + 1.0; // TODO investigate this a little, maybe no magic numbers are needed
+
     for (int i = 0; i < count; i++)
     {
       glyph_t g = glyphs[i];

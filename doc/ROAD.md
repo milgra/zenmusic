@@ -3,13 +3,9 @@
 **before release**
 
  - ugralo scroll list
- - deselect should work, select range should work
  - check organize during playing
- - vertical alignment of text is too on the top
- - freebsd logo should be in the center
  - dragger visual aid for column field resize
  - play/skip counter should work, last played/last skipped should work
- - library popups should show actual pathes
  - scroll on press on edge of list
  - scroller event normalization to avoid lag when dragging
  - filter selection scrolls item 0 under header
