@@ -3,8 +3,6 @@
 **before release**
 
  - play/skip counter should work, last played/last skipped should work
- - scroll on press on edge of list
- - scroller event normalization to avoid lag when dragging
  - track numbers 2 should preceed 11
  - automated tests
  - fix leaks

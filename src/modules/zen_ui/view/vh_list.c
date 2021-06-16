@@ -508,8 +508,8 @@ void vh_list_add(view_t*         view,
   char* vid = cstr_fromformat(100, "%s%s", view->id, "vscr");
   char* hid = cstr_fromformat(100, "%s%s", view->id, "hscr");
 
-  view_t* vscr = view_new(vid, (r2_t){view->frame.local.w - 11, 0, 11, view->frame.local.h});
-  view_t* hscr = view_new(hid, (r2_t){0, view->frame.local.h - 11, view->frame.local.w, 11});
+  view_t* vscr = view_new(vid, (r2_t){view->frame.local.w - 21, 0, 21, view->frame.local.h});
+  view_t* hscr = view_new(hid, (r2_t){0, view->frame.local.h - 21, view->frame.local.w, 21});
 
   REL(vid);
   REL(hid);
@@ -525,8 +525,8 @@ void vh_list_add(view_t*         view,
   tg_css_add(vscr);
   tg_css_add(hscr);
 
-  vh_sbar_add(vscr, SBAR_V, 30, vh_list_scroll_v, view);
-  vh_sbar_add(hscr, SBAR_H, 30, vh_list_scroll_h, view);
+  vh_sbar_add(vscr, SBAR_V, 30, 10, vh_list_scroll_v, view);
+  vh_sbar_add(hscr, SBAR_H, 30, 10, vh_list_scroll_h, view);
 
   view_add(view, vscr);
   view_add(view, hscr);
