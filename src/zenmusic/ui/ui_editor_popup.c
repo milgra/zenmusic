@@ -209,11 +209,16 @@ void ui_editor_popup_on_button_down(void* userdata, void* data)
   view_t* view = data;
   if (strcmp(view->id, "editor_popup_accept_btn") == 0)
   {
-    char* message = cstr_fromformat(150, "%i fields will be changed %i fields will be removed cover will be %s on %i items, are you sure you want these modifications?",
-                                    ep.changed->count,
-                                    ep.removed->length,
-                                    ep.cover,
-                                    ep.song_count);
+    char* message;
+    if (ep.cover)
+      message = cstr_fromformat(150, "%i fields will be changed cover will be %s on %i items, are you sure you want these modifications?",
+                                ep.changed->count,
+                                ep.cover,
+                                ep.song_count);
+    else
+      message = cstr_fromformat(150, "%i fields will be changed on %i items, are you sure you want these modifications?",
+                                ep.changed->count,
+                                ep.song_count);
 
     cb_t* acc_cb = cb_new(ui_editor_popup_on_accept, NULL);
     ui_decision_popup_show(message, acc_cb, NULL);
@@ -400,12 +405,11 @@ void ui_editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, 
 
 void ui_editor_popup_input_cell_edit_finished(view_t* inputview)
 {
-  /* vh_textinput_t* data = inputview->handler_data; */
+  str_t* str   = vh_textinput_scroller_get_text(ep.textinput);
+  char*  text  = str_cstring(str);
+  char*  value = MGET(ep.attributes, ep.editor_key);
 
-  /* char* key  = data->userdata; */
-  char* text = str_cstring(vh_textinput_scroller_get_text(ep.textinput));
-
-  char* value = MGET(ep.attributes, ep.editor_key);
+  if (value == NULL) value = "";
 
   if (strcmp(value, text) != 0)
   {
