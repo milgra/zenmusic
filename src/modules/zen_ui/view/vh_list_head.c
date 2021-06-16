@@ -5,6 +5,7 @@
 
 #include "vh_list_cell.c"
 #include "view.c"
+#include "view_layout.c"
 #include "zc_cstring.c"
 #include "zc_map.c"
 #include "zc_vector.c"
@@ -182,6 +183,7 @@ void vh_lhead_resize(view_t* view)
   vframe.w           = lframe.x + lframe.w;
 
   view_set_frame(view, vframe);
+  view_layout(view);
 }
 
 // cell handling

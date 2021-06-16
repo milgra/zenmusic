@@ -131,8 +131,8 @@ void ui_songlist_attach(view_t* base)
 
   // add header handler
 
-  view_t* header = view_new("songlist_header", (r2_t){0, 0, 10, 30});
-  /* header->layout.background_color = 0x333333FF; */
+  view_t* header                  = view_new("songlist_header", (r2_t){0, 0, 10, 30});
+  header->layout.background_color = 0x33333355;
   /* header->layout.shadow_blur      = 3; */
   /* header->layout.border_radius    = 3; */
   tg_css_add(header);
@@ -149,6 +149,13 @@ void ui_songlist_attach(view_t* base)
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
     tg_text_add(cellview);
     tg_text_set(cellview, cell->id, sl.textstyle);
+
+    view_t* dragview                  = view_new(id, (r2_t){cell->size - 5, 10, 5, 10});
+    dragview->layout.background_color = 0x00000022;
+    dragview->layout.right            = 5;
+    tg_css_add(dragview);
+    view_add(cellview, dragview);
+    dragview->blocks_touch = 0;
 
     vh_lhead_add_cell(header, cell->id, cell->size, cellview);
 

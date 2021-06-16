@@ -3,8 +3,6 @@
 **before release**
 
  - ugralo scroll list
- - check organize during playing
- - dragger visual aid for column field resize
  - play/skip counter should work, last played/last skipped should work
  - scroll on press on edge of list
  - scroller event normalization to avoid lag when dragging
