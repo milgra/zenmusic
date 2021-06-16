@@ -100,8 +100,12 @@ int visible_comp_entry(void* left, void* right)
 
         if (nla && nra)
         {
-          la = nla;
-          ra = nra;
+          int lt = atoi(nla);
+          int rt = atoi(nra);
+
+          if (lt < rt) return -1;
+          if (lt == rt) return 0;
+          if (lt > rt) return 1;
         }
       }
       else

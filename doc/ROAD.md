@@ -3,7 +3,8 @@
 **before release**
 
  - play/skip counter should work, last played/last skipped should work
- - track numbers 2 should preceed 11
+ - multiple texture full on drag scroll
+ - manual test
  - automated tests
  - fix leaks
  - youtube video
