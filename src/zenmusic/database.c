@@ -42,6 +42,12 @@ void db_init()
   db = MNEW();
 }
 
+void db_destroy()
+{
+  printf("db destroy\n");
+  REL(db);
+}
+
 void db_read(char* libpath)
 {
   assert(libpath != NULL);

@@ -255,11 +255,14 @@ void wm_init(void (*init)(int, int, char*),
 
         SDL_StopTextInput();
         SDL_GL_DeleteContext(context);
+
+        printf("SDL Context deleted\n");
       }
     }
 
     SDL_DestroyWindow(wm_window);
     SDL_Quit();
+    printf("SDL Window destroyed\n");
   }
 }
 

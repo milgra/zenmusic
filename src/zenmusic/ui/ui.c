@@ -3,7 +3,8 @@
 
 #include "view.c"
 
-void ui_load(float width, float height);
+void ui_init(float width, float height);
+void ui_destroy();
 
 #endif
 
@@ -39,7 +40,7 @@ void ui_load(float width, float height);
 void ui_on_button_down(void* userdata, void* data);
 void ui_on_key_down(void* userdata, void* data);
 
-void ui_load(float width, float height)
+void ui_init(float width, float height)
 {
   text_init();
 
@@ -112,6 +113,11 @@ void ui_load(float width, float height)
   /* view_t* header = view_get_subview(view_base, "header"); */
   /* header->texture.blur = 1; */
   /* header->texture.shadow = 1; */
+}
+
+void ui_destroy()
+{
+  printf("ui destroy\n");
 }
 
 // key event from base view

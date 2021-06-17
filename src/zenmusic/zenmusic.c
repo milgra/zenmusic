@@ -106,11 +106,11 @@ void init(int width, int height, char* path)
   zm.lib_ch = ch_new(100); // comm channel for library entries
   zm.rem_ch = ch_new(10);  // remote channel
 
-  db_init();
-  config_init();
-  player_init();
-  visible_init();
-  callbacks_init();
+  db_init();        // destroy 0
+  config_init();    // destroy 1
+  player_init();    // destroy 2
+  visible_init();   // destroy 3
+  callbacks_init(); // destroy 4
 
   // init callbacks
 
@@ -172,7 +172,7 @@ void init(int width, int height, char* path)
 
   // load ui from descriptors
 
-  ui_load(width, height);
+  ui_init(width, height); // destroy 5
 
   // start listening for remote control events if set
 
@@ -253,12 +253,12 @@ void render(uint32_t time)
 
 void destroy()
 {
-  /* ui_unload(); */
-  /* callbacks_destroy(); */
-  /* visible_destroy(); */
-  /* player_destroy(); */
-  /* config_destroy(); */
-  /* db_destroy(); */
+  ui_destroy();        // destroy 5
+  callbacks_destroy(); // destroy 4
+  visible_destroy();   // destroy 3
+  player_destroy();    // destroy 2
+  config_destroy();    // destroy 1
+  db_destroy();        // destroy 0
 }
 
 void load_library()

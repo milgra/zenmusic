@@ -4,6 +4,7 @@
 #include "zc_map.c"
 
 void visible_init();
+void visible_destroy();
 void visible_update();
 
 map_t* visible_song_at_index(int index);
@@ -50,6 +51,16 @@ void visible_init()
 
   vis.filter     = NULL;
   vis.sort_field = "meta/artist";
+}
+
+void visible_destroy()
+{
+  printf("visible destroy\n");
+  REL(vis.songs);
+  REL(vis.genres);
+  REL(vis.artists);
+  REL(vis.tmp1);
+  REL(vis.tmp2);
 }
 
 map_t* visible_song_at_index(int index)

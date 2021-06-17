@@ -4,6 +4,7 @@
 #include "zc_callback.c"
 
 void   callbacks_init();
+void   callbacks_destroy();
 void   callbacks_set(char* id, cb_t* cb);
 cb_t*  callbacks_get(char* id);
 void   callbacks_call(char* id, void* data);
@@ -21,6 +22,12 @@ map_t* callbacks;
 void callbacks_init()
 {
   callbacks = MNEW();
+}
+
+void callbacks_destroy()
+{
+  printf("callbacks destroy\n");
+  REL(callbacks);
 }
 
 void callbacks_set(char* id, cb_t* cb)

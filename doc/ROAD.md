@@ -2,8 +2,6 @@
 
 **before release**
 
- - maszkolas problema
- - multiple texture full on drag scroll
  - fix leaks
  - manual test
  - automated tests
@@ -11,6 +9,9 @@
 
 **near future**
 
+ - multiple texture full on drag scroll
+ - glyph grey out when texture reset
+ - id editor textinput mask problem
  - show scrollbar on mouse over, fade in/out
  - use zen_callback in all view handlers
  - set window dimensions with command line parameters

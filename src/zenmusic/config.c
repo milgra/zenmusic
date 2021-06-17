@@ -4,6 +4,7 @@
 #include "zc_map.c"
 
 void  config_init();
+void  config_destroy();
 void  config_read(char* path);
 void  config_write(char* path);
 void  config_set(char* key, char* value);
@@ -29,6 +30,12 @@ map_t* confmap;
 void config_init()
 {
   confmap = MNEW();
+}
+
+void config_destroy()
+{
+  printf("config destroy\n");
+  REL(confmap);
 }
 
 void config_read(char* path)

@@ -9,6 +9,7 @@
 #include "zc_map.c"
 
 void  player_init();
+void  player_destroy();
 void  player_play(char* path);
 char* player_get_path();
 
@@ -54,6 +55,11 @@ void player_init()
 {
   av_init_packet(&flush_pkt);
   flush_pkt.data = (uint8_t*)&flush_pkt;
+}
+
+void player_destroy()
+{
+  printf("player destroy\n");
 }
 
 char* player_get_path()
