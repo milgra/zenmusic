@@ -44,6 +44,8 @@ textlist_t* textlist_new(view_t* view, textstyle_t textstyle, void (*on_select)(
 void textlist_del(void* p)
 {
   textlist_t* tl = p;
+
+  if (tl->items) REL(tl->items); // REL 0
 }
 
 void textlist_update(textlist_t* tl)
@@ -53,7 +55,8 @@ void textlist_update(textlist_t* tl)
 
 void textlist_set_datasource(textlist_t* tl, vec_t* items)
 {
-  tl->items = items;
+  if (tl->items) REL(tl->items);
+  tl->items = items; // REL 0
   RET(items);
 }
 
@@ -69,20 +72,22 @@ view_t* textlist_create_item(textlist_t* tl)
 {
   static int item_cnt = 0;
 
-  char* item_id = cstr_fromformat(100, "tetlist_item%i", item_cnt++);
-  char* cell_id = cstr_fromformat(100, "%s%s", item_id, "cell");
+  char* item_id = cstr_fromformat(100, "tetlist_item%i", item_cnt++); // REL 0
+  char* cell_id = cstr_fromformat(100, "%s%s", item_id, "cell");      // REL 1
 
-  view_t* item_view = view_new(item_id, (r2_t){0, 0, 0, 35});
-  view_t* cell_view = view_new(cell_id, (r2_t){0, 0, tl->view->frame.local.w, 35});
-
-  REL(item_id);
-  REL(cell_id);
+  view_t* item_view = view_new(item_id, (r2_t){0, 0, 0, 35});                       // REL 2
+  view_t* cell_view = view_new(cell_id, (r2_t){0, 0, tl->view->frame.local.w, 35}); // REL 3
 
   tg_text_add(cell_view);
 
   vh_litem_add(item_view, tl);
   vh_litem_set_on_select(item_view, on_textitem_select);
   vh_litem_add_cell(item_view, "cell", 200, cell_view);
+
+  REL(item_id);   // REL 0
+  REL(cell_id);   // REL 1
+  REL(item_view); // REL 2
+  REL(cell_view); // REL 3
 
   return item_view;
 }
@@ -96,17 +101,16 @@ view_t* textlist_item_for_index(int index, void* data, view_t* listview, int* it
 
   *item_count = tl->items->length;
 
-  view_t*  item  = textlist_create_item(tl);
+  view_t*  item  = textlist_create_item(tl); // REL 0
   uint32_t color = (index % 2 == 0) ? 0xEFEFEFFF : 0xE5E5E5FF;
 
   tl->textstyle.backcolor = color;
 
-  str_t* str = str_new(); // REL 0
+  str_t* str = str_new(); // REL 1
   str_addbytearray(str, tl->items->data[index]);
   int nw;
   int nh;
   text_measure(str, tl->textstyle, item->frame.local.w, item->frame.local.h, &nw, &nh);
-  REL(str);
 
   if (nh < 35) nh = 35;
 
@@ -124,6 +128,8 @@ view_t* textlist_item_for_index(int index, void* data, view_t* listview, int* it
 
   vh_litem_upd_index(item, index);
   tg_text_set(cell, tl->items->data[index], tl->textstyle);
+
+  REL(str); // REL 1
 
   return item;
 }

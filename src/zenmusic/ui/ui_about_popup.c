@@ -33,23 +33,29 @@ struct ui_about_popup_t
 {
   view_t*     view;   // table view
   vec_t*      fields; // fileds in table
-  vec_t*      items;
+  vec_t*      items;  // table items
   textstyle_t textstyle;
   void (*popup)(char* text);
 } donl = {0};
 
-typedef struct _sl_cell_t
+typedef struct _al_cell_t
 {
   char* id;
   int   size;
   int   index;
-} sl_cell_t;
+} al_cell_t;
 
-sl_cell_t* donl_cell_new(char* id, int size, int index)
+void donl_cell_del(void* p)
 {
-  sl_cell_t* cell = mem_calloc(sizeof(sl_cell_t), "sl_cell_t", NULL, NULL);
+  al_cell_t* cell = p;
+  REL(cell->id); // REL 0
+}
 
-  cell->id    = cstr_fromcstring(id);
+al_cell_t* donl_cell_new(char* id, int size, int index)
+{
+  al_cell_t* cell = mem_calloc(sizeof(al_cell_t), "al_cell_t", donl_cell_del, NULL);
+
+  cell->id    = cstr_fromcstring(id); // REL 0
   cell->size  = size;
   cell->index = index;
 
@@ -74,7 +80,7 @@ void ui_about_popup_on_header_field_select(view_t* view, char* id, ev_t ev)
 void ui_about_popup_on_header_field_insert(view_t* view, int src, int tgt)
 {
   // update in fields so new items will use updated order
-  sl_cell_t* cell = donl.fields->data[src];
+  al_cell_t* cell = donl.fields->data[src];
 
   RET(cell);
   VREM(donl.fields, cell);
@@ -95,7 +101,7 @@ void ui_about_popup_on_header_field_resize(view_t* view, char* id, int size)
   // update in fields so new items will use updated size
   for (int i = 0; i < donl.fields->length; i++)
   {
-    sl_cell_t* cell = donl.fields->data[i];
+    al_cell_t* cell = donl.fields->data[i];
     if (strcmp(cell->id, id) == 0)
     {
       cell->size = size;
@@ -145,19 +151,17 @@ view_t* donateitem_create(int index)
   if (index == 0) height = 130;
   if (index == 5) height = 160;
 
-  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 470, height});
+  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 470, height}); // REL 0
 
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, ui_about_popup_on_item_select);
 
-  sl_cell_t* cell;
+  al_cell_t* cell;
   while ((cell = VNXT(donl.fields)))
   {
-    char* id = cstr_fromformat(100, "%s%s", rowview->id, cell->id);
+    char* id = cstr_fromformat(100, "%s%s", rowview->id, cell->id); // REL 1
 
-    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, height});
-
-    REL(id);
+    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, height}); // REL 2
 
     if (index == 5)
     {
@@ -178,6 +182,9 @@ view_t* donateitem_create(int index)
     }
 
     vh_litem_add_cell(rowview, cell->id, cell->size, cellview);
+
+    REL(id);       // REL 1
+    REL(cellview); // REL 2
   }
 
   return rowview;
@@ -208,8 +215,8 @@ view_t* ui_about_popup_item_for_index(int index, void* userdata, view_t* listvie
 void ui_about_popup_attach(view_t* baseview)
 {
   donl.view   = view_get_subview(baseview, "aboutlist");
-  donl.fields = VNEW();
-  donl.items  = VNEW();
+  donl.fields = VNEW(); // REL 0
+  donl.items  = VNEW(); // REL 1
 
   donl.textstyle.font      = config_get("font_path");
   donl.textstyle.align     = TA_CENTER;
@@ -238,7 +245,7 @@ void ui_about_popup_attach(view_t* baseview)
   VADD(donl.items, donateitem_create(4));
   VADD(donl.items, donateitem_create(5));
 
-  char* version = cstr_fromformat(200, "Zen Music v%i.%i beta\nby Milan Toth\nFree and Open Source Software.", VERSION, BUILD);
+  char* version = cstr_fromformat(200, "Zen Music v%i.%i beta\nby Milan Toth\nFree and Open Source Software.", VERSION, BUILD); // REL 2
 
   donateitem_update_row(donl.items->data[0], 0, version);
   donateitem_update_row(donl.items->data[1], 1, "Support on Patreon");
@@ -246,11 +253,13 @@ void ui_about_popup_attach(view_t* baseview)
   donateitem_update_row(donl.items->data[3], 3, "Report an Issue");
   donateitem_update_row(donl.items->data[4], 4, "GitHub Page");
 
-  REL(version);
+  REL(version); // REL 2
 }
 
 void ui_about_popup_detach()
 {
+  REL(donl.fields); // REL 0
+  REL(donl.items);  // REL 1
 }
 
 #endif
