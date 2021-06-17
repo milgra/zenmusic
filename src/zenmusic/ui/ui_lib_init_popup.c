@@ -4,6 +4,7 @@
 #include "view.c"
 
 void ui_lib_init_popup_attach(view_t* baseview);
+void ui_lib_init_popup_detach();
 void ui_lib_init_popup_show(char* text);
 void ui_lib_init_popup_hide();
 void ui_lib_init_popup_set_library();
@@ -73,6 +74,10 @@ void ui_lib_init_popup_attach(view_t* baseview)
   vh_textinput_set_on_return(vh_textinput_scroller_get_input_view(textinput_scroller), ui_lib_init_popup_set_library);
 
   view_remove(baseview, ulip.view);
+}
+
+void ui_lib_init_popup_detach()
+{
 }
 
 void ui_lib_init_popup_set_library(view_t* view)

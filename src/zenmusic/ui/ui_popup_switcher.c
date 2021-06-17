@@ -4,6 +4,7 @@
 #include "view.c"
 
 void ui_popup_switcher_attach(view_t* baseview);
+void ui_popup_switcher_detach();
 void ui_popup_switcher_toggle(char* id);
 
 #endif
@@ -59,6 +60,10 @@ void ui_popup_switcher_attach(view_t* baseview)
 
     MPUT(ups.popup_views, name, page_view);
   }
+}
+
+void ui_popup_switcher_detach()
+{
 }
 
 void ui_popup_switcher_remove(view_t* view, void* userdata)

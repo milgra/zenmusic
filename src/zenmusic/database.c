@@ -14,8 +14,8 @@ void db_update(map_t* map);
 int db_organize_entry(char* libpath, map_t* db, map_t* entry);
 int db_organize(char* libpath, map_t* db);
 
-vec_t* db_get_genres();
-vec_t* db_get_artists();
+void db_get_genres(vec_t* vec);
+void db_get_artists(vec_t* vec);
 
 map_t*   db_get_db();
 uint32_t db_count();
@@ -40,13 +40,13 @@ map_t* db;
 
 void db_init()
 {
-  db = MNEW();
+  db = MNEW(); // REL 0
 }
 
 void db_destroy()
 {
   printf("db destroy\n");
-  REL(db);
+  REL(db); // REL 1
 }
 
 void db_read(char* libpath)
@@ -68,7 +68,7 @@ void db_write(char* libpath)
 {
   assert(libpath != NULL);
 
-  char* dbpath = cstr_fromformat(PATH_MAX + NAME_MAX, "/%s/zenmusic.kvl", libpath);
+  char* dbpath = cstr_fromformat(PATH_MAX + NAME_MAX, "/%s/zenmusic.kvl", libpath); // REL 0
 
   int res = kvlist_write(dbpath, db);
 
@@ -76,7 +76,7 @@ void db_write(char* libpath)
 
   LOG("db : written");
 
-  REL(dbpath);
+  REL(dbpath); // REL 0
 }
 
 void db_add_entry(char* path, map_t* entry)
@@ -108,8 +108,9 @@ uint32_t db_count()
 void db_update(map_t* files)
 {
   // first remove deleted files from db
-  vec_t* paths = VNEW();
+  vec_t* paths = VNEW(); // REL 0
   map_keys(db, paths);
+
   for (int index = 0; index < paths->length; index++)
   {
     char*  path = paths->data[index];
@@ -125,6 +126,7 @@ void db_update(map_t* files)
   // go through lib paths
   vec_reset(paths);
   map_keys(files, paths);
+
   for (int index = 0; index < paths->length; index++)
   {
     char*  path = paths->data[index];
@@ -135,6 +137,8 @@ void db_update(map_t* files)
       MDEL(files, path);
     }
   }
+
+  REL(paths); // REL 0
 }
 
 char* db_replace_char(char* str, char find, char replace)
@@ -169,21 +173,21 @@ int db_organize_entry(char* libpath, map_t* db, map_t* entry)
 
   char* ext = cstr_path_extension(path);
 
-  char* old_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", libpath, path);
-  char* new_dirs     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s/", libpath, artist, album);
+  char* old_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", libpath, path);              // REL 0
+  char* new_dirs     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s/", libpath, artist, album); // REL 1
   char* new_path     = NULL;
   char* new_path_rel = NULL;
 
   if (track)
   {
     int trackno  = atoi(track);
-    new_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s/%.3i %s.%s", libpath, artist, album, trackno, title, ext);
-    new_path_rel = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%.3i %s.%s", artist, album, trackno, title, ext);
+    new_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s/%.3i %s.%s", libpath, artist, album, trackno, title, ext); // REL 2
+    new_path_rel = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%.3i %s.%s", artist, album, trackno, title, ext);             // REL 3
   }
   else
   {
-    new_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s/%s.%s", libpath, artist, album, title, ext);
-    new_path_rel = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s.%s", artist, album, title, ext);
+    new_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s/%s.%s", libpath, artist, album, title, ext); // REL 2
+    new_path_rel = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s.%s", artist, album, title, ext);             // REL 3
   }
 
   if (strcmp(old_path, new_path) != 0)
@@ -199,10 +203,10 @@ int db_organize_entry(char* libpath, map_t* db, map_t* entry)
     }
   }
 
-  REL(new_dirs);
-  REL(new_path);
-  REL(new_path_rel);
-  REL(old_path);
+  REL(old_path);     // REL 0
+  REL(new_dirs);     // REL 1
+  REL(new_path);     // REL 2
+  REL(new_path_rel); // REL 3
 
   return 0;
 }
@@ -214,7 +218,7 @@ int db_organize(char* libpath, map_t* db)
   // go through all db entries, check path, move if needed
 
   int    changed = 0;
-  vec_t* paths   = VNEW();
+  vec_t* paths   = VNEW(); // REL 0
 
   map_keys(db, paths);
 
@@ -229,7 +233,7 @@ int db_organize(char* libpath, map_t* db)
     }
   }
 
-  REL(paths);
+  REL(paths); // REL 0
 
   return changed;
 }
@@ -242,13 +246,12 @@ int db_comp_text(void* left, void* right)
   return strcmp(la, ra);
 }
 
-vec_t* db_get_genres()
+void db_get_genres(vec_t* vec)
 {
   int ei, gi; // entry, genre index
 
-  vec_t* songs  = VNEW();
-  map_t* genres = MNEW();
-  vec_t* result = VNEW();
+  vec_t* songs  = VNEW(); // REL 0
+  map_t* genres = MNEW(); // REL 1
 
   map_values(db, songs);
 
@@ -265,22 +268,19 @@ vec_t* db_get_genres()
     }
   }
 
-  map_values(genres, result);
-  vec_sort(result, VSD_ASC, db_comp_text);
+  map_values(genres, vec);
+  vec_sort(vec, VSD_ASC, db_comp_text);
 
-  REL(genres);
-  REL(songs);
-
-  return result;
+  REL(genres); // REL 1
+  REL(songs);  // REL 0
 }
 
-vec_t* db_get_artists()
+void db_get_artists(vec_t* vec)
 {
   int ei;
 
-  vec_t* songs   = VNEW();
-  vec_t* result  = VNEW();
-  map_t* artists = MNEW();
+  vec_t* songs   = VNEW(); // REL 0
+  map_t* artists = MNEW(); // REL 1
 
   map_values(db, songs);
 
@@ -294,24 +294,18 @@ vec_t* db_get_artists()
     if (artist) MPUT(artists, artist, artist);
   }
 
-  map_values(artists, result);
-  vec_sort(result, VSD_ASC, db_comp_text);
+  map_values(artists, vec);
+  vec_sort(vec, VSD_ASC, db_comp_text);
 
-  REL(artists);
-  REL(songs);
-
-  return result;
+  REL(artists); // REL 1
+  REL(songs);   // REL 0
 }
 
 void db_update_metadata(char* path, map_t* changed, vec_t* removed)
 {
-
   map_t* song = MGET(db, path);
-  vec_t* keys = VNEW();
+  vec_t* keys = VNEW(); // REL 0
   map_keys(changed, keys);
-
-  printf("before db update\n");
-  mem_describe(song, 0);
 
   // update changed
 
@@ -329,8 +323,7 @@ void db_update_metadata(char* path, map_t* changed, vec_t* removed)
     MDEL(song, field);
   }
 
-  printf("after db update\n");
-  mem_describe(song, 0);
+  REL(keys); // REL 0
 }
 
 #endif

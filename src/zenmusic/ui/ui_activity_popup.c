@@ -5,6 +5,7 @@
 #include "view.c"
 
 void ui_activity_popup_attach(view_t* baseview);
+void ui_activity_popup_detach();
 
 #endif
 
@@ -80,6 +81,10 @@ void ui_activity_popup_attach(view_t* baseview)
   act.style.align = TA_CENTER;
 
   textlist_set_datasource(act.list, act.logs);
+}
+
+void ui_activity_popup_detach()
+{
 }
 
 #endif

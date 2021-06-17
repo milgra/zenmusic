@@ -42,12 +42,12 @@ struct _visible_t
 
 void visible_init()
 {
-  vis.songs   = VNEW();
-  vis.genres  = VNEW();
-  vis.artists = VNEW();
+  vis.songs   = VNEW(); // REL 0
+  vis.genres  = VNEW(); // REL 1
+  vis.artists = VNEW(); // REL 2
 
-  vis.tmp1 = VNEW();
-  vis.tmp2 = VNEW();
+  vis.tmp1 = VNEW(); // REL 3
+  vis.tmp2 = VNEW(); // REL 4
 
   vis.filter     = NULL;
   vis.sort_field = "meta/artist";
@@ -56,11 +56,11 @@ void visible_init()
 void visible_destroy()
 {
   printf("visible destroy\n");
-  REL(vis.songs);
-  REL(vis.genres);
-  REL(vis.artists);
-  REL(vis.tmp1);
-  REL(vis.tmp2);
+  REL(vis.songs);   // REL 0
+  REL(vis.genres);  // REL 1
+  REL(vis.artists); // REL 2
+  REL(vis.tmp1);    // REL 3
+  REL(vis.tmp2);    // REL 4
 }
 
 map_t* visible_song_at_index(int index)
@@ -186,7 +186,7 @@ void visible_gen_artists()
 
   vec_reset(vis.artists);
 
-  map_t* artists = MNEW();
+  map_t* artists = MNEW(); // REL 0
 
   for (ei = 0;
        ei < vis.songs->length;
@@ -201,7 +201,7 @@ void visible_gen_artists()
   map_values(artists, vis.artists);
   vec_sort(vis.artists, VSD_ASC, visible_comp_text);
 
-  REL(artists);
+  REL(artists); // REL 0
 }
 
 int visible_nextword(char* text, char* part)
@@ -221,7 +221,7 @@ map_t* visible_query_fields(char* text)
 {
   if (strstr(text, " "))
   {
-    map_t* fields = MNEW();
+    map_t* fields = MNEW(); // REL 0
     char*  key    = NULL;
     char*  val    = NULL;
     int    last   = 0;
@@ -277,7 +277,7 @@ void visible_filter()
 {
   int ei, ki; // entry, key index
 
-  // map_t* fields = visible_query_fields(vis.filter);
+  // map_t* fields = visible_query_fields(vis.filter); // REL 0
   char* value = NULL;
   char* query = NULL;
 

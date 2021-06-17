@@ -4,6 +4,7 @@
 #include "view.c"
 
 void ui_song_infos_attach(view_t* baseview);
+void ui_song_infos_detach();
 void ui_song_infos_update_time(double time, double left, double duration);
 void ui_song_infos_show(int index);
 
@@ -49,6 +50,10 @@ void ui_song_infos_attach(view_t* baseview)
   tg_text_add(uisi.song_remaining_view);
 
   ui_song_infos_update_time(0.0, 0.0, 0.0);
+}
+
+void ui_song_infos_detach()
+{
 }
 
 void ui_song_infos_update_time(double time, double left, double dur)

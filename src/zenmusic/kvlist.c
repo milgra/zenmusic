@@ -65,19 +65,19 @@ int kvlist_read(char* libpath, map_t* db, char* keyfield)
 int kvlist_write(char* libpath, map_t* db)
 {
   int   retv = -1;
-  char* path = cstr_fromformat(PATH_MAX + NAME_MAX, "%snew", libpath);
-  FILE* file = fopen(path, "w");
+  char* path = cstr_fromformat(PATH_MAX + NAME_MAX, "%snew", libpath); // REL 0
+  FILE* file = fopen(path, "w");                                       // CLOSE 0
 
   if (file)
   {
     retv        = 0;
-    vec_t* vals = VNEW();
+    vec_t* vals = VNEW(); // REL 1
     map_values(db, vals);
 
     for (int vali = 0; vali < vals->length; vali++)
     {
       map_t* entry = vals->data[vali];
-      vec_t* keys  = VNEW();
+      vec_t* keys  = VNEW(); // REL 2
 
       map_keys(entry, keys);
 
@@ -92,14 +92,14 @@ int kvlist_write(char* libpath, map_t* db)
 
       if (fprintf(file, "-\n") < 0) retv = -1;
 
-      REL(keys);
+      REL(keys); // REL 2
 
       if (retv < 0) break;
     }
 
-    if (fclose(file) == EOF) retv = -1;
+    if (fclose(file) == EOF) retv = -1; // CLOSE 0
 
-    REL(vals);
+    REL(vals); // REL 1
 
     if (retv == 0)
     {
@@ -111,7 +111,7 @@ int kvlist_write(char* libpath, map_t* db)
   else
     printf("ERROR kvlist_write cannot open file %s\n", path);
 
-  REL(path);
+  REL(path); // REL 0
 
   return retv;
 }

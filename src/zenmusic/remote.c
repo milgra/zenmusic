@@ -72,14 +72,9 @@ void* remote_listen_ins(void* p)
     buffer[num] = '\0';
 
     ch_send(channel, buffer);
-
-    printf("data received : %s\n", buffer);
   }
 
   close(sockfd);
-
-  printf("remote socket closed\n");
-
   return NULL;
 }
 

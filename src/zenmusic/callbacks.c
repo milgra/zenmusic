@@ -21,13 +21,13 @@ map_t* callbacks;
 
 void callbacks_init()
 {
-  callbacks = MNEW();
+  callbacks = MNEW(); // REL 0
 }
 
 void callbacks_destroy()
 {
   printf("callbacks destroy\n");
-  REL(callbacks);
+  REL(callbacks); // REL 0
 }
 
 void callbacks_set(char* id, cb_t* cb)

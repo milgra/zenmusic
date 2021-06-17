@@ -4,6 +4,7 @@
 #include "view.c"
 
 void ui_visualizer_attach(view_t* baseview);
+void ui_visualizer_detach();
 void ui_visualizer_update();
 void ui_visualizer_update_video();
 
@@ -46,14 +47,11 @@ void ui_visualizer_attach(view_t* baseview)
   vh_anim_add(uiv.visuleftbtnbck);
   vh_anim_add(uiv.visurightbtnbck);
 
-  /* view_remove(uiv.visuleft, uiv.visuleftbtn); */
-  /* view_remove(uiv.visuright, uiv.visurightbtn); */
-
   // visualise roll over
 
-  cb_t* cb_btn_press     = cb_new(ui_visualizer_on_button_down, NULL);
-  cb_t* cb_roll_in_visu  = cb_new(ui_visualizer_on_roll_in, NULL);
-  cb_t* cb_roll_out_visu = cb_new(ui_visualizer_on_roll_out, NULL);
+  cb_t* cb_btn_press     = cb_new(ui_visualizer_on_button_down, NULL); // REL 0
+  cb_t* cb_roll_in_visu  = cb_new(ui_visualizer_on_roll_in, NULL);     // REL 1
+  cb_t* cb_roll_out_visu = cb_new(ui_visualizer_on_roll_out, NULL);    // REL 2
 
   vh_button_add(uiv.visuleftbtn, VH_BUTTON_NORMAL, cb_btn_press);
   vh_button_add(uiv.visurightbtn, VH_BUTTON_NORMAL, cb_btn_press);
@@ -63,6 +61,14 @@ void ui_visualizer_attach(view_t* baseview)
 
   vh_anim_alpha(uiv.visuleftbtnbck, 1.0, 0.0, 10, AT_LINEAR);
   vh_anim_alpha(uiv.visurightbtnbck, 1.0, 0.0, 10, AT_LINEAR);
+
+  REL(cb_btn_press);
+  REL(cb_roll_in_visu);
+  REL(cb_roll_out_visu);
+}
+
+void ui_visualizer_detach()
+{
 }
 
 void ui_visualizer_update()

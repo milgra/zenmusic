@@ -5,6 +5,7 @@
 #include "wm_event.c"
 
 void    ui_manager_init(int width, int height);
+void    ui_manager_destroy();
 void    ui_manager_event(ev_t event);
 void    ui_manager_add(view_t* view);
 void    ui_manager_add_to_top(view_t* view);
@@ -41,6 +42,14 @@ void ui_manager_init(int width, int height)
   uim.views     = VNEW();
   uim.implqueue = VNEW();
   uim.explqueue = VNEW();
+}
+
+void ui_manager_destroy()
+{
+  REL(uim.root);
+  REL(uim.views);
+  REL(uim.implqueue);
+  REL(uim.explqueue);
 }
 
 void ui_manager_event(ev_t ev)

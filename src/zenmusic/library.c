@@ -61,9 +61,9 @@ static int lib_file_data_step(const char* fpath, const struct stat* sb, int tfla
 
   if (tflag == FTW_F)
   {
-    char* size = cstr_fromformat(20, "%li", sb->st_size);
-    MPUT(lib.files, fpath + strlen(lib.path) + 1, size); // use relative path as path
-    REL(size);
+    char* size = cstr_fromformat(20, "%li", sb->st_size); // REL 0
+    MPUT(lib.files, fpath + strlen(lib.path) + 1, size);  // use relative path as path
+    REL(size);                                            // REL 0
   }
 
   return 0; /* To tell nftw() to continue */
@@ -74,7 +74,7 @@ void lib_delete_file(char* lib_path, map_t* entry)
   assert(lib_path != NULL);
 
   char* rel_path  = MGET(entry, "file/path");
-  char* file_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", lib_path, rel_path);
+  char* file_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", lib_path, rel_path); // REL 0
 
   int error = remove(file_path);
   if (error)
@@ -82,7 +82,7 @@ void lib_delete_file(char* lib_path, map_t* entry)
   else
     LOG("lib : file %s removed.", file_path);
 
-  REL(file_path);
+  REL(file_path); // REL 0
 }
 
 int lib_rename_file(char* old_path, char* new_path, char* new_dirs)
@@ -104,8 +104,8 @@ void lib_analyze_files(ch_t* channel, map_t* files)
   if (lib.lock) return;
 
   lib.lock  = 1;
-  lib.files = RET(files);
-  lib.paths = VNEW();
+  lib.files = RET(files); // REL 0
+  lib.paths = VNEW();     // REL 1
 
   map_keys(files, lib.paths);
 
@@ -146,7 +146,7 @@ int analyzer_thread(void* chptr)
       MPUT(song, "file/play_count", cstr_fromcstring("0"));
       MPUT(song, "file/skip_count", cstr_fromcstring("0"));
 
-      char* real = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", lib.path, path);
+      char* real = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", lib.path, path); // REL 1
 
       LOG("lib : analyzing %s", real);
 
@@ -171,8 +171,8 @@ int analyzer_thread(void* chptr)
       }
 
       // cleanup
-      REL(real);
-      REL(time_str);
+      REL(real);     // REL 1
+      REL(time_str); // REL 0
 
       // remove entry from remaining
       vec_rematindex(lib.paths, lib.paths->length - 1);
@@ -194,12 +194,12 @@ int analyzer_thread(void* chptr)
   }
 
   // send empty song to initiaite finish
-  song = MNEW();
+  song = MNEW();                                       // REL 2
   MPUT(song, "file/path", cstr_fromcstring("//////")); // impossible path
   ch_send(channel, song);                              // send finishing entry
 
-  REL(lib.files);
-  REL(lib.paths);
+  REL(lib.files); // REL 0
+  REL(lib.paths); // REL 1
 
   lib.files = NULL;
   lib.paths = NULL;

@@ -5,6 +5,7 @@
 #include "zc_map.c"
 
 void ui_song_menu_popup_attach(view_t* view);
+void ui_song_menu_popup_detach();
 
 #endif
 
@@ -58,6 +59,10 @@ void ui_song_menu_popup_attach(view_t* baseview)
   // add list handler to view
 
   vh_list_add(slp.view, ((vh_list_inset_t){0, 10, 0, 10}), ui_song_menu_popup_item_for_index, NULL, NULL);
+}
+
+void ui_song_menu_popup_detach()
+{
 }
 
 void ui_song_menu_popup_on_item_delete(void* userdata, void* data)

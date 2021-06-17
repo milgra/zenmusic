@@ -3,8 +3,8 @@
 
 #include "view.c"
 
-void ui_play_controls_init();
 void ui_play_controls_attach(view_t* baseview);
+void ui_play_controls_detach();
 
 void ui_play_next();
 void ui_play_prev();
@@ -81,6 +81,10 @@ void ui_play_controls_attach(view_t* baseview)
   vh_button_add(uipc.mutebtn, VH_BUTTON_TOGGLE, msg_play_pause_cb);
 
   ui_play_update_volume(0.9);
+}
+
+void ui_play_controls_detach()
+{
 }
 
 void ui_play_update_position(float ratio)

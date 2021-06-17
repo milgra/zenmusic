@@ -10,6 +10,8 @@ void ui_songlist_select_range(int index);
 void ui_songlist_get_selected(vec_t* vec);
 
 void ui_songlist_attach(view_t* base);
+void ui_songlist_detach();
+
 void ui_songlist_update();
 void ui_songlist_refresh();
 void ui_songlist_toggle_pause(int state);
@@ -45,11 +47,17 @@ typedef struct _sl_cell_t
   int   index;
 } sl_cell_t;
 
+void sl_cell_del(void* p)
+{
+  sl_cell_t* cell = p;
+  REL(cell->id); // REL 0
+}
+
 sl_cell_t* sl_cell_new(char* id, int size, int index)
 {
-  sl_cell_t* cell = mem_calloc(sizeof(sl_cell_t), "sl_cell_t", NULL, NULL);
+  sl_cell_t* cell = mem_calloc(sizeof(sl_cell_t), "sl_cell_t", sl_cell_del, NULL);
 
-  cell->id    = cstr_fromcstring(id);
+  cell->id    = cstr_fromcstring(id); // REL 0
   cell->size  = size;
   cell->index = index;
 
@@ -75,9 +83,9 @@ void ui_songlist_attach(view_t* base)
   assert(base != NULL);
 
   sl.view    = view_get_subview(base, "songlist");
-  sl.cache   = VNEW();
-  sl.columns = VNEW();
-  sl.fields  = VNEW();
+  sl.cache   = VNEW(); // REL 0
+  sl.columns = VNEW(); // REL 1
+  sl.fields  = VNEW(); // REL 2
 
   sl.color_s = 0x55FF55FF;
 
@@ -131,7 +139,7 @@ void ui_songlist_attach(view_t* base)
 
   // add header handler
 
-  view_t* header                  = view_new("songlist_header", (r2_t){0, 0, 10, 30});
+  view_t* header                  = view_new("songlist_header", (r2_t){0, 0, 10, 30}); // REL 3
   header->layout.background_color = 0x33333355;
   /* header->layout.shadow_blur      = 3; */
   /* header->layout.border_radius    = 3; */
@@ -174,6 +182,15 @@ void ui_songlist_attach(view_t* base)
   // select first song by default
 
   selection_add(0);
+
+  REL(header); // REL 3
+}
+
+void ui_songlist_detach()
+{
+  REL(sl.cache);   // REL 0
+  REL(sl.columns); // REL 1
+  REL(sl.fields);  // REL 2
 }
 
 void ui_songlist_update()

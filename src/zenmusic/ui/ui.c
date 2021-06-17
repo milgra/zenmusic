@@ -37,12 +37,14 @@ void ui_destroy();
 #include "wm_connector.c"
 #include "zc_number.c"
 
+view_t* ui_view_list;
+
 void ui_on_button_down(void* userdata, void* data);
 void ui_on_key_down(void* userdata, void* data);
 
 void ui_init(float width, float height)
 {
-  text_init();
+  text_init(); // DESTROY 0
 
   // callbacks setup for simple buttons
 
@@ -50,7 +52,7 @@ void ui_init(float width, float height)
 
   // view setup with existing callbacks
 
-  vec_t*  view_list = view_gen_load(config_get("html_path"), config_get("css_path"), config_get("res_path"), callbacks_get_data());
+  vec_t*  view_list = view_gen_load(config_get("html_path"), config_get("css_path"), config_get("res_path"), callbacks_get_data()); // REL 0
   view_t* view_base = vec_head(view_list);
 
   // initial layout of views
@@ -60,34 +62,34 @@ void ui_init(float width, float height)
 
   // setup ui manager
 
-  ui_manager_init(width, height);
+  ui_manager_init(width, height); // DESTROY 0
   ui_manager_add(view_base);
 
   // attach ui components
 
-  ui_songlist_attach(view_base);
-  ui_song_infos_attach(view_base);
-  ui_visualizer_attach(view_base);
-  ui_filter_bar_attach(view_base);
-  ui_about_popup_attach(view_base);
-  ui_alert_popup_attach(view_base);
-  ui_filter_popup_attach(view_base);
-  ui_editor_popup_attach(view_base);
-  ui_play_controls_attach(view_base);
-  ui_decision_popup_attach(view_base);
-  ui_lib_init_popup_attach(view_base);
-  ui_activity_popup_attach(view_base);
-  ui_settings_popup_attach(view_base);
-  ui_song_menu_popup_attach(view_base);
-  ui_inputfield_popup_attach(view_base);
+  ui_songlist_attach(view_base);         // DETACH 0
+  ui_song_infos_attach(view_base);       // DETACH 1
+  ui_visualizer_attach(view_base);       // DETACH 2
+  ui_filter_bar_attach(view_base);       // DETACH 3
+  ui_about_popup_attach(view_base);      // DETACH 4
+  ui_alert_popup_attach(view_base);      // DETACH 5
+  ui_filter_popup_attach(view_base);     // DETACH 6
+  ui_editor_popup_attach(view_base);     // DETACH 7
+  ui_play_controls_attach(view_base);    // DETACH 8
+  ui_decision_popup_attach(view_base);   // DETACH 9
+  ui_lib_init_popup_attach(view_base);   // DETACH 10
+  ui_activity_popup_attach(view_base);   // DETACH 11
+  ui_settings_popup_attach(view_base);   // DETACH 12
+  ui_song_menu_popup_attach(view_base);  // DETACH 13
+  ui_inputfield_popup_attach(view_base); // DETACH 14
 
   // setup views
 
   view_t* main_view = view_get_subview(view_base, "main");
   view_t* song_info = view_get_subview(main_view, "song_info");
 
-  cb_t* key_cb = cb_new(ui_on_key_down, view_base);
-  cb_t* but_cb = cb_new(ui_on_button_down, NULL);
+  cb_t* key_cb = cb_new(ui_on_key_down, view_base); // REL 1
+  cb_t* but_cb = cb_new(ui_on_button_down, NULL);   // REL 2
 
   main_view->needs_touch = 0;                         // don't cover events from songlist
   vh_key_add(view_base, key_cb);                      // listen on view_base for shortcuts
@@ -113,11 +115,35 @@ void ui_init(float width, float height)
   /* view_t* header = view_get_subview(view_base, "header"); */
   /* header->texture.blur = 1; */
   /* header->texture.shadow = 1; */
+
+  REL(view_list); // REL 0
+  REL(key_cb);    // REL 1
+  REL(but_cb);    // REL 2
 }
 
 void ui_destroy()
 {
   printf("ui destroy\n");
+
+  ui_songlist_detach();         // DETACH 0
+  ui_song_infos_detach();       // DETACH 1
+  ui_visualizer_detach();       // DETACH 2
+  ui_filter_bar_detach();       // DETACH 3
+  ui_about_popup_detach();      // DETACH 4
+  ui_alert_popup_detach();      // DETACH 5
+  ui_filter_popup_detach();     // DETACH 6
+  ui_editor_popup_detach();     // DETACH 7
+  ui_play_controls_detach();    // DETACH 8
+  ui_decision_popup_detach();   // DETACH 9
+  ui_lib_init_popup_detach();   // DETACH 10
+  ui_activity_popup_detach();   // DETACH 11
+  ui_settings_popup_detach();   // DETACH 12
+  ui_song_menu_popup_detach();  // DETACH 13
+  ui_inputfield_popup_detach(); // DETACH 14
+
+  ui_manager_destroy(); // DESTROY 0
+
+  text_destroy(); // DESTROY 0
 }
 
 // key event from base view

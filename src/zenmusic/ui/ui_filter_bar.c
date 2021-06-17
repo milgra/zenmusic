@@ -4,6 +4,7 @@
 #include "view.c"
 
 void ui_filter_bar_attach(view_t* baseview);
+void ui_filter_bar_detach();
 void ui_filter_bar_clear_search();
 void ui_filter_bar_show_query(char* text);
 
@@ -57,6 +58,10 @@ void ui_filter_bar_attach(view_t* baseview)
   vh_textinput_add(ufb.songlist_filter_bar, "", "Search/Filter", ts, NULL);
   vh_textinput_set_on_text(ufb.songlist_filter_bar, ui_filter_bar_filter);
   //vh_textinput_set_on_activate(ufb.songlist_filter_bar, ui_on_filter_activate);
+}
+
+void ui_filter_bar_detach()
+{
 }
 
 void ui_filter_bar_filter(view_t* view, void* userdata)

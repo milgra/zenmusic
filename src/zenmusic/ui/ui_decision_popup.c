@@ -5,6 +5,7 @@
 #include "zc_callback.c"
 
 void ui_decision_popup_attach(view_t* baseview);
+void ui_decision_popup_detach();
 void ui_decision_popup_show(char* text, cb_t* acc_cb, cb_t* rej_cb);
 
 #endif
@@ -61,6 +62,10 @@ void ui_decision_popup_attach(view_t* baseview)
   udp.tf       = tf;
   udp.attached = 1;
   udp.requests = VNEW();
+}
+
+void ui_decision_popup_detach()
+{
 }
 
 void ui_decision_popup_shownext()

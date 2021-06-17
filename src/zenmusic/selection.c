@@ -124,10 +124,8 @@ void selection_add_selection(vec_t* vec, vec_t* res)
     sel_rng_t rng = sel.ranges[index];
     for (int r = rng.s; r < rng.e; r++)
     {
-      printf("range %i %i\n", rng.s, rng.e);
       if (r >= 0 && r < vec->length)
       {
-        printf("SELECTION ADDING %i TO RES\n", r);
         VADD(res, vec->data[r]);
       }
     }

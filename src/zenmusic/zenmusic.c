@@ -170,7 +170,7 @@ void init(int width, int height, char* path)
 
   // start listening for remote control events if set
 
-  if (config_get("remote_enabled") && config_get_bool("remote_enabled")) remote_listen(zm.rem_ch, config_get_int("remote_port"));
+  if (config_get("remote_enabled") && config_get_bool("remote_enabled")) remote_listen(zm.rem_ch, config_get_int("remote_port")); // CLOSE 0
 
   // show library popup if no lib path is saved yet or load library
 
@@ -246,6 +246,8 @@ void render(uint32_t time)
 
 void destroy()
 {
+  remote_close(); // CLOSE 0
+
   ui_destroy();                    // destroy 8
   if (zm.rep_par) evrec_destroy(); // destroy 7
   if (zm.rec_par) evrec_destroy(); // destroy 6
@@ -336,7 +338,7 @@ void get_analyzed_songs()
 
   // get analyzed song entries
 
-  while ((entry = ch_recv(zm.lib_ch)))
+  while ((entry = ch_recv(zm.lib_ch))) // REL 0
   {
     char* path = MGET(entry, "file/path");
 
@@ -372,7 +374,7 @@ void get_analyzed_songs()
 
     // cleanup, ownership was passed with the channel from analyzer
 
-    REL(entry);
+    REL(entry); // REL 0
   }
 }
 

@@ -54,6 +54,7 @@ void textlist_update(textlist_t* tl)
 void textlist_set_datasource(textlist_t* tl, vec_t* items)
 {
   tl->items = items;
+  RET(items);
 }
 
 void on_textitem_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)

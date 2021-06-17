@@ -29,18 +29,18 @@ map_t* confmap;
 
 void config_init()
 {
-  confmap = MNEW();
+  confmap = MNEW(); // REL 0
 }
 
 void config_destroy()
 {
   printf("config destroy\n");
-  REL(confmap);
+  REL(confmap); // REL 0
 }
 
 void config_read(char* path)
 {
-  map_t* data = MNEW();
+  map_t* data = MNEW(); // REL 0
 
   kvlist_read(path, data, "id");
 
@@ -48,7 +48,7 @@ void config_read(char* path)
 
   if (cfdb)
   {
-    vec_t* keys = VNEW();
+    vec_t* keys = VNEW(); // REL 1
     map_keys(cfdb, keys);
 
     for (int index = 0; index < keys->length; index++)
@@ -57,22 +57,23 @@ void config_read(char* path)
       MPUT(confmap, key, MGET(cfdb, key));
     }
 
+    REL(keys);
+
     printf("config loaded from %s, entries : %i\n", path, confmap->count);
   }
 
-  REL(path);
-  REL(data);
+  REL(data); // REL 0
 }
 
 void config_write(char* path)
 {
-  map_t* data    = MNEW();
-  char*  dirpath = cstr_remove_last_path_component(path);
+  map_t* data    = MNEW();                                // REL 0
+  char*  dirpath = cstr_remove_last_path_component(path); // REL 1
 
   printf("CONFIG DIR %s FILE %s\n", dirpath, path);
 
-  MPUT(confmap, "id", cstr_fromcstring("config")); // put id in config db
-  MPUT(data, "id", confmap);                       // put config db in final data with same id
+  MPUTR(confmap, "id", cstr_fromcstring("config")); // put id in config db
+  MPUT(data, "id", confmap);                        // put config db in final data with same id
 
   int error = files_mkpath(dirpath, 0777);
 
@@ -87,15 +88,15 @@ void config_write(char* path)
   else
     LOG("ERROR config_write cannot create config path\n");
 
-  REL(dirpath);
-  REL(data);
+  REL(dirpath); // REL 1
+  REL(data);    // REL 0
 }
 
 void config_set(char* key, char* value)
 {
-  char* str = cstr_fromcstring(value);
+  char* str = cstr_fromcstring(value); // REL 0
   MPUT(confmap, key, str);
-  REL(str);
+  REL(str); // REL 0
 }
 
 char* config_get(char* key)
@@ -125,13 +126,11 @@ void config_set_bool(char* key, int val)
 {
   if (val)
   {
-    char* str = cstr_fromcstring("true");
-    MPUT(confmap, key, str);
+    MPUTR(confmap, key, cstr_fromcstring("true"));
   }
   else
   {
-    char* str = cstr_fromcstring("false");
-    MPUT(confmap, key, str);
+    MPUTR(confmap, key, cstr_fromcstring("false"));
   }
 }
 

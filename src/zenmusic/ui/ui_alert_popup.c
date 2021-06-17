@@ -5,6 +5,7 @@
 #include "zc_callback.c"
 
 void ui_alert_popup_attach(view_t* baseview);
+void ui_alert_popup_detach();
 void ui_alert_popup_show(char* text);
 
 #endif
@@ -37,6 +38,10 @@ void ui_alert_popup_attach(view_t* baseview)
   view_t* acc_btn = view_get_subview(baseview, "simple_pop_acc_btn");
   cb_t*   acc_cb  = cb_new(ui_alert_popup_accept, NULL);
   vh_button_add(acc_btn, VH_BUTTON_NORMAL, acc_cb);
+}
+
+void ui_alert_popup_detach()
+{
 }
 
 void ui_alert_popup_show(char* text)

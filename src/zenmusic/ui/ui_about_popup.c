@@ -5,6 +5,7 @@
 #include "zc_map.c"
 
 void ui_about_popup_attach(view_t* base);
+void ui_about_popup_detach();
 void ui_about_popup_update();
 void ui_about_popup_refresh();
 
@@ -246,6 +247,10 @@ void ui_about_popup_attach(view_t* baseview)
   donateitem_update_row(donl.items->data[4], 4, "GitHub Page");
 
   REL(version);
+}
+
+void ui_about_popup_detach()
+{
 }
 
 #endif

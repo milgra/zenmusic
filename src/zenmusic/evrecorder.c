@@ -28,7 +28,7 @@ struct evrec_t
 
 void evrec_init_recorder(char* path)
 {
-  FILE* file = fopen(path, "w");
+  FILE* file = fopen(path, "w"); // CLOSE 0
   if (!file) printf("evrec recorder : cannot open file %s\n", path);
   rec.file = file;
 }
@@ -39,7 +39,7 @@ void evrec_init_player(char* path)
   if (!file) printf("evrec player : cannot open file %s\n", path);
 
   rec.file   = file;
-  rec.events = VNEW();
+  rec.events = VNEW(); // REL 0
 
   char line[1000] = {0};
   char type[100]  = {0};
@@ -91,8 +91,8 @@ void evrec_init_player(char* path)
 
 void evrec_destroy()
 {
-  fclose(rec.file);
-  if (rec.events) REL(rec.events);
+  fclose(rec.file);                // CLOSE 0
+  if (rec.events) REL(rec.events); // REL 0
 }
 
 void evrec_record(ev_t ev)

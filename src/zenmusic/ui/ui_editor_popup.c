@@ -5,6 +5,7 @@
 #include "zc_map.c"
 
 void ui_editor_popup_attach(view_t* view);
+void ui_editor_popup_detach();
 void ui_editor_popup_show();
 
 #endif
@@ -170,6 +171,10 @@ void ui_editor_popup_attach(view_t* view)
 
   // force texture initialization on cover view
   cover_view->tex_gen(cover_view);
+}
+
+void ui_editor_popup_detach()
+{
 }
 
 void ui_editor_popup_show()

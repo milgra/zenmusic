@@ -4,6 +4,7 @@
 #include "view.c"
 
 void ui_filter_popup_attach(view_t* baseview);
+void ui_filter_popup_detach();
 void ui_filter_popup_show();
 
 #endif
@@ -47,12 +48,26 @@ void ui_filter_popup_attach(view_t* baseview)
   ufp.artistlist  = textlist_new(view_get_subview(baseview, "artistlist"), ts, ui_filter_popup_on_artist_select);
 }
 
+void ui_filter_popup_detach()
+{
+}
+
 void ui_filter_popup_show()
 {
-  textlist_set_datasource(ufp.genrelist, db_get_genres());
-  textlist_set_datasource(ufp.artistlist, db_get_artists());
+  vec_t* genres  = VNEW(); // REL 0
+  vec_t* artists = VNEW(); // REL 1
+
+  db_get_genres(genres);
+  db_get_artists(artists);
+
+  textlist_set_datasource(ufp.genrelist, genres);
+  textlist_set_datasource(ufp.artistlist, artists);
+
   textlist_update(ufp.genrelist);
   textlist_update(ufp.artistlist);
+
+  REL(genres);  // REL 0
+  REL(artists); // REL 1
 
   ui_popup_switcher_toggle("filters_popup_page");
 }
@@ -61,28 +76,40 @@ void ui_filter_popup_on_genre_select(int index)
 {
   printf("on genre select %i\n", index);
 
-  vec_t* genres = db_get_genres();
-  char*  genre  = genres->data[index];
+  vec_t* genres = VNEW(); // REL 0
 
-  char* query = cstr_fromformat(100, "genre is %s", genre);
+  db_get_genres(genres);
+
+  char* genre = genres->data[index];
+
+  char* query = cstr_fromformat(100, "genre is %s", genre); // REL 1
 
   visible_set_filter(query);
   ui_songlist_update();
   ui_filter_bar_show_query(genre);
+
+  REL(genres); // REL 0
+  REL(query);  // REL 1
 }
 
 void ui_filter_popup_on_artist_select(int index)
 {
   printf("on artist select %i\n", index);
 
-  vec_t* artists = db_get_artists();
-  char*  artist  = artists->data[index];
+  vec_t* artists = VNEW(); // REL 0
 
-  char* query = cstr_fromformat(100, "artist is %s", artist);
+  db_get_artists(artists);
+
+  char* artist = artists->data[index];
+
+  char* query = cstr_fromformat(100, "artist is %s", artist); // REL 1
 
   visible_set_filter(query);
   ui_songlist_update();
   ui_filter_bar_show_query(artist);
+
+  REL(artists);
+  REL(query);
 }
 
 #endif

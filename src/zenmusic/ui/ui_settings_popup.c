@@ -5,6 +5,7 @@
 #include "zc_map.c"
 
 void ui_settings_popup_attach(view_t* view);
+void ui_settings_popup_detach();
 void ui_settings_popup_update();
 void ui_settings_popup_refresh();
 void ui_settings_popup_show();
@@ -125,6 +126,10 @@ void ui_settings_popup_attach(view_t* baseview)
   ui_settings_popup_update_item(uisp.items->data[2], 2, "Remote Control", "Disabled");
   ui_settings_popup_update_item(uisp.items->data[3], 3, "Config Path", "/home/.config/zenmusic/config");
   ui_settings_popup_update_item(uisp.items->data[4], 4, "Style Path", "/usr/local/share/zenmusic");
+}
+
+void ui_settings_popup_detach()
+{
 }
 
 void ui_settings_popup_show()

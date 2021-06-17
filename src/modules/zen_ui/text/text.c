@@ -64,6 +64,7 @@ typedef struct _glyph_t
 } glyph_t;
 
 void text_init();
+void text_destroy();
 
 void text_break_glyphs(
     glyph_t*    glyphs,
@@ -127,6 +128,12 @@ void text_init()
   fonts  = MNEW();
   gbytes = malloc(sizeof(unsigned char));
   gcount = 1;
+}
+
+void text_destroy()
+{
+  REL(fonts);
+  free(gbytes);
 }
 
 void text_font_load(char* path)

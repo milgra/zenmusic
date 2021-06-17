@@ -5,6 +5,8 @@
 #include "zc_callback.c"
 
 void ui_inputfield_popup_attach(view_t* baseview);
+void ui_inputfield_popup_detach();
+
 void ui_inputfield_popup_show(char* text, cb_t* acc_cb, cb_t* rej_cb);
 
 #endif
@@ -78,6 +80,10 @@ void ui_inputfield_popup_attach(view_t* baseview)
   uip.requests  = VNEW();
 
   REL(cb_btn_press);
+}
+
+void ui_inputfield_popup_detach()
+{
 }
 
 void ui_inputfield_on_button_down(void* userdata, void* data)
