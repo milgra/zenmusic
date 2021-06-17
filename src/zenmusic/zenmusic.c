@@ -16,7 +16,6 @@
 #include "ui_play_controls.c"
 #include "ui_song_infos.c"
 #include "ui_songlist.c"
-#include "ui_visualizer.c"
 #include "visible.c"
 #include "wm_connector.c"
 #include "wm_event.c"
@@ -50,9 +49,8 @@ void save_screenshot();
 
 struct
 {
-  double last_step; // last timestep
-  ch_t*  lib_ch;    // library channel
-  ch_t*  rem_ch;    // remote channel
+  ch_t* lib_ch; // library channel
+  ch_t* rem_ch; // remote channel
 
   char* cfg_par; // config path parameter
   char* res_par; // resources path parameter
@@ -216,7 +214,7 @@ void update(ev_t ev)
   {
     get_analyzed_songs();
     get_remote_events();
-    update_player();
+    ui_play_update();
 
     if (zm.rep_par)
     {
@@ -249,25 +247,6 @@ void update(ev_t ev)
 
 void render(uint32_t time)
 {
-  double phead = player_time();
-
-  if (phead > 0.0)
-  {
-    if (floor(phead) != zm.last_step)
-    {
-      zm.last_step = floor(phead);
-
-      double posratio = phead / player_duration();
-      double volratio = player_volume();
-
-      ui_song_infos_update_time(zm.last_step, player_duration() - zm.last_step, player_duration());
-      ui_play_update_position(posratio);
-      ui_play_update_volume(volratio);
-    }
-
-    ui_visualizer_update();
-    ui_visualizer_update_video();
-  }
 
   ui_manager_render(time);
 }
@@ -404,34 +383,6 @@ void get_remote_events()
     if (buffer[0] == '0') ui_play_pause();
     if (buffer[0] == '1') ui_play_prev();
     if (buffer[0] == '2') ui_play_next();
-  }
-}
-
-void update_player()
-{
-  // update player
-
-  int finished = player_refresh();
-
-  if (finished)
-  {
-    // increase play count of song
-
-    char*  path  = player_get_path();
-    map_t* entry = MGET(db_get_db(), path);
-
-    if (entry)
-    {
-      char* play_count_s = MGET(entry, "file/play_count");
-      int   play_count_i = 0;
-
-      if (play_count_s != NULL) play_count_i = atoi(play_count_s);
-      play_count_i += 1;
-      MPUTR(entry, "file/play_count", cstr_fromformat(10, "%i", play_count_i));
-      db_write(config_get("lib_path"));
-    }
-
-    ui_play_next();
   }
 }
 

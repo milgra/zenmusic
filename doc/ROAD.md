@@ -2,15 +2,16 @@
 
 **before release**
 
- - play/skip counter should work, last played/last skipped should work
+ - maszkolas problema
  - multiple texture full on drag scroll
+ - fix leaks
  - manual test
  - automated tests
- - fix leaks
  - youtube video
 
 **near future**
 
+ - show scrollbar on mouse over, fade in/out
  - use zen_callback in all view handlers
  - set window dimensions with command line parameters
  - filters popup : genre select should filter artists, "none" item is needed

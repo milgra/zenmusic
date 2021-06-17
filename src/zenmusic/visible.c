@@ -85,38 +85,50 @@ int visible_comp_entry(void* left, void* right)
   char* la = MGET(l, vis.sort_field);
   char* ra = MGET(r, vis.sort_field);
 
-  if (strcmp(la, ra) == 0)
+  if (la && ra)
   {
-    // todo make this controllable from header fields
-    char* nla = MGET(l, "meta/album");
-    char* nra = MGET(r, "meta/album");
-
-    if (nla && nra)
+    if (strcmp(la, ra) == 0)
     {
-      if (strcmp(nla, nra) == 0)
+      // todo make this controllable from header fields
+      char* nla = MGET(l, "meta/album");
+      char* nra = MGET(r, "meta/album");
+
+      if (nla && nra)
       {
-        nla = MGET(l, "meta/track");
-        nra = MGET(r, "meta/track");
-
-        if (nla && nra)
+        if (strcmp(nla, nra) == 0)
         {
-          int lt = atoi(nla);
-          int rt = atoi(nra);
+          nla = MGET(l, "meta/track");
+          nra = MGET(r, "meta/track");
 
-          if (lt < rt) return -1;
-          if (lt == rt) return 0;
-          if (lt > rt) return 1;
+          if (nla && nra)
+          {
+            int lt = atoi(nla);
+            int rt = atoi(nra);
+
+            if (lt < rt) return -1;
+            if (lt == rt) return 0;
+            if (lt > rt) return 1;
+          }
+        }
+        else
+        {
+          la = nla;
+          ra = nra;
         }
       }
-      else
-      {
-        la = nla;
-        ra = nra;
-      }
     }
-  }
 
-  return strcmp(la, ra);
+    return strcmp(la, ra);
+  }
+  else
+  {
+    if (la)
+      return -1;
+    else if (ra)
+      return 1;
+    else
+      return 0;
+  }
 }
 
 int visible_comp_text(void* left, void* right)

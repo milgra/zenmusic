@@ -203,8 +203,16 @@ void ui_songlist_toggle_pause(int state)
 
 void on_header_field_select(view_t* view, char* id, ev_t ev)
 {
-  visible_set_sortfield(id, 1);
-  ui_songlist_refresh();
+  for (int index = 0; index < sl.columns->length; index++)
+  {
+    sl_cell_t* cell = sl.columns->data[index];
+    if (strcmp(cell->id, id) == 0)
+    {
+      char* field = sl.fields->data[index];
+      visible_set_sortfield(field, 1);
+      ui_songlist_refresh();
+    }
+  }
 }
 
 void on_header_field_insert(view_t* view, int src, int tgt)
