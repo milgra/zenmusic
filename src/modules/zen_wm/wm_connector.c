@@ -12,6 +12,7 @@
 
 void wm_init(void (*init)(int, int, char*), void (*update)(ev_t), void (*render)(uint32_t), void (*destroy)());
 void wm_close();
+void wm_destroy();
 void wm_toggle_fullscreen();
 
 #endif
@@ -269,6 +270,11 @@ void wm_init(void (*init)(int, int, char*),
 void wm_close()
 {
   wm_quit = 1;
+}
+
+void wm_destroy()
+{
+  printf("wm_destroy\n");
 }
 
 void wm_toggle_fullscreen()

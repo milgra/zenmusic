@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
     }
   }
 
-  wm_init(init, update, render, destroy);
+  wm_init(init, update, render, destroy); // destroy 0
   return 0;
 }
 
@@ -106,11 +106,11 @@ void init(int width, int height, char* path)
   zm.lib_ch = ch_new(100); // comm channel for library entries
   zm.rem_ch = ch_new(10);  // remote channel
 
-  db_init();        // destroy 0
-  config_init();    // destroy 1
-  player_init();    // destroy 2
-  visible_init();   // destroy 3
-  callbacks_init(); // destroy 4
+  db_init();        // destroy 1
+  config_init();    // destroy 2
+  player_init();    // destroy 3
+  visible_init();   // destroy 4
+  callbacks_init(); // destroy 5
 
   // init callbacks
 
@@ -120,14 +120,8 @@ void init(int width, int height, char* path)
 
   // init paths
 
-  char* wrk_path = cstr_path_normalize(path, NULL); // REL 0
-
-#ifndef DEBUG
-  char* res_path = zm.res_par ? cstr_path_normalize(zm.res_par, wrk_path) : cstr_fromcstring("/usr/local/share/zenmusic"); // REL 1
-#else
-  char* res_path = zm.res_par ? cstr_path_normalize(zm.res_par, wrk_path) : cstr_path_normalize("../res", wrk_path); // REL 1
-#endif
-
+  char* wrk_path    = cstr_path_normalize(path, NULL);                                                                                    // REL 0
+  char* res_path    = zm.res_par ? cstr_path_normalize(zm.res_par, wrk_path) : cstr_fromcstring("/usr/local/share/zenmusic");             // REL 1
   char* cfgdir_path = zm.cfg_par ? cstr_path_normalize(zm.cfg_par, wrk_path) : cstr_path_normalize("~/.config/zenmusic", getenv("HOME")); // REL 2
   char* css_path    = cstr_path_append(res_path, "main.css");                                                                             // REL 3
   char* html_path   = cstr_path_append(res_path, "main.html");                                                                            // REL 4
@@ -167,12 +161,12 @@ void init(int width, int height, char* path)
 
   // init recording/playing
 
-  if (zm.rec_par) evrec_init_recorder(rec_path);
-  if (zm.rep_par) evrec_init_player(rep_path);
+  if (zm.rec_par) evrec_init_recorder(rec_path); // destroy 6
+  if (zm.rep_par) evrec_init_player(rep_path);   // destroy 7
 
   // load ui from descriptors
 
-  ui_init(width, height); // destroy 5
+  ui_init(width, height); // destroy 8
 
   // start listening for remote control events if set
 
@@ -247,18 +241,25 @@ void update(ev_t ev)
 
 void render(uint32_t time)
 {
-
   ui_manager_render(time);
 }
 
 void destroy()
 {
-  ui_destroy();        // destroy 5
-  callbacks_destroy(); // destroy 4
-  visible_destroy();   // destroy 3
-  player_destroy();    // destroy 2
-  config_destroy();    // destroy 1
-  db_destroy();        // destroy 0
+  ui_destroy();                    // destroy 8
+  if (zm.rep_par) evrec_destroy(); // destroy 7
+  if (zm.rec_par) evrec_destroy(); // destroy 6
+  callbacks_destroy();             // destroy 5
+  visible_destroy();               // destroy 4
+  player_destroy();                // destroy 3
+  config_destroy();                // destroy 2
+  db_destroy();                    // destroy 1
+  wm_destroy();                    // destroy 0
+
+  if (zm.cfg_par) REL(zm.cfg_par); // REL 0
+  if (zm.res_par) REL(zm.res_par); // REL 1
+  if (zm.rec_par) REL(zm.rec_par); // REL 2
+  if (zm.rep_par) REL(zm.rep_par); // REL 3
 }
 
 void load_library()
@@ -298,7 +299,7 @@ void on_change_library(void* userdata, void* data)
 
   // construct path if needed
 
-  lib_path = cstr_path_normalize(new_path, config_get("wrk_path"));
+  lib_path = cstr_path_normalize(new_path, config_get("wrk_path")); // REL 0
 
   printf("new path %s lib path %s\n", new_path, lib_path);
 
@@ -316,7 +317,7 @@ void on_change_library(void* userdata, void* data)
   else
     ui_lib_init_popup_show("Location doesn't exists, please enter valid location.");
 
-  REL(lib_path);
+  REL(lib_path); // REL 0
 }
 
 void on_change_organize(void* userdata, void* data)
@@ -395,16 +396,16 @@ void save_screenshot()
 
   ui_compositor_render_to_bmp(screen);
 
-  char* name    = cstr_fromformat(20, "screenshot%.3i.png", cnt++); // REL 2
-  char* path    = cstr_path_append(config_get("lib_path"), name);   // REL 3
-  bm_t* flipped = bm_flip_y(screen);                                // REL 1
+  char* name    = cstr_fromformat(20, "screenshot%.3i.png", cnt++); // REL 1
+  char* path    = cstr_path_append(config_get("lib_path"), name);   // REL 2
+  bm_t* flipped = bm_flip_y(screen);                                // REL 3
 
   coder_write_png(path, flipped);
 
-  REL(screen);  // REL 0
-  REL(flipped); // REL 1
+  REL(flipped); // REL 3
   REL(name);    // REL 2
-  REL(path);    // REL 3
+  REL(path);    // REL 1
+  REL(screen);  // REL 0
 
-  if (zm.rep_par) view_set_frame(zm.rep_cur, frame);
+  if (zm.rep_par) view_set_frame(zm.rep_cur, frame); // full screen cursor to indicate screenshot
 }

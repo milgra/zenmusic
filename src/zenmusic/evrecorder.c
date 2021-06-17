@@ -5,7 +5,7 @@
 
 void  evrec_init_recorder(char* path);
 void  evrec_init_player(char* path);
-void  evrec_close();
+void  evrec_destroy();
 void  evrec_record(ev_t event);
 ev_t* evrec_replay(uint32_t time);
 
@@ -59,7 +59,6 @@ void evrec_init_player(char* path)
       }
       else
       {
-
         if (strcmp(type, "mmove") == 0) sscanf(line, "%i %i %f %f %c\n", &ev.x, &ev.y, &ev.dx, &ev.dy, &ev.drag);
         if (strcmp(type, "mdown") == 0) sscanf(line, "%i %i %i %i %i %i\n", &ev.x, &ev.y, &ev.button, &ev.dclick, &ev.ctrl_down, &ev.shift_down);
         if (strcmp(type, "mup") == 0) sscanf(line, "%i %i %i %i %i %i\n", &ev.x, &ev.y, &ev.button, &ev.dclick, &ev.ctrl_down, &ev.shift_down);
@@ -87,14 +86,13 @@ void evrec_init_player(char* path)
       break;
   }
 
-  fclose(file);
-
   printf("%i events read\n", rec.events->length);
 }
 
-void evrec_close()
+void evrec_destroy()
 {
   fclose(rec.file);
+  if (rec.events) REL(rec.events);
 }
 
 void evrec_record(ev_t ev)

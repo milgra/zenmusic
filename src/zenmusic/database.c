@@ -4,6 +4,7 @@
 #include "zc_map.c"
 
 void db_init();
+void db_destroy();
 void db_read(char* libpath);
 void db_write(char* libpath);
 void db_add_entry(char* path, map_t* entry);
