@@ -13,6 +13,7 @@ void ui_about_popup_refresh();
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "column.c"
 #include "config.c"
 #include "selection.c"
 #include "tg_css.c"
@@ -38,30 +39,6 @@ struct ui_about_popup_tv
   void (*popup)(char* text);
 } donl = {0};
 
-typedef struct _al_cell_t
-{
-  char* id;
-  int   size;
-  int   index;
-} al_cell_t;
-
-void donl_cell_del(void* p)
-{
-  al_cell_t* cell = p;
-  REL(cell->id); // REL 0
-}
-
-al_cell_t* donl_cell_new(char* id, int size, int index)
-{
-  al_cell_t* cell = mem_calloc(sizeof(al_cell_t), "al_cell_t", donl_cell_del, NULL);
-
-  cell->id    = cstr_new_cstring(id); // REL 0
-  cell->size  = size;
-  cell->index = index;
-
-  return cell;
-}
-
 void ui_about_popup_update()
 {
   vh_list_reset(donl.view);
@@ -80,12 +57,12 @@ void ui_about_popup_on_header_field_select(view_t* view, char* id, ev_t ev)
 void ui_about_popup_on_header_field_insert(view_t* view, int src, int tgt)
 {
   // update in fields so new items will use updated order
-  al_cell_t* cell = donl.fields->data[src];
+  col_t* cell = donl.fields->data[src];
 
-  RET(cell);
+  RET(cell); // REL 0
   VREM(donl.fields, cell);
   vec_ins(donl.fields, cell, tgt);
-  REL(cell);
+  REL(cell); // REL 0
 
   // update all items and cache
   view_t* item;
@@ -101,7 +78,7 @@ void ui_about_popup_on_header_field_resize(view_t* view, char* id, int size)
   // update in fields so new items will use updated size
   for (int i = 0; i < donl.fields->length; i++)
   {
-    al_cell_t* cell = donl.fields->data[i];
+    col_t* cell = donl.fields->data[i];
     if (strcmp(cell->id, id) == 0)
     {
       cell->size = size;
@@ -156,7 +133,7 @@ view_t* donateitem_create(int index)
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, ui_about_popup_on_item_select);
 
-  al_cell_t* cell;
+  col_t* cell;
   while ((cell = VNXT(donl.fields)))
   {
     char* id = cstr_new_format(100, "%s%s", rowview->id, cell->id); // REL 1
@@ -165,14 +142,14 @@ view_t* donateitem_create(int index)
 
     if (index == 5)
     {
-      view_t* imgview                  = view_new("bsdlogo", ((r2_t){137, 10, 200, 200}));
+      view_t* imgview                  = view_new("bsdlogo", ((r2_t){137, 10, 200, 200})); // REL 3
       char*   respath                  = config_get("res_path");
-      char*   imagepath                = cstr_new_format(100, "%s/freebsd.png", respath);
+      char*   imagepath                = cstr_new_format(100, "%s/freebsd.png", respath); // REL 4
       imgview->layout.background_image = imagepath;
       tg_css_add(imgview);
-      // TODO set image instead of direct set
-      // REL(imagepath);
       view_add(cellview, imgview);
+
+      REL(imgview);
 
       vh_litem_upd_index(rowview, 5);
     }
@@ -228,7 +205,7 @@ void ui_about_popup_attach(view_t* baseview)
 
   // create fields
 
-  VADD(donl.fields, donl_cell_new("field", 470, 0));
+  VADD(donl.fields, col_new("field", 470, 0));
 
   vec_dec_retcount(donl.fields);
 

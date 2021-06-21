@@ -15,6 +15,7 @@ void ui_settings_popup_show();
 #if __INCLUDE_LEVEL__ == 0
 
 #include "callbacks.c"
+#include "column.c"
 #include "config.c"
 #include "selection.c"
 #include "tg_css.c"
@@ -44,24 +45,6 @@ struct ui_settings_popup_t
   textstyle_t textstyle;
 } uisp = {0};
 
-typedef struct _sl_cell_t
-{
-  char* id;
-  int   size;
-  int   index;
-} sl_cell_t;
-
-sl_cell_t* uisp_cell_new(char* id, int size, int index)
-{
-  sl_cell_t* cell = mem_calloc(sizeof(sl_cell_t), "sl_cell_t", NULL, NULL);
-
-  cell->id    = cstr_new_cstring(id);
-  cell->size  = size;
-  cell->index = index;
-
-  return cell;
-}
-
 void ui_settings_popup_attach(view_t* baseview)
 {
   uisp.view    = view_get_subview(baseview, "settingslist");
@@ -77,8 +60,8 @@ void ui_settings_popup_attach(view_t* baseview)
 
   // create columns
 
-  VADDR(uisp.columns, uisp_cell_new("key", 200, 0));
-  VADDR(uisp.columns, uisp_cell_new("value", 800, 1));
+  VADDR(uisp.columns, col_new("key", 200, 0));
+  VADDR(uisp.columns, col_new("value", 800, 1));
 
   // add header handler
 
@@ -93,7 +76,7 @@ void ui_settings_popup_attach(view_t* baseview)
   vh_lhead_set_on_insert(header, ui_settings_popup_on_header_field_insert);
   vh_lhead_set_on_resize(header, ui_settings_popup_on_header_field_resize);
 
-  sl_cell_t* cell;
+  col_t* cell;
   while ((cell = VNXT(uisp.columns)))
   {
     char*   id       = cstr_new_format(100, "%s%s", header->id, cell->id);
@@ -162,7 +145,7 @@ void ui_settings_popup_on_header_field_select(view_t* view, char* id, ev_t ev)
 void ui_settings_popup_on_header_field_insert(view_t* view, int src, int tgt)
 {
   // update in columns so new items will use updated order
-  sl_cell_t* cell = uisp.columns->data[src];
+  col_t* cell = uisp.columns->data[src];
 
   RET(cell);
   VREM(uisp.columns, cell);
@@ -183,7 +166,7 @@ void ui_settings_popup_on_header_field_resize(view_t* view, char* id, int size)
   // update in columns so new items will use updated size
   for (int i = 0; i < uisp.columns->length; i++)
   {
-    sl_cell_t* cell = uisp.columns->data[i];
+    col_t* cell = uisp.columns->data[i];
     if (strcmp(cell->id, id) == 0)
     {
       cell->size = size;
@@ -297,7 +280,7 @@ view_t* ui_settings_popup_create_item()
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, ui_settings_popup_on_item_select);
 
-  sl_cell_t* cell;
+  col_t* cell;
   while ((cell = VNXT(uisp.columns)))
   {
     char*   id       = cstr_new_format(100, "%s%s", rowview->id, cell->id);

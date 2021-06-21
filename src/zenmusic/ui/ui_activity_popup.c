@@ -86,7 +86,7 @@ void ui_activity_popup_attach(view_t* baseview)
 void ui_activity_popup_detach()
 {
   log_set_proxy(NULL);
-  REL(act.logs);
+  REL(act.logs); // REL G0
 }
 
 #endif

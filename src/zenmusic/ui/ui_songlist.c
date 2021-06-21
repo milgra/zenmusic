@@ -21,6 +21,7 @@ void ui_songlist_select_and_show(int index);
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "column.c"
 #include "config.c"
 #include "selection.c"
 #include "tg_css.c"
@@ -39,30 +40,6 @@ void on_header_field_resize(view_t* view, char* id, int size);
 
 view_t* ui_songlist_item_for_index(int index, void* userdata, view_t* listview, int* item_count);
 void    ui_songlist_item_recycle(view_t* item);
-
-typedef struct _sl_cell_t
-{
-  char* id;
-  int   size;
-  int   index;
-} sl_cell_t;
-
-void sl_cell_del(void* p)
-{
-  sl_cell_t* cell = p;
-  REL(cell->id); // REL 0
-}
-
-sl_cell_t* sl_cell_new(char* id, int size, int index)
-{
-  sl_cell_t* cell = mem_calloc(sizeof(sl_cell_t), "sl_cell_t", sl_cell_del, NULL);
-
-  cell->id    = cstr_new_cstring(id); // REL 0
-  cell->size  = size;
-  cell->index = index;
-
-  return cell;
-}
 
 struct ui_songlist_t
 {
@@ -97,25 +74,25 @@ void ui_songlist_attach(view_t* base)
 
   // create columns
 
-  VADDR(sl.columns, sl_cell_new("ind", 60, 0));
-  VADDR(sl.columns, sl_cell_new("artist", 200, 1));
-  VADDR(sl.columns, sl_cell_new("album", 200, 2));
-  VADDR(sl.columns, sl_cell_new("title", 350, 3));
-  VADDR(sl.columns, sl_cell_new("date", 70, 4));
-  VADDR(sl.columns, sl_cell_new("genre", 150, 5));
-  VADDR(sl.columns, sl_cell_new("track", 60, 6));
-  VADDR(sl.columns, sl_cell_new("disc", 60, 7));
-  VADDR(sl.columns, sl_cell_new("time", 50, 8));
-  VADDR(sl.columns, sl_cell_new("ch", 40, 9));
-  VADDR(sl.columns, sl_cell_new("bit rate", 100, 10));
-  VADDR(sl.columns, sl_cell_new("sample", 80, 11));
-  VADDR(sl.columns, sl_cell_new("plays", 55, 12));
-  VADDR(sl.columns, sl_cell_new("skips", 55, 13));
-  VADDR(sl.columns, sl_cell_new("added", 150, 14));
-  VADDR(sl.columns, sl_cell_new("last played", 155, 15));
-  VADDR(sl.columns, sl_cell_new("last skipped", 155, 16));
-  VADDR(sl.columns, sl_cell_new("type", 80, 17));
-  VADDR(sl.columns, sl_cell_new("ext", 80, 18));
+  VADDR(sl.columns, col_new("ind", 60, 0));
+  VADDR(sl.columns, col_new("artist", 200, 1));
+  VADDR(sl.columns, col_new("album", 200, 2));
+  VADDR(sl.columns, col_new("title", 350, 3));
+  VADDR(sl.columns, col_new("date", 70, 4));
+  VADDR(sl.columns, col_new("genre", 150, 5));
+  VADDR(sl.columns, col_new("track", 60, 6));
+  VADDR(sl.columns, col_new("disc", 60, 7));
+  VADDR(sl.columns, col_new("time", 50, 8));
+  VADDR(sl.columns, col_new("ch", 40, 9));
+  VADDR(sl.columns, col_new("bit rate", 100, 10));
+  VADDR(sl.columns, col_new("sample", 80, 11));
+  VADDR(sl.columns, col_new("plays", 55, 12));
+  VADDR(sl.columns, col_new("skips", 55, 13));
+  VADDR(sl.columns, col_new("added", 150, 14));
+  VADDR(sl.columns, col_new("last played", 155, 15));
+  VADDR(sl.columns, col_new("last skipped", 155, 16));
+  VADDR(sl.columns, col_new("type", 80, 17));
+  VADDR(sl.columns, col_new("ext", 80, 18));
 
   VADDR(sl.fields, cstr_new_cstring("index"));
   VADDR(sl.fields, cstr_new_cstring("meta/artist"));
@@ -150,7 +127,7 @@ void ui_songlist_attach(view_t* base)
   vh_lhead_set_on_insert(header, on_header_field_insert);
   vh_lhead_set_on_resize(header, on_header_field_resize);
 
-  sl_cell_t* cell;
+  col_t* cell;
   while ((cell = VNXT(sl.columns)))
   {
     char*   id       = cstr_new_format(100, "%s%s", header->id, cell->id);
@@ -222,7 +199,7 @@ void on_header_field_select(view_t* view, char* id, ev_t ev)
 {
   for (int index = 0; index < sl.columns->length; index++)
   {
-    sl_cell_t* cell = sl.columns->data[index];
+    col_t* cell = sl.columns->data[index];
     if (strcmp(cell->id, id) == 0)
     {
       char* field = sl.fields->data[index];
@@ -243,7 +220,7 @@ void on_header_field_insert(view_t* view, int src, int tgt)
   REL(field);
 
   // update in columns so new items will use updated order
-  sl_cell_t* cell = sl.columns->data[src];
+  col_t* cell = sl.columns->data[src];
 
   RET(cell);
   VREM(sl.columns, cell);
@@ -271,7 +248,7 @@ void on_header_field_resize(view_t* view, char* id, int size)
   // update in columns so new items will use updated size
   for (int i = 0; i < sl.columns->length; i++)
   {
-    sl_cell_t* cell = sl.columns->data[i];
+    col_t* cell = sl.columns->data[i];
     if (strcmp(cell->id, id) == 0)
     {
       cell->size = size;
@@ -384,7 +361,7 @@ view_t* songitem_create()
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, ui_songlist_on_item_select);
 
-  sl_cell_t* cell;
+  col_t* cell;
   while ((cell = VNXT(sl.columns)))
   {
     char*   id       = cstr_new_format(100, "%s%s", rowview->id, cell->id);
@@ -414,8 +391,8 @@ void songitem_update_row(view_t* rowview, int index, map_t* file, uint32_t color
   for (int index = 0; index < sl.columns->length; index++)
   {
 
-    sl_cell_t* cell  = sl.columns->data[index];
-    char*      field = sl.fields->data[index];
+    col_t* cell  = sl.columns->data[index];
+    char*  field = sl.fields->data[index];
 
     if (MGET(file, field))
     {

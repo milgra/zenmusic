@@ -13,6 +13,7 @@ void ui_editor_popup_show();
 #if __INCLUDE_LEVEL__ == 0
 
 #include "coder.c"
+#include "column.c"
 #include "config.c"
 #include "database.c"
 #include "text.c"
@@ -79,26 +80,6 @@ struct _ui_editor_popup_t
   textstyle_t textstyle;
 
 } ep = {0};
-
-// TODO unify these
-
-typedef struct _se_cell_t
-{
-  char* id;
-  int   size;
-  int   index;
-} se_cell_t;
-
-se_cell_t* uise_cell_new(char* id, int size, int index)
-{
-  se_cell_t* cell = mem_calloc(sizeof(se_cell_t), "se_cell_t", NULL, NULL);
-
-  cell->id    = cstr_new_cstring(id);
-  cell->size  = size;
-  cell->index = index;
-
-  return cell;
-}
 
 char* mand_fields[] = {"artist", "album", "title", "date", "track", "disc", "genre", "tags", "comments", "encoder", "publisher", "copyright"};
 
@@ -251,9 +232,9 @@ void ui_editor_popup_on_button_down(void* userdata, void* data)
 
 void ui_editor_popup_create_table()
 {
-  VADDR(ep.cols, uise_cell_new("key", 140, 0));
-  VADDR(ep.cols, uise_cell_new("value", 380, 1));
-  // VADDR(ep.cols, uise_cell_new("delete", 80, 2));
+  VADDR(ep.cols, col_new("key", 140, 0));
+  VADDR(ep.cols, col_new("value", 380, 1));
+  // VADDR(ep.cols, col_new("delete", 80, 2));
 
   // create header
 
@@ -268,15 +249,15 @@ void ui_editor_popup_create_table()
   ep.textstyle.align     = TA_LEFT;
   ep.textstyle.backcolor = 0xFFFFFFFF;
 
-  se_cell_t* cell;
-  while ((cell = VNXT(ep.cols)))
+  col_t* col;
+  while ((col = VNXT(ep.cols)))
   {
-    char*   id       = cstr_new_format(100, "%s%s", header->id, cell->id);
-    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
+    char*   id      = cstr_new_format(100, "%s%s", header->id, col->id);
+    view_t* colview = view_new(id, (r2_t){0, 0, col->size, 30});
 
-    tg_text_add(cellview);
-    tg_text_set(cellview, cell->id, ep.textstyle);
-    vh_lhead_add_cell(header, cell->id, cell->size, cellview);
+    tg_text_add(colview);
+    tg_text_set(colview, col->id, ep.textstyle);
+    vh_lhead_add_cell(header, col->id, col->size, colview);
 
     REL(id);
   }
@@ -295,12 +276,12 @@ void ui_editor_popup_on_header_field_select(view_t* view, char* id, ev_t ev)
 void ui_editor_popup_on_header_field_insert(view_t* view, int src, int tgt)
 {
   // update in fields so new items will use updated order
-  se_cell_t* cell = ep.cols->data[src];
+  col_t* col = ep.cols->data[src];
 
-  RET(cell);
-  VREM(ep.cols, cell);
-  vec_ins(ep.cols, cell, tgt);
-  REL(cell);
+  RET(col);
+  VREM(ep.cols, col);
+  vec_ins(ep.cols, col, tgt);
+  REL(col);
 
   // update all items and cache
   view_t* item;
@@ -316,10 +297,10 @@ void ui_editor_popup_on_header_field_resize(view_t* view, char* id, int size)
   // update in fields so new items will use updated size
   for (int i = 0; i < ep.cols->length; i++)
   {
-    se_cell_t* cell = ep.cols->data[i];
-    if (strcmp(cell->id, id) == 0)
+    col_t* col = ep.cols->data[i];
+    if (strcmp(col->id, id) == 0)
     {
-      cell->size = size;
+      col->size = size;
       break;
     }
   }
@@ -355,17 +336,17 @@ view_t* ui_editor_popup_create_item()
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, ui_editor_popup_select_item);
 
-  se_cell_t* cell;
-  while ((cell = VNXT(ep.cols)))
+  col_t* col;
+  while ((col = VNXT(ep.cols)))
   {
-    char*   id       = cstr_new_format(100, "%s%s", rowview->id, cell->id);
-    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 35});
+    char*   id      = cstr_new_format(100, "%s%s", rowview->id, col->id);
+    view_t* colview = view_new(id, (r2_t){0, 0, col->size, 35});
     REL(id);
 
-    tg_text_add(cellview);
-    tg_text_set(cellview, cell->id, ep.textstyle);
+    tg_text_add(colview);
+    tg_text_set(colview, col->id, ep.textstyle);
 
-    vh_litem_add_cell(rowview, cell->id, cell->size, cellview);
+    vh_litem_add_cell(rowview, col->id, col->size, colview);
   }
 
   return rowview;
