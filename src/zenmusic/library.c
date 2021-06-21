@@ -158,7 +158,7 @@ int analyzer_thread(void* chptr)
       {
         if (MGET(song, "meta/artist") == NULL) MPUTR(song, "meta/artist", cstr_new_cstring("Unknown"));
         if (MGET(song, "meta/album") == NULL) MPUTR(song, "meta/album", cstr_new_cstring("Unknown"));
-        if (MGET(song, "meta/title") == NULL) MPUTR(song, "meta/title", cstr_path_filename(path));
+        if (MGET(song, "meta/title") == NULL) MPUTR(song, "meta/title", cstr_new_path_filename(path));
 
         // try to send it to main thread
         if (ch_send(channel, song)) song = NULL;

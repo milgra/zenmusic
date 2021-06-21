@@ -107,7 +107,7 @@ view_t* textlist_item_for_index(int index, void* data, view_t* listview, int* it
   tl->textstyle.backcolor = color;
 
   str_t* str = str_new(); // REL 1
-  str_addbytearray(str, tl->items->data[index]);
+  str_add_bytearray(str, tl->items->data[index]);
   int nw;
   int nh;
   text_measure(str, tl->textstyle, item->frame.local.w, item->frame.local.h, &nw, &nh);

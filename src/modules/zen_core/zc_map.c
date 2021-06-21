@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MNEW() map_alloc()
+#define MNEW() map_new()
 #define MPUT(MAP, ID, OBJ) map_put(MAP, ID, OBJ)
 #define MPUTR(MAP, ID, OBJ) map_put_rel(MAP, ID, OBJ)
 #define MGET(MAP, ID) map_get(MAP, ID)
@@ -33,7 +33,7 @@ struct _map_t
   bucket_t*    buckets;
 };
 
-map_t* map_alloc(void);
+map_t* map_new(void);
 void   map_dealloc(void* pointer);
 void   map_reset(map_t* map);
 int    map_put(map_t* map, const char* key, void* value);
@@ -42,7 +42,7 @@ void*  map_get(map_t* map, const char* key);
 void   map_del(map_t* map, const char* key);
 void   map_keys(map_t* map, vec_t* res);
 void   map_values(map_t* map, vec_t* res);
-void   map_printkeys(map_t* map);
+void   map_print_keys(map_t* map);
 void   map_describe(void* p, int level);
 
 #ifdef DEBUG
@@ -58,7 +58,7 @@ void map_test(void);
 
 /* creates map */
 
-map_t* map_alloc()
+map_t* map_new()
 {
   map_t* map = mem_calloc(sizeof(map_t), "map_t", map_dealloc, map_describe);
 
@@ -429,11 +429,11 @@ void map_test()
 {
   printf("MAP TEST SESSION START");
   printf("1 CREATE EMPTY");
-  map_t* m1 = map_alloc();
+  map_t* m1 = map_new();
   printf("2 DELETE EMPTY");
   mem_release(m1);
   printf("3 ADDING DATA");
-  map_t* m2 = map_alloc();
+  map_t* m2 = map_new();
   map_put(m2, "fakk", "fakkvalue");
   map_put(m2, "makk", "makkvalue");
   map_put(m2, "takk", "takkvalue");

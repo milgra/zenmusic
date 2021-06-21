@@ -67,8 +67,8 @@ void config_read(char* path)
 
 void config_write(char* path)
 {
-  map_t* data    = MNEW();                                // REL 0
-  char*  dirpath = cstr_remove_last_path_component(path); // REL 1
+  map_t* data    = MNEW();                                    // REL 0
+  char*  dirpath = cstr_new_path_remove_last_component(path); // REL 1
 
   printf("CONFIG DIR %s FILE %s\n", dirpath, path);
 

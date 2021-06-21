@@ -120,15 +120,15 @@ void init(int width, int height, char* path)
 
   // init paths
 
-  char* wrk_path    = cstr_path_normalize(path, NULL);                                                                                    // REL 0
-  char* res_path    = zm.res_par ? cstr_path_normalize(zm.res_par, wrk_path) : cstr_new_cstring("/usr/local/share/zenmusic");             // REL 1
-  char* cfgdir_path = zm.cfg_par ? cstr_path_normalize(zm.cfg_par, wrk_path) : cstr_path_normalize("~/.config/zenmusic", getenv("HOME")); // REL 2
-  char* css_path    = cstr_path_append(res_path, "main.css");                                                                             // REL 3
-  char* html_path   = cstr_path_append(res_path, "main.html");                                                                            // REL 4
-  char* font_path   = cstr_path_append(res_path, "Baloo.ttf");                                                                            // REL 5
-  char* cfg_path    = cstr_path_append(cfgdir_path, "config.kvl");                                                                        // REL 6
-  char* rec_path    = zm.rec_par ? cstr_path_normalize(zm.rec_par, wrk_path) : NULL;                                                      // REL 7
-  char* rep_path    = zm.rep_par ? cstr_path_normalize(zm.rep_par, wrk_path) : NULL;                                                      // REL 8
+  char* wrk_path    = cstr_new_path_normalize(path, NULL);                                                                                        // REL 0
+  char* res_path    = zm.res_par ? cstr_new_path_normalize(zm.res_par, wrk_path) : cstr_new_cstring("/usr/local/share/zenmusic");                 // REL 1
+  char* cfgdir_path = zm.cfg_par ? cstr_new_path_normalize(zm.cfg_par, wrk_path) : cstr_new_path_normalize("~/.config/zenmusic", getenv("HOME")); // REL 2
+  char* css_path    = cstr_new_path_append(res_path, "main.css");                                                                                 // REL 3
+  char* html_path   = cstr_new_path_append(res_path, "main.html");                                                                                // REL 4
+  char* font_path   = cstr_new_path_append(res_path, "Baloo.ttf");                                                                                // REL 5
+  char* cfg_path    = cstr_new_path_append(cfgdir_path, "config.kvl");                                                                            // REL 6
+  char* rec_path    = zm.rec_par ? cstr_new_path_normalize(zm.rec_par, wrk_path) : NULL;                                                          // REL 7
+  char* rep_path    = zm.rep_par ? cstr_new_path_normalize(zm.rep_par, wrk_path) : NULL;                                                          // REL 8
 
   // print path info to console
 
@@ -301,7 +301,7 @@ void on_change_library(void* userdata, void* data)
 
   // construct path if needed
 
-  lib_path = cstr_path_normalize(new_path, config_get("wrk_path")); // REL 0
+  lib_path = cstr_new_path_normalize(new_path, config_get("wrk_path")); // REL 0
 
   printf("new path %s lib path %s\n", new_path, lib_path);
 
@@ -398,9 +398,9 @@ void save_screenshot()
 
   ui_compositor_render_to_bmp(screen);
 
-  char* name    = cstr_new_format(20, "screenshot%.3i.png", cnt++); // REL 1
-  char* path    = cstr_path_append(config_get("lib_path"), name);   // REL 2
-  bm_t* flipped = bm_new_flip_y(screen);                            // REL 3
+  char* name    = cstr_new_format(20, "screenshot%.3i.png", cnt++);   // REL 1
+  char* path    = cstr_new_path_append(config_get("lib_path"), name); // REL 2
+  bm_t* flipped = bm_new_flip_y(screen);                              // REL 3
 
   coder_write_png(path, flipped);
 

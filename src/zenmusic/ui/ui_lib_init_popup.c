@@ -84,7 +84,7 @@ void ui_lib_init_popup_set_library(view_t* view)
 {
   // get path string
   str_t* path    = vh_textinput_scroller_get_text(ulip.textinput);
-  char*  path_ch = str_cstring(path);
+  char*  path_ch = str_new_cstring(path);
 
   callbacks_call("on_change_library", path_ch);
   REL(path_ch);

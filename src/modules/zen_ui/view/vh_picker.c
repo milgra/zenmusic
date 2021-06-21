@@ -32,7 +32,7 @@ void vh_picker_evt(view_t* view, ev_t ev)
     uint8_t  g = view->texture.bitmap->data[i + 1];
     uint8_t  b = view->texture.bitmap->data[i + 2];
 
-    num_t* num = num_newuint32((r << 24) | (g << 16) | (b << 8) | 0xFF);
+    num_t* num = num_new_uint32((r << 24) | (g << 16) | (b << 8) | 0xFF);
     (*vh->on_press->fp)(vh->on_press->userdata, num);
     REL(num);
   }

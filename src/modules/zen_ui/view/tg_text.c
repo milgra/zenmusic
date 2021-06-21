@@ -42,7 +42,7 @@ void tg_text_gen(view_t* view)
     if (gen->text)
     {
       str_t* str = str_new(); // REL 1
-      str_addbytearray(str, gen->text);
+      str_add_bytearray(str, gen->text);
 
       text_render(str, style, fontmap);
 

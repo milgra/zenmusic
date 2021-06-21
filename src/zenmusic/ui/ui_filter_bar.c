@@ -68,7 +68,7 @@ void ui_filter_bar_filter(view_t* view, void* userdata)
 {
   str_t* text = vh_textinput_get_text(view);
 
-  char* ctext = str_cstring(text);
+  char* ctext = str_new_cstring(text);
 
   visible_set_filter(ctext);
   ui_songlist_update();

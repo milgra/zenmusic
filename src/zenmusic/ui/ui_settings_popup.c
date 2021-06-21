@@ -226,7 +226,7 @@ void ui_settings_popup_on_accept_remote(void* userdata, void* data)
 
 void ui_settings_popup_on_accept_library(void* userdata, void* data)
 {
-  char* path_cs = str_cstring(data);
+  char* path_cs = str_new_cstring(data);
 
   callbacks_call("on_change_library", path_cs);
   REL(path_cs);

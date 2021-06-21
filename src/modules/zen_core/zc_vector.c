@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define VNEW() vec_alloc()
+#define VNEW() vec_new()
 #define VADD(VEC, OBJ) vec_add(VEC, OBJ)
 #define VADDR(VEC, OBJ) vec_add_rel(VEC, OBJ)
 #define VREM(VEC, OBJ) vec_rem(VEC, OBJ)
@@ -31,8 +31,7 @@ struct _vec_t
   uint32_t length_real;
 };
 
-vec_t*   vec_alloc(void);
-void     vec_dealloc(void* vector);
+vec_t*   vec_new(void);
 void     vec_reset(vec_t* vector);
 void     vec_dec_retcount(vec_t* vector);
 void     vec_add(vec_t* vector, void* data);
@@ -58,11 +57,13 @@ void vec_describe(void* p, int level);
 #endif
 #if __INCLUDE_LEVEL__ == 0
 
+void vec_del(void* vector);
+
 /* creates new vector */
 
-vec_t* vec_alloc()
+vec_t* vec_new()
 {
-  vec_t* vector       = mem_calloc(sizeof(vec_t), "vec_t", vec_dealloc, vec_describe);
+  vec_t* vector       = mem_calloc(sizeof(vec_t), "vec_t", vec_del, vec_describe);
   vector->data        = mem_calloc(sizeof(void*) * 10, "void**", NULL, NULL);
   vector->pos         = 0;
   vector->length      = 0;
@@ -72,7 +73,7 @@ vec_t* vec_alloc()
 
 /* deletes vector */
 
-void vec_dealloc(void* pointer)
+void vec_del(void* pointer)
 {
   vec_t* vector = pointer;
   for (uint32_t index = 0; index < vector->length; index++)

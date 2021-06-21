@@ -53,7 +53,7 @@ void db_read(char* libpath)
 {
   assert(libpath != NULL);
 
-  char* dbpath = cstr_path_append(libpath, "zenmusic.kvl"); // REL 0
+  char* dbpath = cstr_new_path_append(libpath, "zenmusic.kvl"); // REL 0
 
   LOG("db : reading db %s", dbpath);
 
@@ -171,7 +171,7 @@ int db_organize_entry(char* libpath, map_t* db, map_t* entry)
 
   // get extension
 
-  char* ext = cstr_path_extension(path);
+  char* ext = cstr_new_path_extension(path);
 
   char* old_path     = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s", libpath, path);              // REL 0
   char* new_dirs     = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s/%s/", libpath, artist, album); // REL 1

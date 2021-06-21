@@ -21,15 +21,15 @@ str_t* str_new(void);
 void   str_reset(str_t* string);
 void   str_describe(void* p, int level);
 
-str_t* str_substring(str_t* string, int start, int end);
-char*  str_cstring(str_t* string);
+str_t* str_new_substring(str_t* string, int start, int end);
+char*  str_new_cstring(str_t* string);
 
-void str_addstring(str_t* stra, str_t* strb);
-void str_addbytearray(str_t* string, char* bytearray);
-void str_addcodepoint(str_t* string, uint32_t codepoint);
+void str_add_string(str_t* stra, str_t* strb);
+void str_add_bytearray(str_t* string, char* bytearray);
+void str_add_codepoint(str_t* string, uint32_t codepoint);
 
-void str_removecodepointatindex(str_t* string, uint32_t index);
-void str_removecodepointsinrange(str_t* string, uint32_t start, uint32_t end);
+void str_remove_codepoint_at_index(str_t* string, uint32_t index);
+void str_remove_codepoints_in_range(str_t* string, uint32_t start, uint32_t end);
 
 int8_t str_compare(str_t* stra, str_t* strb);
 
@@ -74,19 +74,19 @@ void str_describe(void* p, int level)
   printf("length %u", str->length);
 }
 
-str_t* str_substring(str_t* string, int start, int end)
+str_t* str_new_substring(str_t* string, int start, int end)
 {
   str_t* result = str_new();
 
   for (int index = start; index < end; index++)
   {
-    str_addcodepoint(result, string->codepoints[index]);
+    str_add_codepoint(result, string->codepoints[index]);
   }
 
   return result;
 }
 
-char* str_cstring(str_t* string)
+char* str_new_cstring(str_t* string)
 {
   if (string == NULL) return NULL;
   char*    bytes    = mem_calloc((string->length_bytes + 1) * sizeof(char), "char*", NULL, NULL);
@@ -120,7 +120,7 @@ char* str_cstring(str_t* string)
   return bytes;
 }
 
-void str_addstring(str_t* stra, str_t* strb)
+void str_add_string(str_t* stra, str_t* strb)
 {
   if (strb != NULL)
   {
@@ -137,7 +137,7 @@ void str_addstring(str_t* stra, str_t* strb)
   }
 }
 
-uint8_t strgetcodebytelength(uint32_t codepoint)
+uint8_t str_get_code_bytelength(uint32_t codepoint)
 {
   uint8_t codelength = 4;
   if (codepoint < 0x80)
@@ -149,7 +149,7 @@ uint8_t strgetcodebytelength(uint32_t codepoint)
   return codelength;
 }
 
-void str_addbuffer(str_t* string, char* buffer, char length)
+void str_add_buffer(str_t* string, char* buffer, char length)
 {
   // filter byte order mark
   if (strcmp(buffer, UTF8_BOM) != 0)
@@ -165,11 +165,11 @@ void str_addbuffer(str_t* string, char* buffer, char length)
     else if (length == 4)
       codepoint = (buffer[0] & 0x7) << 18 | (buffer[1] & 0x3F) << 12 | (buffer[2] & 0x3F) << 6 | (buffer[3] & 0x3F);
     // add codepoint
-    str_addcodepoint(string, codepoint);
+    str_add_codepoint(string, codepoint);
   }
 }
 
-void str_addbytearray(str_t* string, char* bytearray)
+void str_add_bytearray(str_t* string, char* bytearray)
 {
   char buffer[4]       = {0};
   char buffer_position = 0;
@@ -180,7 +180,7 @@ void str_addbytearray(str_t* string, char* bytearray)
     {
       if (buffer_position > 0)
       {
-        str_addbuffer(string, buffer, buffer_position);
+        str_add_buffer(string, buffer, buffer_position);
         // reset unicode buffer
         memset(&buffer, 0, 4);
         buffer_position = 0;
@@ -194,12 +194,12 @@ void str_addbytearray(str_t* string, char* bytearray)
     if (buffer_position == 5) return;
   }
   // add remaining buffer content
-  if (buffer_position > 0) str_addbuffer(string, buffer, buffer_position);
+  if (buffer_position > 0) str_add_buffer(string, buffer, buffer_position);
 }
 
-void str_addcodepoint(str_t* string, uint32_t codepoint)
+void str_add_codepoint(str_t* string, uint32_t codepoint)
 {
-  uint8_t codelength = strgetcodebytelength(codepoint);
+  uint8_t codelength = str_get_code_bytelength(codepoint);
 
   // expand
   if (string->length_real == string->length)
@@ -213,24 +213,24 @@ void str_addcodepoint(str_t* string, uint32_t codepoint)
   string->length_bytes += codelength;
 }
 
-void str_removecodepointatindex(str_t* string, uint32_t index)
+void str_remove_codepoint_at_index(str_t* string, uint32_t index)
 {
   uint32_t codepoint  = string->codepoints[index];
-  uint8_t  codelength = strgetcodebytelength(codepoint);
+  uint8_t  codelength = str_get_code_bytelength(codepoint);
 
   string->length_bytes -= codelength;
   memmove(string->codepoints + index, string->codepoints + index + 1, (string->length - index - 1) * sizeof(uint32_t));
   string->length -= 1;
 }
 
-void str_removecodepointsinrange(str_t* string, uint32_t start, uint32_t end)
+void str_remove_codepoints_in_range(str_t* string, uint32_t start, uint32_t end)
 {
   if (end > string->length) end = string->length;
 
   for (int index = start; index < end; index++)
   {
     uint32_t codepoint  = string->codepoints[index];
-    uint8_t  codelength = strgetcodebytelength(codepoint);
+    uint8_t  codelength = str_get_code_bytelength(codepoint);
     string->length_bytes -= codelength;
   }
 
@@ -247,8 +247,8 @@ void str_removecodepointsinrange(str_t* string, uint32_t start, uint32_t end)
 
 int8_t str_compare(str_t* stra, str_t* strb)
 {
-  char* bytes_a = str_cstring(stra);
-  char* bytes_b = str_cstring(strb);
+  char* bytes_a = str_new_cstring(stra);
+  char* bytes_b = str_new_cstring(strb);
 
   int8_t result = strcmp(bytes_a, bytes_b);
 

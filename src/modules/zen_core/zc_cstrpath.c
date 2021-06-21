@@ -3,11 +3,11 @@
 
 #include "zc_cstring.c"
 
-char* cstr_path_append(char* root, char* component);
-char* cstr_remove_last_path_component(char* path);
-char* cstr_path_extension(char* path);
-char* cstr_path_filename(char* path);
-char* cstr_path_normalize(char* path, char* execpath);
+char* cstr_new_path_append(char* root, char* component);
+char* cstr_new_path_remove_last_component(char* path);
+char* cstr_new_path_extension(char* path);
+char* cstr_new_path_filename(char* path);
+char* cstr_new_path_normalize(char* path, char* execpath);
 
 #endif
 
@@ -17,7 +17,7 @@ char* cstr_path_normalize(char* path, char* execpath);
 #include <limits.h>
 #include <string.h>
 
-char* cstr_path_append(char* root, char* component)
+char* cstr_new_path_append(char* root, char* component)
 {
   if (root[strlen(root) - 1] == '/')
     return cstr_new_format(PATH_MAX + NAME_MAX, "%s%s", root, component);
@@ -25,7 +25,7 @@ char* cstr_path_append(char* root, char* component)
     return cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s", root, component);
 }
 
-char* cstr_remove_last_path_component(char* path)
+char* cstr_new_path_remove_last_component(char* path)
 {
   int index;
   for (index = strlen(path) - 1; index > -1; --index)
@@ -41,7 +41,7 @@ char* cstr_remove_last_path_component(char* path)
   return str;
 }
 
-char* cstr_path_extension(char* path)
+char* cstr_new_path_extension(char* path)
 {
   int index;
   for (index = strlen(path) - 1; index > -1; --index)
@@ -59,7 +59,7 @@ char* cstr_path_extension(char* path)
   return ext;
 }
 
-char* cstr_path_filename(char* path)
+char* cstr_new_path_filename(char* path)
 {
   int dotindex;
   for (dotindex = strlen(path) - 1; dotindex > -1; --dotindex)
@@ -85,7 +85,7 @@ char* cstr_path_filename(char* path)
   return title;
 }
 
-char* cstr_path_normalize(char* path, char* execpath)
+char* cstr_new_path_normalize(char* path, char* execpath)
 {
   char* result = NULL;
 

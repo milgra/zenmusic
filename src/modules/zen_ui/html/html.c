@@ -246,7 +246,7 @@ void analyze_classes(char* css, prop_t* props)
 
 prop_t* html_parse_css(char* css)
 {
-  map_t*   map   = map_alloc();
+  map_t*   map   = map_new();
   uint32_t cnt   = count_props(css);
   prop_t*  props = mem_calloc(sizeof(prop_t) * (cnt + 1), "prop_t*", NULL, NULL);
 

@@ -408,8 +408,8 @@ int coder_write_metadata(char* libpath, char* path, char* cover_path, map_t* dat
 
   int success = 0; // indicate that everything went well after closing the avio channel
 
-  char* ext  = cstr_path_extension(path); // REL 0
-  char* name = cstr_path_filename(path);  // REL 1
+  char* ext  = cstr_new_path_extension(path); // REL 0
+  char* name = cstr_new_path_filename(path);  // REL 1
 
   char* old_name = cstr_new_format(PATH_MAX + NAME_MAX, "%s.%s", name, ext);         // REL 2
   char* old_path = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s", libpath, path);     // REL 3

@@ -27,7 +27,7 @@ void*  mem_calloc(size_t size, char* type, void (*destructor)(void*), void (*des
 void*  mem_realloc(void* pointer, size_t size);
 void*  mem_retain(void* pointer);
 char   mem_release(void* pointer);
-char   mem_releaseeach(void* first, ...);
+char   mem_release_each(void* first, ...);
 size_t mem_retaincount(void* pointer);
 void   mem_replace(void** address, void* data);
 void*  mem_stack_to_heap(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*, int), uint8_t* data);

@@ -48,7 +48,7 @@ tm_t* tm_new(int w, int h)
   int rows = h / 32;
 
   tm_t* tm   = mem_calloc(sizeof(tm_t), "tm_t", tm_del, NULL);
-  tm->coords = map_alloc();
+  tm->coords = map_new();
   tm->blocks = mem_calloc(sizeof(char) * cols * rows, "char*", NULL, NULL);
   tm->width  = w;
   tm->height = h;

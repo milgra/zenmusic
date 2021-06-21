@@ -195,8 +195,8 @@ void ui_editor_popup_show()
 
 void ui_editor_popup_on_accept_cover(void* userdata, void* data)
 {
-  char* path_cs    = str_cstring(data);                                    // REL 0
-  char* path_final = cstr_path_normalize(path_cs, config_get("wrk_path")); // REL 1
+  char* path_cs    = str_new_cstring(data);                                    // REL 0
+  char* path_final = cstr_new_path_normalize(path_cs, config_get("wrk_path")); // REL 1
   // check if image is valid
   bm_t* image = coder_load_image(path_final);
 
@@ -419,7 +419,7 @@ void ui_editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, 
 void ui_editor_popup_input_cell_edit_finished(view_t* inputview)
 {
   str_t* str   = vh_textinput_scroller_get_text(ep.textinput);
-  char*  text  = str_cstring(str);
+  char*  text  = str_new_cstring(str);
   char*  value = MGET(ep.attributes, ep.editor_key);
 
   if (value == NULL) value = "";
@@ -601,7 +601,7 @@ void ui_editor_popup_set_songs(vec_t* vec)
   {
     map_t* song = vec->data[0];
     char*  path = MGET(song, "file/path");
-    char*  file = cstr_path_append(config_get("lib_path"), path);
+    char*  file = cstr_new_path_append(config_get("lib_path"), path);
 
     coder_load_cover_into(file, ep.cover_view->texture.bitmap);
 

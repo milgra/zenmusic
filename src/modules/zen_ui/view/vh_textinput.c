@@ -214,7 +214,7 @@ void vh_textinput_upd(view_t* view)
   //vh_anim_set(glyphview, sf, ef, 10, AT_LINEAR);
 
   // show text as texture
-  //char* cstr = str_cstring(text_s);
+  //char* cstr = str_new_cstring(text_s);
   //tg_text_set(view, cstr, data->style);
   //REL(cstr);
 }
@@ -289,7 +289,7 @@ void vh_textinput_evt(view_t* view, ev_t ev)
   }
   else if (ev.type == EV_TEXT)
   {
-    str_addbytearray(data->text_s, ev.text);
+    str_add_bytearray(data->text_s, ev.text);
 
     // create view for glyph
 
@@ -311,7 +311,7 @@ void vh_textinput_evt(view_t* view, ev_t ev)
   {
     if (ev.keycode == SDLK_BACKSPACE && data->text_s->length > 0)
     {
-      str_removecodepointatindex(data->text_s, data->text_s->length - 1);
+      str_remove_codepoint_at_index(data->text_s, data->text_s->length - 1);
 
       view_t* glyph_view = vec_tail(data->glyph_v);
       VREM(data->glyph_v, glyph_view);
@@ -410,12 +410,12 @@ void vh_textinput_add(view_t*     view,
 
   if (text)
   {
-    str_addbytearray(data->text_s, text);
+    str_add_bytearray(data->text_s, text);
 
     for (int i = 0; i < data->text_s->length; i++)
     {
       str_t* charstr = str_new();
-      str_addcodepoint(charstr, data->text_s->codepoints[i]);
+      str_add_codepoint(charstr, data->text_s->codepoints[i]);
       char view_id[100];
       snprintf(view_id, 100, "%sglyph%i", view->id, data->glyph_index++);
       view_t* glyph_view = view_new(view_id, (r2_t){0, 0, 0, 0});
@@ -469,12 +469,12 @@ void vh_textinput_set_text(view_t* view, char* text)
 
   if (text)
   {
-    str_addbytearray(data->text_s, text);
+    str_add_bytearray(data->text_s, text);
 
     for (int i = 0; i < data->text_s->length; i++)
     {
       str_t* charstr = str_new();
-      str_addcodepoint(charstr, data->text_s->codepoints[i]);
+      str_add_codepoint(charstr, data->text_s->codepoints[i]);
       char view_id[100];
       snprintf(view_id, 100, "%sglyph%i", view->id, data->glyph_index++);
       view_t* glyph_view = view_new(view_id, (r2_t){0, 0, 0, 0});
