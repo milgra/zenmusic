@@ -68,7 +68,7 @@ void ui_inputfield_popup_attach(view_t* baseview)
   ts.multiline = 1;
   ts.align     = TA_CENTER;
 
-  cb_t* cb_btn_press = cb_new(ui_inputfield_on_button_down, NULL);
+  cb_t* cb_btn_press = cb_new(ui_inputfield_on_button_down, NULL); // REL 0
 
   vh_button_add(acc_btn, VH_BUTTON_NORMAL, cb_btn_press);
   vh_button_add(rej_btn, VH_BUTTON_NORMAL, cb_btn_press);
@@ -77,13 +77,14 @@ void ui_inputfield_popup_attach(view_t* baseview)
   uip.textfield = textfield;
   uip.textinput = textinput;
   uip.attached  = 1;
-  uip.requests  = VNEW();
+  uip.requests  = VNEW(); // REL 1
 
   REL(cb_btn_press);
 }
 
 void ui_inputfield_popup_detach()
 {
+  REL(uip.requests);
 }
 
 void ui_inputfield_on_button_down(void* userdata, void* data)
@@ -108,7 +109,8 @@ void ui_inputfield_popup_shownext()
 
 void ui_inputfield_popup_show(char* text, cb_t* acc_cb, cb_t* rej_cb)
 {
-  map_t* request = MNEW();
+  map_t* request = MNEW(); // REL 0
+
   MPUTR(request, "text", cstr_new_cstring(text));
   if (acc_cb) MPUT(request, "acc_cb", acc_cb);
   if (rej_cb) MPUT(request, "rej_cb", rej_cb);
@@ -119,6 +121,8 @@ void ui_inputfield_popup_show(char* text, cb_t* acc_cb, cb_t* rej_cb)
   ui_popup_switcher_toggle("inp_popup_page");
 
   vh_textinput_scroller_activate(uip.textinput, 1); // activate text input
+
+  REL(request);
 }
 
 void ui_inputfield_popup_enter(view_t* view)

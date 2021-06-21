@@ -42,14 +42,16 @@ void ui_filter_popup_attach(view_t* baseview)
   ts.align       = TA_RIGHT;
 
   ts.margin_right = 20;
-  ufp.genrelist   = textlist_new(view_get_subview(baseview, "genrelist"), ts, ui_filter_popup_on_genre_select);
+  ufp.genrelist   = textlist_new(view_get_subview(baseview, "genrelist"), ts, ui_filter_popup_on_genre_select); // REL 0
   ts.margin_left  = 20;
   ts.align        = TA_LEFT;
-  ufp.artistlist  = textlist_new(view_get_subview(baseview, "artistlist"), ts, ui_filter_popup_on_artist_select);
+  ufp.artistlist  = textlist_new(view_get_subview(baseview, "artistlist"), ts, ui_filter_popup_on_artist_select); // REL 1
 }
 
 void ui_filter_popup_detach()
 {
+  REL(ufp.genrelist);  // REL 0
+  REL(ufp.artistlist); // REL 1
 }
 
 void ui_filter_popup_show()
@@ -108,8 +110,8 @@ void ui_filter_popup_on_artist_select(int index)
   ui_songlist_update();
   ui_filter_bar_show_query(artist);
 
-  REL(artists);
-  REL(query);
+  REL(artists); // REL 0
+  REL(query);   // REL 1
 }
 
 #endif

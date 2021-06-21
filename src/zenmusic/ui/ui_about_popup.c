@@ -118,7 +118,7 @@ void ui_about_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* cell
   if (index < 5) ui_alert_popup_show("Link is opened in the browser.");
 }
 
-view_t* donateitem_create(int index)
+view_t* donateitem_new(int index)
 {
   static int item_cnt      = 0;
   char       idbuffer[100] = {0};
@@ -215,12 +215,12 @@ void ui_about_popup_attach(view_t* baseview)
 
   // create items
 
-  VADD(donl.items, donateitem_create(0));
-  VADD(donl.items, donateitem_create(1));
-  VADD(donl.items, donateitem_create(2));
-  VADD(donl.items, donateitem_create(3));
-  VADD(donl.items, donateitem_create(4));
-  VADD(donl.items, donateitem_create(5));
+  VADD(donl.items, donateitem_new(0));
+  VADD(donl.items, donateitem_new(1));
+  VADD(donl.items, donateitem_new(2));
+  VADD(donl.items, donateitem_new(3));
+  VADD(donl.items, donateitem_new(4));
+  VADD(donl.items, donateitem_new(5));
 
   char* version = cstr_new_format(200, "Zen Music v%i.%i beta\nby Milan Toth\nFree and Open Source Software.", VERSION, BUILD); // REL 2
 

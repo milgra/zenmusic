@@ -38,7 +38,7 @@ view_t* ui_song_menu_popupitem_create(int index, char* text);
 void ui_song_menu_popup_attach(view_t* baseview)
 {
   slp.view  = view_get_subview(baseview, "song_popup_list");
-  slp.items = VNEW();
+  slp.items = VNEW(); // REL 0
 
   slp.textstyle.font      = config_get("font_path");
   slp.textstyle.align     = TA_CENTER;
@@ -63,11 +63,13 @@ void ui_song_menu_popup_attach(view_t* baseview)
 
 void ui_song_menu_popup_detach()
 {
+  REL(slp.items);
 }
 
 void ui_song_menu_popup_on_item_delete(void* userdata, void* data)
 {
-  vec_t* selected = VNEW();
+  vec_t* selected = VNEW(); // REL 0
+
   ui_songlist_get_selected(selected);
   mem_describe(selected, 0);
 
@@ -80,7 +82,7 @@ void ui_song_menu_popup_on_item_delete(void* userdata, void* data)
     ui_songlist_update();
   }
 
-  REL(selected);
+  REL(selected); // REL 0
 }
 
 void ui_song_menu_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, ev_t ev)
@@ -97,23 +99,23 @@ void ui_song_menu_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* 
     vec_t* selected = VNEW(); // REL 0
     ui_songlist_get_selected(selected);
 
-    cb_t* acc_cb = cb_new(ui_song_menu_popup_on_item_delete, NULL); // REL 1
-    char* text   = cstr_new_format(100, "Are you sure you want to delete %i items?", selected->length);
+    cb_t* acc_cb = cb_new(ui_song_menu_popup_on_item_delete, NULL);                                     // REL 1
+    char* text   = cstr_new_format(100, "Are you sure you want to delete %i items?", selected->length); // REL 2
+
     ui_decision_popup_show(text, acc_cb, NULL);
-    REL(acc_cb);
-    REL(selected);
+
+    REL(text);     // REL 2
+    REL(acc_cb);   // REL 1
+    REL(selected); // REL 0
   }
 }
 
 view_t* ui_song_menu_popupitem_create(int index, char* text)
 {
-  char*   rowid    = cstr_new_format(100, "smlist_item%i", index);
-  char*   cellid   = cstr_new_format(100, "%s%s", rowid, "field");
-  view_t* rowview  = view_new(rowid, (r2_t){0, 0, 460, 50});
-  view_t* cellview = view_new(cellid, (r2_t){0, 0, 250, 50});
-
-  REL(rowid);
-  REL(cellid);
+  char*   rowid    = cstr_new_format(100, "smlist_item%i", index); // REL 0
+  char*   cellid   = cstr_new_format(100, "%s%s", rowid, "field"); // REL 1
+  view_t* rowview  = view_new(rowid, (r2_t){0, 0, 460, 50});       // REL 2
+  view_t* cellview = view_new(cellid, (r2_t){0, 0, 250, 50});      // REL 3
 
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, ui_song_menu_popup_on_item_select);
@@ -126,6 +128,10 @@ view_t* ui_song_menu_popupitem_create(int index, char* text)
 
   tg_text_add(cellview);
   tg_text_set(cellview, text, slp.textstyle);
+
+  REL(rowid);    // REL 0
+  REL(cellid);   // REL 1
+  REL(cellview); // REL 3
 
   return rowview;
 }

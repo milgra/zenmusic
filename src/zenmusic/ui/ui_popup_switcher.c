@@ -31,8 +31,8 @@ void ui_popup_switcher_on_button_down(void* userdata, void* data);
 void ui_popup_switcher_attach(view_t* baseview)
 {
   ups.baseview    = baseview;
-  ups.popup_names = VNEW();
-  ups.popup_views = MNEW();
+  ups.popup_names = VNEW(); // REL 0
+  ups.popup_views = MNEW(); // REL 1
 
   VADDR(ups.popup_names, cstr_new_cstring("song_popup_page"));
   VADDR(ups.popup_names, cstr_new_cstring("messages_popup_page"));
@@ -64,6 +64,8 @@ void ui_popup_switcher_attach(view_t* baseview)
 
 void ui_popup_switcher_detach()
 {
+  REL(ups.popup_names);
+  REL(ups.popup_views);
 }
 
 void ui_popup_switcher_remove(view_t* view, void* userdata)

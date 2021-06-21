@@ -34,7 +34,7 @@ void ui_settings_popup_on_header_field_insert(view_t* view, int src, int tgt);
 void ui_settings_popup_on_header_field_resize(view_t* view, char* id, int size);
 
 view_t* ui_settings_popup_item_for_index(int index, void* userdata, view_t* listview, int* item_count);
-view_t* ui_settings_popup_create_item();
+view_t* ui_settings_popup_new_item();
 void    ui_settings_popup_update_item(view_t* rowview, int index, char* field, char* value);
 
 struct ui_settings_popup_t
@@ -48,8 +48,8 @@ struct ui_settings_popup_t
 void ui_settings_popup_attach(view_t* baseview)
 {
   uisp.view    = view_get_subview(baseview, "settingslist");
-  uisp.columns = VNEW();
-  uisp.items   = VNEW();
+  uisp.columns = VNEW(); // REL 0
+  uisp.items   = VNEW(); // REL 1
 
   uisp.textstyle.font        = config_get("font_path");
   uisp.textstyle.align       = 0;
@@ -65,7 +65,7 @@ void ui_settings_popup_attach(view_t* baseview)
 
   // add header handler
 
-  view_t* header = view_new("settingslist_header", (r2_t){0, 0, 10, 30});
+  view_t* header = view_new("settingslist_header", (r2_t){0, 0, 10, 30}); // REL 2
   /* header->layout.background_color = 0x333333FF; */
   /* header->layout.shadow_blur      = 3; */
   /* header->layout.border_radius    = 3; */
@@ -79,14 +79,16 @@ void ui_settings_popup_attach(view_t* baseview)
   col_t* cell;
   while ((cell = VNXT(uisp.columns)))
   {
-    char*   id       = cstr_new_format(100, "%s%s", header->id, cell->id);
-    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
-    REL(id);
+    char*   id       = cstr_new_format(100, "%s%s", header->id, cell->id); // REL 3
+    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});         // REL 4
 
     tg_text_add(cellview);
     tg_text_set(cellview, cell->id, uisp.textstyle);
 
     vh_lhead_add_cell(header, cell->id, cell->size, cellview);
+
+    REL(id);       // REL 3
+    REL(cellview); // REL 4
   }
 
   // add list handler to view
@@ -96,12 +98,12 @@ void ui_settings_popup_attach(view_t* baseview)
 
   // create items
 
-  VADD(uisp.items, ui_settings_popup_create_item());
-  VADD(uisp.items, ui_settings_popup_create_item());
-  // VADD(uisp.items, ui_settings_popup_create_item());
-  VADD(uisp.items, ui_settings_popup_create_item());
-  VADD(uisp.items, ui_settings_popup_create_item());
-  VADD(uisp.items, ui_settings_popup_create_item());
+  VADDR(uisp.items, ui_settings_popup_new_item());
+  VADDR(uisp.items, ui_settings_popup_new_item());
+  // VADD(uisp.items, ui_settings_popup_new_item());
+  VADDR(uisp.items, ui_settings_popup_new_item());
+  VADDR(uisp.items, ui_settings_popup_new_item());
+  VADDR(uisp.items, ui_settings_popup_new_item());
 
   ui_settings_popup_update_item(uisp.items->data[0], 0, "Library Path", "/home/user/milgra/Music");
   ui_settings_popup_update_item(uisp.items->data[1], 1, "Organize Library", "Disabled");
@@ -109,10 +111,14 @@ void ui_settings_popup_attach(view_t* baseview)
   ui_settings_popup_update_item(uisp.items->data[2], 2, "Remote Control", "Disabled");
   ui_settings_popup_update_item(uisp.items->data[3], 3, "Config Path", "/home/.config/zenmusic/config");
   ui_settings_popup_update_item(uisp.items->data[4], 4, "Style Path", "/usr/local/share/zenmusic");
+
+  REL(header);
 }
 
 void ui_settings_popup_detach()
 {
+  REL(uisp.columns);
+  REL(uisp.items);
 }
 
 void ui_settings_popup_show()
@@ -209,10 +215,10 @@ void ui_settings_popup_on_accept_remote(void* userdata, void* data)
 
 void ui_settings_popup_on_accept_library(void* userdata, void* data)
 {
-  char* path_cs = str_new_cstring(data);
+  char* path_cs = str_new_cstring(data); // REL 0
 
   callbacks_call("on_change_library", path_cs);
-  REL(path_cs);
+  REL(path_cs); // REL 0
 }
 
 // items
@@ -227,27 +233,27 @@ void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* c
   {
   case 0:
   {
-    cb_t* acc_cb = cb_new(ui_settings_popup_on_accept_library, NULL);
+    cb_t* acc_cb = cb_new(ui_settings_popup_on_accept_library, NULL); // REL 0
     ui_inputfield_popup_show("Use library at", acc_cb, NULL);
-    REL(acc_cb);
+    REL(acc_cb); // REL 0
 
     break;
   }
   case 1:
   {
     int   enabled = config_get_bool("organize_lib");
-    cb_t* acc_cb  = cb_new(ui_settings_popup_on_accept, NULL);
+    cb_t* acc_cb  = cb_new(ui_settings_popup_on_accept, NULL); // REL 0
     if (enabled)
       ui_decision_popup_show("Are you sure you want to switch off automatic organization?", acc_cb, NULL);
     else
       ui_decision_popup_show("Music files will be renamed/reorganized automatically under your library folder, based on artist, title and track number. Are you sure?", acc_cb, NULL);
-    REL(acc_cb);
+    REL(acc_cb); // REL 0
     break;
   }
   case 2:
   {
     int   enabled = config_get_bool("remote_enabled");
-    cb_t* acc_cb  = cb_new(ui_settings_popup_on_accept_remote, NULL);
+    cb_t* acc_cb  = cb_new(ui_settings_popup_on_accept_remote, NULL); // REL 0
     if (enabled)
       ui_decision_popup_show("Are you sure you want to switch off remote control?", acc_cb, NULL);
     else
@@ -257,7 +263,7 @@ void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* c
                                       config_get("remote_port"));
       ui_decision_popup_show(message, acc_cb, NULL);
     }
-    REL(acc_cb);
+    REL(acc_cb); // REL 0
     break;
   }
   case 3:
@@ -269,13 +275,13 @@ void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* c
   }
 }
 
-view_t* ui_settings_popup_create_item()
+view_t* ui_settings_popup_new_item()
 {
   static int item_cnt      = 0;
   char       idbuffer[100] = {0};
   snprintf(idbuffer, 100, "uispist_item%i", item_cnt++);
 
-  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 1000, 50});
+  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 1000, 50}); // REL 0
 
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, ui_settings_popup_on_item_select);
@@ -283,13 +289,15 @@ view_t* ui_settings_popup_create_item()
   col_t* cell;
   while ((cell = VNXT(uisp.columns)))
   {
-    char*   id       = cstr_new_format(100, "%s%s", rowview->id, cell->id);
-    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 50});
-    REL(id);
+    char*   id       = cstr_new_format(100, "%s%s", rowview->id, cell->id); // REL 1
+    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 50});          // REL 2
 
     tg_text_add(cellview);
 
     vh_litem_add_cell(rowview, cell->id, cell->size, cellview);
+
+    REL(id);
+    REL(cellview);
   }
 
   return rowview;

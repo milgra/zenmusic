@@ -62,9 +62,9 @@ void ui_visualizer_attach(view_t* baseview)
   vh_anim_alpha(uiv.visuleftbtnbck, 1.0, 0.0, 10, AT_LINEAR);
   vh_anim_alpha(uiv.visurightbtnbck, 1.0, 0.0, 10, AT_LINEAR);
 
-  REL(cb_btn_press);
-  REL(cb_roll_in_visu);
-  REL(cb_roll_out_visu);
+  REL(cb_btn_press);     // REL 0
+  REL(cb_roll_in_visu);  // REL 1
+  REL(cb_roll_out_visu); // REL 2
 }
 
 void ui_visualizer_detach()

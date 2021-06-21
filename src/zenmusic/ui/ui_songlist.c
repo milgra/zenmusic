@@ -130,12 +130,13 @@ void ui_songlist_attach(view_t* base)
   col_t* cell;
   while ((cell = VNXT(sl.columns)))
   {
-    char*   id       = cstr_new_format(100, "%s%s", header->id, cell->id);
-    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
+    char*   id       = cstr_new_format(100, "%s%s", header->id, cell->id); // REL 4
+    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});         // REL 5
+    view_t* dragview = view_new(id, (r2_t){cell->size - 5, 10, 5, 10});    // REL 6
+
     tg_text_add(cellview);
     tg_text_set(cellview, cell->id, sl.textstyle);
 
-    view_t* dragview                  = view_new(id, (r2_t){cell->size - 5, 10, 5, 10});
     dragview->layout.background_color = 0x00000022;
     dragview->layout.right            = 5;
     tg_css_add(dragview);
@@ -144,7 +145,9 @@ void ui_songlist_attach(view_t* base)
 
     vh_lhead_add_cell(header, cell->id, cell->size, cellview);
 
-    REL(id);
+    REL(id);       // REL 4
+    REL(cellview); // REL 5
+    REL(dragview); // REL 6
   }
 
   // add list handler to view
@@ -350,13 +353,13 @@ void ui_songlist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, e
   }
 }
 
-view_t* songitem_create()
+view_t* songitem_new()
 {
   static int item_cnt      = 0;
   char       idbuffer[100] = {0};
   snprintf(idbuffer, 100, "list_item%i", item_cnt++);
 
-  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35});
+  view_t* rowview = view_new(idbuffer, (r2_t){0, 0, 0, 35}); // REL 0
 
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, ui_songlist_on_item_select);
@@ -364,12 +367,14 @@ view_t* songitem_create()
   col_t* cell;
   while ((cell = VNXT(sl.columns)))
   {
-    char*   id       = cstr_new_format(100, "%s%s", rowview->id, cell->id);
-    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 35});
+    char*   id       = cstr_new_format(100, "%s%s", rowview->id, cell->id); // REL 0
+    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 35});          // REL 1
     tg_text_add(cellview);
 
     vh_litem_add_cell(rowview, cell->id, cell->size, cellview);
-    REL(id);
+
+    REL(id);       // REL 0
+    REL(cellview); // REL 1
   }
 
   return rowview;
@@ -423,7 +428,7 @@ view_t* ui_songlist_item_for_index(int index, void* userdata, view_t* listview, 
   if (sl.cache->length > 0)
     item = sl.cache->data[0];
   else
-    item = songitem_create();
+    item = songitem_new();
 
   VREM(sl.cache, item);
 

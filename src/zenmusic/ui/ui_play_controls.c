@@ -60,7 +60,7 @@ void ui_play_controls_attach(view_t* baseview)
   uipc.volknob  = view_get_subview(baseview, "volknob");
   uipc.mutebtn  = view_get_subview(baseview, "mutebtn");
 
-  cb_t* cb_btn_press = cb_new(ui_play_on_button_down, NULL);
+  cb_t* cb_btn_press = cb_new(ui_play_on_button_down, NULL); // REL 0
 
   vh_button_add(uipc.playbtn, VH_BUTTON_NORMAL, cb_btn_press);
   vh_button_add(uipc.mutebtn, VH_BUTTON_NORMAL, cb_btn_press);
@@ -75,12 +75,12 @@ void ui_play_controls_attach(view_t* baseview)
   tg_knob_add(uipc.volknob);
   vh_knob_add(uipc.volknob, ui_play_on_volume_change, ui_play_on_mute_button_down);
 
-  cb_t* msg_play_pause_cb = cb_new(ui_play_on_button_down, NULL);
-
-  vh_button_add(uipc.playbtn, VH_BUTTON_TOGGLE, msg_play_pause_cb);
-  vh_button_add(uipc.mutebtn, VH_BUTTON_TOGGLE, msg_play_pause_cb);
+  vh_button_add(uipc.playbtn, VH_BUTTON_TOGGLE, cb_btn_press);
+  vh_button_add(uipc.mutebtn, VH_BUTTON_TOGGLE, cb_btn_press);
 
   ui_play_update_volume(0.9);
+
+  REL(cb_btn_press); // REL 0
 }
 
 void ui_play_controls_detach()
@@ -139,7 +139,9 @@ void ui_play_index(int index)
         }
       }
       db_write(config_get("lib_path"));
-      REL(time_str);
+
+      REL(time_str); // REL 0
+
       printf("play/skip count increased\n");
       mem_describe(entry, 0);
     }
@@ -147,10 +149,13 @@ void ui_play_index(int index)
     ui_song_infos_show(uipc.lastindex);
     vec_t* songs   = visible_get_songs();
     map_t* songmap = songs->data[uipc.lastindex];
+
     if (uipc.current_path) REL(uipc.current_path);
     uipc.current_path = MGET(songmap, "file/path");
     RET(uipc.current_path);
-    char* path = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s", config_get("lib_path"), uipc.current_path);
+
+    char* path = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s", config_get("lib_path"), uipc.current_path); // REL 0
+
     player_play(path);
     player_set_volume(0.9);
     REL(path);

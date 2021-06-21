@@ -46,14 +46,14 @@ void ui_filter_bar_attach(view_t* baseview)
   view_t* clearbtn  = view_get_subview(baseview, "clearbtn");
   view_t* filterbtn = view_get_subview(baseview, "filterbtn");
 
-  cb_t* filter_cb = cb_new(ui_filter_bar_show_filters, NULL);
-  cb_t* clear_cb  = cb_new(ui_filter_bar_clear_search, NULL);
+  cb_t* filter_cb = cb_new(ui_filter_bar_show_filters, NULL); // REL 0
+  cb_t* clear_cb  = cb_new(ui_filter_bar_clear_search, NULL); // REL 1
 
   vh_button_add(filterbtn, VH_BUTTON_NORMAL, filter_cb);
   vh_button_add(clearbtn, VH_BUTTON_NORMAL, clear_cb);
 
-  REL(filter_cb);
-  REL(clear_cb);
+  REL(filter_cb); // REL 0
+  REL(clear_cb);  // REL 1
 
   vh_textinput_add(ufb.songlist_filter_bar, "", "Search/Filter", ts, NULL);
   vh_textinput_set_on_text(ufb.songlist_filter_bar, ui_filter_bar_filter);
@@ -68,10 +68,12 @@ void ui_filter_bar_filter(view_t* view, void* userdata)
 {
   str_t* text = vh_textinput_get_text(view);
 
-  char* ctext = str_new_cstring(text);
+  char* ctext = str_new_cstring(text); // REL 0
 
   visible_set_filter(ctext);
   ui_songlist_update();
+
+  REL(ctext); // REL 0
 }
 
 void ui_filter_bar_show_filters(void* userdata, void* data)

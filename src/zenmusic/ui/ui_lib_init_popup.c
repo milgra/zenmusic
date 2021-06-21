@@ -50,7 +50,7 @@ void ui_lib_init_popup_attach(view_t* baseview)
 
   ulip.textinput = textinput_scroller;
 
-  cb_t* cb_btn_press = cb_new(ui_lib_init_on_button_down, NULL);
+  cb_t* cb_btn_press = cb_new(ui_lib_init_on_button_down, NULL); // REL 0
 
   vh_button_add(view_get_subview(baseview, "lib_init_accept_btn"), VH_BUTTON_NORMAL, cb_btn_press);
   vh_button_add(view_get_subview(baseview, "lib_init_reject_btn"), VH_BUTTON_NORMAL, cb_btn_press);
@@ -74,6 +74,8 @@ void ui_lib_init_popup_attach(view_t* baseview)
   vh_textinput_set_on_return(vh_textinput_scroller_get_input_view(textinput_scroller), ui_lib_init_popup_set_library);
 
   view_remove(baseview, ulip.view);
+
+  REL(cb_btn_press);
 }
 
 void ui_lib_init_popup_detach()
@@ -84,10 +86,10 @@ void ui_lib_init_popup_set_library(view_t* view)
 {
   // get path string
   str_t* path    = vh_textinput_scroller_get_text(ulip.textinput);
-  char*  path_ch = str_new_cstring(path);
+  char*  path_ch = str_new_cstring(path); // REL 0
 
   callbacks_call("on_change_library", path_ch);
-  REL(path_ch);
+  REL(path_ch); // REL 0
 }
 
 void ui_lib_init_on_button_down(void* userdata, void* data)
