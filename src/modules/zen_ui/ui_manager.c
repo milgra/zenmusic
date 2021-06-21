@@ -191,7 +191,7 @@ void ui_manager_remove(view_t* view)
 
 void ui_manager_activate(view_t* view)
 {
-  VADD(uim.explqueue, view);
+  vec_adduniquedata(uim.explqueue, view);
 }
 
 void ui_manager_collect(view_t* view, vec_t* views)

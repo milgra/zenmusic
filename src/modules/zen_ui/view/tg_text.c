@@ -73,7 +73,7 @@ void tg_text_set(view_t* view, char* text, textstyle_t style)
   tg_text_t* gen = view->tex_gen_data;
 
   if (gen->text) REL(gen->text);
-  gen->text           = cstr_fromcstring(text);
+  gen->text           = cstr_new_cstring(text);
   gen->style          = style;
   view->texture.state = TS_BLANK;
 }

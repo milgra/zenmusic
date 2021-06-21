@@ -341,8 +341,8 @@ int coder_load_metadata_into(const char* path, map_t* map)
 
       while ((tag = av_dict_get(pFormatCtx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
       {
-        char* value = cstr_fromcstring(tag->value);
-        char* key   = cstr_fromformat(100, "%s/%s", "meta", tag->key);
+        char* value = cstr_new_cstring(tag->value);
+        char* key   = cstr_new_format(100, "%s/%s", "meta", tag->key);
         MPUT(map, key, value);
         REL(key);
         REL(value);
@@ -362,7 +362,7 @@ int coder_load_metadata_into(const char* path, map_t* map)
       else
       {
         printf("coder_get_metadata no stream information found!!!\n");
-        MPUT(map, "file/duration", cstr_fromcstring("0"));
+        MPUT(map, "file/duration", cstr_new_cstring("0"));
       }
 
       for (unsigned i = 0; i < pFormatCtx->nb_streams; i++)
@@ -411,9 +411,9 @@ int coder_write_metadata(char* libpath, char* path, char* cover_path, map_t* dat
   char* ext  = cstr_path_extension(path); // REL 0
   char* name = cstr_path_filename(path);  // REL 1
 
-  char* old_name = cstr_fromformat(PATH_MAX + NAME_MAX, "%s.%s", name, ext);         // REL 2
-  char* old_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", libpath, path);     // REL 3
-  char* new_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s.tmp", libpath, path); // REL 4
+  char* old_name = cstr_new_format(PATH_MAX + NAME_MAX, "%s.%s", name, ext);         // REL 2
+  char* old_path = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s", libpath, path);     // REL 3
+  char* new_path = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s.tmp", libpath, path); // REL 4
 
   printf("old_path %s\n", old_path);
   printf("new_path %s\n", new_path);

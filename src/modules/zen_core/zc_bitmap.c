@@ -16,9 +16,9 @@ struct _bm_t
 };
 
 bm_t* bm_new(int the_w, int the_h);
-bm_t* bm_clone(bm_t* bm);
+bm_t* bm_new_clone(bm_t* bm);
+bm_t* bm_new_flip_y(bm_t* bm);
 void  bm_reset(bm_t* bm);
-bm_t* bm_flip_y(bm_t* bm);
 void  bm_describe(void* p, int level);
 
 #endif
@@ -49,19 +49,14 @@ bm_t* bm_new(int the_w, int the_h)
   return bm;
 }
 
-bm_t* bm_clone(bm_t* the_bm)
+bm_t* bm_new_clone(bm_t* the_bm)
 {
   bm_t* bm = bm_new(the_bm->w, the_bm->h);
   memcpy(bm->data, the_bm->data, the_bm->size);
   return bm;
 }
 
-void bm_reset(bm_t* bm)
-{
-  memset(bm->data, 0, bm->size);
-}
-
-bm_t* bm_flip_y(bm_t* bm)
+bm_t* bm_new_flip_y(bm_t* bm)
 {
   bm_t* tmp = bm_new(bm->w, bm->h);
   for (int y = 0; y < bm->h; y++)
@@ -70,6 +65,11 @@ bm_t* bm_flip_y(bm_t* bm)
     memcpy(tmp->data + y * bm->w * 4, bm->data + src_y * bm->w * 4, bm->w * 4);
   }
   return tmp;
+}
+
+void bm_reset(bm_t* bm)
+{
+  memset(bm->data, 0, bm->size);
 }
 
 void bm_describe(void* p, int level)

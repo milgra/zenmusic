@@ -33,15 +33,18 @@ void ui_alert_popup_attach(view_t* baseview)
   uap.sim_pop_txt = view_get_subview(baseview, "sim_pop_txt");
   tg_text_add(uap.sim_pop_txt);
   uap.fontpath  = config_get("font_path");
-  uap.textqueue = VNEW();
+  uap.textqueue = VNEW(); // REL 0
 
   view_t* acc_btn = view_get_subview(baseview, "simple_pop_acc_btn");
-  cb_t*   acc_cb  = cb_new(ui_alert_popup_accept, NULL);
+  cb_t*   acc_cb  = cb_new(ui_alert_popup_accept, NULL); // REL 1
   vh_button_add(acc_btn, VH_BUTTON_NORMAL, acc_cb);
+
+  REL(acc_cb);
 }
 
 void ui_alert_popup_detach()
 {
+  REL(uap.textqueue);
 }
 
 void ui_alert_popup_show(char* text)

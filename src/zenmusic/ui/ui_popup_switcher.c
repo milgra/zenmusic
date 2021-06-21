@@ -34,15 +34,15 @@ void ui_popup_switcher_attach(view_t* baseview)
   ups.popup_names = VNEW();
   ups.popup_views = MNEW();
 
-  VADDR(ups.popup_names, cstr_fromcstring("song_popup_page"));
-  VADDR(ups.popup_names, cstr_fromcstring("messages_popup_page"));
-  VADDR(ups.popup_names, cstr_fromcstring("song_editor_popup_page"));
-  VADDR(ups.popup_names, cstr_fromcstring("about_popup_page"));
-  VADDR(ups.popup_names, cstr_fromcstring("filters_popup_page"));
-  VADDR(ups.popup_names, cstr_fromcstring("settings_popup_page"));
-  VADDR(ups.popup_names, cstr_fromcstring("decision_popup_page"));
-  VADDR(ups.popup_names, cstr_fromcstring("simple_popup_page"));
-  VADDR(ups.popup_names, cstr_fromcstring("inp_popup_page"));
+  VADDR(ups.popup_names, cstr_new_cstring("song_popup_page"));
+  VADDR(ups.popup_names, cstr_new_cstring("messages_popup_page"));
+  VADDR(ups.popup_names, cstr_new_cstring("song_editor_popup_page"));
+  VADDR(ups.popup_names, cstr_new_cstring("about_popup_page"));
+  VADDR(ups.popup_names, cstr_new_cstring("filters_popup_page"));
+  VADDR(ups.popup_names, cstr_new_cstring("settings_popup_page"));
+  VADDR(ups.popup_names, cstr_new_cstring("decision_popup_page"));
+  VADDR(ups.popup_names, cstr_new_cstring("simple_popup_page"));
+  VADDR(ups.popup_names, cstr_new_cstring("inp_popup_page"));
 
   for (int index = 0; index < ups.popup_names->length; index++)
   {

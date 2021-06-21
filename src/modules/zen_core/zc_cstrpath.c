@@ -20,9 +20,9 @@ char* cstr_path_normalize(char* path, char* execpath);
 char* cstr_path_append(char* root, char* component)
 {
   if (root[strlen(root) - 1] == '/')
-    return cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", root, component);
+    return cstr_new_format(PATH_MAX + NAME_MAX, "%s%s", root, component);
   else
-    return cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", root, component);
+    return cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s", root, component);
 }
 
 char* cstr_remove_last_path_component(char* path)
@@ -90,11 +90,11 @@ char* cstr_path_normalize(char* path, char* execpath)
   char* result = NULL;
 
   if (path[0] == '~') // if starts with tilde, insert home dir
-    result = cstr_fromformat(PATH_MAX + NAME_MAX, "%s%s", getenv("HOME"), path + 1);
+    result = cstr_new_format(PATH_MAX + NAME_MAX, "%s%s", getenv("HOME"), path + 1);
   else if (path[0] != '/') // if doesn't start with / insert base dir
-    result = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", execpath, path);
+    result = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s", execpath, path);
   else
-    result = cstr_fromcstring(path);
+    result = cstr_new_cstring(path);
 
   // if ends with '/' remove it
   if (result[strlen(result) - 1] == '/') result[strlen(result) - 1] = '\0';

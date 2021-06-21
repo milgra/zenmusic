@@ -109,7 +109,7 @@ void ui_inputfield_popup_shownext()
 void ui_inputfield_popup_show(char* text, cb_t* acc_cb, cb_t* rej_cb)
 {
   map_t* request = MNEW();
-  MPUTR(request, "text", cstr_fromcstring(text));
+  MPUTR(request, "text", cstr_new_cstring(text));
   if (acc_cb) MPUT(request, "acc_cb", acc_cb);
   if (rej_cb) MPUT(request, "rej_cb", rej_cb);
 

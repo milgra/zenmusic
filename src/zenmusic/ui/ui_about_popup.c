@@ -29,7 +29,7 @@ void ui_about_popup_on_header_field_select(view_t* view, char* id, ev_t ev);
 void ui_about_popup_on_header_field_insert(view_t* view, int src, int tgt);
 void ui_about_popup_on_header_field_resize(view_t* view, char* id, int size);
 
-struct ui_about_popup_t
+struct ui_about_popup_tv
 {
   view_t*     view;   // table view
   vec_t*      fields; // fileds in table
@@ -55,7 +55,7 @@ al_cell_t* donl_cell_new(char* id, int size, int index)
 {
   al_cell_t* cell = mem_calloc(sizeof(al_cell_t), "al_cell_t", donl_cell_del, NULL);
 
-  cell->id    = cstr_fromcstring(id); // REL 0
+  cell->id    = cstr_new_cstring(id); // REL 0
   cell->size  = size;
   cell->index = index;
 
@@ -159,7 +159,7 @@ view_t* donateitem_create(int index)
   al_cell_t* cell;
   while ((cell = VNXT(donl.fields)))
   {
-    char* id = cstr_fromformat(100, "%s%s", rowview->id, cell->id); // REL 1
+    char* id = cstr_new_format(100, "%s%s", rowview->id, cell->id); // REL 1
 
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, height}); // REL 2
 
@@ -167,7 +167,7 @@ view_t* donateitem_create(int index)
     {
       view_t* imgview                  = view_new("bsdlogo", ((r2_t){137, 10, 200, 200}));
       char*   respath                  = config_get("res_path");
-      char*   imagepath                = cstr_fromformat(100, "%s/freebsd.png", respath);
+      char*   imagepath                = cstr_new_format(100, "%s/freebsd.png", respath);
       imgview->layout.background_image = imagepath;
       tg_css_add(imgview);
       // TODO set image instead of direct set
@@ -245,7 +245,7 @@ void ui_about_popup_attach(view_t* baseview)
   VADD(donl.items, donateitem_create(4));
   VADD(donl.items, donateitem_create(5));
 
-  char* version = cstr_fromformat(200, "Zen Music v%i.%i beta\nby Milan Toth\nFree and Open Source Software.", VERSION, BUILD); // REL 2
+  char* version = cstr_new_format(200, "Zen Music v%i.%i beta\nby Milan Toth\nFree and Open Source Software.", VERSION, BUILD); // REL 2
 
   donateitem_update_row(donl.items->data[0], 0, version);
   donateitem_update_row(donl.items->data[1], 1, "Support on Patreon");

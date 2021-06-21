@@ -82,7 +82,7 @@ void ui_filter_popup_on_genre_select(int index)
 
   char* genre = genres->data[index];
 
-  char* query = cstr_fromformat(100, "genre is %s", genre); // REL 1
+  char* query = cstr_new_format(100, "genre is %s", genre); // REL 1
 
   visible_set_filter(query);
   ui_songlist_update();
@@ -102,7 +102,7 @@ void ui_filter_popup_on_artist_select(int index)
 
   char* artist = artists->data[index];
 
-  char* query = cstr_fromformat(100, "artist is %s", artist); // REL 1
+  char* query = cstr_new_format(100, "artist is %s", artist); // REL 1
 
   visible_set_filter(query);
   ui_songlist_update();

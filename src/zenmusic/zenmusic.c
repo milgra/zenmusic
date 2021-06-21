@@ -81,10 +81,10 @@ int main(int argc, char* argv[])
   while ((option = getopt_long(argc, argv, "c:l:r:s:p:", long_options, &option_index)) != -1)
   {
     if (option != '?') printf("parsing option %c value: %s\n", option, optarg);
-    if (option == 'c') zm.cfg_par = cstr_fromcstring(optarg); // REL 0
-    if (option == 'r') zm.res_par = cstr_fromcstring(optarg); // REL 1
-    if (option == 's') zm.rec_par = cstr_fromcstring(optarg); // REL 2
-    if (option == 'p') zm.rep_par = cstr_fromcstring(optarg); // REL 3
+    if (option == 'c') zm.cfg_par = cstr_new_cstring(optarg); // REL 0
+    if (option == 'r') zm.res_par = cstr_new_cstring(optarg); // REL 1
+    if (option == 's') zm.rec_par = cstr_new_cstring(optarg); // REL 2
+    if (option == 'p') zm.rep_par = cstr_new_cstring(optarg); // REL 3
     if (option == '?')
     {
       printf("-c --config= [config file] \t use config file for session\n");
@@ -121,7 +121,7 @@ void init(int width, int height, char* path)
   // init paths
 
   char* wrk_path    = cstr_path_normalize(path, NULL);                                                                                    // REL 0
-  char* res_path    = zm.res_par ? cstr_path_normalize(zm.res_par, wrk_path) : cstr_fromcstring("/usr/local/share/zenmusic");             // REL 1
+  char* res_path    = zm.res_par ? cstr_path_normalize(zm.res_par, wrk_path) : cstr_new_cstring("/usr/local/share/zenmusic");             // REL 1
   char* cfgdir_path = zm.cfg_par ? cstr_path_normalize(zm.cfg_par, wrk_path) : cstr_path_normalize("~/.config/zenmusic", getenv("HOME")); // REL 2
   char* css_path    = cstr_path_append(res_path, "main.css");                                                                             // REL 3
   char* html_path   = cstr_path_append(res_path, "main.html");                                                                            // REL 4
@@ -398,9 +398,9 @@ void save_screenshot()
 
   ui_compositor_render_to_bmp(screen);
 
-  char* name    = cstr_fromformat(20, "screenshot%.3i.png", cnt++); // REL 1
+  char* name    = cstr_new_format(20, "screenshot%.3i.png", cnt++); // REL 1
   char* path    = cstr_path_append(config_get("lib_path"), name);   // REL 2
-  bm_t* flipped = bm_flip_y(screen);                                // REL 3
+  bm_t* flipped = bm_new_flip_y(screen);                            // REL 3
 
   coder_write_png(path, flipped);
 

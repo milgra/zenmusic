@@ -72,8 +72,8 @@ view_t* textlist_create_item(textlist_t* tl)
 {
   static int item_cnt = 0;
 
-  char* item_id = cstr_fromformat(100, "tetlist_item%i", item_cnt++); // REL 0
-  char* cell_id = cstr_fromformat(100, "%s%s", item_id, "cell");      // REL 1
+  char* item_id = cstr_new_format(100, "tetlist_item%i", item_cnt++); // REL 0
+  char* cell_id = cstr_new_format(100, "%s%s", item_id, "cell");      // REL 1
 
   view_t* item_view = view_new(item_id, (r2_t){0, 0, 0, 35});                       // REL 2
   view_t* cell_view = view_new(cell_id, (r2_t){0, 0, tl->view->frame.local.w, 35}); // REL 3

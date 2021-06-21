@@ -72,7 +72,7 @@ void config_write(char* path)
 
   printf("CONFIG DIR %s FILE %s\n", dirpath, path);
 
-  MPUTR(confmap, "id", cstr_fromcstring("config")); // put id in config db
+  MPUTR(confmap, "id", cstr_new_cstring("config")); // put id in config db
   MPUT(data, "id", confmap);                        // put config db in final data with same id
 
   int error = files_mkpath(dirpath, 0777);
@@ -94,7 +94,7 @@ void config_write(char* path)
 
 void config_set(char* key, char* value)
 {
-  char* str = cstr_fromcstring(value); // REL 0
+  char* str = cstr_new_cstring(value); // REL 0
   MPUT(confmap, key, str);
   REL(str); // REL 0
 }
@@ -126,11 +126,11 @@ void config_set_bool(char* key, int val)
 {
   if (val)
   {
-    MPUTR(confmap, key, cstr_fromcstring("true"));
+    MPUTR(confmap, key, cstr_new_cstring("true"));
   }
   else
   {
-    MPUTR(confmap, key, cstr_fromcstring("false"));
+    MPUTR(confmap, key, cstr_new_cstring("false"));
   }
 }
 

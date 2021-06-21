@@ -59,7 +59,7 @@ void ui_activity_popup_log(char* log)
 
 void ui_activity_popup_attach(view_t* baseview)
 {
-  act.logs = VNEW();
+  act.logs = VNEW(); // REL 0
   log_set_proxy(ui_activity_popup_log);
 
   view_t* listview = view_get_subview(baseview, "messages_popup_list");
@@ -85,6 +85,8 @@ void ui_activity_popup_attach(view_t* baseview)
 
 void ui_activity_popup_detach()
 {
+  log_set_proxy(NULL);
+  REL(act.logs);
 }
 
 #endif

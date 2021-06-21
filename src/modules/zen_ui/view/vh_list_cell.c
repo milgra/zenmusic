@@ -27,7 +27,7 @@ void        vh_lcell_set_size(vec_t* cells, char* id, int size);
 vh_lcell_t* vh_lcell_new(char* id, int size, view_t* view, int index)
 {
   vh_lcell_t* cell = mem_alloc(sizeof(vh_lcell_t), "vh_lcell_t", NULL, NULL);
-  cell->id         = cstr_fromcstring(id);
+  cell->id         = cstr_new_cstring(id);
   cell->size       = size;
   cell->view       = view;
   cell->index      = index;

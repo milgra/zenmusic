@@ -68,7 +68,7 @@ void db_write(char* libpath)
 {
   assert(libpath != NULL);
 
-  char* dbpath = cstr_fromformat(PATH_MAX + NAME_MAX, "/%s/zenmusic.kvl", libpath); // REL 0
+  char* dbpath = cstr_new_format(PATH_MAX + NAME_MAX, "/%s/zenmusic.kvl", libpath); // REL 0
 
   int res = kvlist_write(dbpath, db);
 
@@ -173,21 +173,21 @@ int db_organize_entry(char* libpath, map_t* db, map_t* entry)
 
   char* ext = cstr_path_extension(path);
 
-  char* old_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", libpath, path);              // REL 0
-  char* new_dirs     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s/", libpath, artist, album); // REL 1
+  char* old_path     = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s", libpath, path);              // REL 0
+  char* new_dirs     = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s/%s/", libpath, artist, album); // REL 1
   char* new_path     = NULL;
   char* new_path_rel = NULL;
 
   if (track)
   {
     int trackno  = atoi(track);
-    new_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s/%.3i %s.%s", libpath, artist, album, trackno, title, ext); // REL 2
-    new_path_rel = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%.3i %s.%s", artist, album, trackno, title, ext);             // REL 3
+    new_path     = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s/%s/%.3i %s.%s", libpath, artist, album, trackno, title, ext); // REL 2
+    new_path_rel = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s/%.3i %s.%s", artist, album, trackno, title, ext);             // REL 3
   }
   else
   {
-    new_path     = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s/%s.%s", libpath, artist, album, title, ext); // REL 2
-    new_path_rel = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s/%s.%s", artist, album, title, ext);             // REL 3
+    new_path     = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s/%s/%s.%s", libpath, artist, album, title, ext); // REL 2
+    new_path_rel = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s/%s.%s", artist, album, title, ext);             // REL 3
   }
 
   if (strcmp(old_path, new_path) != 0)

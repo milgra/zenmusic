@@ -57,7 +57,7 @@ sl_cell_t* sl_cell_new(char* id, int size, int index)
 {
   sl_cell_t* cell = mem_calloc(sizeof(sl_cell_t), "sl_cell_t", sl_cell_del, NULL);
 
-  cell->id    = cstr_fromcstring(id); // REL 0
+  cell->id    = cstr_new_cstring(id); // REL 0
   cell->size  = size;
   cell->index = index;
 
@@ -117,25 +117,25 @@ void ui_songlist_attach(view_t* base)
   VADDR(sl.columns, sl_cell_new("type", 80, 17));
   VADDR(sl.columns, sl_cell_new("ext", 80, 18));
 
-  VADDR(sl.fields, cstr_fromcstring("index"));
-  VADDR(sl.fields, cstr_fromcstring("meta/artist"));
-  VADDR(sl.fields, cstr_fromcstring("meta/album"));
-  VADDR(sl.fields, cstr_fromcstring("meta/title"));
-  VADDR(sl.fields, cstr_fromcstring("meta/date"));
-  VADDR(sl.fields, cstr_fromcstring("meta/genre"));
-  VADDR(sl.fields, cstr_fromcstring("meta/track"));
-  VADDR(sl.fields, cstr_fromcstring("meta/disc"));
-  VADDR(sl.fields, cstr_fromcstring("file/duration"));
-  VADDR(sl.fields, cstr_fromcstring("file/channels"));
-  VADDR(sl.fields, cstr_fromcstring("file/bit_rate"));
-  VADDR(sl.fields, cstr_fromcstring("file/sample_rate"));
-  VADDR(sl.fields, cstr_fromcstring("file/play_count"));
-  VADDR(sl.fields, cstr_fromcstring("file/skip_count"));
-  VADDR(sl.fields, cstr_fromcstring("file/added"));
-  VADDR(sl.fields, cstr_fromcstring("file/last_played"));
-  VADDR(sl.fields, cstr_fromcstring("file/last_skipped"));
-  VADDR(sl.fields, cstr_fromcstring("file/media_type"));
-  VADDR(sl.fields, cstr_fromcstring("file/container"));
+  VADDR(sl.fields, cstr_new_cstring("index"));
+  VADDR(sl.fields, cstr_new_cstring("meta/artist"));
+  VADDR(sl.fields, cstr_new_cstring("meta/album"));
+  VADDR(sl.fields, cstr_new_cstring("meta/title"));
+  VADDR(sl.fields, cstr_new_cstring("meta/date"));
+  VADDR(sl.fields, cstr_new_cstring("meta/genre"));
+  VADDR(sl.fields, cstr_new_cstring("meta/track"));
+  VADDR(sl.fields, cstr_new_cstring("meta/disc"));
+  VADDR(sl.fields, cstr_new_cstring("file/duration"));
+  VADDR(sl.fields, cstr_new_cstring("file/channels"));
+  VADDR(sl.fields, cstr_new_cstring("file/bit_rate"));
+  VADDR(sl.fields, cstr_new_cstring("file/sample_rate"));
+  VADDR(sl.fields, cstr_new_cstring("file/play_count"));
+  VADDR(sl.fields, cstr_new_cstring("file/skip_count"));
+  VADDR(sl.fields, cstr_new_cstring("file/added"));
+  VADDR(sl.fields, cstr_new_cstring("file/last_played"));
+  VADDR(sl.fields, cstr_new_cstring("file/last_skipped"));
+  VADDR(sl.fields, cstr_new_cstring("file/media_type"));
+  VADDR(sl.fields, cstr_new_cstring("file/container"));
 
   // add header handler
 
@@ -153,7 +153,7 @@ void ui_songlist_attach(view_t* base)
   sl_cell_t* cell;
   while ((cell = VNXT(sl.columns)))
   {
-    char*   id       = cstr_fromformat(100, "%s%s", header->id, cell->id);
+    char*   id       = cstr_new_format(100, "%s%s", header->id, cell->id);
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
     tg_text_add(cellview);
     tg_text_set(cellview, cell->id, sl.textstyle);
@@ -387,7 +387,7 @@ view_t* songitem_create()
   sl_cell_t* cell;
   while ((cell = VNXT(sl.columns)))
   {
-    char*   id       = cstr_fromformat(100, "%s%s", rowview->id, cell->id);
+    char*   id       = cstr_new_format(100, "%s%s", rowview->id, cell->id);
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 35});
     tg_text_add(cellview);
 

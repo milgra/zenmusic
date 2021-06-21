@@ -61,7 +61,7 @@ static int lib_file_data_step(const char* fpath, const struct stat* sb, int tfla
 
   if (tflag == FTW_F)
   {
-    char* size = cstr_fromformat(20, "%li", sb->st_size); // REL 0
+    char* size = cstr_new_format(20, "%li", sb->st_size); // REL 0
     MPUT(lib.files, fpath + strlen(lib.path) + 1, size);  // use relative path as path
     REL(size);                                            // REL 0
   }
@@ -74,7 +74,7 @@ void lib_delete_file(char* lib_path, map_t* entry)
   assert(lib_path != NULL);
 
   char* rel_path  = MGET(entry, "file/path");
-  char* file_path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", lib_path, rel_path); // REL 0
+  char* file_path = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s", lib_path, rel_path); // REL 0
 
   int error = remove(file_path);
   if (error)
@@ -143,10 +143,10 @@ int analyzer_thread(void* chptr)
       MPUT(song, "file/added", time_str);
       MPUT(song, "file/last_played", time_str);
       MPUT(song, "file/last_skipped", time_str);
-      MPUT(song, "file/play_count", cstr_fromcstring("0"));
-      MPUT(song, "file/skip_count", cstr_fromcstring("0"));
+      MPUT(song, "file/play_count", cstr_new_cstring("0"));
+      MPUT(song, "file/skip_count", cstr_new_cstring("0"));
 
-      char* real = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", lib.path, path); // REL 1
+      char* real = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s", lib.path, path); // REL 1
 
       LOG("lib : analyzing %s", real);
 
@@ -156,8 +156,8 @@ int analyzer_thread(void* chptr)
 
       if (res == 0)
       {
-        if (MGET(song, "meta/artist") == NULL) MPUTR(song, "meta/artist", cstr_fromcstring("Unknown"));
-        if (MGET(song, "meta/album") == NULL) MPUTR(song, "meta/album", cstr_fromcstring("Unknown"));
+        if (MGET(song, "meta/artist") == NULL) MPUTR(song, "meta/artist", cstr_new_cstring("Unknown"));
+        if (MGET(song, "meta/album") == NULL) MPUTR(song, "meta/album", cstr_new_cstring("Unknown"));
         if (MGET(song, "meta/title") == NULL) MPUTR(song, "meta/title", cstr_path_filename(path));
 
         // try to send it to main thread
@@ -195,7 +195,7 @@ int analyzer_thread(void* chptr)
 
   // send empty song to initiaite finish
   song = MNEW();                                       // REL 2
-  MPUT(song, "file/path", cstr_fromcstring("//////")); // impossible path
+  MPUT(song, "file/path", cstr_new_cstring("//////")); // impossible path
   ch_send(channel, song);                              // send finishing entry
 
   REL(lib.files); // REL 0

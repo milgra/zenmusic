@@ -47,21 +47,21 @@ void ui_decision_popup_attach(view_t* baseview)
   view_t* rej_btn = view_get_subview(baseview, "dec_pop_rej_btn");
   view_t* tf      = view_get_subview(baseview, "dec_pop_tf");
 
-  cb_t* acc_cb = cb_new(ui_decision_popup_accept, NULL);
-  cb_t* rej_cb = cb_new(ui_decision_popup_reject, NULL);
+  cb_t* acc_cb = cb_new(ui_decision_popup_accept, NULL); // REL 0
+  cb_t* rej_cb = cb_new(ui_decision_popup_reject, NULL); // REl 1
 
   tg_text_add(tf);
 
   vh_button_add(acc_btn, VH_BUTTON_NORMAL, acc_cb);
   vh_button_add(rej_btn, VH_BUTTON_NORMAL, rej_cb);
 
-  REL(acc_cb);
-  REL(rej_cb);
-
   udp.ts       = ts;
   udp.tf       = tf;
   udp.attached = 1;
   udp.requests = VNEW();
+
+  REL(acc_cb); // REL 0
+  REL(rej_cb); // REl 1
 }
 
 void ui_decision_popup_detach()
@@ -82,8 +82,8 @@ void ui_decision_popup_shownext()
 
 void ui_decision_popup_show(char* text, cb_t* acc_cb, cb_t* rej_cb)
 {
-  map_t* request = MNEW();
-  MPUTR(request, "text", cstr_fromcstring(text));
+  map_t* request = MNEW(); // REL 0
+  MPUTR(request, "text", cstr_new_cstring(text));
   if (acc_cb) MPUT(request, "acc_cb", acc_cb);
   if (rej_cb) MPUT(request, "rej_cb", rej_cb);
 
@@ -91,6 +91,8 @@ void ui_decision_popup_show(char* text, cb_t* acc_cb, cb_t* rej_cb)
 
   tg_text_set(udp.tf, text, udp.ts);
   ui_popup_switcher_toggle("decision_popup_page");
+
+  REL(request);
 }
 
 void ui_decision_popup_accept(void* userdata, void* data)

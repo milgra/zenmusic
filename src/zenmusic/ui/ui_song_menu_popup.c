@@ -98,7 +98,7 @@ void ui_song_menu_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* 
     ui_songlist_get_selected(selected);
 
     cb_t* acc_cb = cb_new(ui_song_menu_popup_on_item_delete, NULL); // REL 1
-    char* text   = cstr_fromformat(100, "Are you sure you want to delete %i items?", selected->length);
+    char* text   = cstr_new_format(100, "Are you sure you want to delete %i items?", selected->length);
     ui_decision_popup_show(text, acc_cb, NULL);
     REL(acc_cb);
     REL(selected);
@@ -107,8 +107,8 @@ void ui_song_menu_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* 
 
 view_t* ui_song_menu_popupitem_create(int index, char* text)
 {
-  char*   rowid    = cstr_fromformat(100, "smlist_item%i", index);
-  char*   cellid   = cstr_fromformat(100, "%s%s", rowid, "field");
+  char*   rowid    = cstr_new_format(100, "smlist_item%i", index);
+  char*   cellid   = cstr_new_format(100, "%s%s", rowid, "field");
   view_t* rowview  = view_new(rowid, (r2_t){0, 0, 460, 50});
   view_t* cellview = view_new(cellid, (r2_t){0, 0, 250, 50});
 

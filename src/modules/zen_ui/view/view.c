@@ -183,14 +183,14 @@ void view_del(void* pointer)
   if (view->layout.background_image != NULL) REL(view->layout.background_image);
 
   REL(view->id);
-  REL(view->texture.bitmap);
+  if (view->texture.bitmap) REL(view->texture.bitmap); // not all views has texture
   REL(view->views);
 }
 
 view_t* view_new(char* id, r2_t frame)
 {
   view_t* view            = mem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
-  view->id                = cstr_fromcstring(id);
+  view->id                = cstr_new_cstring(id);
   view->views             = VNEW();
   view->frame.local       = frame;
   view->frame.global      = frame;
@@ -286,7 +286,7 @@ void view_coll_touched(view_t* view, ev_t ev, vec_t* queue)
       ev.y <= view->frame.global.y + view->frame.global.h &&
       ev.y >= view->frame.global.y)
   {
-    VADD(queue, view);
+    vec_adduniquedata(queue, view);
     for (int i = 0; i < view->views->length; i++)
     {
       view_t* v = view->views->data[i];

@@ -17,7 +17,7 @@ int kvlist_write(char* libpath, map_t* db);
 int kvlist_read(char* libpath, map_t* db, char* keyfield)
 {
   int   retv  = -1;
-  char* dbstr = cstr_fromfile(libpath); // REL 0
+  char* dbstr = cstr_new_file(libpath); // REL 0
 
   if (dbstr)
   {
@@ -31,7 +31,7 @@ int kvlist_read(char* libpath, map_t* db, char* keyfield)
     {
       if (key)
       {
-        char* val = cstr_fromcstring(token);
+        char* val = cstr_new_cstring(token);
         MPUT(map, key, val);
         REL(key);
         REL(val);
@@ -48,7 +48,7 @@ int kvlist_read(char* libpath, map_t* db, char* keyfield)
           key = NULL;
         }
         else
-          key = cstr_fromcstring(token);
+          key = cstr_new_cstring(token);
       }
       token = strtok(NULL, "\n");
     }
@@ -65,7 +65,7 @@ int kvlist_read(char* libpath, map_t* db, char* keyfield)
 int kvlist_write(char* libpath, map_t* db)
 {
   int   retv = -1;
-  char* path = cstr_fromformat(PATH_MAX + NAME_MAX, "%snew", libpath); // REL 0
+  char* path = cstr_new_format(PATH_MAX + NAME_MAX, "%snew", libpath); // REL 0
   FILE* file = fopen(path, "w");                                       // CLOSE 0
 
   if (file)

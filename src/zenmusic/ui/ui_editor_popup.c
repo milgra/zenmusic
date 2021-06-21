@@ -93,7 +93,7 @@ se_cell_t* uise_cell_new(char* id, int size, int index)
 {
   se_cell_t* cell = mem_calloc(sizeof(se_cell_t), "se_cell_t", NULL, NULL);
 
-  cell->id    = cstr_fromcstring(id);
+  cell->id    = cstr_new_cstring(id);
   cell->size  = size;
   cell->index = index;
 
@@ -118,9 +118,6 @@ void ui_editor_popup_attach(view_t* view)
   frame.y    = 0;
   view_set_frame(textinput, frame);
   view_remove(view_get_subview(view, "song_editor_list_back"), textinput);
-
-  // view_t* newfieldbtn = view_get_subview(view, "newfieldbtn");
-  cb_t* but_cb = cb_new(ui_editor_popup_on_button_down, NULL);
 
   textstyle_t ts = {0};
   ts.font        = config_get("font_path");
@@ -161,6 +158,8 @@ void ui_editor_popup_attach(view_t* view)
   // tg_text_add(newfieldbtn);
   // tg_text_set(newfieldbtn, "add new field", ts);
 
+  cb_t* but_cb = cb_new(ui_editor_popup_on_button_down, NULL); // REL 0
+
   vh_button_add(acceptbtn, VH_BUTTON_NORMAL, but_cb);
   vh_button_add(rejectbtn, VH_BUTTON_NORMAL, but_cb);
   vh_button_add(uploadbtn, VH_BUTTON_NORMAL, but_cb);
@@ -171,6 +170,8 @@ void ui_editor_popup_attach(view_t* view)
 
   // force texture initialization on cover view
   cover_view->tex_gen(cover_view);
+
+  REL(but_cb);
 }
 
 void ui_editor_popup_detach()
@@ -179,17 +180,17 @@ void ui_editor_popup_detach()
 
 void ui_editor_popup_show()
 {
-  vec_t* selected = VNEW();
+  vec_t* selected = VNEW(); // REL 0
   ui_songlist_get_selected(selected);
 
   if (selected->length > 0)
   {
     ui_editor_popup_set_songs(selected);
     ui_popup_switcher_toggle("song_editor_popup_page");
-    REL(selected);
   }
   else
     ui_alert_popup_show("No songs are selected.");
+  REL(selected);
 }
 
 void ui_editor_popup_on_accept_cover(void* userdata, void* data)
@@ -223,12 +224,12 @@ void ui_editor_popup_on_button_down(void* userdata, void* data)
   {
     char* message;
     if (ep.cover)
-      message = cstr_fromformat(150, "%i fields will be changed cover will be %s on %i items, are you sure you want these modifications?",
+      message = cstr_new_format(150, "%i fields will be changed cover will be %s on %i items, are you sure you want these modifications?",
                                 ep.changed->count,
                                 ep.cover,
                                 ep.song_count);
     else
-      message = cstr_fromformat(150, "%i fields will be changed on %i items, are you sure you want these modifications?",
+      message = cstr_new_format(150, "%i fields will be changed on %i items, are you sure you want these modifications?",
                                 ep.changed->count,
                                 ep.song_count);
 
@@ -270,7 +271,7 @@ void ui_editor_popup_create_table()
   se_cell_t* cell;
   while ((cell = VNXT(ep.cols)))
   {
-    char*   id       = cstr_fromformat(100, "%s%s", header->id, cell->id);
+    char*   id       = cstr_new_format(100, "%s%s", header->id, cell->id);
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
 
     tg_text_add(cellview);
@@ -347,7 +348,7 @@ view_t* ui_editor_popup_create_item()
 {
   static int itemcnt;
 
-  char*   id      = cstr_fromformat(100, "editor_popup_item%i", itemcnt++);
+  char*   id      = cstr_new_format(100, "editor_popup_item%i", itemcnt++);
   view_t* rowview = view_new(id, (r2_t){0, 0, 0, 35});
   REL(id);
 
@@ -357,7 +358,7 @@ view_t* ui_editor_popup_create_item()
   se_cell_t* cell;
   while ((cell = VNXT(ep.cols)))
   {
-    char*   id       = cstr_fromformat(100, "%s%s", rowview->id, cell->id);
+    char*   id       = cstr_new_format(100, "%s%s", rowview->id, cell->id);
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 35});
     REL(id);
 
@@ -386,7 +387,7 @@ void ui_editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, 
       ep.sel_item   = itemview;
       ep.editor_col = color1;
 
-      /* char*   id        = cstr_fromformat(100, "%s%s%s", itemview->id, key, "edit"); // REL 0 */
+      /* char*   id        = cstr_new_format(100, "%s%s%s", itemview->id, key, "edit"); // REL 0 */
       /* view_t* inputcell = view_new(id, cell->view->frame.local); */
 
       ep.textstyle.backcolor = color1;
@@ -435,7 +436,7 @@ void ui_editor_popup_input_cell_edit_finished(view_t* inputview)
 
   // replace textinput cell with simple text cell
 
-  char*   id       = cstr_fromformat(100, "%s%s", ep.sel_item->id, "value");
+  char*   id       = cstr_new_format(100, "%s%s", ep.sel_item->id, "value");
   view_t* textcell = view_new(id, inputview->frame.local);
 
   ep.textstyle.backcolor = ep.editor_col;
@@ -497,7 +498,7 @@ void ui_editor_popup_create_items()
 
   for (int index = 0; index < sizeof(mand_fields) / sizeof(mand_fields[0]); index++)
   {
-    char* field = cstr_fromformat(100, "meta/%s", mand_fields[index]); // REL 3
+    char* field = cstr_new_format(100, "meta/%s", mand_fields[index]); // REL 3
     map_del(tmpmap, field);
     VADD(ep.fields, field);
     REL(field); // REL 3
@@ -575,7 +576,7 @@ void ui_editor_popup_set_songs(vec_t* vec)
         }
         else
         {
-          if (strcmp(curr, value) != 0) MPUT(ep.attributes, field, cstr_fromcstring("MULTIPLE"));
+          if (strcmp(curr, value) != 0) MPUT(ep.attributes, field, cstr_new_cstring("MULTIPLE"));
         }
       }
     }
@@ -588,7 +589,7 @@ void ui_editor_popup_set_songs(vec_t* vec)
   ep.song_count          = vec->length;
   ep.textstyle.backcolor = 0;
 
-  char* text = cstr_fromformat(100, "Editing %i song(s)", vec->length);
+  char* text = cstr_new_format(100, "Editing %i song(s)", vec->length);
   tg_text_set(ep.head_view, text, ep.textstyle);
   REL(text);
 

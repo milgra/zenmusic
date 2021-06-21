@@ -123,7 +123,7 @@ void ui_play_index(int index)
 
           if (play_count_s != NULL) play_count_i = atoi(play_count_s);
           play_count_i += 1;
-          MPUTR(entry, "file/play_count", cstr_fromformat(10, "%i", play_count_i));
+          MPUTR(entry, "file/play_count", cstr_new_format(10, "%i", play_count_i));
           MPUT(entry, "file/last_played", time_str);
         }
         else
@@ -134,7 +134,7 @@ void ui_play_index(int index)
 
           if (skip_count_s != NULL) skip_count_i = atoi(skip_count_s);
           skip_count_i += 1;
-          MPUTR(entry, "file/skip_count", cstr_fromformat(10, "%i", skip_count_i));
+          MPUTR(entry, "file/skip_count", cstr_new_format(10, "%i", skip_count_i));
           MPUT(entry, "file/last_skipped", time_str);
         }
       }
@@ -150,7 +150,7 @@ void ui_play_index(int index)
     if (uipc.current_path) REL(uipc.current_path);
     uipc.current_path = MGET(songmap, "file/path");
     RET(uipc.current_path);
-    char* path = cstr_fromformat(PATH_MAX + NAME_MAX, "%s/%s", config_get("lib_path"), uipc.current_path);
+    char* path = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s", config_get("lib_path"), uipc.current_path);
     player_play(path);
     player_set_volume(0.9);
     REL(path);

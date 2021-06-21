@@ -55,7 +55,7 @@ sl_cell_t* uisp_cell_new(char* id, int size, int index)
 {
   sl_cell_t* cell = mem_calloc(sizeof(sl_cell_t), "sl_cell_t", NULL, NULL);
 
-  cell->id    = cstr_fromcstring(id);
+  cell->id    = cstr_new_cstring(id);
   cell->size  = size;
   cell->index = index;
 
@@ -96,7 +96,7 @@ void ui_settings_popup_attach(view_t* baseview)
   sl_cell_t* cell;
   while ((cell = VNXT(uisp.columns)))
   {
-    char*   id       = cstr_fromformat(100, "%s%s", header->id, cell->id);
+    char*   id       = cstr_new_format(100, "%s%s", header->id, cell->id);
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});
     REL(id);
 
@@ -269,7 +269,7 @@ void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* c
       ui_decision_popup_show("Are you sure you want to switch off remote control?", acc_cb, NULL);
     else
     {
-      char* message = cstr_fromformat(200, "You can remote control Zen Music by sending 0x00(play/pause) 0x01(prev song) 0x02(next song) to UDP port %s. "
+      char* message = cstr_new_format(200, "You can remote control Zen Music by sending 0x00(play/pause) 0x01(prev song) 0x02(next song) to UDP port %s. "
                                            "Would you like to enable it?",
                                       config_get("remote_port"));
       ui_decision_popup_show(message, acc_cb, NULL);
@@ -300,7 +300,7 @@ view_t* ui_settings_popup_create_item()
   sl_cell_t* cell;
   while ((cell = VNXT(uisp.columns)))
   {
-    char*   id       = cstr_fromformat(100, "%s%s", rowview->id, cell->id);
+    char*   id       = cstr_new_format(100, "%s%s", rowview->id, cell->id);
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 50});
     REL(id);
 

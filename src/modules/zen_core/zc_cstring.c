@@ -5,12 +5,12 @@
 #include <stdint.h>
 #include <stdio.h>
 
-char*    cstr_fromformat(int size, char* format, ...);
-char*    cstr_fromcstring(char* string);
-char*    cstr_fromfile(char* path);
+char*    cstr_new_format(int size, char* format, ...);
+char*    cstr_new_cstring(char* string);
+char*    cstr_new_file(char* path);
 uint32_t cstr_color_from_cstring(char* string);
-char*    cstr_generate_readablec(uint32_t length);
-char*    cstr_generate_alphanumeric(uint32_t length);
+char*    cstr_new_readablec(uint32_t length);
+char*    cstr_new_alphanumeric(uint32_t length);
 void     cstr_describe(void* p, int level);
 void     cstr_tolower(char* str);
 
@@ -47,27 +47,7 @@ uint32_t cstr_color_from_cstring(char* string)
   return result;
 }
 
-char* cstr_concat(char* format, ...)
-{
-  va_list ap;
-  char*   text;
-  size_t  length = strlen(format);
-
-  va_start(ap, format);
-  for (text = format; text != NULL; text = va_arg(ap, char*))
-    length += strlen(text);
-  length += 1;
-  va_end(ap);
-
-  char* result = mem_calloc(sizeof(char) * length, "char*", NULL, cstr_describe);
-  va_start(ap, format);
-  vsnprintf(result, length, format, ap);
-  va_end(ap);
-
-  return result;
-}
-
-char* cstr_fromformat(int size, char* format, ...)
+char* cstr_new_format(int size, char* format, ...)
 {
   char*   result = mem_calloc(sizeof(char) * size, "char*", NULL, cstr_describe);
   va_list args;
@@ -81,7 +61,7 @@ char* cstr_fromformat(int size, char* format, ...)
 
 /* copies c string with managed memory space */
 
-char* cstr_fromcstring(char* string)
+char* cstr_new_cstring(char* string)
 {
   char* result = NULL;
   if (string != NULL)
@@ -94,7 +74,7 @@ char* cstr_fromcstring(char* string)
 
 /* reads up text file */
 
-char* cstr_fromfile(char* path)
+char* cstr_new_file(char* path)
 {
 
   char* buffer = NULL;
@@ -140,7 +120,7 @@ char* cstr_fromfile(char* path)
 char* vowels     = "aeiou";
 char* consonants = "bcdefghijklmnpqrstvwxyz";
 
-char* cstr_generate_readablec(uint32_t length)
+char* cstr_new_readablec(uint32_t length)
 {
   char* result = mem_calloc(sizeof(char) * (length + 1), "char*", NULL, cstr_describe);
   for (int index = 0; index < length; index += 2)
@@ -166,7 +146,7 @@ char* cstr_alphanumeric =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     "abcdefghijklmnopqrstuvwxyz";
 
-char* cstr_generate_alphanumeric(uint32_t length)
+char* cstr_new_alphanumeric(uint32_t length)
 {
   char* result = mem_calloc(sizeof(char) * (length + 1), "char*", NULL, cstr_describe);
   for (int index = 0; index < length; index++)
