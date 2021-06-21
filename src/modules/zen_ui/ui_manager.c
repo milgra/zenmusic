@@ -22,8 +22,8 @@ void    ui_manager_resize_to_root(view_t* view);
 #include "ui_generator.c"
 #include "view_layout.c"
 #include "zc_map.c"
-#include "zc_math2.c"
 #include "zc_vector.c"
+#include "zm_math2.c"
 
 struct _uim_t
 {

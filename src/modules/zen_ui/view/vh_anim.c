@@ -2,7 +2,7 @@
 #define vh_anim_h
 
 #include "view.c"
-#include "zc_math2.c"
+#include "zm_math2.c"
 
 typedef enum _animtype_t
 {

@@ -1,5 +1,5 @@
-#ifndef zc_math3_h
-#define zc_math3_h
+#ifndef zm_math3_h
+#define zm_math3_h
 
 #include <math.h>
 #include <stdio.h>

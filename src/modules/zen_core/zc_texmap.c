@@ -3,7 +3,7 @@
 
 #include "zc_bitmap.c"
 #include "zc_map.c"
-#include "zc_math4.c"
+#include "zm_math4.c"
 
 typedef struct _tm_coords_t tm_coords_t;
 struct _tm_coords_t

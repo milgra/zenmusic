@@ -6,6 +6,7 @@ VERSION = 1
 SOURCES = \
 	$(wildcard src/modules/*.c) \
 	$(wildcard src/modules/zen_core/*.c) \
+	$(wildcard src/modules/zen_math/*.c) \
 	$(wildcard src/modules/zen_wm/*.c) \
 	$(wildcard src/modules/image/*.c) \
 	$(wildcard src/modules/zen_media_player/*.c) \
@@ -24,6 +25,7 @@ CFLAGS = \
 	-I/usr/local/include/SDL2 \
 	-Isrc/modules \
 	-Isrc/modules/zen_core \
+	-Isrc/modules/zen_math \
 	-Isrc/modules/zen_wm \
 	-Isrc/modules/image \
 	-Isrc/modules/zen_media_player \

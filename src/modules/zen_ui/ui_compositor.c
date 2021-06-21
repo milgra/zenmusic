@@ -14,7 +14,7 @@
 
 #include "gl_connector.c"
 #include "zc_bitmap.c"
-#include "zc_math2.c"
+#include "zm_math2.c"
 
 void ui_compositor_init();
 
@@ -50,9 +50,9 @@ void ui_compositor_render_to_bmp(bm_t* bitmap);
 #include "gl_floatbuffer.c"
 #include "zc_cstring.c"
 #include "zc_map.c"
-#include "zc_math4.c"
 #include "zc_texmap.c"
 #include "zc_vector.c"
+#include "zm_math4.c"
 
 typedef struct _crect_t
 {

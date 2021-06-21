@@ -3,8 +3,8 @@
 
 #include "wm_event.c"
 #include "zc_bitmap.c"
-#include "zc_math2.c"
 #include "zc_vector.c"
+#include "zm_math2.c"
 
 typedef enum _laypos_t // layout position
 {

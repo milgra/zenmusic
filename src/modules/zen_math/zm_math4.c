@@ -1,7 +1,7 @@
-#ifndef zc_math4_h
-#define zc_math4_h
+#ifndef zm_math4_h
+#define zm_math4_h
 
-#include "zc_math3.c"
+#include "zm_math3.c"
 #include <stdio.h>
 #include <stdlib.h>
 

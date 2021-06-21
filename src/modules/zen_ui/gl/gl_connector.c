@@ -10,7 +10,7 @@
 #include "gl_floatbuffer.c"
 #include "gl_shader.c"
 #include "zc_bitmap.c"
-#include "zc_math4.c"
+#include "zm_math4.c"
 #include <GL/glew.h>
 #include <stdio.h>
 #include <stdlib.h>
