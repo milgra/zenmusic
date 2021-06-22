@@ -41,8 +41,9 @@ void tg_css_gen(view_t* view)
           bm->w != (int)view->frame.local.w ||
           bm->h != (int)view->frame.local.h)
       {
-        bm = bm_new((int)view->frame.local.w, (int)view->frame.local.h);
+        bm = bm_new((int)view->frame.local.w, (int)view->frame.local.h); // REL 0
         view_set_texture_bmp(view, bm);
+        REL(bm);
       }
 
       coder_load_image_into(view->layout.background_image, view->texture.bitmap);
@@ -66,8 +67,9 @@ void tg_css_gen(view_t* view)
           bm->w != (int)w ||
           bm->h != (int)h)
       {
-        bm = bm_new((int)w, (int)h);
+        bm = bm_new((int)w, (int)h); // REL 0
         view_set_texture_bmp(view, bm);
+        REL(bm);
       }
 
       bm_reset(bm);

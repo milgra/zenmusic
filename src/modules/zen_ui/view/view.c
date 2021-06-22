@@ -182,6 +182,9 @@ void view_del(void* pointer)
 
   if (view->layout.background_image != NULL) REL(view->layout.background_image);
 
+  if (view->handler_data) REL(view->handler_data);
+  if (view->tex_gen_data) REL(view->tex_gen_data);
+
   REL(view->id);
   if (view->texture.bitmap) REL(view->texture.bitmap); // not all views has texture
   REL(view->views);

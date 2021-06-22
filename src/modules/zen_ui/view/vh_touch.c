@@ -26,9 +26,15 @@ void vh_touch_evt(view_t* view, ev_t ev)
   }
 }
 
+void vh_touch_del(void* p)
+{
+  vh_touch_t* vh = p;
+  if (vh->event) REL(vh->event);
+}
+
 void vh_touch_add(view_t* view, cb_t* event)
 {
-  vh_touch_t* vh = mem_calloc(sizeof(vh_touch_t), "vh_touch", NULL, NULL);
+  vh_touch_t* vh = mem_calloc(sizeof(vh_touch_t), "vh_touch", vh_touch_del, NULL);
   vh->event      = event;
 
   if (event) RET(event);

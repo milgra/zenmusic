@@ -380,12 +380,6 @@ void vh_list_evt(view_t* view, ev_t ev)
   }
 }
 
-void vh_list_del(void* p)
-{
-  vh_list_t* vh = (vh_list_t*)p;
-  REL(vh->items);
-}
-
 vec_t* vh_list_items(view_t* view)
 {
   vh_list_t* vh = view->handler_data;
@@ -491,6 +485,17 @@ void vh_list_refresh(view_t* view)
   vh->tail_index = vh->head_index;
 }
 
+void vh_list_del(void* p)
+{
+  vh_list_t* vh = p;
+  REL(vh->items);
+
+  REL(vh->vscr);
+  REL(vh->hscr);
+
+  if (vh->header) REL(vh->header);
+}
+
 void vh_list_add(view_t*         view,
                  vh_list_inset_t inset,
                  view_t* (*item_for_index)(int index, void* userdata, view_t* listview, int* item_count),
@@ -499,7 +504,7 @@ void vh_list_add(view_t*         view,
 {
   vh_list_t* vh      = mem_calloc(sizeof(vh_list_t), "vh_list", vh_list_del, NULL);
   vh->userdata       = userdata;
-  vh->items          = VNEW();
+  vh->items          = VNEW(); // REL 0
   vh->item_for_index = item_for_index;
   vh->item_recycle   = item_recycle;
   vh->inset          = inset;
@@ -508,8 +513,8 @@ void vh_list_add(view_t*         view,
   char* vid = cstr_new_format(100, "%s%s", view->id, "vscr");
   char* hid = cstr_new_format(100, "%s%s", view->id, "hscr");
 
-  view_t* vscr = view_new(vid, (r2_t){view->frame.local.w - 21, 0, 21, view->frame.local.h});
-  view_t* hscr = view_new(hid, (r2_t){0, view->frame.local.h - 21, view->frame.local.w, 21});
+  view_t* vscr = view_new(vid, (r2_t){view->frame.local.w - 21, 0, 21, view->frame.local.h}); // REL 1
+  view_t* hscr = view_new(hid, (r2_t){0, view->frame.local.h - 21, view->frame.local.w, 21}); // REL 2
 
   REL(vid);
   REL(hid);

@@ -24,10 +24,18 @@ void vh_key_evt(view_t* view, ev_t ev)
   }
 }
 
+void vh_key_del(void* p)
+{
+  vh_key_t* vh = p;
+  if (vh->on_key) REL(vh->on_key);
+}
+
 void vh_key_add(view_t* view, cb_t* on_key)
 {
-  vh_key_t* vh = mem_calloc(sizeof(vh_key_t), "vh_key", NULL, NULL);
+  vh_key_t* vh = mem_calloc(sizeof(vh_key_t), "vh_key", vh_key_del, NULL);
   vh->on_key   = on_key;
+
+  if (on_key) RET(on_key);
 
   view->needs_key    = 1;
   view->handler_data = vh;

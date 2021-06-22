@@ -220,8 +220,8 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
   char* html = html_read(htmlpath);
   char* css  = html_read(csspath);
 
-  tag_t*  view_structure = html_parse_html(html);
-  prop_t* view_styles    = html_parse_css(css);
+  tag_t*  view_structure = html_new_parse_html(html);
+  prop_t* view_styles    = html_new_parse_css(css);
 
   // create style map
   map_t*  styles = MNEW();

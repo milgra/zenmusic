@@ -35,6 +35,12 @@ view_t* vh_textinput_scroller_item_for_index(int index, void* userdata, view_t* 
 void    vh_textinput_scroller_on_text(view_t* textview, void* userdata);
 void    vh_textinput_scroller_on_button_down(void* userdata, void* data);
 
+void vh_textinput_scroller_del(void* p)
+{
+  vh_textinput_scroller_t* vh = p;
+  REL(vh->input_txt_v);
+}
+
 void vh_textinput_scroller_add(view_t*     view,
                                char*       text,
                                char*       phtext,
@@ -49,7 +55,7 @@ void vh_textinput_scroller_add(view_t*     view,
   view_t* input_txt_v     = view->views->data[1];
   view_t* clear_btn_bck_v = view->views->data[2]; // TODO do we need btn bck?
   view_t* clear_btn_v     = clear_btn_bck_v->views->data[0];
-  cb_t*   cb_btn_press    = cb_new(vh_textinput_scroller_on_button_down, view);
+  cb_t*   cb_btn_press    = cb_new(vh_textinput_scroller_on_button_down, view); // REL 0
 
   vh_button_add(clear_btn_v, VH_BUTTON_NORMAL, cb_btn_press);
   vh_textinput_add(input_txt_v, text, phtext, textstyle, view);
@@ -64,6 +70,8 @@ void vh_textinput_scroller_add(view_t*     view,
   view_remove(view, input_txt_v); // remove input txt view, list view will add it as row
 
   view->handler_data = data;
+
+  REL(cb_btn_press);
 }
 
 view_t* vh_textinput_scroller_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
@@ -93,8 +101,6 @@ void vh_textinput_scroller_on_button_down(void* userdata, void* btndata)
 {
   view_t*                  view = userdata;
   vh_textinput_scroller_t* data = view->handler_data;
-
-  printf("BTN DOWN\n");
 
   vh_list_set_item_width(data->list_v, data->input_txt_v->frame.local.w);
   vh_list_scroll_to_x_poisiton(data->list_v, 0);

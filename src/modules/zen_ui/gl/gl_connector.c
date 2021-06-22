@@ -34,8 +34,9 @@ typedef struct _glrect_t
 } glrect_t;
 
 void gl_init();
-void gl_del_texture(uint32_t i);
+void gl_destroy();
 void gl_new_texture(uint32_t i, int width, int height);
+void gl_rel_texture(uint32_t i);
 void gl_upload_vertexes(fb_t* fb);
 void gl_upload_to_texture(int page, int x, int y, int w, int h, void* data);
 void gl_save_framebuffer(bm_t* bm);
@@ -274,7 +275,7 @@ gltex_t gl_create_texture(int page, uint32_t w, uint32_t h)
   tex.w     = w;
   tex.h     = h;
 
-  glGenTextures(1, &tex.tx);
+  glGenTextures(1, &tex.tx); // DEL 0
 
   glActiveTexture(GL_TEXTURE0 + tex.index);
   glBindTexture(GL_TEXTURE_2D, tex.tx);
@@ -284,7 +285,7 @@ gltex_t gl_create_texture(int page, uint32_t w, uint32_t h)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
-  glGenFramebuffers(1, &tex.fb);
+  glGenFramebuffers(1, &tex.fb); // DEL 1
 
   glBindFramebuffer(GL_FRAMEBUFFER, tex.fb);
   glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, tex.tx, 0);
@@ -296,17 +297,17 @@ gltex_t gl_create_texture(int page, uint32_t w, uint32_t h)
 
 void gl_delete_texture(gltex_t tex)
 {
-  glDeleteTextures(1, &tex.tx);
-  glDeleteFramebuffers(1, &tex.fb);
+  glDeleteTextures(1, &tex.tx);     // DEL 0
+  glDeleteFramebuffers(1, &tex.fb); // DEL 1
 }
 
 glbuf_t create_buffer()
 {
   glbuf_t vb = {0};
 
-  glGenBuffers(1, &vb.vbo);
+  glGenBuffers(1, &vb.vbo); // DEL 0
   glBindBuffer(GL_ARRAY_BUFFER, vb.vbo);
-  glGenVertexArrays(1, &vb.vao);
+  glGenVertexArrays(1, &vb.vao); // DEL 1
   glBindVertexArray(vb.vao);
   glEnableVertexAttribArray(0);
   glEnableVertexAttribArray(1);
@@ -339,8 +340,14 @@ void gl_init(width, height)
   gl.textures[TEX_CTX].fb = context_fb;
 
   /* buffer 0 is preserved for framebuffer drawing */
-  gl.vertexes[0] = create_buffer();
-  gl.vertexes[1] = create_buffer();
+  gl.vertexes[0] = create_buffer(); // DEL 0
+  gl.vertexes[1] = create_buffer(); // DEL 1
+}
+
+void gl_destroy()
+{
+  gl_delete_vertex_buffer(gl.vertexes[0]);
+  gl_delete_vertex_buffer(gl.vertexes[1]);
 }
 
 void gl_new_texture(uint32_t page, int width, int height)
@@ -350,7 +357,7 @@ void gl_new_texture(uint32_t page, int width, int height)
   gl.textures[page] = gl_create_texture(page, width, height);
 }
 
-void gl_del_texture(uint32_t page)
+void gl_rel_texture(uint32_t page)
 {
   gl_delete_texture(gl.textures[page]);
 }

@@ -1,8 +1,6 @@
 /*
   Window Manager Connector Module for Zen Multimedia Desktop System
   Creates window and listens for events
-  
-  Currently it is SDL2
  */
 
 #ifndef wm_connector_h
@@ -41,7 +39,7 @@ void wm_init(void (*init)(int, int, char*),
 {
   SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0");
 
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) < 0)
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_TIMER) < 0) // QUIT 0
   {
     printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
   }
@@ -72,7 +70,7 @@ void wm_init(void (*init)(int, int, char*),
                                  SDL_WINDOW_OPENGL |
                                      SDL_WINDOW_SHOWN |
                                      SDL_WINDOW_ALLOW_HIGHDPI |
-                                     SDL_WINDOW_RESIZABLE);
+                                     SDL_WINDOW_RESIZABLE); // DESTROY 0
 
     if (wm_window == NULL)
     {
@@ -82,7 +80,7 @@ void wm_init(void (*init)(int, int, char*),
     {
       printf("SDL Window Init Success\n");
 
-      SDL_GLContext* context = SDL_GL_CreateContext(wm_window);
+      SDL_GLContext* context = SDL_GL_CreateContext(wm_window); // DELETE 0
       if (context == NULL)
       {
         printf("SDL Context could not be created! SDL_Error: %s\n", SDL_GetError());
@@ -102,7 +100,7 @@ void wm_init(void (*init)(int, int, char*),
 
         if (SDL_GL_SetSwapInterval(1) < 0) printf("SDL swap interval error %s\n", SDL_GetError());
 
-        SDL_StartTextInput();
+        SDL_StartTextInput(); // STOP 0
 
         (*init)(width, height, SDL_GetBasePath());
 
@@ -254,15 +252,15 @@ void wm_init(void (*init)(int, int, char*),
 
         (*destroy)();
 
-        SDL_StopTextInput();
-        SDL_GL_DeleteContext(context);
+        SDL_StopTextInput();           // STOP 0
+        SDL_GL_DeleteContext(context); // DELETE 0
 
         printf("SDL Context deleted\n");
       }
     }
 
-    SDL_DestroyWindow(wm_window);
-    SDL_Quit();
+    SDL_DestroyWindow(wm_window); // DESTROY 0
+    SDL_Quit();                   // QUIT 0
     printf("SDL Window destroyed\n");
   }
 }

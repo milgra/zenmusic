@@ -139,9 +139,15 @@ void vh_button_set_state(view_t* view, vh_button_state_t state)
   }
 }
 
+void vh_button_del(void* p)
+{
+  vh_button_t* vh = p;
+  if (vh->event) REL(vh->event);
+}
+
 void vh_button_add(view_t* view, vh_button_type_t type, cb_t* event)
 {
-  vh_button_t* vh = mem_calloc(sizeof(vh_button_t), "vh_button", NULL, NULL);
+  vh_button_t* vh = mem_calloc(sizeof(vh_button_t), "vh_button", vh_button_del, NULL);
   vh->event       = event;
   vh->type        = type;
   vh->state       = VH_BUTTON_UP;

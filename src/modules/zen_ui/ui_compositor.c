@@ -17,9 +17,11 @@
 #include "zm_math2.c"
 
 void ui_compositor_init();
+void ui_compositor_destroy();
 
 void ui_compositor_reset_texmap(int size);
 void ui_compositor_new_texture(int page, int width, int height);
+void ui_compositor_rel_texture(int page);
 void ui_compositor_resize_texture(int page, int width, int height);
 
 void ui_compositor_rewind();
@@ -90,11 +92,19 @@ void ui_compositor_init()
 {
   gl_init();
 
-  uic.fb = fb_new();
-
-  uic.cache     = VNEW();
+  uic.fb        = fb_new(); // REL 0
+  uic.cache     = VNEW();   // REL 1
   uic.cache_ind = 0;
   uic.upd_geo   = 1;
+}
+
+void ui_compositor_destroy()
+{
+  REL(uic.fb);
+  REL(uic.cache);
+  if (uic.tm) REL(uic.tm);
+
+  gl_destroy();
 }
 
 void ui_compositor_rewind()
@@ -107,19 +117,25 @@ void ui_compositor_reset_texmap(int size)
 {
   printf("ui_compositor_new_texmap %i\n", size);
   if (uic.tm) REL(uic.tm);
-  uic.tm = tm_new(size, size);
+  uic.tm = tm_new(size, size); // REL 2
 }
 
 void ui_compositor_new_texture(int page, int width, int height)
 {
   printf("ui_compositor_new_texture %i %i %i\n", page, width, height);
-  gl_new_texture(page, width, height); // texture for texmap
+  gl_new_texture(page, width, height);
+}
+
+void ui_compositor_rel_texture(int page)
+{
+  printf("ui_compositor_rel_texture %i\n", page);
+  gl_rel_texture(page);
 }
 
 void ui_compositor_resize_texture(int page, int width, int height)
 {
   printf("ui_compositor_resize_texture %i %i %i\n", page, width, height);
-  gl_del_texture(page);
+  gl_rel_texture(page);
   gl_new_texture(page, width, height);
 }
 

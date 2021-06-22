@@ -36,9 +36,9 @@ struct _uim_t
 
 void ui_manager_init(int width, int height)
 {
-  ui_generator_init(width, height);
+  ui_generator_init(width, height); // destroy
 
-  uim.root      = view_new("root", (r2_t){0, 0, width, height});
+  uim.root      = view_new("root", (r2_t){0, 0, width, height}); // REL 0
   uim.views     = VNEW();
   uim.implqueue = VNEW();
   uim.explqueue = VNEW();
@@ -46,10 +46,12 @@ void ui_manager_init(int width, int height)
 
 void ui_manager_destroy()
 {
-  REL(uim.root);
+  REL(uim.root); // REL 0
   REL(uim.views);
   REL(uim.implqueue);
   REL(uim.explqueue);
+
+  ui_generator_destroy(); // destroy
 }
 
 void ui_manager_event(ev_t ev)

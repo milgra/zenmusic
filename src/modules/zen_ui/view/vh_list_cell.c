@@ -24,10 +24,16 @@ void        vh_lcell_set_size(vec_t* cells, char* id, int size);
 #include "zc_cstring.c"
 #include "zc_vector.c"
 
+void vh_lcell_del(void* p)
+{
+  vh_lcell_t* cell = p;
+  REL(cell->id);
+}
+
 vh_lcell_t* vh_lcell_new(char* id, int size, view_t* view, int index)
 {
-  vh_lcell_t* cell = mem_alloc(sizeof(vh_lcell_t), "vh_lcell_t", NULL, NULL);
-  cell->id         = cstr_new_cstring(id);
+  vh_lcell_t* cell = mem_alloc(sizeof(vh_lcell_t), "vh_lcell_t", vh_lcell_del, NULL);
+  cell->id         = cstr_new_cstring(id); // REL 0
   cell->size       = size;
   cell->view       = view;
   cell->index      = index;

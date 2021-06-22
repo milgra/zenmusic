@@ -35,6 +35,7 @@
  - solve last column resize problem
  - select/copy/paste in textfields
  - prev button in shuffle mode should jump to previously played song
+ - zc_callback instead of custom function pointers
 
 **inbetween future**
 
@@ -51,7 +52,9 @@
  - cerebral cortex as interactive visualizer - on left/right press start game
  - andromeda : monolith 64K demo like particle visualizer	     
  - grid-based warping of video/album cover based on frequency ( bass in the center )
- - speed up font rendering by using glyph indexes instead of codepoints
+ - speed up font       rendering by using glyph indexes instead of codepoints
  - vh_textinput should seamlessly switch between texture paragraph and glpyh-based paragraph
  - Android Auto support with full screen visualizer for kick-ass experience
  - Vulkan backend for Zen UI
+ - replace/merge zc_string with utf8.h?
+ - retain userdatas?

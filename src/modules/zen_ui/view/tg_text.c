@@ -59,9 +59,15 @@ void tg_text_gen(view_t* view)
   }
 }
 
+void tg_text_del(void* p)
+{
+  tg_text_t* gen = p;
+  if (gen->text) REL(gen->text);
+}
+
 void tg_text_add(view_t* view)
 {
-  tg_text_t* gen = mem_calloc(sizeof(tg_text_t), "tg_text_t", NULL, NULL);
+  tg_text_t* gen = mem_calloc(sizeof(tg_text_t), "tg_text_t", tg_text_del, NULL);
 
   view->tex_gen_data = gen;
   view->tex_gen      = tg_text_gen;

@@ -11,6 +11,7 @@
 #include "view.c"
 
 int      ui_generator_init(int, int);
+void     ui_generator_destroy();
 void     ui_generator_render(uint32_t);
 void     ui_generator_use(vec_t* views);
 void     ui_generator_resize(int width, int height);
@@ -54,14 +55,14 @@ int nxt_pwr(int size)
 
 int ui_generator_init(int width, int height)
 {
-  ui_compositor_init(width, height);
+  ui_compositor_init(width, height); // destroy 0
 
   uig.width  = width;
   uig.height = height;
 
-  uig.views   = VNEW();
-  uig.channel = ch_new(50);
-  uig.thread  = SDL_CreateThread(ui_generator_workloop, "generator", NULL);
+  uig.views   = VNEW();     // REL 0
+  uig.channel = ch_new(50); // REL 0
+  // uig.thread  = SDL_CreateThread(ui_generator_workloop, "generator", NULL); // DEL 0
 
   // create texmap
   ui_compositor_reset_texmap(4096);
@@ -70,8 +71,8 @@ int ui_generator_init(int width, int height)
   int wp = nxt_pwr(width);
   int hp = nxt_pwr(height);
 
-  ui_compositor_new_texture(0, 4096, 4096); // texmap texture
-  ui_compositor_new_texture(1, wp, hp);     // mask texture, screen size fixed
+  ui_compositor_new_texture(0, 4096, 4096); // DEL 0 texmap texture
+  ui_compositor_new_texture(1, wp, hp);     // DEL 1 mask texture, screen size fixed
 
   uig.texpage = 2;
 
@@ -79,6 +80,18 @@ int ui_generator_init(int width, int height)
   uig.hpwr = hp;
 
   return (uig.thread != NULL);
+}
+
+void ui_generator_destroy()
+{
+  REL(uig.views);
+  REL(uig.channel);
+
+  // delete textures
+
+  for (int index = 0; index < uig.texpage; index++) ui_compositor_rel_texture(index);
+
+  ui_compositor_destroy();
 }
 
 void ui_generator_resend_views()
@@ -155,6 +168,7 @@ void ui_generator_use(vec_t* views)
 void ui_generator_resize_texmap(int size)
 {
   printf("ui_generator_resize_texamp %i\n", size);
+
   ui_compositor_reset_texmap(size);
   ui_compositor_resize_texture(0, size, size);
 }
@@ -162,6 +176,7 @@ void ui_generator_resize_texmap(int size)
 void ui_generator_resize_framebuffers(int w, int h)
 {
   printf("ui_generator_resize_framebuffers %i %i\n", w, h);
+
   for (int index = 1; index < uig.texpage; index++)
   {
     ui_compositor_resize_texture(index, w, h);

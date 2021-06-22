@@ -346,21 +346,29 @@ void vh_textinput_evt(view_t* view, ev_t ev)
   }
 }
 
+void vh_textinput_del(void* p)
+{
+  vh_textinput_t* vh = p;
+  REL(vh->text_s);
+  REL(vh->glyph_v);
+  REL(vh->cursor_v);
+}
+
 void vh_textinput_add(view_t*     view,
                       char*       text,
                       char*       phtext,
                       textstyle_t textstyle,
                       void*       userdata)
 {
-  char* id_c = cstr_new_format(100, "%s%s", view->id, "crsr");
-  char* id_h = cstr_new_format(100, "%s%s", view->id, "holder");
+  char* id_c = cstr_new_format(100, "%s%s", view->id, "crsr");   // REL 0
+  char* id_h = cstr_new_format(100, "%s%s", view->id, "holder"); // REL 1
 
   vh_textinput_t* data = mem_calloc(sizeof(vh_textinput_t), "vh_text", NULL, NULL);
 
   textstyle.backcolor = 0;
 
-  data->text_s  = str_new();
-  data->glyph_v = VNEW();
+  data->text_s  = str_new(); // REL 2
+  data->glyph_v = VNEW();    // REL 3
 
   data->style    = textstyle;
   data->userdata = userdata;
@@ -375,7 +383,7 @@ void vh_textinput_add(view_t*     view,
 
   // cursor
 
-  data->cursor_v                          = view_new(id_c, (r2_t){50, 12, 2, 0});
+  data->cursor_v                          = view_new(id_c, (r2_t){50, 12, 2, 0}); // REL 4
   data->cursor_v->layout.background_color = 0x666666FF;
 
   tg_css_add(data->cursor_v);
