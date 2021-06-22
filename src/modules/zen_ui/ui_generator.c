@@ -160,7 +160,7 @@ void ui_generator_resend_views()
 void ui_generator_use(vec_t* views)
 {
   vec_reset(uig.views);
-  vec_addinvector(uig.views, views);
+  vec_add_in_vector(uig.views, views);
 
   ui_generator_resend_views();
 }

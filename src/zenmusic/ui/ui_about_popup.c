@@ -65,10 +65,10 @@ void ui_about_popup_on_header_field_insert(view_t* view, int src, int tgt)
   REL(cell); // REL 0
 
   // update all items and cache
-  view_t* item;
-  vec_t*  items = vh_list_items(donl.view);
-  while ((item = VNXT(items)))
+  vec_t* items = vh_list_items(donl.view);
+  for (int i = 0; i < items->length; i++)
   {
+    view_t* item = items->data[i];
     vh_litem_swp_cell(item, src, tgt);
   }
 }
@@ -87,10 +87,10 @@ void ui_about_popup_on_header_field_resize(view_t* view, char* id, int size)
   }
 
   // update all items and cache
-  view_t* item;
-  vec_t*  items = vh_list_items(donl.view);
-  while ((item = VNXT(items)))
+  vec_t* items = vh_list_items(donl.view);
+  for (int i = 0; i < items->length; i++)
   {
+    view_t* item = items->data[i];
     vh_litem_upd_cell_size(item, id, size);
   }
 }
@@ -133,12 +133,11 @@ view_t* donateitem_new(int index)
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, ui_about_popup_on_item_select);
 
-  col_t* cell;
-  while ((cell = VNXT(donl.fields)))
+  for (int i = 0; i < donl.fields->length; i++)
   {
-    char* id = cstr_new_format(100, "%s%s", rowview->id, cell->id); // REL 1
-
-    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, height}); // REL 2
+    col_t*  cell     = donl.fields->data[i];
+    char*   id       = cstr_new_format(100, "%s%s", rowview->id, cell->id); // REL 1
+    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, height});      // REL 2
 
     if (index == 5)
     {

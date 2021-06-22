@@ -11,7 +11,6 @@
 #define VADD(VEC, OBJ) vec_add(VEC, OBJ)
 #define VADDR(VEC, OBJ) vec_add_rel(VEC, OBJ)
 #define VREM(VEC, OBJ) vec_rem(VEC, OBJ)
-#define VNXT(VEC) vec_next(VEC)
 
 #define REL_VEC_ITEMS(X) vec_decrese_item_retcount(X)
 
@@ -26,7 +25,6 @@ struct _vec_t
 {
   void**   data;
   void**   next;
-  uint32_t pos;
   uint32_t length;
   uint32_t length_real;
 };
@@ -37,19 +35,18 @@ void     vec_dec_retcount(vec_t* vector);
 void     vec_add(vec_t* vector, void* data);
 void     vec_add_rel(vec_t* vector, void* data);
 void     vec_ins(vec_t* vector, void* data, size_t index);
-void*    vec_next(vec_t* vector);
-void     vec_addinvector(vec_t* vec_a, vec_t* vec_b);
-void     vec_adduniquedata(vec_t* vector, void* data);
-void     vec_adduniquedataatindex(vec_t* vector, void* data, size_t index);
-void     vec_replaceatindex(vec_t* vector, void* data, size_t index);
+void     vec_add_in_vector(vec_t* vec_a, vec_t* vec_b);
+void     vec_add_unique_data(vec_t* vector, void* data);
+void     vec_ins_unique_data(vec_t* vector, void* data, size_t index);
+void     vec_replace_at_index(vec_t* vector, void* data, size_t index);
 char     vec_rem(vec_t* vector, void* data);
-char     vec_rematindex(vec_t* vector, uint32_t index);
-void     vec_reminrange(vec_t* vector, uint32_t start, uint32_t end);
-void     vec_reminvector(vec_t* vec_a, vec_t* vec_b);
+char     vec_rem_at_index(vec_t* vector, uint32_t index);
+void     vec_rem_in_range(vec_t* vector, uint32_t start, uint32_t end);
+void     vec_rem_in_vector(vec_t* vec_a, vec_t* vec_b);
 void     vec_reverse(vec_t* vector);
 void*    vec_head(vec_t* vector);
 void*    vec_tail(vec_t* vector);
-uint32_t vec_indexofdata(vec_t* vector, void* data);
+uint32_t vec_index_of_data(vec_t* vector, void* data);
 void     vec_sort(vec_t* vector, vsdir_t dir, int (*comp)(void* left, void* right));
 
 void vec_describe(void* p, int level);
@@ -65,7 +62,6 @@ vec_t* vec_new()
 {
   vec_t* vector       = mem_calloc(sizeof(vec_t), "vec_t", vec_del, vec_describe);
   vector->data        = mem_calloc(sizeof(void*) * 10, "void**", NULL, NULL);
-  vector->pos         = 0;
   vector->length      = 0;
   vector->length_real = 10;
   return vector;
@@ -88,22 +84,6 @@ void vec_reset(vec_t* vector)
   for (uint32_t index = 0; index < vector->length; index++)
     mem_release(vector->data[index]);
   vector->length = 0;
-}
-
-// iterates through all items, resets position when ran out for next loop
-
-void* vec_next(vec_t* vector)
-{
-  if (vector->pos < vector->length)
-  {
-    vector->pos += 1;
-    return vector->data[vector->pos - 1];
-  }
-  else
-  {
-    vector->pos = 0;
-    return NULL;
-  }
 }
 
 /* decreases retain count of items. use when you add items inline and don't want to release every item
@@ -158,7 +138,7 @@ void vec_ins(vec_t* vector, void* data, size_t index)
 
 /* adds all items in vector to vector */
 
-void vec_addinvector(vec_t* vec_a, vec_t* vec_b)
+void vec_add_in_vector(vec_t* vec_a, vec_t* vec_b)
 {
   for (uint32_t index = 0; index < vec_b->length; index++)
     mem_retain(vec_b->data[index]);
@@ -170,21 +150,21 @@ void vec_addinvector(vec_t* vec_a, vec_t* vec_b)
 
 /* adds single unique data */
 
-void vec_adduniquedata(vec_t* vector, void* data)
+void vec_add_unique_data(vec_t* vector, void* data)
 {
-  if (vec_indexofdata(vector, data) == UINT32_MAX) vec_add(vector, data);
+  if (vec_index_of_data(vector, data) == UINT32_MAX) vec_add(vector, data);
 }
 
 /* adds single unique data at index */
 
-void vec_adduniquedataatindex(vec_t* vector, void* data, size_t index)
+void vec_ins_unique_data(vec_t* vector, void* data, size_t index)
 {
-  if (vec_indexofdata(vector, data) == UINT32_MAX) vec_ins(vector, data, index);
+  if (vec_index_of_data(vector, data) == UINT32_MAX) vec_ins(vector, data, index);
 }
 
 /* replaces data at given index */
 
-void vec_replaceatindex(vec_t* vector, void* data, size_t index)
+void vec_replace_at_index(vec_t* vector, void* data, size_t index)
 {
   mem_release(vector->data[index]);
   mem_retain(data);
@@ -195,10 +175,10 @@ void vec_replaceatindex(vec_t* vector, void* data, size_t index)
 
 char vec_rem(vec_t* vector, void* data)
 {
-  uint32_t index = vec_indexofdata(vector, data);
+  uint32_t index = vec_index_of_data(vector, data);
   if (index < UINT32_MAX)
   {
-    vec_rematindex(vector, index);
+    vec_rem_at_index(vector, index);
     return 1;
   }
   return 0;
@@ -206,7 +186,7 @@ char vec_rem(vec_t* vector, void* data)
 
 /* removes single data at index, returns 1 if data is removed and released during removal */
 
-char vec_rematindex(vec_t* vector, uint32_t index)
+char vec_rem_at_index(vec_t* vector, uint32_t index)
 {
   if (index < vector->length)
   {
@@ -226,7 +206,7 @@ char vec_rematindex(vec_t* vector, uint32_t index)
 
 /* removes data in range */
 
-void vec_reminrange(vec_t* vector, uint32_t start, uint32_t end)
+void vec_rem_in_range(vec_t* vector, uint32_t start, uint32_t end)
 {
   for (uint32_t index = start; index < end; index++)
     mem_release(vector->data[index]);
@@ -236,7 +216,7 @@ void vec_reminrange(vec_t* vector, uint32_t start, uint32_t end)
 
 /* removes data in vector */
 
-void vec_reminvector(vec_t* vec_a, vec_t* vec_b)
+void vec_rem_in_vector(vec_t* vec_a, vec_t* vec_b)
 {
   for (int index = 0; index < vec_b->length; index++)
   {
@@ -253,7 +233,7 @@ void vec_reverse(vec_t* vector)
   {
     vec_add(vector, vector->data[index]);
   }
-  vec_reminrange(vector, 0, length - 1);
+  vec_rem_in_range(vector, 0, length - 1);
 }
 
 /* returns head item of vector */
@@ -278,7 +258,7 @@ void* vec_tail(vec_t* vector)
 
 /* returns index of data or UINT32_MAX if not found */
 
-uint32_t vec_indexofdata(vec_t* vector, void* data)
+uint32_t vec_index_of_data(vec_t* vector, void* data)
 {
   void**   actual = vector->data;
   uint32_t index  = 0;

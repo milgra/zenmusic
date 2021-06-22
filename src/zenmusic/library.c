@@ -175,7 +175,7 @@ int analyzer_thread(void* chptr)
       REL(time_str); // REL 0
 
       // remove entry from remaining
-      vec_rematindex(lib.paths, lib.paths->length - 1);
+      vec_rem_at_index(lib.paths, lib.paths->length - 1);
     }
     else
     {

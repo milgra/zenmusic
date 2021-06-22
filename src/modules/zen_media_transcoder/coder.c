@@ -29,12 +29,13 @@ int   coder_write_png(char* path, bm_t* bm);
 
 bm_t* coder_load_image(const char* path)
 {
-  bm_t* bitmap = NULL;
+  bm_t* bitmap  = NULL;
+  int   success = 0;
 
-  AVFormatContext* src_ctx = avformat_alloc_context();
+  AVFormatContext* src_ctx = avformat_alloc_context(); // FREE 0
 
   /* // open the specified path */
-  if (avformat_open_input(&src_ctx, path, NULL, NULL) == 0)
+  if (avformat_open_input(&src_ctx, path, NULL, NULL) == 0) // CLOSE 0
   {
     // find the first attached picture, if available
     for (int index = 0; index < src_ctx->nb_streams; index++)
@@ -44,13 +45,13 @@ bm_t* coder_load_image(const char* path)
         AVCodecParameters* param = src_ctx->streams[index]->codecpar;
 
         const AVCodec*  codec        = avcodec_find_decoder(param->codec_id);
-        AVCodecContext* codecContext = avcodec_alloc_context3(codec);
+        AVCodecContext* codecContext = avcodec_alloc_context3(codec); // FREE 1
 
         avcodec_parameters_to_context(codecContext, param);
-        avcodec_open2(codecContext, codec, NULL);
+        avcodec_open2(codecContext, codec, NULL); // CLOSE 1
 
-        AVPacket* packet = av_packet_alloc(); // FREE 0
-        AVFrame*  frame  = av_frame_alloc();  // FREE 1
+        AVPacket* packet = av_packet_alloc(); // FREE 2
+        AVFrame*  frame  = av_frame_alloc();  // FREE 3
 
         while (av_read_frame(src_ctx, packet) >= 0)
         {
@@ -70,11 +71,11 @@ bm_t* coder_load_image(const char* path)
                                                             sws_flags,
                                                             NULL,
                                                             NULL,
-                                                            NULL);
+                                                            NULL); // FREE 4
 
         if (img_convert_ctx != NULL)
         {
-          bitmap = bm_new(frame->width, frame->height);
+          bitmap = bm_new(frame->width, frame->height); // REL 0
 
           uint8_t* scaledpixels[1];
           scaledpixels[0] = malloc(bitmap->w * bitmap->h * 4);
@@ -100,26 +101,33 @@ bm_t* coder_load_image(const char* path)
                           0,
                           0);
 
-          sws_freeContext(img_convert_ctx);
+          sws_freeContext(img_convert_ctx); // FREE 4
 
-          return bitmap;
+          success = 1;
         }
 
         av_frame_free(&frame);   // FREE 0
         av_packet_free(&packet); // FREE 1
+
+        avcodec_free_context(&codecContext);
+        avcodec_close(codecContext);
       }
     }
+
+    avformat_close_input(&src_ctx); // CLOSE 0
   }
+
+  avformat_free_context(src_ctx); // FREE 0
 
   return bitmap;
 }
 
 void coder_load_image_into(const char* path, bm_t* bitmap)
 {
-  AVFormatContext* src_ctx = avformat_alloc_context();
+  AVFormatContext* src_ctx = avformat_alloc_context(); // FREE 0
 
   /* // open the specified path */
-  if (avformat_open_input(&src_ctx, path, NULL, NULL) == 0)
+  if (avformat_open_input(&src_ctx, path, NULL, NULL) == 0) // CLOSE 0
   {
     // find the first attached picture, if available
     for (int index = 0; index < src_ctx->nb_streams; index++)
@@ -129,13 +137,13 @@ void coder_load_image_into(const char* path, bm_t* bitmap)
         AVCodecParameters* param = src_ctx->streams[index]->codecpar;
 
         const AVCodec*  codec        = avcodec_find_decoder(param->codec_id);
-        AVCodecContext* codecContext = avcodec_alloc_context3(codec);
+        AVCodecContext* codecContext = avcodec_alloc_context3(codec); // FREE 1
 
         avcodec_parameters_to_context(codecContext, param);
-        avcodec_open2(codecContext, codec, NULL);
+        avcodec_open2(codecContext, codec, NULL); // CLOSE 1
 
-        AVPacket* packet = av_packet_alloc();
-        AVFrame*  frame  = av_frame_alloc();
+        AVPacket* packet = av_packet_alloc(); // FREE 2
+        AVFrame*  frame  = av_frame_alloc();  // FREE 3
 
         while (av_read_frame(src_ctx, packet) >= 0)
         {
@@ -155,7 +163,7 @@ void coder_load_image_into(const char* path, bm_t* bitmap)
                                                             sws_flags,
                                                             NULL,
                                                             NULL,
-                                                            NULL);
+                                                            NULL); // FREE 4
 
         if (img_convert_ctx != NULL)
         {
@@ -183,14 +191,21 @@ void coder_load_image_into(const char* path, bm_t* bitmap)
                           0,
                           0);
 
-          sws_freeContext(img_convert_ctx);
+          sws_freeContext(img_convert_ctx); // FREE 4
         }
 
-        av_frame_free(&frame);   // FREE 0
-        av_packet_free(&packet); // FREE 1
+        av_frame_free(&frame);   // FREE 2
+        av_packet_free(&packet); // FREE 3
+
+        avcodec_free_context(&codecContext); // FREE 1
+        avcodec_close(codecContext);         // CLOSE 1
       }
     }
+
+    avformat_close_input(&src_ctx); // CLOSE 0
   }
+
+  avformat_free_context(src_ctx); // FREE 0
 }
 
 void coder_load_cover_into(const char* path, bm_t* bitmap)
@@ -201,7 +216,7 @@ void coder_load_cover_into(const char* path, bm_t* bitmap)
 
   int i, ret = 0;
 
-  AVFormatContext* src_ctx = avformat_alloc_context();
+  AVFormatContext* src_ctx = avformat_alloc_context(); // FREE 0
 
   /* // open the specified path */
   if (avformat_open_input(&src_ctx, path, NULL, NULL) != 0)
@@ -225,12 +240,12 @@ void coder_load_cover_into(const char* path, bm_t* bitmap)
       printf("Resolution %d x %d codec %i\n", param->width, param->height, param->codec_id);
 
       const AVCodec*  codec        = avcodec_find_decoder(param->codec_id);
-      AVCodecContext* codecContext = avcodec_alloc_context3(codec);
+      AVCodecContext* codecContext = avcodec_alloc_context3(codec); // FREE 1
 
       avcodec_parameters_to_context(codecContext, param);
-      avcodec_open2(codecContext, codec, NULL);
+      avcodec_open2(codecContext, codec, NULL); // CLOSE 1
 
-      AVFrame* frame = av_frame_alloc();
+      AVFrame* frame = av_frame_alloc(); // FREE 2
 
       avcodec_send_packet(codecContext, &pkt);
       avcodec_receive_frame(codecContext, frame);
@@ -248,7 +263,7 @@ void coder_load_cover_into(const char* path, bm_t* bitmap)
                                                           sws_flags,
                                                           NULL,
                                                           NULL,
-                                                          NULL);
+                                                          NULL); // FREE 3
 
       if (img_convert_ctx != NULL)
       {
@@ -278,11 +293,17 @@ void coder_load_cover_into(const char* path, bm_t* bitmap)
                          0,
                          0);
         }
+
+        sws_freeContext(img_convert_ctx); // FREE 3
       }
 
-      av_frame_free(&frame); // FREE 0
+      avcodec_free_context(&codecContext); // FREE 1
+      avcodec_close(codecContext);         // CLOSE 1
+      av_frame_free(&frame);               // FREE 2
     }
   }
+
+  avformat_free_context(src_ctx); // FREE 0
 }
 
 int coder_load_metadata_into(const char* path, map_t* map)
@@ -292,13 +313,13 @@ int coder_load_metadata_into(const char* path, map_t* map)
 
   int retv = -1;
 
-  AVFormatContext* pFormatCtx  = avformat_alloc_context();
+  AVFormatContext* pFormatCtx  = avformat_alloc_context(); // FREE 0
   AVDictionary*    format_opts = NULL;
 
   av_dict_set(&format_opts, "scan_all_pmts", "1", AV_DICT_DONT_OVERWRITE);
 
   /* // open the specified path */
-  if (avformat_open_input(&pFormatCtx, path, NULL, &format_opts) == 0)
+  if (avformat_open_input(&pFormatCtx, path, NULL, &format_opts) == 0) // CLOSE 0
   {
     if (pFormatCtx)
     {
@@ -309,16 +330,17 @@ int coder_load_metadata_into(const char* path, map_t* map)
 
         if (slash)
         {
-          char* media_type = mem_calloc(strlen(format->mime_type), "char*", NULL, NULL);
-          char* container  = mem_calloc(strlen(format->mime_type), "char*", NULL, NULL);
+          char* media_type = mem_calloc(strlen(format->mime_type), "char*", NULL, NULL); // REL 0
+          char* container  = mem_calloc(strlen(format->mime_type), "char*", NULL, NULL); // REL 1
 
           memcpy(media_type, format->mime_type, slash - format->mime_type);
           memcpy(container, slash + 1, strlen(format->mime_type) - (slash - format->mime_type));
 
           MPUT(map, "file/media_type", media_type);
           MPUT(map, "file/container", container);
-          REL(media_type);
-          REL(container);
+
+          REL(media_type); // REL 0
+          REL(container);  // REL 1
         }
       }
       else
@@ -341,11 +363,13 @@ int coder_load_metadata_into(const char* path, map_t* map)
 
       while ((tag = av_dict_get(pFormatCtx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
       {
-        char* value = cstr_new_cstring(tag->value);
-        char* key   = cstr_new_format(100, "%s/%s", "meta", tag->key);
+        char* value = cstr_new_cstring(tag->value);                    // REL 0
+        char* key   = cstr_new_format(100, "%s/%s", "meta", tag->key); // REL 1
+
         MPUT(map, key, value);
-        REL(key);
-        REL(value);
+
+        REL(key);   // REL 0
+        REL(value); // REL 1
       }
 
       // Retrieve stream information
@@ -373,16 +397,17 @@ int coder_load_metadata_into(const char* path, map_t* map)
         {
           if (param->codec_type == AVMEDIA_TYPE_AUDIO)
           {
-            char* channels   = mem_calloc(10, "char*", NULL, NULL);
-            char* bitrate    = mem_calloc(10, "char*", NULL, NULL);
-            char* samplerate = mem_calloc(10, "char*", NULL, NULL);
+            char* channels   = mem_calloc(10, "char*", NULL, NULL); // REL 0
+            char* bitrate    = mem_calloc(10, "char*", NULL, NULL); // REL 1
+            char* samplerate = mem_calloc(10, "char*", NULL, NULL); // REL 2
 
             snprintf(channels, 10, "%i", param->channels);
             snprintf(bitrate, 10, "%li", param->bit_rate);
             snprintf(samplerate, 10, "%i", param->sample_rate);
-            MPUT(map, "file/channels", channels);
-            MPUT(map, "file/bit_rate", bitrate);
-            MPUT(map, "file/sample_rate", samplerate);
+
+            MPUTR(map, "file/channels", channels);      // REL 0
+            MPUTR(map, "file/bit_rate", bitrate);       // REL 1
+            MPUTR(map, "file/sample_rate", samplerate); // REL 2
           }
         }
       }
@@ -392,12 +417,14 @@ int coder_load_metadata_into(const char* path, map_t* map)
       LOG("coder : skpping %s, no media context present", path);
     }
 
-    avformat_close_input(&pFormatCtx);
+    avformat_close_input(&pFormatCtx); // CLOSE 0
   }
   else
   {
     LOG("coder : skipping %s, probably not a media file", path);
   }
+
+  avformat_free_context(pFormatCtx); // FREE 0
 
   return retv;
 }

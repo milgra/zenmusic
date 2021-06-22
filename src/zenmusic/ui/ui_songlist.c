@@ -127,9 +127,9 @@ void ui_songlist_attach(view_t* base)
   vh_lhead_set_on_insert(header, on_header_field_insert);
   vh_lhead_set_on_resize(header, on_header_field_resize);
 
-  col_t* cell;
-  while ((cell = VNXT(sl.columns)))
+  for (int i = 0; i < sl.columns->length; i++)
   {
+    col_t*  cell     = sl.columns->data[i];
     char*   id       = cstr_new_format(100, "%s%s", header->id, cell->id); // REL 4
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});         // REL 5
     view_t* dragview = view_new(id, (r2_t){cell->size - 5, 10, 5, 10});    // REL 6
@@ -364,9 +364,9 @@ view_t* songitem_new()
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, ui_songlist_on_item_select);
 
-  col_t* cell;
-  while ((cell = VNXT(sl.columns)))
+  for (int i = 0; i < sl.columns->length; i++)
   {
+    col_t*  cell     = sl.columns->data[i];
     char*   id       = cstr_new_format(100, "%s%s", rowview->id, cell->id); // REL 0
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 35});          // REL 1
     tg_text_add(cellview);

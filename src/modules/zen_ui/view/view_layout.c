@@ -27,8 +27,9 @@ void view_layout(view_t* view)
   {
     if (view->layout.flexdir == FD_ROW)
     {
-      while ((v = VNXT(view->views)))
+      for (int i = 0; i < view->views->length; i++)
       {
+        view_t* v = view->views->data[i];
         if (v->layout.width > 0)
         {
           rel_w -= v->layout.width;
@@ -38,8 +39,9 @@ void view_layout(view_t* view)
     }
     if (view->layout.flexdir == FD_COL)
     {
-      while ((v = VNXT(view->views)))
+      for (int i = 0; i < view->views->length; i++)
       {
+        view_t* v = view->views->data[i];
         if (v->layout.height > 0)
         {
           rel_h -= v->layout.height;
@@ -49,9 +51,10 @@ void view_layout(view_t* view)
     }
   }
 
-  while ((v = VNXT(view->views)))
+  for (int i = 0; i < view->views->length; i++)
   {
-    r2_t frame = v->frame.local;
+    view_t* v     = view->views->data[i];
+    r2_t    frame = v->frame.local;
 
     if (v->layout.margin > 0)
     {
@@ -149,8 +152,9 @@ void view_layout(view_t* view)
     view_set_frame(v, frame);
   }
 
-  while ((v = VNXT(view->views)))
+  for (int i = 0; i < view->views->length; i++)
   {
+    view_t* v = view->views->data[i];
     view_layout(v);
   }
 }

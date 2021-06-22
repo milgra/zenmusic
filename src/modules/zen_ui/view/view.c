@@ -289,7 +289,7 @@ void view_coll_touched(view_t* view, ev_t ev, vec_t* queue)
       ev.y <= view->frame.global.y + view->frame.global.h &&
       ev.y >= view->frame.global.y)
   {
-    vec_adduniquedata(queue, view);
+    vec_add_unique_data(queue, view);
     for (int i = 0; i < view->views->length; i++)
     {
       view_t* v = view->views->data[i];
@@ -312,9 +312,11 @@ view_t* view_get_subview(view_t* view, char* id)
 
 void view_evt(view_t* view, ev_t ev)
 {
-  view_t* v;
-  while ((v = VNXT(view->views)))
+  for (int i = 0; i < view->views->length; i++)
+  {
+    view_t* v = view->views->data[i];
     view_evt(v, ev);
+  }
 
   if (view->handler) (*view->handler)(view, ev);
 }
@@ -334,8 +336,11 @@ void view_calc_global(view_t* view)
 
   view->frame.global = frame_global;
 
-  view_t* v;
-  while ((v = VNXT(view->views))) view_calc_global(v);
+  for (int i = 0; i < view->views->length; i++)
+  {
+    view_t* v = view->views->data[i];
+    view_calc_global(v);
+  }
 }
 
 void view_set_frame(view_t* view, r2_t frame)
@@ -372,8 +377,11 @@ void view_set_block_touch(view_t* view, char block, char recursive)
 
   if (recursive)
   {
-    view_t* v;
-    while ((v = VNXT(view->views))) view_set_block_touch(v, block, recursive);
+    for (int i = 0; i < view->views->length; i++)
+    {
+      view_t* v = view->views->data[i];
+      view_set_block_touch(v, block, recursive);
+    }
   }
 }
 
@@ -403,8 +411,11 @@ void view_set_texture_alpha(view_t* view, float alpha, char recur)
 
   if (recur)
   {
-    view_t* v;
-    while ((v = VNXT(view->views))) view_set_texture_alpha(v, alpha, recur);
+    for (int i = 0; i < view->views->length; i++)
+    {
+      view_t* v = view->views->data[i];
+      view_set_texture_alpha(v, alpha, recur);
+    }
   }
 }
 

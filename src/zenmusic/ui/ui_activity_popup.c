@@ -40,12 +40,12 @@ void ui_activity_popup_log(char* log)
 
   if (last && strstr(log, "progress"))
   {
-    vec_replaceatindex(act.logs, log, 0);
+    vec_replace_at_index(act.logs, log, 0);
   }
   else
     vec_ins(act.logs, log, 0);
 
-  if (act.logs->length > 100) vec_rematindex(act.logs, 100);
+  if (act.logs->length > 100) vec_rem_at_index(act.logs, 100);
 
   if (act.list)
   {

@@ -76,9 +76,9 @@ void ui_settings_popup_attach(view_t* baseview)
   vh_lhead_set_on_insert(header, ui_settings_popup_on_header_field_insert);
   vh_lhead_set_on_resize(header, ui_settings_popup_on_header_field_resize);
 
-  col_t* cell;
-  while ((cell = VNXT(uisp.columns)))
+  for (int i = 0; i < uisp.columns->length; i++)
   {
+    col_t*  cell     = uisp.columns->data[i];
     char*   id       = cstr_new_format(100, "%s%s", header->id, cell->id); // REL 3
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});         // REL 4
 
@@ -159,10 +159,10 @@ void ui_settings_popup_on_header_field_insert(view_t* view, int src, int tgt)
   REL(cell);
 
   // update all items and cache
-  view_t* item;
-  vec_t*  items = vh_list_items(uisp.view);
-  while ((item = VNXT(items)))
+  vec_t* items = vh_list_items(uisp.view);
+  for (int i = 0; i < items->length; i++)
   {
+    view_t* item = items->data[i];
     vh_litem_swp_cell(item, src, tgt);
   }
 }
@@ -181,10 +181,10 @@ void ui_settings_popup_on_header_field_resize(view_t* view, char* id, int size)
   }
 
   // update all items and cache
-  view_t* item;
-  vec_t*  items = vh_list_items(uisp.view);
-  while ((item = VNXT(items)))
+  vec_t* items = vh_list_items(uisp.view);
+  for (int i = 0; i < items->length; i++)
   {
+    view_t* item = items->data[i];
     vh_litem_upd_cell_size(item, id, size);
   }
 }
@@ -286,9 +286,9 @@ view_t* ui_settings_popup_new_item()
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, ui_settings_popup_on_item_select);
 
-  col_t* cell;
-  while ((cell = VNXT(uisp.columns)))
+  for (int i = 0; i < uisp.columns->length; i++)
   {
+    col_t*  cell     = uisp.columns->data[i];
     char*   id       = cstr_new_format(100, "%s%s", rowview->id, cell->id); // REL 1
     view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 50});          // REL 2
 

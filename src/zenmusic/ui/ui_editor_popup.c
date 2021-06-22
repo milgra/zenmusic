@@ -259,9 +259,9 @@ void ui_editor_popup_create_table()
   ep.textstyle.align     = TA_LEFT;
   ep.textstyle.backcolor = 0xFFFFFFFF;
 
-  col_t* col;
-  while ((col = VNXT(ep.cols)))
+  for (int i = 0; i < ep.cols->length; i++)
   {
+    col_t*  col     = ep.cols->data[i];
     char*   id      = cstr_new_format(100, "%s%s", header->id, col->id); // REL 1
     view_t* colview = view_new(id, (r2_t){0, 0, col->size, 30});         // REL 2
 
@@ -295,10 +295,10 @@ void ui_editor_popup_on_header_field_insert(view_t* view, int src, int tgt)
   REL(col);
 
   // update all items and cache
-  view_t* item;
-  vec_t*  items = vh_list_items(ep.list_view);
-  while ((item = VNXT(items)))
+  vec_t* items = vh_list_items(ep.list_view);
+  for (int i = 0; i < items->length; i++)
   {
+    view_t* item = items->data[i];
     vh_litem_swp_cell(item, src, tgt);
   }
 }
@@ -317,9 +317,12 @@ void ui_editor_popup_on_header_field_resize(view_t* view, char* id, int size)
   }
 
   // update all items and cache
-  view_t* item;
-  vec_t*  items = vh_list_items(ep.list_view);
-  while ((item = VNXT(items))) vh_litem_upd_cell_size(item, id, size);
+  vec_t* items = vh_list_items(ep.list_view);
+  for (int i = 0; i < items->length; i++)
+  {
+    view_t* item = items->data[i];
+    vh_litem_upd_cell_size(item, id, size);
+  }
 }
 
 // row related
@@ -346,9 +349,9 @@ view_t* ui_editor_popup_new_item()
   vh_litem_add(rowview, NULL);
   vh_litem_set_on_select(rowview, ui_editor_popup_select_item);
 
-  col_t* col;
-  while ((col = VNXT(ep.cols)))
+  for (int i = 0; i < ep.cols->length; i++)
   {
+    col_t*  col     = ep.cols->data[i];
     char*   id      = cstr_new_format(100, "%s%s", rowview->id, col->id);
     view_t* colview = view_new(id, (r2_t){0, 0, col->size, 35});
     REL(id);
@@ -464,7 +467,7 @@ void ui_editor_popup_remove_str(vec_t* vec, char* str)
     char* val = (char*)vec->data[index];
     if (strcmp(val, str) == 0)
     {
-      vec_rematindex(vec, index);
+      vec_rem_at_index(vec, index);
       return;
     }
   }
@@ -504,7 +507,7 @@ void ui_editor_popup_create_items()
   vec_sort(tmpfields, VSD_DSC, ui_editor_popup_comp_text);
 
   // add remaining fields in tmpfields
-  vec_addinvector(ep.fields, tmpfields);
+  vec_add_in_vector(ep.fields, tmpfields);
 
   REL(tmpfields); // REL 0
   REL(tmpmap);    // REL 1
