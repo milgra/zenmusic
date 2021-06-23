@@ -46,10 +46,13 @@ void ui_manager_init(int width, int height)
 
 void ui_manager_destroy()
 {
-  REL(uim.root); // REL 0
   REL(uim.views);
   REL(uim.implqueue);
   REL(uim.explqueue);
+
+  view_desc(uim.root, 0);
+
+  REL(uim.root); // REL 0
 
   ui_generator_destroy(); // destroy
 }

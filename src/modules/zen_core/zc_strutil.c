@@ -3,7 +3,6 @@
 
 #include "zc_string.c"
 
-// TODO this should be void
 str_t* str_new_replace(str_t* string, str_t* newstring, int start, int end);
 void   str_new_replace_codepoints(str_t* string, uint32_t oldcp, uint32_t newcp);
 vec_t* str_split(str_t* string, char character);

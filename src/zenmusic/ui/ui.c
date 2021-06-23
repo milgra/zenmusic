@@ -37,7 +37,8 @@ void ui_destroy();
 #include "wm_connector.c"
 #include "zc_number.c"
 
-view_t* ui_view_list;
+view_t* view_base;
+vec_t*  view_list;
 
 void ui_on_button_down(void* userdata, void* data);
 void ui_on_key_down(void* userdata, void* data);
@@ -52,8 +53,10 @@ void ui_init(float width, float height)
 
   // view setup with existing callbacks
 
-  vec_t*  view_list = view_gen_load(config_get("html_path"), config_get("css_path"), config_get("res_path"), callbacks_get_data()); // REL 0
-  view_t* view_base = vec_head(view_list);
+  view_list = view_gen_load(config_get("html_path"), config_get("css_path"), config_get("res_path"), callbacks_get_data()); // REL 0
+  view_base = vec_head(view_list);
+
+  view_desc(view_base, 0);
 
   // initial layout of views
 
@@ -97,7 +100,7 @@ void ui_init(float width, float height)
 
   // finally attach and remove popups, it removes views so it has to be the last command
 
-  ui_popup_switcher_attach(view_base);
+  ui_popup_switcher_attach(view_base); // DETACH 15
 
   // show texture map for debug
 
@@ -116,9 +119,8 @@ void ui_init(float width, float height)
   /* header->texture.blur = 1; */
   /* header->texture.shadow = 1; */
 
-  REL(view_list); // REL 0
-  REL(key_cb);    // REL 1
-  REL(but_cb);    // REL 2
+  REL(key_cb); // REL 1
+  REL(but_cb); // REL 2
 }
 
 void ui_destroy()
@@ -140,8 +142,11 @@ void ui_destroy()
   ui_settings_popup_detach();   // DETACH 12
   ui_song_menu_popup_detach();  // DETACH 13
   ui_inputfield_popup_detach(); // DETACH 14
+  ui_popup_switcher_detach();   // DETACH 15
 
   ui_manager_destroy(); // DESTROY 0
+
+  REL(view_list);
 
   text_destroy(); // DESTROY 0
 }

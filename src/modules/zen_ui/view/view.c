@@ -231,8 +231,6 @@ void view_set_masked(view_t* view, char masked)
 
 void view_add(view_t* view, view_t* subview)
 {
-  resend = 1;
-
   for (int i = 0; i < view->views->length; i++)
   {
     view_t* sview = view->views->data[i];
@@ -242,6 +240,8 @@ void view_add(view_t* view, view_t* subview)
       return;
     }
   }
+
+  resend = 1;
 
   VADD(view->views, subview);
   subview->parent = view;
@@ -432,13 +432,14 @@ void view_gen_texture(view_t* view)
 void view_desc(void* pointer, int level)
 {
   view_t* view = (view_t*)pointer;
-  printf("%*.sid %s frame %.1f %.1f %.1f %.1f tex %i\n", level, " ",
+  printf("%*.sid %s frame %.1f %.1f %.1f %.1f tex %i ret %zx\n", level, " ",
          view->id,
          view->frame.local.x,
          view->frame.local.y,
          view->frame.local.w,
          view->frame.local.h,
-         view->texture.page);
+         view->texture.page,
+         mem_retaincount(view));
 
   for (int i = 0; i < view->views->length; i++)
   {

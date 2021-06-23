@@ -144,8 +144,8 @@ void tg_knob_gen(view_t* view)
 void tg_knob_del(void* p)
 {
   tg_knob_t* tg = p;
-  REL(tg->back);
-  REL(tg->fore);
+  if (tg->back) REL(tg->back);
+  if (tg->fore) REL(tg->fore);
 }
 
 void tg_knob_add(view_t* view)

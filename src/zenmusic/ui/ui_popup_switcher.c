@@ -64,6 +64,14 @@ void ui_popup_switcher_attach(view_t* baseview)
 
 void ui_popup_switcher_detach()
 {
+  vec_t* views = VNEW();
+  map_values(ups.popup_views, views);
+  for (int index = 0; index < views->length; index++)
+  {
+    view_add(ups.baseview, views->data[index]);
+  }
+  REL(views);
+
   REL(ups.popup_names);
   REL(ups.popup_views);
 }

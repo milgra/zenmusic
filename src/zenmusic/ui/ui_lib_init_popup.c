@@ -80,6 +80,12 @@ void ui_lib_init_popup_attach(view_t* baseview)
 
 void ui_lib_init_popup_detach()
 {
+  if (ulip.view->parent)
+  {
+    ui_manager_remove(ulip.view);
+    ui_manager_add(ulip.baseview);
+  }
+  view_add(ulip.baseview, ulip.view);
 }
 
 void ui_lib_init_popup_set_library(view_t* view)

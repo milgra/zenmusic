@@ -253,10 +253,14 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
     tag_t t = *tags;
     if (t.id.len > 0)
     {
-      char* id = mem_calloc(sizeof(char) * t.id.len + 1, "char*", NULL, NULL);
+      char* id = mem_calloc(sizeof(char) * t.id.len + 1, "char*", NULL, NULL); // REL 0
+
       memcpy(id, html + t.id.pos + 1, t.id.len);
-      view_t* view = view_new(id, (r2_t){0});
+
+      view_t* view = view_new(id, (r2_t){0}); // REL 1
+
       VADD(views, view);
+
       if (t.level > 0) // add view to paernt
       {
         view_t* parent = views->data[t.parent];
@@ -312,7 +316,8 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
         }
       }
 
-      REL(id);
+      REL(id);   // REL 0
+      REL(view); // REL 1
     }
     else
     {
