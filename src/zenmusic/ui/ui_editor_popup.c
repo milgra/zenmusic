@@ -122,7 +122,7 @@ void ui_editor_popup_attach(view_t* view)
   frame.y    = 0;
 
   view_set_frame(textinput, frame);
-  view_remove(view_get_subview(view, "song_editor_list_back"), textinput);
+  view_remove_from_parent(textinput);
 
   ts.autosize = AS_AUTO;
 

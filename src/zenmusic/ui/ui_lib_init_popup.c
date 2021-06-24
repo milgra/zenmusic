@@ -73,7 +73,7 @@ void ui_lib_init_popup_attach(view_t* baseview)
 
   vh_textinput_set_on_return(vh_textinput_scroller_get_input_view(textinput_scroller), ui_lib_init_popup_set_library);
 
-  view_remove(baseview, ulip.view);
+  view_remove_from_parent(ulip.view);
 
   REL(cb_btn_press);
 }
@@ -85,7 +85,7 @@ void ui_lib_init_popup_detach()
     ui_manager_remove(ulip.view);
     ui_manager_add(ulip.baseview);
   }
-  view_add(ulip.baseview, ulip.view);
+  view_add_subview(ulip.baseview, ulip.view);
 }
 
 void ui_lib_init_popup_set_library(view_t* view)

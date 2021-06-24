@@ -220,11 +220,11 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
   char* html = html_read(htmlpath);
   char* css  = html_read(csspath);
 
-  tag_t*  view_structure = html_new_parse_html(html);
-  prop_t* view_styles    = html_new_parse_css(css);
+  tag_t*  view_structure = html_new_parse_html(html); // REL 0
+  prop_t* view_styles    = html_new_parse_css(css);   // REL 1
 
   // create style map
-  map_t*  styles = MNEW();
+  map_t*  styles = MNEW(); // REL 2
   prop_t* props  = view_styles;
   while ((*props).class.len > 0)
   {
@@ -265,7 +265,7 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
       {
         view_t* parent = views->data[t.parent];
         //printf("parent %i %i\n", t.parent, views->length);
-        view_add(parent, view);
+        view_add_subview(parent, view);
       }
 
       char cssid[100] = {0};
@@ -327,6 +327,12 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
     }
     tags += 1;
   }
+
+  // cleanup
+
+  REL(view_structure);
+  REL(view_styles);
+  REL(styles);
 
   return views;
 }

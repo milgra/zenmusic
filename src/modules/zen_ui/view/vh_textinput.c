@@ -107,15 +107,17 @@ void vh_textinput_upd(view_t* view)
           r2_t nf = (r2_t){g.x, g.y, g.w, g.h};
           if (f.w == 0 || f.h == 0)
           {
-            bm_t* texture = bm_new(g.w, g.h);
+            bm_t* texture = bm_new(g.w, g.h); // REL 0
 
             text_render_glyph(g, data->style, texture);
 
             view_set_texture_bmp(gv, texture);
 
+            REL(texture);
+
             gv->exclude = 0; // do we have to have 0 as default?!?!
 
-            view_add(view, gv);
+            view_add_subview(view, gv);
 
             view_set_frame(gv, nf);
 
@@ -258,7 +260,7 @@ void vh_textinput_activate(view_t* view, char state)
 void vh_textinput_on_glyph_close(view_t* view, void* userdata)
 {
   view_t* textview = userdata;
-  view_remove(textview, view);
+  view_remove_from_parent(view);
 }
 
 void vh_textinput_evt(view_t* view, ev_t ev)
@@ -390,7 +392,7 @@ void vh_textinput_add(view_t*     view,
   vh_anim_add(data->cursor_v);
 
   view_set_texture_alpha(data->cursor_v, 0.0, 1);
-  view_add(view, data->cursor_v);
+  view_add_subview(view, data->cursor_v);
 
   // placeholder
 
@@ -406,7 +408,7 @@ void vh_textinput_add(view_t*     view,
 
   data->holder_v->blocks_touch = 0;
 
-  view_add(view, data->holder_v);
+  view_add_subview(view, data->holder_v);
 
   // view setup
 
@@ -457,7 +459,7 @@ void vh_textinput_set_text(view_t* view, char* text)
   {
     view_t* gv = data->glyph_v->data[i];
 
-    view_remove(view, gv);
+    view_remove_from_parent(gv);
 
     /* r2_t sf = gv->frame.local; */
     /* r2_t ef = sf; */

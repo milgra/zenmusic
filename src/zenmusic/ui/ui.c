@@ -45,7 +45,8 @@ void ui_on_key_down(void* userdata, void* data);
 
 void ui_init(float width, float height)
 {
-  text_init(); // DESTROY 0
+  text_init();                    // DESTROY 0
+  ui_manager_init(width, height); // DESTROY 1
 
   // callbacks setup for simple buttons
 
@@ -63,9 +64,6 @@ void ui_init(float width, float height)
   view_set_frame(view_base, (r2_t){0.0, 0.0, (float)width, (float)height});
   view_layout(view_base);
 
-  // setup ui manager
-
-  ui_manager_init(width, height); // DESTROY 0
   ui_manager_add(view_base);
 
   // attach ui components
@@ -144,7 +142,7 @@ void ui_destroy()
   ui_inputfield_popup_detach(); // DETACH 14
   ui_popup_switcher_detach();   // DETACH 15
 
-  ui_manager_destroy(); // DESTROY 0
+  ui_manager_destroy(); // DESTROY 1
 
   REL(view_list);
 

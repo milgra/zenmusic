@@ -142,9 +142,11 @@ struct _view_t
 };
 
 view_t* view_new(char* id, r2_t frame);
-void    view_add(view_t* view, view_t* subview);
-void    view_insert(view_t* view, view_t* subview, uint32_t index);
-void    view_remove(view_t* view, view_t* subview);
+void    view_add_subview(view_t* view, view_t* subview);
+void    view_remove_subiew(view_t* view, view_t* subview);
+void    view_insert_subview(view_t* view, view_t* subview, uint32_t index);
+void    view_remove_from_parent(view_t* view);
+void    view_set_parent(view_t* view, view_t* parent);
 
 void    view_evt(view_t* view, ev_t ev); /* general event, sending to all views */
 void    view_coll_touched(view_t* view, ev_t ev, vec_t* queue);
@@ -170,15 +172,16 @@ extern char resend;
 
 #if __INCLUDE_LEVEL__ == 0
 
+#include "views.c"
 #include "zc_cstring.c"
 #include "zc_memory.c"
 #include <limits.h>
 
-char resend = 1;
-
 void view_del(void* pointer)
 {
   view_t* view = (view_t*)pointer;
+
+  printf("del %s\n", view->id);
 
   if (view->layout.background_image != NULL) REL(view->layout.background_image);
 
@@ -216,6 +219,10 @@ view_t* view_new(char* id, r2_t frame)
   view->layout.bottom        = INT_MAX;
   view->layout.shadow_color  = 0x00000033;
 
+  // store and release
+
+  VADD(views.list, view);
+
   return view;
 }
 
@@ -229,7 +236,7 @@ void view_set_masked(view_t* view, char masked)
   }
 }
 
-void view_add(view_t* view, view_t* subview)
+void view_add_subview(view_t* view, view_t* subview)
 {
   for (int i = 0; i < view->views->length; i++)
   {
@@ -241,19 +248,20 @@ void view_add(view_t* view, view_t* subview)
     }
   }
 
-  resend = 1;
+  views.arrange = 1;
+
+  view_set_parent(subview, view);
 
   VADD(view->views, subview);
-  subview->parent = view;
 
   if (view->layout.masked) view_set_masked(subview, 1);
 
   view_calc_global(view);
 }
 
-void view_insert(view_t* view, view_t* subview, uint32_t index)
+void view_insert_subview(view_t* view, view_t* subview, uint32_t index)
 {
-  resend = 1;
+  views.arrange = 1;
 
   for (int i = 0; i < view->views->length; i++)
   {
@@ -266,20 +274,35 @@ void view_insert(view_t* view, view_t* subview, uint32_t index)
   }
 
   vec_ins(view->views, subview, index);
-  subview->parent = view;
+
+  view_set_parent(subview, view);
 
   if (view->layout.masked) view_set_masked(subview, 1);
 
   view_calc_global(view);
 }
 
-void view_remove(view_t* view, view_t* subview)
+void view_remove_subview(view_t* view, view_t* subview)
 {
-  resend = 1;
+  char success = VREM(view->views, subview);
 
-  VREM(view->views, subview);
+  if (success == 1)
+  {
+    views.arrange = 1;
+    view_set_parent(subview, NULL);
+  }
+}
 
-  subview->parent = NULL;
+void view_remove_from_parent(view_t* view)
+{
+  if (view->parent) view_remove_subview(view->parent, view);
+}
+
+void view_set_parent(view_t* view, view_t* parent)
+{
+  if (view->parent) REL(view->parent);
+  view->parent = parent;
+  if (view->parent) RET(view->parent);
 }
 
 void view_coll_touched(view_t* view, ev_t ev, vec_t* queue)

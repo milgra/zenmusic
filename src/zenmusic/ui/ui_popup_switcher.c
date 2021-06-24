@@ -56,7 +56,7 @@ void ui_popup_switcher_attach(view_t* baseview)
     vh_anim_set_event(page_view, page_view, ui_popup_switcher_remove);
     vh_touch_add(btn_view, cb_new(ui_popup_switcher_on_button_down, NULL));
 
-    view_remove(ups.baseview, page_view);
+    view_remove_from_parent(page_view);
 
     MPUT(ups.popup_views, name, page_view);
   }
@@ -68,7 +68,7 @@ void ui_popup_switcher_detach()
   map_values(ups.popup_views, views);
   for (int index = 0; index < views->length; index++)
   {
-    view_add(ups.baseview, views->data[index]);
+    view_add_subview(ups.baseview, views->data[index]);
   }
   REL(views);
 
@@ -78,7 +78,7 @@ void ui_popup_switcher_detach()
 
 void ui_popup_switcher_remove(view_t* view, void* userdata)
 {
-  if (view->texture.alpha < 1.0) view_remove(ups.baseview, view);
+  if (view->texture.alpha < 1.0) view_remove_from_parent(view);
 }
 
 void ui_popup_switcher_on_button_down(void* userdata, void* data)
@@ -120,7 +120,7 @@ void ui_popup_switcher_toggle_baseview(view_t* view)
     viewf.y    = (basef.h - viewf.h) / 2;
     view_set_frame(popview, viewf);
 
-    view_add(ups.baseview, view);
+    view_add_subview(ups.baseview, view);
     view->texture.alpha = 0.0;
     vh_anim_alpha(view, 0.0, 1.0, 20, AT_LINEAR);
   }

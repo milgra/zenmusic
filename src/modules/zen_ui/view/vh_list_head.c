@@ -103,8 +103,8 @@ void vh_lhead_evt(view_t* view, ev_t ev)
           vh->dragged_pos  = ev.x - f.x;
           vh->dragged_ind  = i;
         }
-        view_remove(view, cell->view);
-        view_add(view, cell->view);
+        view_remove_from_parent(cell->view);
+        view_add_subview(view, cell->view);
         break;
       }
     }
@@ -197,7 +197,7 @@ void vh_lhead_add_cell(view_t* view, char* id, int size, view_t* cellview)
   cellview->needs_touch = 0;
 
   // add subview
-  view_add(view, cellview);
+  view_add_subview(view, cellview);
 
   // store cell
   VADD(vh->cells, cell);

@@ -66,8 +66,8 @@ void vh_textinput_scroller_add(view_t*     view,
   data->input_txt_v = input_txt_v;
   data->clear_btn_v = clear_btn_v;
 
-  RET(input_txt_v);               // retain input view
-  view_remove(view, input_txt_v); // remove input txt view, list view will add it as row
+  RET(input_txt_v);                     // retain input view
+  view_remove_from_parent(input_txt_v); // remove input txt view, list view will add it as row
 
   view->handler_data = data;
 

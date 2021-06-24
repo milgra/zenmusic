@@ -174,7 +174,7 @@ void vh_list_evt(view_t* view, ev_t ev)
         {
           VADD(vh->items, item);
 
-          view_insert(view, item, 0);
+          view_insert_subview(view, item, 0);
 
           view_set_frame(item, (r2_t){0, vh->head_pos, item->frame.local.w, item->frame.local.h});
 
@@ -198,7 +198,7 @@ void vh_list_evt(view_t* view, ev_t ev)
           {
             vec_ins(vh->items, item, 0);
 
-            view_insert(view, item, 0);
+            view_insert_subview(view, item, 0);
 
             vh->full     = 0;                    // there is probably more to come
             vh->item_wth = item->frame.global.w; // store maximum width
@@ -224,7 +224,7 @@ void vh_list_evt(view_t* view, ev_t ev)
           {
             VADD(vh->items, item);
 
-            view_insert(view, item, 0);
+            view_insert_subview(view, item, 0);
 
             vh->full     = 0;                    // there is probably more to come
             vh->item_wth = item->frame.global.w; // store maximum width
@@ -250,14 +250,14 @@ void vh_list_evt(view_t* view, ev_t ev)
           {
             VREM(vh->items, head);
             vh->head_index += 1;
-            view_remove(view, head);
+            view_remove_from_parent(head);
             if (vh->item_recycle) (*vh->item_recycle)(head);
           }
           if (tail->frame.local.y > view->frame.local.h + PRELOAD_DISTANCE && vh->items->length > 1)
           {
             VREM(vh->items, tail);
             vh->tail_index -= 1;
-            view_remove(view, tail);
+            view_remove_from_parent(tail);
             if (vh->item_recycle) (*vh->item_recycle)(tail);
           }
         }
@@ -455,7 +455,7 @@ void vh_list_reset(view_t* view)
   for (int index = 0; index < vh->items->length; index++)
   {
     view_t* item = vh->items->data[index];
-    view_remove(view, item);
+    view_remove_from_parent(item);
     if (vh->item_recycle) (*vh->item_recycle)(item);
   }
 
@@ -475,7 +475,7 @@ void vh_list_refresh(view_t* view)
   {
     view_t* item = vh->items->data[index];
     if (index == 0) vh->head_pos = item->frame.local.y;
-    view_remove(view, item);
+    view_remove_from_parent(item);
     if (vh->item_recycle) (*vh->item_recycle)(item);
   }
 
@@ -533,8 +533,8 @@ void vh_list_add(view_t*         view,
   vh_sbar_add(vscr, SBAR_V, 30, 10, vh_list_scroll_v, view);
   vh_sbar_add(hscr, SBAR_H, 30, 10, vh_list_scroll_h, view);
 
-  view_add(view, vscr);
-  view_add(view, hscr);
+  view_add_subview(view, vscr);
+  view_add_subview(view, hscr);
 
   vh->vscr = vscr;
   vh->hscr = hscr;
@@ -564,14 +564,14 @@ void vh_list_set_header(view_t* view, view_t* headerview)
 
   if (vh->header != NULL)
   {
-    view_remove(view, vh->header);
+    view_remove_from_parent(vh->header);
     REL(vh->header);
   }
   RET(headerview);
   vh->header = headerview;
 
   // add as subview before scrollers
-  view_insert(view, headerview, 0);
+  view_insert_subview(view, headerview, 0);
 
   vh->head_pos = headerview->frame.local.h;
 }

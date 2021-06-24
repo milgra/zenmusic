@@ -106,7 +106,7 @@ void vh_litem_add_cell(view_t* view, char* id, int size, view_t* cellview)
   view_set_block_touch(cellview, 0, 1);
 
   // add subview
-  view_add(view, cellview);
+  view_add_subview(view, cellview);
 
   // store cell
   VADD(vh->cells, cell);
@@ -137,8 +137,8 @@ void vh_litem_rpl_cell(view_t* view, char* id, view_t* newcell)
     vh_lcell_t* cell = vh->cells->data[index];
     if (strcmp(cell->id, id) == 0)
     {
-      view_add(view, newcell);
-      view_remove(view, cell->view);
+      view_add_subview(view, newcell);
+      view_remove_from_parent(cell->view);
 
       cell->view = newcell;
       break;

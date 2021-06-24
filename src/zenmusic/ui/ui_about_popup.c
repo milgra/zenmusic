@@ -146,7 +146,7 @@ view_t* donateitem_new(int index)
       char*   imagepath                = cstr_new_format(100, "%s/freebsd.png", respath); // REL 4
       imgview->layout.background_image = imagepath;
       tg_css_add(imgview);
-      view_add(cellview, imgview);
+      view_add_subview(cellview, imgview);
 
       REL(imgview);
 

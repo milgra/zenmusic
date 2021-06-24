@@ -21,6 +21,7 @@ void    ui_manager_resize_to_root(view_t* view);
 
 #include "ui_generator.c"
 #include "view_layout.c"
+#include "views.c"
 #include "zc_map.c"
 #include "zc_vector.c"
 #include "zm_math2.c"
@@ -36,6 +37,7 @@ struct _uim_t
 
 void ui_manager_init(int width, int height)
 {
+  views_init();
   ui_generator_init(width, height); // destroy
 
   uim.root      = view_new("root", (r2_t){0, 0, width, height}); // REL 0
@@ -46,13 +48,12 @@ void ui_manager_init(int width, int height)
 
 void ui_manager_destroy()
 {
+  REL(uim.root); // REL 0
   REL(uim.views);
   REL(uim.implqueue);
   REL(uim.explqueue);
 
-  view_desc(uim.root, 0);
-
-  REL(uim.root); // REL 0
+  views_destroy();
 
   ui_generator_destroy(); // destroy
 }
@@ -178,20 +179,20 @@ void ui_manager_event(ev_t ev)
 void ui_manager_add(view_t* view)
 {
   if (uim.keep_top)
-    view_insert(uim.root, view, uim.root->views->length - 1);
+    view_insert_subview(uim.root, view, uim.root->views->length - 1);
   else
-    view_add(uim.root, view);
+    view_add_subview(uim.root, view);
 }
 
 void ui_manager_add_to_top(view_t* view)
 {
-  view_add(uim.root, view);
+  view_add_subview(uim.root, view);
   uim.keep_top = 1;
 }
 
 void ui_manager_remove(view_t* view)
 {
-  view_remove(uim.root, view);
+  view_remove_from_parent(view);
 }
 
 void ui_manager_activate(view_t* view)
@@ -208,12 +209,12 @@ void ui_manager_collect(view_t* view, vec_t* views)
 
 void ui_manager_render(uint32_t time)
 {
-  if (resend)
+  if (views.arrange == 1)
   {
     vec_reset(uim.views);
     ui_manager_collect(uim.root, uim.views);
     ui_generator_use(uim.views);
-    resend = 0;
+    views.arrange = 0;
   }
   ui_generator_render(time);
 }

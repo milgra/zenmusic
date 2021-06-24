@@ -140,7 +140,7 @@ void ui_songlist_attach(view_t* base)
     dragview->layout.background_color = 0x00000022;
     dragview->layout.right            = 5;
     tg_css_add(dragview);
-    view_add(cellview, dragview);
+    view_add_subview(cellview, dragview);
     dragview->blocks_touch = 0;
 
     vh_lhead_add_cell(header, cell->id, cell->size, cellview);
