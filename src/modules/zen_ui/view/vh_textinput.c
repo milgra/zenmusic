@@ -354,6 +354,7 @@ void vh_textinput_del(void* p)
   REL(vh->text_s);
   REL(vh->glyph_v);
   REL(vh->cursor_v);
+  REL(vh->holder_v);
 }
 
 void vh_textinput_add(view_t*     view,
@@ -396,14 +397,17 @@ void vh_textinput_add(view_t*     view,
 
   // placeholder
 
-  textstyle_t phts             = textstyle;
-  phts.align                   = TA_CENTER;
-  phts.textcolor               = 0x888888FF;
-  data->holder_v               = view_new(id_h, (r2_t){0, 0, view->frame.local.w, view->frame.local.h});
+  textstyle_t phts = textstyle;
+  phts.align       = TA_CENTER;
+  phts.textcolor   = 0x888888FF;
+
+  data->holder_v               = view_new(id_h, (r2_t){0, 0, view->frame.local.w, view->frame.local.h}); // REL 0
   data->holder_v->layout.w_per = 1.0;
   data->holder_v->layout.h_per = 1.0;
+
   tg_text_add(data->holder_v);
   tg_text_set(data->holder_v, phtext, phts);
+
   vh_anim_add(data->holder_v);
 
   data->holder_v->blocks_touch = 0;
