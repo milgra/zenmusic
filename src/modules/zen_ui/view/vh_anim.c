@@ -267,7 +267,7 @@ void vh_anim_finish(view_t* view)
 
 void vh_anim_add(view_t* view)
 {
-  vh_anim_t* vh = mem_calloc(sizeof(vh_anim_t), "vh_anim", NULL, NULL);
+  vh_anim_t* vh = CAL(sizeof(vh_anim_t), NULL, NULL);
 
   view->handler      = vh_anim_evt;
   view->handler_data = vh;

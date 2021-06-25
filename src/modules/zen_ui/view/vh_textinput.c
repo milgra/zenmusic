@@ -223,7 +223,7 @@ void vh_textinput_upd(view_t* view)
 
 void vh_textinput_activate(view_t* view, char state)
 {
-  assert(view && view->handler_data != NULL && strcmp(mem_type(view->handler_data), "vh_text") == 0);
+  assert(view && view->handler_data != NULL);
 
   vh_textinput_t* data = view->handler_data;
 
@@ -368,7 +368,7 @@ void vh_textinput_add(view_t*     view,
   char* id_c = cstr_new_format(100, "%s%s", view->id, "crsr");   // REL 0
   char* id_h = cstr_new_format(100, "%s%s", view->id, "holder"); // REL 1
 
-  vh_textinput_t* data = mem_calloc(sizeof(vh_textinput_t), "vh_text", NULL, NULL);
+  vh_textinput_t* data = CAL(sizeof(vh_textinput_t), NULL, NULL);
 
   textstyle.backcolor = 0;
 

@@ -60,11 +60,11 @@ void map_test(void);
 
 map_t* map_new()
 {
-  map_t* map = mem_calloc(sizeof(map_t), "map_t", map_dealloc, map_describe);
+  map_t* map = CAL(sizeof(map_t), map_dealloc, map_describe);
 
   map->count_real = 10;
   map->count      = 0;
-  map->buckets    = mem_calloc(map->count_real * sizeof(bucket_t), "bucket_t*", NULL, NULL);
+  map->buckets    = CAL(map->count_real * sizeof(bucket_t), NULL, NULL);
 
   if (map->buckets == NULL)
   {
@@ -122,7 +122,7 @@ void map_reset(map_t* map)
 
   map->count_real = 10;
   map->count      = 0;
-  map->buckets    = mem_calloc(map->count_real * sizeof(bucket_t), "bucket_t*", NULL, NULL);
+  map->buckets    = CAL(map->count_real * sizeof(bucket_t), NULL, NULL);
 }
 
 /* resizes map */
@@ -131,10 +131,10 @@ void map_resize(map_t* map)
 {
   // create new map
 
-  map_t* newmap      = mem_calloc(sizeof(map_t), "map_t", map_dealloc, map_describe);
+  map_t* newmap      = CAL(sizeof(map_t), map_dealloc, map_describe);
   newmap->count_real = map->count_real * 2;
   newmap->count      = 0;
-  newmap->buckets    = mem_calloc(newmap->count_real * sizeof(bucket_t), "bucket_t*", NULL, NULL);
+  newmap->buckets    = CAL(newmap->count_real * sizeof(bucket_t), NULL, NULL);
 
   // put old values in new map
 
@@ -235,7 +235,7 @@ int map_put(map_t* map, const char* key, void* value)
     // the bucket is empty, lazily allocate space for a single
     // key-value pair.
 
-    bucket->pairs = mem_calloc(sizeof(pair_t), "pair_t*", NULL, NULL);
+    bucket->pairs = CAL(sizeof(pair_t), NULL, NULL);
     if (bucket->pairs == NULL) return 0;
     bucket->count = 1;
   }
@@ -253,7 +253,7 @@ int map_put(map_t* map, const char* key, void* value)
   // get the last pair in the chain for the bucket
 
   pair        = &(bucket->pairs[bucket->count - 1]);
-  pair->key   = mem_calloc((strlen(key) + 1) * sizeof(char), "char*", NULL, NULL);
+  pair->key   = CAL((strlen(key) + 1) * sizeof(char), NULL, NULL);
   pair->value = value;
 
   map->count += 1;

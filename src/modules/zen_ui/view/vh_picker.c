@@ -46,7 +46,7 @@ void vh_picker_del(void* p)
 
 void vh_picker_add(view_t* view, cb_t* on_press)
 {
-  vh_picker_t* vh = mem_calloc(sizeof(vh_picker_t), "vh_picker", NULL, NULL);
+  vh_picker_t* vh = CAL(sizeof(vh_picker_t), NULL, NULL);
 
   vh->on_press = on_press;
 

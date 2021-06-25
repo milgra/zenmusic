@@ -155,7 +155,7 @@ void ui_compositor_add(char* id,
   // fill up cache if needed
   if (uic.cache_ind + 1 > uic.cache->length)
   {
-    crect_t* rect = mem_calloc(sizeof(crect_t), "crect_t", crect_del, NULL); // REL 0
+    crect_t* rect = CAL(sizeof(crect_t), crect_del, NULL); // REL 0
     VADD(uic.cache, rect);
     REL(rect); // REL 0
   }

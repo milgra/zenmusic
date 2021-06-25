@@ -27,7 +27,7 @@ void log_set_proxy(void (*proxy)(char*))
 void log_log(char* fmt, ...)
 {
   va_list arglist;
-  char*   str = mem_calloc(LOG_SIZE, "char*", NULL, NULL);
+  char*   str = CAL(LOG_SIZE, NULL, NULL);
   va_start(arglist, fmt);
   vsnprintf(str, LOG_SIZE, fmt, arglist);
   va_end(arglist);

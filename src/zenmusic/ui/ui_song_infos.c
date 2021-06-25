@@ -94,7 +94,7 @@ void ui_song_infos_show(int index)
   int   sr     = atoi(sample);
   int   br     = atoi(bit);
 
-  char* infostr = mem_calloc(100, "char*", NULL, NULL); // REL 0
+  char* infostr = CAL(100, NULL, NULL); // REL 0
 
   snprintf(infostr, 100, "%s\n%s\n%s/%iKHz/%iKbit/%s channels",
            (char*)MGET(songmap, "meta/title"),

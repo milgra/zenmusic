@@ -38,13 +38,13 @@ void bm_del(void* pointer)
 
 bm_t* bm_new(int the_w, int the_h)
 {
-  bm_t* bm = mem_calloc(sizeof(bm_t), "zc_bitmap", bm_del, bm_describe); // REL 0
+  bm_t* bm = CAL(sizeof(bm_t), bm_del, bm_describe); // REL 0
 
   bm->w = the_w;
   bm->h = the_h;
 
   bm->size = 4 * the_w * the_h;
-  bm->data = mem_calloc(bm->size * sizeof(unsigned char), "uint8_t*", NULL, NULL); // REL 1
+  bm->data = CAL(bm->size * sizeof(unsigned char), NULL, NULL); // REL 1
 
   return bm;
 }

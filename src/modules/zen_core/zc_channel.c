@@ -48,10 +48,10 @@ void ch_del(void* pointer)
 
 ch_t* ch_new(uint32_t size)
 {
-  ch_t* ch = mem_calloc(sizeof(ch_t), "zc_channel", ch_del, NULL);
+  ch_t* ch = CAL(sizeof(ch_t), ch_del, NULL);
 
-  ch->flags = mem_calloc(sizeof(char) * size, "char*", NULL, NULL);
-  ch->boxes = mem_calloc(sizeof(void*) * size, "void**", NULL, NULL);
+  ch->flags = CAL(sizeof(char) * size, NULL, NULL);
+  ch->boxes = CAL(sizeof(void*) * size, NULL, NULL);
   ch->size  = size;
   ch->rpos  = 0;
   ch->wpos  = 0;
@@ -110,7 +110,7 @@ void send_test(ch_t* ch)
   uint32_t counter = 0;
   while (1)
   {
-    uint32_t* number = mem_calloc(sizeof(uint32_t), "uint32_t", NULL, NULL);
+    uint32_t* number = CAL(sizeof(uint32_t), NULL, NULL);
     *number          = counter;
     char success     = ch_send(ch, number);
     if (success == 0)
@@ -154,7 +154,7 @@ ch_t** testarray;
 
 void ch_test()
 {
-  testarray = mem_calloc(sizeof(ch_t) * kChTestThreads, "ch_t**", NULL, NULL);
+  testarray = CAL(sizeof(ch_t) * kChTestThreads, NULL, NULL);
 
   for (int index = 0; index < kChTestThreads; index++)
   {

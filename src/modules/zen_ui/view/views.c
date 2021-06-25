@@ -49,7 +49,7 @@ void views_destroy()
     if (mem_retaincount(view) == 1) count++;
   }
 
-  // views_describe();
+  views_describe();
 
   // release list
   REL(views.list);

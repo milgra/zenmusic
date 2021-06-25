@@ -22,21 +22,21 @@ num_t* num_new_uint32(uint32_t val);
 
 num_t* num_new_float(float val)
 {
-  num_t* res  = mem_calloc(sizeof(num_t), "num_t", NULL, NULL);
+  num_t* res  = CAL(sizeof(num_t), NULL, NULL);
   res->floatv = val;
   return res;
 }
 
 num_t* num_new_int(int val)
 {
-  num_t* res = mem_calloc(sizeof(num_t), "num_t", NULL, NULL);
+  num_t* res = CAL(sizeof(num_t), NULL, NULL);
   res->intv  = val;
   return res;
 }
 
 num_t* num_new_uint32(uint32_t val)
 {
-  num_t* res   = mem_calloc(sizeof(num_t), "num_t", NULL, NULL);
+  num_t* res   = CAL(sizeof(num_t), NULL, NULL);
   res->uint32v = val;
   return res;
 }

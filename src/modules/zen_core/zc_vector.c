@@ -60,8 +60,8 @@ void vec_del(void* vector);
 
 vec_t* vec_new()
 {
-  vec_t* vector       = mem_calloc(sizeof(vec_t), "vec_t", vec_del, vec_describe);
-  vector->data        = mem_calloc(sizeof(void*) * 10, "void**", NULL, NULL);
+  vec_t* vector       = CAL(sizeof(vec_t), vec_del, vec_describe);
+  vector->data        = CAL(sizeof(void*) * 10, NULL, NULL);
   vector->length      = 0;
   vector->length_real = 10;
   return vector;
@@ -296,12 +296,12 @@ void vec_sort_ins(mtvn_t* node, void* data, vsdir_t dir, int (*comp)(void* left,
 
     if (smaller)
     {
-      if (node->l == NULL) node->l = mem_calloc(sizeof(mtvn_t), "mtvn_t", NULL, NULL);
+      if (node->l == NULL) node->l = CAL(sizeof(mtvn_t), NULL, NULL);
       vec_sort_ins(node->l, data, dir, comp);
     }
     else
     {
-      if (node->r == NULL) node->r = mem_calloc(sizeof(mtvn_t), "mtvn_t", NULL, NULL);
+      if (node->r == NULL) node->r = CAL(sizeof(mtvn_t), NULL, NULL);
       vec_sort_ins(node->r, data, dir, comp);
     }
   }
@@ -325,7 +325,7 @@ void vec_sort_ord(mtvn_t* node, vec_t* vector, int* index)
 
 void vec_sort(vec_t* vector, vsdir_t dir, int (*comp)(void* left, void* right))
 {
-  mtvn_t* node = mem_calloc(sizeof(mtvn_t), "mtvn_t", NULL, NULL);
+  mtvn_t* node = CAL(sizeof(mtvn_t), NULL, NULL);
   for (int index = 0; index < vector->length; index++)
   {
     vec_sort_ins(node, vector->data[index], dir, comp);

@@ -46,7 +46,7 @@ void vh_textinput_scroller_add(view_t*     view,
                                textstyle_t textstyle,
                                void*       userdata)
 {
-  vh_textinput_scroller_t* data = mem_calloc(sizeof(vh_textinput_scroller_t), "vh_textinput_scroller", NULL, NULL);
+  vh_textinput_scroller_t* data = CAL(sizeof(vh_textinput_scroller_t), NULL, NULL);
 
   assert(view->views->length == 3);
 

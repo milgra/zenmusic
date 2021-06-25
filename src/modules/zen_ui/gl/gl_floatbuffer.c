@@ -26,8 +26,8 @@ void  fb_add(fb_t* fb, GLfloat* data, size_t count);
 
 fb_t* fb_new()
 {
-  fb_t* fb = mem_calloc(sizeof(fb_t), "fb_t", fb_del, NULL);
-  fb->data = mem_calloc(sizeof(GLfloat) * 10, "GLfloat*", NULL, NULL);
+  fb_t* fb = CAL(sizeof(fb_t), fb_del, NULL);
+  fb->data = CAL(sizeof(GLfloat) * 10, NULL, NULL);
   fb->pos  = 0;
   fb->cap  = 10;
 

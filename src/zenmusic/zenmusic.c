@@ -262,6 +262,8 @@ void destroy()
   if (zm.res_par) REL(zm.res_par); // REL 1
   if (zm.rec_par) REL(zm.rec_par); // REL 2
   if (zm.rep_par) REL(zm.rep_par); // REL 3
+
+  // mem_stats();
 }
 
 void load_library()

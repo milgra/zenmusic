@@ -50,7 +50,7 @@ void vh_lhead_resize(view_t* view);
 
 void vh_lhead_add(view_t* view)
 {
-  vh_lhead_t* vh = mem_calloc(sizeof(vh_lhead_t), "vh_lhead_t", vh_lhead_del, NULL);
+  vh_lhead_t* vh = CAL(sizeof(vh_lhead_t), vh_lhead_del, NULL);
   vh->cells      = VNEW();
 
   view->handler_data = vh;

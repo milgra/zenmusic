@@ -18,7 +18,7 @@ cb_t* cb_new(void (*fp)(void*, void*), void* userdata);
 
 cb_t* cb_new(void (*fp)(void*, void*), void* userdata)
 {
-  cb_t* cb     = mem_calloc(sizeof(cb_t), "zc_callback", NULL, NULL);
+  cb_t* cb     = CAL(sizeof(cb_t), NULL, NULL);
   cb->fp       = fp;
   cb->userdata = userdata;
 

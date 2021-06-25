@@ -497,7 +497,7 @@ void vh_list_add(view_t*         view,
                  void (*item_recycle)(view_t* item),
                  void* userdata)
 {
-  vh_list_t* vh      = mem_calloc(sizeof(vh_list_t), "vh_list", vh_list_del, NULL);
+  vh_list_t* vh      = CAL(sizeof(vh_list_t), vh_list_del, NULL);
   vh->userdata       = userdata;
   vh->items          = VNEW(); // REL 0
   vh->item_for_index = item_for_index;

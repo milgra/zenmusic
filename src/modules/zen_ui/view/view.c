@@ -196,7 +196,7 @@ void view_del(void* pointer)
 
 view_t* view_new(char* id, r2_t frame)
 {
-  view_t* view            = mem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
+  view_t* view            = CAL(sizeof(view_t), view_del, view_desc);
   view->id                = cstr_new_cstring(id);
   view->nth               = view_cnt++;
   view->views             = VNEW();

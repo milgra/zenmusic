@@ -167,7 +167,7 @@ void text_font_load(char* path)
       stbtt_fontinfo font;
       stbtt_InitFont(&font, data, stbtt_GetFontOffsetForIndex(data, 0));
 
-      MPUTR(txt.fonts, path, HEAP(font, "stbtt_fontinfo"));
+      MPUTR(txt.fonts, path, HEAP(font));
 
       printf("Font loaded %s txt.fonts in file %i\n", path, stbtt_GetNumberOfFonts(data));
 

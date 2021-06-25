@@ -47,9 +47,9 @@ tm_t* tm_new(int w, int h)
   int cols = w / 32;
   int rows = h / 32;
 
-  tm_t* tm   = mem_calloc(sizeof(tm_t), "tm_t", tm_del, NULL);
+  tm_t* tm   = CAL(sizeof(tm_t), tm_del, NULL);
   tm->coords = map_new();
-  tm->blocks = mem_calloc(sizeof(char) * cols * rows, "char*", NULL, NULL);
+  tm->blocks = CAL(sizeof(char) * cols * rows, NULL, NULL);
   tm->width  = w;
   tm->height = h;
   tm->cols   = cols;
@@ -161,10 +161,9 @@ int tm_put(tm_t* tm, char* id, int w, int h)
                                               .x   = ncx,
                                               .y   = ncy,
                                               .w   = w,
-                                              .h   = h}),
-                               "float*");
+                                              .h   = h}));
 
-    map_put(tm->coords, id, coords);
+    MPUTR(tm->coords, id, coords);
   }
   else
     return -2; // texmap is full

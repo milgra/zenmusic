@@ -231,7 +231,7 @@ map_t* visible_query_fields(char* text)
     {
       if (visible_nextword(text + i, " is") && key == NULL)
       {
-        key = mem_calloc(i - last + 1, "char", NULL, NULL);
+        key = CAL(i - last + 1, NULL, NULL);
         memcpy(key, text + last, i - last);
         i += 4;
         last = i;
@@ -240,7 +240,7 @@ map_t* visible_query_fields(char* text)
 
       if (visible_nextword(text + i, " and") && val == NULL)
       {
-        val = mem_calloc(i - last + 1, "char", NULL, NULL);
+        val = CAL(i - last + 1, NULL, NULL);
         memcpy(val, text + last, i - last);
         i += 5;
         last = i;
@@ -256,7 +256,7 @@ map_t* visible_query_fields(char* text)
     }
     if (last < i && val == NULL && key != NULL)
     {
-      val = mem_calloc(i - last, "char", NULL, NULL);
+      val = CAL(i - last, NULL, NULL);
       memcpy(val, text + last, i - last);
       printf("val %s\n", val);
 

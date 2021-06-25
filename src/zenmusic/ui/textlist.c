@@ -30,7 +30,7 @@ view_t* textlist_item_for_index(int index, void* data, view_t* listview, int* it
 
 textlist_t* textlist_new(view_t* view, textstyle_t textstyle, void (*on_select)(int))
 {
-  textlist_t* tl = mem_calloc(sizeof(textlist_t), "textlist", textlist_del, NULL);
+  textlist_t* tl = CAL(sizeof(textlist_t), textlist_del, NULL);
 
   tl->view      = view;
   tl->textstyle = textstyle;

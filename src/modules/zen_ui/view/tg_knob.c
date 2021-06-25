@@ -150,7 +150,7 @@ void tg_knob_del(void* p)
 
 void tg_knob_add(view_t* view)
 {
-  tg_knob_t* tg = mem_calloc(sizeof(tg_knob_t), "tg_knob", tg_knob_del, NULL);
+  tg_knob_t* tg = CAL(sizeof(tg_knob_t), tg_knob_del, NULL);
   tg->angle     = 3 * 3.14 / 2;
 
   view->tex_gen_data = tg;

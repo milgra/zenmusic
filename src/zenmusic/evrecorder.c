@@ -77,7 +77,7 @@ void evrec_init_player(char* path)
         if (strcmp(type, "text") == 0) ev.type = EV_TEXT;
         if (strcmp(type, "resize") == 0) ev.type = EV_RESIZE;
 
-        VADDR(rec.events, HEAP(ev, "ev_t"));
+        VADDR(rec.events, HEAP(ev));
 
         done = 1;
       }

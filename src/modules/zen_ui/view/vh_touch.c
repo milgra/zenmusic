@@ -34,7 +34,7 @@ void vh_touch_del(void* p)
 
 void vh_touch_add(view_t* view, cb_t* event)
 {
-  vh_touch_t* vh = mem_calloc(sizeof(vh_touch_t), "vh_touch", vh_touch_del, NULL);
+  vh_touch_t* vh = CAL(sizeof(vh_touch_t), vh_touch_del, NULL);
   vh->event      = event;
 
   if (event) RET(event);

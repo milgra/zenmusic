@@ -330,8 +330,8 @@ int coder_load_metadata_into(const char* path, map_t* map)
 
         if (slash)
         {
-          char* media_type = mem_calloc(strlen(format->mime_type), "char*", NULL, NULL); // REL 0
-          char* container  = mem_calloc(strlen(format->mime_type), "char*", NULL, NULL); // REL 1
+          char* media_type = CAL(strlen(format->mime_type), NULL, NULL); // REL 0
+          char* container  = CAL(strlen(format->mime_type), NULL, NULL); // REL 1
 
           memcpy(media_type, format->mime_type, slash - format->mime_type);
           memcpy(container, slash + 1, strlen(format->mime_type) - (slash - format->mime_type));
@@ -378,7 +378,7 @@ int coder_load_metadata_into(const char* path, map_t* map)
       if (retv >= 0)
       {
         int   dur   = pFormatCtx->duration / 1000000;
-        char* dur_s = mem_calloc(10, "char*", NULL, NULL);
+        char* dur_s = CAL(10, NULL, NULL);
         snprintf(dur_s, 10, "%i:%.2i", (int)dur / 60, dur - (int)(dur / 60) * 60);
         MPUT(map, "file/duration", dur_s);
         REL(dur_s);
@@ -397,9 +397,9 @@ int coder_load_metadata_into(const char* path, map_t* map)
         {
           if (param->codec_type == AVMEDIA_TYPE_AUDIO)
           {
-            char* channels   = mem_calloc(10, "char*", NULL, NULL); // REL 0
-            char* bitrate    = mem_calloc(10, "char*", NULL, NULL); // REL 1
-            char* samplerate = mem_calloc(10, "char*", NULL, NULL); // REL 2
+            char* channels   = CAL(10, NULL, NULL); // REL 0
+            char* bitrate    = CAL(10, NULL, NULL); // REL 1
+            char* samplerate = CAL(10, NULL, NULL); // REL 2
 
             snprintf(channels, 10, "%i", param->channels);
             snprintf(bitrate, 10, "%li", param->bit_rate);

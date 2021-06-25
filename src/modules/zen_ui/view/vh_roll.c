@@ -65,7 +65,7 @@ void vh_roll_del(void* p)
 
 void vh_roll_add(view_t* view, cb_t* roll_in, cb_t* roll_out)
 {
-  vh_roll_t* vh = mem_calloc(sizeof(vh_roll_t), "vh_roll", vh_roll_del, NULL);
+  vh_roll_t* vh = CAL(sizeof(vh_roll_t), vh_roll_del, NULL);
   vh->roll_in   = roll_in;
   vh->roll_out  = roll_out;
 

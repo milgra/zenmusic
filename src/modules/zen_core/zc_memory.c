@@ -7,37 +7,33 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define ALL() mem_test(__FILE__, __LINE__);
-#define RPL(X, Y) mem_replace((void**)&X, Y)
-#define SET(X, Y) X = Y
+#define CAL(X, Y, Z) mem_calloc(X, Y, Z, __FILE__, __LINE__);
 #define RET(X) mem_retain(X)
 #define REL(X) mem_release(X)
-#define HEAP(X, T) mem_stack_to_heap(sizeof(X), T, NULL, NULL, (uint8_t*)&X)
+#define HEAP(X) mem_stack_to_heap(sizeof(X), NULL, NULL, (uint8_t*)&X, __FILE__, __LINE__)
 
 struct mem_head
 {
-  char id[2]; // starting bytes for zc_memory managed memory ranges to detect invalid object during retain/release
-  char type[10];
+  char     id[2]; // starting bytes for zc_memory managed memory ranges to detect invalid object during retain/release
+  uint32_t index; // allocation index for debugging/safety checks
+
   void (*destructor)(void*);
   void (*descriptor)(void*, int);
   size_t retaincount;
 };
 
-void   mem_test(char* file, int line);
-void*  mem_alloc(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*, int));
-void*  mem_calloc(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*, int));
-void*  mem_realloc(void* pointer, size_t size);
-void*  mem_retain(void* pointer);
-char   mem_release(void* pointer);
-char   mem_release_each(void* first, ...);
-size_t mem_retaincount(void* pointer);
-void   mem_replace(void** address, void* data);
-void*  mem_stack_to_heap(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*, int), uint8_t* data);
-char*  mem_type(void* pointer);
-void   mem_describe(void* pointer, int level);
-void   mem_exit(char* text, char* type);
-
-extern uint32_t mem_objects;
+void*    mem_alloc(size_t size, void (*destructor)(void*), void (*descriptor)(void*, int), char* file, int line);
+void*    mem_calloc(size_t size, void (*destructor)(void*), void (*descriptor)(void*, int), char* file, int line);
+void*    mem_realloc(void* pointer, size_t size);
+void*    mem_retain(void* pointer);
+char     mem_release(void* pointer);
+char     mem_release_each(void* first, ...);
+size_t   mem_retaincount(void* pointer);
+void*    mem_stack_to_heap(size_t size, void (*destructor)(void*), void (*descriptor)(void*, int), uint8_t* data, char* file, int line);
+uint32_t mem_index_value(void* pointer);
+void     mem_describe(void* pointer, int level);
+void     mem_exit(char* text, char* file, int line);
+void     mem_stats();
 
 #endif
 
@@ -45,67 +41,79 @@ extern uint32_t mem_objects;
 
 #include <string.h>
 
-uint32_t mem_objects = 0; /* live object counter for debugging */
+/*******DEBUGGING********/
 
-void mem_test(char* file, int line)
-{
-  printf("mem test %s %d\n", file, line);
-}
+#define ZC_MAX_BLOCKS 100000
+
+char*    mem_files[ZC_MAX_BLOCKS] = {0};
+int      mem_lines[ZC_MAX_BLOCKS] = {0};
+uint32_t mem_index                = 0; /* live object counter for debugging */
+
+/************************/
 
 void* mem_alloc(size_t size,                    /* size of data to store */
-                char*  type,                    /* short descriptoon of data to show for describing memory map*/
                 void (*destructor)(void*),      /* optional destructor */
-                void (*descriptor)(void*, int)) /* optional descriptor for describing memory map*/
+                void (*descriptor)(void*, int), /* optional descriptor for describing memory map*/
+                char* file,                     /* caller file name */
+                int   line)                       /* caller file line number */
 {
-  if (size == 0) mem_exit("Ttrying to allocate 0 bytes for", type);
+  if (size == 0) mem_exit("Ttrying to allocate 0 bytes for", file, line);
   uint8_t* bytes = malloc(sizeof(struct mem_head) + size);
-  if (bytes == NULL) mem_exit("Out of RAM \\_(o)_/ for", type);
+  if (bytes == NULL) mem_exit("Out of RAM \\_(o)_/ for", file, line);
 
   struct mem_head* head = (struct mem_head*)bytes;
 
-  head->id[0] = 'm';
-  head->id[1] = 't';
-  memcpy(head->type, type, 9);
+  head->id[0]       = 'z';
+  head->id[1]       = 'c';
+  head->index       = mem_index;
   head->destructor  = destructor;
   head->descriptor  = descriptor;
   head->retaincount = 1;
 
-  mem_objects++;
+  // for leak checking
+  mem_files[mem_index] = file;
+  mem_lines[mem_index] = line;
+  mem_index++;
 
   return bytes + sizeof(struct mem_head);
 }
 
 void* mem_calloc(size_t size,                    /* size of data to store */
-                 char*  type,                    /* short descriptoon of data to show for describing memory map*/
                  void (*destructor)(void*),      /* optional destructor */
-                 void (*descriptor)(void*, int)) /* optional descriptor for describing memory map*/
+                 void (*descriptor)(void*, int), /* optional descriptor for describing memory map*/
+                 char* file,                     /* caller file name */
+                 int   line)                       /* caller file line number */
 {
-  if (size == 0) mem_exit("Ttrying to allocate 0 bytes for", type);
+  if (size == 0) mem_exit("Ttrying to allocate 0 bytes for", file, line);
   uint8_t* bytes = calloc(1, sizeof(struct mem_head) + size);
-  if (bytes == NULL) mem_exit("Out of RAM \\_(o)_/ for", type);
+  if (bytes == NULL) mem_exit("Out of RAM \\_(o)_/ for", file, line);
 
   struct mem_head* head = (struct mem_head*)bytes;
 
-  head->id[0] = 'm';
-  head->id[1] = 't';
-  memcpy(head->type, type, 9);
+  head->id[0]       = 'z';
+  head->id[1]       = 'c';
+  head->index       = mem_index;
   head->destructor  = destructor;
   head->descriptor  = descriptor;
   head->retaincount = 1;
 
-  mem_objects++;
+  // for leak checking
+  mem_files[mem_index] = file;
+  mem_lines[mem_index] = line;
+  mem_index++;
 
   return bytes + sizeof(struct mem_head);
 }
 
 void* mem_stack_to_heap(size_t size,
-                        char*  type,
                         void (*destructor)(void*),
                         void (*descriptor)(void*, int),
-                        uint8_t* data)
+                        uint8_t* data,
+                        char*    file,
+                        int      line)
 {
-  uint8_t* bytes = mem_alloc(size, type, destructor, descriptor);
-  if (bytes == NULL) mem_exit("Out of RAM \\_(o)_/ for", type);
+  uint8_t* bytes = mem_alloc(size, destructor, descriptor, file, line);
+  if (bytes == NULL) mem_exit("Out of RAM \\_(o)_/ for", file, line);
   memcpy(bytes, data, size);
   return bytes;
 }
@@ -117,7 +125,7 @@ void* mem_realloc(void* pointer, size_t size)
   uint8_t* bytes = (uint8_t*)pointer;
   bytes -= sizeof(struct mem_head);
   bytes = realloc(bytes, sizeof(struct mem_head) + size);
-  if (bytes == NULL) mem_exit("Out of RAM \\_(o)_/ when realloc", "");
+  if (bytes == NULL) mem_exit("Out of RAM \\_(o)_/ when realloc", "", 0);
 
   return bytes + sizeof(struct mem_head);
 }
@@ -131,10 +139,10 @@ void* mem_retain(void* pointer)
   struct mem_head* head = (struct mem_head*)bytes;
 
   // check memory range id
-  assert(head->id[0] == 'm' && head->id[1] == 't');
+  assert(head->id[0] == 'z' && head->id[1] == 'c');
 
   head->retaincount += 1;
-  if (head->retaincount == SIZE_MAX) mem_exit("Maximum retain count reached \\(o)_/ for", head->type);
+  if (head->retaincount == SIZE_MAX) mem_exit("Maximum retain count reached \\(o)_/ for", "", 0);
 
   return pointer;
 }
@@ -148,20 +156,21 @@ char mem_release(void* pointer)
   struct mem_head* head = (struct mem_head*)bytes;
 
   // check memory range id
-  assert(head->id[0] == 'm' && head->id[1] == 't');
+  assert(head->id[0] == 'z' && head->id[1] == 'c');
 
-  if (head->retaincount == 0) mem_exit("Tried to release already released memory for", head->type);
+  if (head->retaincount == 0) mem_exit("Tried to release already released memory for", "", 0);
 
   head->retaincount -= 1;
 
   if (head->retaincount == 0)
   {
+    mem_files[head->index] = NULL;
+    mem_lines[head->index] = 0;
+
     if (head->destructor != NULL) head->destructor(pointer);
     // zero out bytes that will be deallocated so it will be easier to detect re-using of released zc_memory areas
     memset(bytes, 0, sizeof(struct mem_head));
     free(bytes);
-
-    mem_objects--;
 
     return 1;
   }
@@ -192,24 +201,17 @@ size_t mem_retaincount(void* pointer)
   struct mem_head* head = (struct mem_head*)bytes;
 
   // check memory range id
-  assert(head->id[0] == 'm' && head->id[1] == 't');
+  assert(head->id[0] == 'z' && head->id[1] == 'c');
 
   return head->retaincount;
 }
 
-char* mem_type(void* pointer)
+uint32_t mem_index_value(void* pointer)
 {
   uint8_t* bytes = (uint8_t*)pointer;
   bytes -= sizeof(struct mem_head);
   struct mem_head* head = (struct mem_head*)bytes;
-  return head->type;
-}
-
-void mem_replace(void** address, void* data)
-{
-  if (*address != NULL) mem_release(*address);
-  mem_retain(data);
-  *address = data;
+  return head->index;
 }
 
 void mem_describe(void* pointer, int level)
@@ -221,7 +223,7 @@ void mem_describe(void* pointer, int level)
   struct mem_head* head = (struct mem_head*)bytes;
 
   // check memory range id
-  assert(head->id[0] == 'm' && head->id[1] == 't');
+  assert(head->id[0] == 'z' && head->id[1] == 'c');
 
   if (head->descriptor != NULL)
   {
@@ -229,14 +231,30 @@ void mem_describe(void* pointer, int level)
   }
   else
   {
-    printf("(%s)", head->type);
+    printf("no descriptor, index %u", head->index);
   }
 }
 
-void mem_exit(char* text, char* type)
+void mem_exit(char* text, char* file, int line)
 {
-  printf("%s %s\n", text, type);
+  printf("%s %s %i\n", text, file, line);
   exit(EXIT_FAILURE);
+}
+
+void mem_stats()
+{
+  printf("MEM STATS\n");
+  uint32_t count;
+  for (int index = 0; index < mem_index; index++)
+  {
+    char* file = mem_files[index];
+    if (file)
+    {
+      printf("unreleased block at %s %i\n", file, mem_lines[index]);
+      count++;
+    }
+  }
+  printf("total unreleased blocks : %i\n", count);
 }
 
 #endif

@@ -67,7 +67,7 @@ void vh_knob_add(view_t* view,
                  void (*ratio_changed)(view_t* view, float ratio),
                  void (*button_pushed)(view_t* view))
 {
-  vh_knob_t* vh = mem_calloc(sizeof(vh_knob_t), "vh_knob", NULL, NULL);
+  vh_knob_t* vh = CAL(sizeof(vh_knob_t), NULL, NULL);
 
   vh->ratio_changed = ratio_changed;
   vh->button_pushed = button_pushed;

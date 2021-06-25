@@ -106,7 +106,7 @@ void ui_play_index(int index)
     if (uipc.current_path != NULL)
     {
       map_t* entry    = MGET(db_get_db(), uipc.current_path);
-      char*  time_str = mem_calloc(80, "char*", NULL, NULL); // REL 0
+      char*  time_str = CAL(80, NULL, NULL); // REL 0
 
       time_t now;
       time(&now);

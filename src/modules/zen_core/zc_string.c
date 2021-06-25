@@ -49,12 +49,12 @@ void str_del(void* pointer)
 
 str_t* str_new()
 {
-  str_t* string = mem_calloc(sizeof(str_t), "str_t", str_del, str_describe);
+  str_t* string = CAL(sizeof(str_t), str_del, str_describe);
 
   string->length       = 0;  // current length of codepoint array
   string->length_real  = 10; // backing length of codepoint array
   string->length_bytes = 0;  // needed length of byte array for all codepoints
-  string->codepoints   = mem_calloc(string->length_real * sizeof(uint32_t), "uint32_t*", NULL, NULL);
+  string->codepoints   = CAL(string->length_real * sizeof(uint32_t), NULL, NULL);
 
   return string;
 }
@@ -89,7 +89,7 @@ str_t* str_new_substring(str_t* string, int start, int end)
 char* str_new_cstring(str_t* string)
 {
   if (string == NULL) return NULL;
-  char*    bytes    = mem_calloc((string->length_bytes + 1) * sizeof(char), "char*", NULL, NULL);
+  char*    bytes    = CAL((string->length_bytes + 1) * sizeof(char), NULL, NULL);
   uint32_t position = 0;
   for (int index = 0; index < string->length; index++)
   {

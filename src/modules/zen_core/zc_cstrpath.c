@@ -36,7 +36,7 @@ char* cstr_new_path_remove_last_component(char* path)
       break;
     }
   }
-  char* str = mem_calloc(index + 1, "char*", NULL, NULL);
+  char* str = CAL(index + 1, NULL, NULL);
   memcpy(str, path, index);
   return str;
 }
@@ -54,7 +54,7 @@ char* cstr_new_path_extension(char* path)
   }
 
   int   len = strlen(path) - index;
-  char* ext = mem_calloc(len + 1, "char*", NULL, NULL);
+  char* ext = CAL(len + 1, NULL, NULL);
   memcpy(ext, path + index, len);
   return ext;
 }
@@ -80,7 +80,7 @@ char* cstr_new_path_filename(char* path)
   }
   if (slashindex == -1) slashindex = 0;
   int   len   = dotindex - slashindex;
-  char* title = mem_calloc(len + 1, "char*", NULL, NULL);
+  char* title = CAL(len + 1, NULL, NULL);
   memcpy(title, path + slashindex, len);
   return title;
 }

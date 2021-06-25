@@ -158,7 +158,7 @@ void vh_sbar_evt(view_t* view, ev_t ev)
 
 void vh_sbar_add(view_t* view, sbartype_t type, int steps, int thickness, void (*scroll)(view_t* view, void* userdata, float ratio), void* userdata)
 {
-  vh_sbar_t* vh = mem_calloc(sizeof(vh_sbar_t), "vh_sbar", NULL, NULL);
+  vh_sbar_t* vh = CAL(sizeof(vh_sbar_t), NULL, NULL);
 
   vh->type     = type;
   vh->steps    = steps;

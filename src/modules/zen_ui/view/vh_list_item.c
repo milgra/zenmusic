@@ -39,7 +39,7 @@ void vh_litem_del(void* p);
 
 void vh_litem_add(view_t* view, void* userdata)
 {
-  vh_litem_t* vh = mem_calloc(sizeof(vh_litem_t), "vh_litem_t", vh_litem_del, NULL);
+  vh_litem_t* vh = CAL(sizeof(vh_litem_t), vh_litem_del, NULL);
   vh->cells      = VNEW();
   vh->userdata   = userdata;
 

@@ -25,7 +25,7 @@ void col_del(void* p)
 
 col_t* col_new(char* id, int size, int index)
 {
-  col_t* col = mem_calloc(sizeof(col_t), "col_t", col_del, NULL);
+  col_t* col = CAL(sizeof(col_t), col_del, NULL);
 
   col->id    = cstr_new_cstring(id);
   col->size  = size;

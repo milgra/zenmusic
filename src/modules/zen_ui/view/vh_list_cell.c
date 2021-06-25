@@ -32,7 +32,7 @@ void vh_lcell_del(void* p)
 
 vh_lcell_t* vh_lcell_new(char* id, int size, view_t* view, int index)
 {
-  vh_lcell_t* cell = mem_alloc(sizeof(vh_lcell_t), "vh_lcell_t", vh_lcell_del, NULL);
+  vh_lcell_t* cell = CAL(sizeof(vh_lcell_t), vh_lcell_del, NULL);
   cell->id         = cstr_new_cstring(id); // REL 0
   cell->size       = size;
   cell->view       = view;
