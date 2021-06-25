@@ -322,7 +322,7 @@ void visible_filter()
 
         if (utf8casestr(value, query))
         {
-          vec_add(vis.songs, entry);
+          VADD(vis.songs, entry);
           break;
         }
       }

@@ -498,7 +498,7 @@ void crect_del(void* pointer)
 
 void crect_set_id(crect_t* r, char* id)
 {
-  r->id = id;
+  r->id = RET(id);
 }
 
 void crect_set_masked(crect_t* r, char masked)

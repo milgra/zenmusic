@@ -214,12 +214,12 @@ void ui_about_popup_attach(view_t* baseview)
 
   // create items
 
-  VADD(donl.items, donateitem_new(0));
-  VADD(donl.items, donateitem_new(1));
-  VADD(donl.items, donateitem_new(2));
-  VADD(donl.items, donateitem_new(3));
-  VADD(donl.items, donateitem_new(4));
-  VADD(donl.items, donateitem_new(5));
+  VADDR(donl.items, donateitem_new(0));
+  VADDR(donl.items, donateitem_new(1));
+  VADDR(donl.items, donateitem_new(2));
+  VADDR(donl.items, donateitem_new(3));
+  VADDR(donl.items, donateitem_new(4));
+  VADDR(donl.items, donateitem_new(5));
 
   char* version = cstr_new_format(200, "Zen Music v%i.%i beta\nby Milan Toth\nFree and Open Source Software.", VERSION, BUILD); // REL 2
 

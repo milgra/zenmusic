@@ -6,6 +6,7 @@
  - manual test
  - automated tests
  - youtube video
+ - activity crash
 
 **near future**
 
@@ -36,6 +37,7 @@
  - select/copy/paste in textfields
  - prev button in shuffle mode should jump to previously played song
  - zc_callback instead of custom function pointers
+ - jobb/bal gomb prev/next
 
 **inbetween future**
 

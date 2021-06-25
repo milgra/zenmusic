@@ -322,8 +322,9 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
     else
     {
       // idless view, probably </div>
-      view_t* view = view_new("", (r2_t){0});
+      view_t* view = view_new("div", (r2_t){0});
       VADD(views, view);
+      REL(view);
     }
     tags += 1;
   }

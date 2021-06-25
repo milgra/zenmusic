@@ -46,6 +46,9 @@ void db_init()
 void db_destroy()
 {
   printf("db destroy\n");
+
+  // mem_describe(db, 0);
+
   REL(db); // REL 1
 }
 

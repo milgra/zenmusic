@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define ALL() mem_test(__FILE__, __LINE__);
 #define RPL(X, Y) mem_replace((void**)&X, Y)
 #define SET(X, Y) X = Y
 #define RET(X) mem_retain(X)
@@ -22,6 +23,7 @@ struct mem_head
   size_t retaincount;
 };
 
+void   mem_test(char* file, int line);
 void*  mem_alloc(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*, int));
 void*  mem_calloc(size_t size, char* type, void (*destructor)(void*), void (*descriptor)(void*, int));
 void*  mem_realloc(void* pointer, size_t size);
@@ -35,11 +37,20 @@ char*  mem_type(void* pointer);
 void   mem_describe(void* pointer, int level);
 void   mem_exit(char* text, char* type);
 
+extern uint32_t mem_objects;
+
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
 
 #include <string.h>
+
+uint32_t mem_objects = 0; /* live object counter for debugging */
+
+void mem_test(char* file, int line)
+{
+  printf("mem test %s %d\n", file, line);
+}
 
 void* mem_alloc(size_t size,                    /* size of data to store */
                 char*  type,                    /* short descriptoon of data to show for describing memory map*/
@@ -58,6 +69,8 @@ void* mem_alloc(size_t size,                    /* size of data to store */
   head->destructor  = destructor;
   head->descriptor  = descriptor;
   head->retaincount = 1;
+
+  mem_objects++;
 
   return bytes + sizeof(struct mem_head);
 }
@@ -79,6 +92,8 @@ void* mem_calloc(size_t size,                    /* size of data to store */
   head->destructor  = destructor;
   head->descriptor  = descriptor;
   head->retaincount = 1;
+
+  mem_objects++;
 
   return bytes + sizeof(struct mem_head);
 }
@@ -145,6 +160,9 @@ char mem_release(void* pointer)
     // zero out bytes that will be deallocated so it will be easier to detect re-using of released zc_memory areas
     memset(bytes, 0, sizeof(struct mem_head));
     free(bytes);
+
+    mem_objects--;
+
     return 1;
   }
 

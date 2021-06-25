@@ -297,11 +297,13 @@ void vh_textinput_evt(view_t* view, ev_t ev)
 
     char view_id[100];
     snprintf(view_id, 100, "%sglyph%i", view->id, data->glyph_index++);
-    view_t* glyph_view = view_new(view_id, (r2_t){0, 0, 0, 0});
+    view_t* glyph_view = view_new(view_id, (r2_t){0, 0, 0, 0}); // REL 0
     vh_anim_add(glyph_view);
     glyph_view->texture.resizable = 0;
 
     VADD(data->glyph_v, glyph_view);
+
+    REL(glyph_view); // REL 0
 
     // append or break-insert new glyph(s)
 
@@ -428,16 +430,17 @@ void vh_textinput_add(view_t*     view,
 
     for (int i = 0; i < data->text_s->length; i++)
     {
-      str_t* charstr = str_new();
+      str_t* charstr = str_new(); // REL 1
       str_add_codepoint(charstr, data->text_s->codepoints[i]);
       char view_id[100];
-      snprintf(view_id, 100, "%sglyph%i", view->id, data->glyph_index++);
-      view_t* glyph_view = view_new(view_id, (r2_t){0, 0, 0, 0});
+      snprintf(view_id, 100, "%s_glyph_%i", view->id, data->glyph_index++);
+      view_t* glyph_view = view_new(view_id, (r2_t){0, 0, 0, 0}); // REL 0
       vh_anim_add(glyph_view);
 
       VADD(data->glyph_v, glyph_view);
 
-      REL(charstr);
+      REL(glyph_view); // REL 0
+      REL(charstr);    // REL 1
     }
   }
 

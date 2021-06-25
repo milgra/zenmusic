@@ -489,11 +489,6 @@ void vh_list_del(void* p)
 {
   vh_list_t* vh = p;
   REL(vh->items);
-
-  REL(vh->vscr);
-  REL(vh->hscr);
-
-  if (vh->header) REL(vh->header);
 }
 
 void vh_list_add(view_t*         view,
@@ -543,6 +538,9 @@ void vh_list_add(view_t*         view,
   view->handler      = vh_list_evt;
 
   view->blocks_scroll = 1;
+
+  REL(vh->vscr);
+  REL(vh->hscr);
 }
 
 view_t* vh_list_item_for_index(view_t* view, int index)
@@ -567,7 +565,6 @@ void vh_list_set_header(view_t* view, view_t* headerview)
     view_remove_from_parent(vh->header);
     REL(vh->header);
   }
-  RET(headerview);
   vh->header = headerview;
 
   // add as subview before scrollers

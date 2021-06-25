@@ -168,6 +168,8 @@ void ui_songlist_attach(view_t* base)
 
 void ui_songlist_detach()
 {
+  vh_list_reset(sl.view);
+
   REL(sl.cache);   // REL 0
   REL(sl.columns); // REL 1
   REL(sl.fields);  // REL 2

@@ -142,9 +142,9 @@ void ui_destroy()
   ui_inputfield_popup_detach(); // DETACH 14
   ui_popup_switcher_detach();   // DETACH 15
 
-  ui_manager_destroy(); // DESTROY 1
-
   REL(view_list);
+
+  ui_manager_destroy(); // DESTROY 1
 
   text_destroy(); // DESTROY 0
 }

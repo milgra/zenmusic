@@ -127,6 +127,7 @@ struct _view_t
   char blocks_scroll; /* blocks scroll events */
 
   char*    id;     /* identifier for handling view */
+  uint32_t nth;    /* allocation counter for debugging */
   vec_t*   views;  /* subviews */
   view_t*  parent; /* parent view */
   uint32_t index;  /* depth */
@@ -177,11 +178,11 @@ extern char resend;
 #include "zc_memory.c"
 #include <limits.h>
 
+int view_cnt = 0;
+
 void view_del(void* pointer)
 {
   view_t* view = (view_t*)pointer;
-
-  printf("del %s\n", view->id);
 
   if (view->layout.background_image != NULL) REL(view->layout.background_image);
 
@@ -197,6 +198,7 @@ view_t* view_new(char* id, r2_t frame)
 {
   view_t* view            = mem_calloc(sizeof(view_t), "view_t", view_del, view_desc);
   view->id                = cstr_new_cstring(id);
+  view->nth               = view_cnt++;
   view->views             = VNEW();
   view->frame.local       = frame;
   view->frame.global      = frame;
@@ -411,8 +413,7 @@ void view_set_block_touch(view_t* view, char block, char recursive)
 void view_set_texture_bmp(view_t* view, bm_t* bitmap)
 {
   if (view->texture.bitmap) REL(view->texture.bitmap);
-  RET(bitmap);
-  view->texture.bitmap  = bitmap;
+  view->texture.bitmap  = RET(bitmap);
   view->texture.state   = TS_READY;
   view->texture.changed = 1;
 }
