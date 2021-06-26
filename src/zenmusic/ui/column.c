@@ -23,9 +23,14 @@ void col_del(void* p)
   REL(col->id);
 }
 
+void col_desc(void* p, int level)
+{
+  printf("col\n");
+}
+
 col_t* col_new(char* id, int size, int index)
 {
-  col_t* col = CAL(sizeof(col_t), col_del, NULL);
+  col_t* col = CAL(sizeof(col_t), col_del, col_desc);
 
   col->id    = cstr_new_cstring(id);
   col->size  = size;

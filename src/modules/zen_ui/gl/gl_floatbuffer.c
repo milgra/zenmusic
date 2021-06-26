@@ -24,10 +24,20 @@ void  fb_add(fb_t* fb, GLfloat* data, size_t count);
 
 #if __INCLUDE_LEVEL__ == 0
 
+void fb_desc(void* p, int level)
+{
+  printf("fb\n");
+}
+
+void fb_desc_data(void* p, int level)
+{
+  printf("fb data\n");
+}
+
 fb_t* fb_new()
 {
-  fb_t* fb = CAL(sizeof(fb_t), fb_del, NULL);
-  fb->data = CAL(sizeof(GLfloat) * 10, NULL, NULL);
+  fb_t* fb = CAL(sizeof(fb_t), fb_del, fb_desc);
+  fb->data = CAL(sizeof(GLfloat) * 10, NULL, fb_desc_data);
   fb->pos  = 0;
   fb->cap  = 10;
 
@@ -37,7 +47,7 @@ fb_t* fb_new()
 void fb_del(void* pointer)
 {
   fb_t* fb = pointer;
-  mem_release(fb->data);
+  REL(fb->data);
 }
 
 void fb_reset(fb_t* fb)

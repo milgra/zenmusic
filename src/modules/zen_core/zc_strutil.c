@@ -55,7 +55,7 @@ vec_t* str_split(str_t* string, char codepoint)
       if (segment->length > 0)
       {
         vec_add(vector, segment);
-        mem_release(segment);
+        REL(segment);
         segment = str_new();
       }
     }
@@ -64,7 +64,7 @@ vec_t* str_split(str_t* string, char codepoint)
   }
   // add word to result
   if (segment->length > 0) vec_add(vector, segment);
-  mem_release(segment);
+  REL(segment);
   return vector;
 }
 
@@ -74,7 +74,7 @@ int str_intvalue(str_t* string)
 {
   char* viewindexc = str_new_cstring(string);
   int   viewindex  = atoi(viewindexc);
-  mem_release(viewindexc);
+  REL(viewindexc);
   return viewindex;
 }
 
@@ -84,7 +84,7 @@ float str_floatvalue(str_t* string)
 {
   char* viewindexc = str_new_cstring(string);
   float viewindex  = atof(viewindexc);
-  mem_release(viewindexc);
+  REL(viewindexc);
   return viewindex;
 }
 
@@ -94,7 +94,7 @@ uint32_t str_unsignedvalue(str_t* string)
 {
   char*         valuec = str_new_cstring(string);
   unsigned long value  = strtoul(valuec, NULL, 0);
-  mem_release(valuec);
+  REL(valuec);
   return (uint32_t)value;
 }
 

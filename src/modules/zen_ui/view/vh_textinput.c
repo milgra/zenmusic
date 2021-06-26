@@ -359,6 +359,11 @@ void vh_textinput_del(void* p)
   REL(vh->holder_v);
 }
 
+void vh_textinput_desc(void* p, int level)
+{
+  printf("vh_textinput\n");
+}
+
 void vh_textinput_add(view_t*     view,
                       char*       text,
                       char*       phtext,
@@ -368,7 +373,7 @@ void vh_textinput_add(view_t*     view,
   char* id_c = cstr_new_format(100, "%s%s", view->id, "crsr");   // REL 0
   char* id_h = cstr_new_format(100, "%s%s", view->id, "holder"); // REL 1
 
-  vh_textinput_t* data = CAL(sizeof(vh_textinput_t), NULL, NULL);
+  vh_textinput_t* data = CAL(sizeof(vh_textinput_t), vh_textinput_del, vh_textinput_desc);
 
   textstyle.backcolor = 0;
 

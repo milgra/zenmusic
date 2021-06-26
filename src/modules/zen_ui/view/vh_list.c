@@ -491,13 +491,18 @@ void vh_list_del(void* p)
   REL(vh->items);
 }
 
+void vh_list_desc(void* p, int level)
+{
+  printf("vh_list\n");
+}
+
 void vh_list_add(view_t*         view,
                  vh_list_inset_t inset,
                  view_t* (*item_for_index)(int index, void* userdata, view_t* listview, int* item_count),
                  void (*item_recycle)(view_t* item),
                  void* userdata)
 {
-  vh_list_t* vh      = CAL(sizeof(vh_list_t), vh_list_del, NULL);
+  vh_list_t* vh      = CAL(sizeof(vh_list_t), vh_list_del, vh_list_desc);
   vh->userdata       = userdata;
   vh->items          = VNEW(); // REL 0
   vh->item_for_index = item_for_index;
@@ -560,11 +565,7 @@ void vh_list_set_header(view_t* view, view_t* headerview)
 {
   vh_list_t* vh = view->handler_data;
 
-  if (vh->header != NULL)
-  {
-    view_remove_from_parent(vh->header);
-    REL(vh->header);
-  }
+  if (vh->header != NULL) view_remove_from_parent(vh->header);
   vh->header = headerview;
 
   // add as subview before scrollers

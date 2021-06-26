@@ -37,9 +37,14 @@ void    vh_litem_upd_cell_size(view_t* view, char* id, int size);
 void vh_litem_evt(view_t* view, ev_t ev);
 void vh_litem_del(void* p);
 
+void vh_litem_desc(void* p, int level)
+{
+  printf("vh_litem\n");
+}
+
 void vh_litem_add(view_t* view, void* userdata)
 {
-  vh_litem_t* vh = CAL(sizeof(vh_litem_t), vh_litem_del, NULL);
+  vh_litem_t* vh = CAL(sizeof(vh_litem_t), vh_litem_del, vh_litem_desc);
   vh->cells      = VNEW();
   vh->userdata   = userdata;
 

@@ -173,10 +173,15 @@ void analyze_tags(char* html, tag_t* tags, uint32_t count)
   }
 }
 
+void tag_describe(void* p, int level)
+{
+  printf("html tag_t\n");
+}
+
 tag_t* html_new_parse_html(char* html)
 {
   uint32_t cnt  = count_tags(html);
-  tag_t*   tags = CAL(sizeof(tag_t) * (cnt + 1), NULL, NULL); // REL 0
+  tag_t*   tags = CAL(sizeof(tag_t) * (cnt + 1), NULL, tag_describe); // REL 0
 
   extract_tags(html, tags);
   analyze_tags(html, tags, cnt);
@@ -244,10 +249,15 @@ void analyze_classes(char* css, prop_t* props)
   }
 }
 
+void prop_desc(void* p, int level)
+{
+  printf("html prop_t\n");
+}
+
 prop_t* html_new_parse_css(char* css)
 {
   uint32_t cnt   = count_props(css);
-  prop_t*  props = CAL(sizeof(prop_t) * (cnt + 1), NULL, NULL); // REL 1
+  prop_t*  props = CAL(sizeof(prop_t) * (cnt + 1), NULL, prop_desc); // REL 1
 
   analyze_classes(css, props);
 

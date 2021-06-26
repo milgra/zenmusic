@@ -16,6 +16,7 @@ void ui_song_infos_show(int index);
 #include "text.c"
 #include "tg_text.c"
 #include "visible.c"
+#include "zc_cstring.c"
 
 struct ui_song_infos_t
 {
@@ -94,7 +95,7 @@ void ui_song_infos_show(int index)
   int   sr     = atoi(sample);
   int   br     = atoi(bit);
 
-  char* infostr = CAL(100, NULL, NULL); // REL 0
+  char* infostr = CAL(100, NULL, cstr_describe); // REL 0
 
   snprintf(infostr, 100, "%s\n%s\n%s/%iKHz/%iKbit/%s channels",
            (char*)MGET(songmap, "meta/title"),

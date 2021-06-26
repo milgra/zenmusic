@@ -36,11 +36,11 @@ void view_gen_apply_style(view_t* view, map_t* style, char* respath)
     {
       if (strstr(val, "url") != NULL)
       {
-        char* url = CAL(sizeof(char) * strlen(val), NULL, NULL);
+        char* url = CAL(sizeof(char) * strlen(val), NULL, cstr_describe); // REL 0
         memcpy(url, val + 5, strlen(val) - 7);
         char* imagepath               = cstr_new_format(100, "%s/%s", respath, url);
         view->layout.background_image = imagepath;
-        REL(url);
+        REL(url); // REL 0
         tg_css_add(view);
       }
     }
@@ -229,20 +229,24 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
   while ((*props).class.len > 0)
   {
     prop_t t   = *props;
-    char*  cls = CAL(sizeof(char) * t.class.len + 1, NULL, cstr_describe);
-    char*  key = CAL(sizeof(char) * t.key.len + 1, NULL, cstr_describe);
-    char*  val = CAL(sizeof(char) * t.value.len + 1, NULL, cstr_describe);
+    char*  cls = CAL(sizeof(char) * t.class.len + 1, NULL, cstr_describe); // REL 0
+    char*  key = CAL(sizeof(char) * t.key.len + 1, NULL, cstr_describe);   // REL 1
+    char*  val = CAL(sizeof(char) * t.value.len + 1, NULL, cstr_describe); // REL 2
     memcpy(cls, css + t.class.pos, t.class.len);
     memcpy(key, css + t.key.pos, t.key.len);
     memcpy(val, css + t.value.pos, t.value.len);
     map_t* style = MGET(styles, cls);
     if (style == NULL)
     {
-      style = MNEW();
+      style = MNEW(); // REL 0
       MPUT(styles, cls, style);
+      REL(style); // REL 0
     }
     MPUT(style, key, val);
     props += 1;
+    REL(cls);
+    REL(key);
+    REL(val);
   }
 
   // create view structure
@@ -253,7 +257,7 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
     tag_t t = *tags;
     if (t.id.len > 0)
     {
-      char* id = CAL(sizeof(char) * t.id.len + 1, NULL, NULL); // REL 0
+      char* id = CAL(sizeof(char) * t.id.len + 1, NULL, cstr_describe); // REL 0
 
       memcpy(id, html + t.id.pos + 1, t.id.len);
 
@@ -279,7 +283,7 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
 
       if (t.class.len > 0)
       {
-        char* class = CAL(sizeof(char) * t.class.len + 1, NULL, NULL);
+        char* class = CAL(sizeof(char) * t.class.len + 1, NULL, cstr_describe); // REL 0
         memcpy(class, html + t.class.pos + 1, t.class.len);
 
         char csscls[100] = {0};
@@ -290,30 +294,34 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
         {
           view_gen_apply_style(view, style, respath);
         }
+        REL(class);
       }
 
       if (t.type.len > 0)
       {
-        char* type = CAL(sizeof(char) * t.type.len + 1, NULL, NULL);
+        char* type = CAL(sizeof(char) * t.type.len + 1, NULL, cstr_describe); // REL 2
         memcpy(type, html + t.type.pos + 1, t.type.len);
 
         // TODO remove non-standard types
         if (strcmp(type, "button") == 0 && t.onclick.len > 0)
         {
-          char* onclick = CAL(sizeof(char) * t.onclick.len + 1, NULL, NULL);
+          char* onclick = CAL(sizeof(char) * t.onclick.len + 1, NULL, cstr_describe); // REL 3
           memcpy(onclick, html + t.onclick.pos + 1, t.onclick.len);
 
           cb_t* callback = MGET(callbacks, onclick);
           if (callback) vh_button_add(view, VH_BUTTON_NORMAL, callback);
+          REL(onclick);
         }
         else if (strcmp(type, "checkbox") == 0 && t.onclick.len > 0)
         {
-          char* onclick = CAL(sizeof(char) * t.onclick.len + 1, NULL, NULL);
+          char* onclick = CAL(sizeof(char) * t.onclick.len + 1, NULL, cstr_describe); // REL 4
           memcpy(onclick, html + t.onclick.pos + 1, t.onclick.len);
 
           cb_t* callback = MGET(callbacks, onclick);
           if (callback) vh_button_add(view, VH_BUTTON_TOGGLE, callback);
+          REL(onclick);
         }
+        REL(type);
       }
 
       REL(id);   // REL 0

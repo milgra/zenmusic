@@ -32,9 +32,14 @@ void vh_touch_del(void* p)
   if (vh->event) REL(vh->event);
 }
 
+void vh_touch_desc(void* p, int level)
+{
+  printf("vh_touch\n");
+}
+
 void vh_touch_add(view_t* view, cb_t* event)
 {
-  vh_touch_t* vh = CAL(sizeof(vh_touch_t), vh_touch_del, NULL);
+  vh_touch_t* vh = CAL(sizeof(vh_touch_t), vh_touch_del, vh_touch_desc);
   vh->event      = event;
 
   if (event) RET(event);

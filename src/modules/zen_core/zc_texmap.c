@@ -42,14 +42,25 @@ int         tm_put(tm_t* tm, char* id, int w, int h);
 
 #include "zc_memory.c"
 
+void tm_desc(void* p, int level)
+{
+  tm_t* tm = p;
+  printf("tm w %i h %i\n", tm->width, tm->height);
+}
+
+void tm_desc_blocks(void* p, int level)
+{
+  printf("tm blocks\n");
+}
+
 tm_t* tm_new(int w, int h)
 {
   int cols = w / 32;
   int rows = h / 32;
 
-  tm_t* tm   = CAL(sizeof(tm_t), tm_del, NULL);
+  tm_t* tm   = CAL(sizeof(tm_t), tm_del, tm_desc);
   tm->coords = map_new();
-  tm->blocks = CAL(sizeof(char) * cols * rows, NULL, NULL);
+  tm->blocks = CAL(sizeof(char) * cols * rows, NULL, tm_desc_blocks);
   tm->width  = w;
   tm->height = h;
   tm->cols   = cols;

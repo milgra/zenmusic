@@ -28,9 +28,14 @@ void        textlist_set_datasource(textlist_t* tl, vec_t* items);
 void    textlist_del(void* p);
 view_t* textlist_item_for_index(int index, void* data, view_t* listview, int* item_count);
 
+void textlist_desc(void* p, int level)
+{
+  printf("textlist\n");
+}
+
 textlist_t* textlist_new(view_t* view, textstyle_t textstyle, void (*on_select)(int))
 {
-  textlist_t* tl = CAL(sizeof(textlist_t), textlist_del, NULL);
+  textlist_t* tl = CAL(sizeof(textlist_t), textlist_del, textlist_desc);
 
   tl->view      = view;
   tl->textstyle = textstyle;

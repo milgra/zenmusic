@@ -91,7 +91,7 @@ char* cstr_new_file(char* path)
     rewind(handler);
 
     // Allocate a string that can hold it all
-    buffer = (char*)CAL(sizeof(char) * (string_size + 1), NULL, NULL);
+    buffer = (char*)CAL(sizeof(char) * (string_size + 1), NULL, cstr_describe);
 
     // Read it all in one operation
     read_size = fread(buffer, sizeof(char), string_size, handler);

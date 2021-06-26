@@ -48,9 +48,14 @@ void vh_lhead_evt(view_t* view, ev_t ev);
 void vh_lhead_del(void* p);
 void vh_lhead_resize(view_t* view);
 
+void vh_lhead_desc(void* p, int level)
+{
+  printf("vh_lhead\n");
+}
+
 void vh_lhead_add(view_t* view)
 {
-  vh_lhead_t* vh = CAL(sizeof(vh_lhead_t), vh_lhead_del, NULL);
+  vh_lhead_t* vh = CAL(sizeof(vh_lhead_t), vh_lhead_del, vh_lhead_desc);
   vh->cells      = VNEW();
 
   view->handler_data = vh;

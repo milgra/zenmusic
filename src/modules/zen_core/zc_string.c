@@ -44,7 +44,12 @@ int8_t str_compare(str_t* stra, str_t* strb);
 void str_del(void* pointer)
 {
   str_t* string = pointer;
-  mem_release(string->codepoints);
+  REL(string->codepoints);
+}
+
+void str_describe_codepoints(void* p, int level)
+{
+  printf("str codepoints\n");
 }
 
 str_t* str_new()
@@ -86,10 +91,15 @@ str_t* str_new_substring(str_t* string, int start, int end)
   return result;
 }
 
+void str_desc_cstr(void* p, int level)
+{
+  printf("%s", (char*)p);
+}
+
 char* str_new_cstring(str_t* string)
 {
   if (string == NULL) return NULL;
-  char*    bytes    = CAL((string->length_bytes + 1) * sizeof(char), NULL, NULL);
+  char*    bytes    = CAL((string->length_bytes + 1) * sizeof(char), NULL, str_desc_cstr);
   uint32_t position = 0;
   for (int index = 0; index < string->length; index++)
   {

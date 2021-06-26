@@ -34,22 +34,26 @@ void views_describe()
   for (int index = 0; index < views.list->length; index++)
   {
     view_t* view = views.list->data[index];
-    printf("view %s retc %zu\n", view->id, mem_retaincount(view));
+    printf("view %s retc %zu ", view->id, mem_retaincount(view));
+    mem_stat(view);
+    printf("\n");
   }
 }
 
 void views_destroy()
 {
   // flatten view
-  uint32_t count = 0;
   for (int index = 0; index < views.list->length; index++)
   {
     view_t* view = views.list->data[index];
     view_remove_from_parent(view);
-    if (mem_retaincount(view) == 1) count++;
+    if (view->handler_data) REL(view->handler_data);
+    if (view->tex_gen_data) REL(view->tex_gen_data);
+    view->handler_data = NULL;
+    view->tex_gen_data = NULL;
   }
 
-  views_describe();
+  // views_describe();
 
   // release list
   REL(views.list);

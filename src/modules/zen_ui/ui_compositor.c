@@ -65,7 +65,7 @@ typedef struct _crect_t
 } crect_t;
 
 void crect_del(void* rect);
-void crect_desc(crect_t* rect);
+void crect_desc(void* p, int level);
 void crect_set_id(crect_t* rect, char* id);
 void crect_set_masked(crect_t* r, char masked);
 void crect_set_page(crect_t* rect, uint32_t page);
@@ -155,7 +155,7 @@ void ui_compositor_add(char* id,
   // fill up cache if needed
   if (uic.cache_ind + 1 > uic.cache->length)
   {
-    crect_t* rect = CAL(sizeof(crect_t), crect_del, NULL); // REL 0
+    crect_t* rect = CAL(sizeof(crect_t), crect_del, crect_desc); // REL 0
     VADD(uic.cache, rect);
     REL(rect); // REL 0
   }
@@ -570,8 +570,10 @@ void crect_set_alpha(crect_t* r, float alpha)
   r->data[35] = alpha;
 }
 
-void crect_desc(crect_t* r)
+void crect_desc(void* p, int level)
 {
+  printf("crect\n");
+  crect_t* r = p;
   for (int index = 0; index < 30; index++)
   {
     if (index % 5 == 0) printf("\n");

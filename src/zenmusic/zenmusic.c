@@ -263,7 +263,7 @@ void destroy()
   if (zm.rec_par) REL(zm.rec_par); // REL 2
   if (zm.rep_par) REL(zm.rep_par); // REL 3
 
-  // mem_stats();
+  mem_stats();
 }
 
 void load_library()

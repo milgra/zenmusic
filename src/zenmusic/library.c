@@ -128,7 +128,7 @@ int analyzer_thread(void* chptr)
       char* path = vec_tail(lib.paths);
       char* size = MGET(lib.files, path);
 
-      char* time_str = CAL(80, NULL, NULL); // REL 0
+      char* time_str = CAL(80, NULL, cstr_describe); // REL 0
       // snprintf(time_str, 20, "%lu", time(NULL));
 
       time_t now;

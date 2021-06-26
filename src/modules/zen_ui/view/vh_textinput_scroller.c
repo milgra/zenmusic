@@ -40,13 +40,18 @@ void vh_textinput_scroller_del(void* p)
   vh_textinput_scroller_t* vh = p;
 }
 
+void vh_textinput_scroller_desc(void* p, int level)
+{
+  printf("vh_textinput_scroller\n");
+}
+
 void vh_textinput_scroller_add(view_t*     view,
                                char*       text,
                                char*       phtext,
                                textstyle_t textstyle,
                                void*       userdata)
 {
-  vh_textinput_scroller_t* data = CAL(sizeof(vh_textinput_scroller_t), NULL, NULL);
+  vh_textinput_scroller_t* data = CAL(sizeof(vh_textinput_scroller_t), vh_textinput_scroller_del, vh_textinput_scroller_desc);
 
   assert(view->views->length == 3);
 

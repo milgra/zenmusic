@@ -184,6 +184,8 @@ void view_del(void* pointer)
 {
   view_t* view = (view_t*)pointer;
 
+  // printf("RELEASEING %s\n", view->id);
+
   if (view->layout.background_image != NULL) REL(view->layout.background_image);
 
   if (view->handler_data) REL(view->handler_data);

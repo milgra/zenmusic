@@ -8,8 +8,8 @@
 #include <stdlib.h>
 
 #define CAL(X, Y, Z) mem_calloc(X, Y, Z, __FILE__, __LINE__);
-#define RET(X) mem_retain(X)
-#define REL(X) mem_release(X)
+#define RET(X) mem_retain(X, __FILE__, __LINE__)
+#define REL(X) mem_release(X, __FILE__, __LINE__)
 #define HEAP(X) mem_stack_to_heap(sizeof(X), NULL, NULL, (uint8_t*)&X, __FILE__, __LINE__)
 
 struct mem_head
@@ -25,14 +25,15 @@ struct mem_head
 void*    mem_alloc(size_t size, void (*destructor)(void*), void (*descriptor)(void*, int), char* file, int line);
 void*    mem_calloc(size_t size, void (*destructor)(void*), void (*descriptor)(void*, int), char* file, int line);
 void*    mem_realloc(void* pointer, size_t size);
-void*    mem_retain(void* pointer);
-char     mem_release(void* pointer);
+void*    mem_retain(void* pointer, char* file, int line);
+char     mem_release(void* pointer, char* file, int line);
 char     mem_release_each(void* first, ...);
 size_t   mem_retaincount(void* pointer);
 void*    mem_stack_to_heap(size_t size, void (*destructor)(void*), void (*descriptor)(void*, int), uint8_t* data, char* file, int line);
 uint32_t mem_index_value(void* pointer);
 void     mem_describe(void* pointer, int level);
 void     mem_exit(char* text, char* file, int line);
+void     mem_stat(void* pointer);
 void     mem_stats();
 
 #endif
@@ -45,9 +46,17 @@ void     mem_stats();
 
 #define ZC_MAX_BLOCKS 100000
 
-char*    mem_files[ZC_MAX_BLOCKS] = {0};
-int      mem_lines[ZC_MAX_BLOCKS] = {0};
-uint32_t mem_index                = 0; /* live object counter for debugging */
+struct mem_info
+{
+  char* file;
+  int   line;
+  char* file1;
+  int   line1;
+  void* ptr;
+};
+
+struct mem_info mem_infos[ZC_MAX_BLOCKS] = {0};
+uint32_t        mem_index                = 0; /* live object counter for debugging */
 
 /************************/
 
@@ -71,8 +80,9 @@ void* mem_alloc(size_t size,                    /* size of data to store */
   head->retaincount = 1;
 
   // for leak checking
-  mem_files[mem_index] = file;
-  mem_lines[mem_index] = line;
+  mem_infos[mem_index].file = file;
+  mem_infos[mem_index].line = line;
+  mem_infos[mem_index].ptr  = bytes + sizeof(struct mem_head);
   mem_index++;
 
   return bytes + sizeof(struct mem_head);
@@ -98,8 +108,9 @@ void* mem_calloc(size_t size,                    /* size of data to store */
   head->retaincount = 1;
 
   // for leak checking
-  mem_files[mem_index] = file;
-  mem_lines[mem_index] = line;
+  mem_infos[mem_index].file = file;
+  mem_infos[mem_index].line = line;
+  mem_infos[mem_index].ptr  = bytes + sizeof(struct mem_head);
   mem_index++;
 
   return bytes + sizeof(struct mem_head);
@@ -130,7 +141,7 @@ void* mem_realloc(void* pointer, size_t size)
   return bytes + sizeof(struct mem_head);
 }
 
-void* mem_retain(void* pointer)
+void* mem_retain(void* pointer, char* file, int line)
 {
   assert(pointer != NULL);
 
@@ -141,13 +152,16 @@ void* mem_retain(void* pointer)
   // check memory range id
   assert(head->id[0] == 'z' && head->id[1] == 'c');
 
+  mem_infos[head->index].file1 = file;
+  mem_infos[head->index].line1 = line;
+
   head->retaincount += 1;
   if (head->retaincount == SIZE_MAX) mem_exit("Maximum retain count reached \\(o)_/ for", "", 0);
 
   return pointer;
 }
 
-char mem_release(void* pointer)
+char mem_release(void* pointer, char* file, int line)
 {
   assert(pointer != NULL);
 
@@ -164,8 +178,8 @@ char mem_release(void* pointer)
 
   if (head->retaincount == 0)
   {
-    mem_files[head->index] = NULL;
-    mem_lines[head->index] = 0;
+    mem_infos[head->index].file = NULL;
+    mem_infos[head->index].line = 0;
 
     if (head->destructor != NULL) head->destructor(pointer);
     // zero out bytes that will be deallocated so it will be easier to detect re-using of released zc_memory areas
@@ -173,6 +187,11 @@ char mem_release(void* pointer)
     free(bytes);
 
     return 1;
+  }
+  else if (head->retaincount == 1)
+  {
+    mem_infos[head->index].file1 = NULL;
+    mem_infos[head->index].line1 = 0;
   }
 
   return 0;
@@ -186,7 +205,7 @@ char mem_releaseeach(void* first, ...)
   va_start(ap, first);
   for (actual = first; actual != NULL; actual = va_arg(ap, void*))
   {
-    released &= mem_release(actual);
+    released &= mem_release(actual, __FILE__, __LINE__);
   }
   va_end(ap);
   return released;
@@ -241,20 +260,36 @@ void mem_exit(char* text, char* file, int line)
   exit(EXIT_FAILURE);
 }
 
+void mem_stat(void* pointer)
+{
+  assert(pointer != NULL);
+
+  uint8_t* bytes = (uint8_t*)pointer;
+  bytes -= sizeof(struct mem_head);
+  struct mem_head* head = (struct mem_head*)bytes;
+
+  // check memory range id
+  assert(head->id[0] == 'z' && head->id[1] == 'c');
+
+  printf("mem stat %s %i %s %i", mem_infos[head->index].file, mem_infos[head->index].line, mem_infos[head->index].file1, mem_infos[head->index].line1);
+}
+
 void mem_stats()
 {
   printf("MEM STATS\n");
-  uint32_t count;
+  uint32_t count = 0;
   for (int index = 0; index < mem_index; index++)
   {
-    char* file = mem_files[index];
-    if (file)
+    char* file = mem_infos[index].file;
+    if (file != NULL)
     {
-      printf("unreleased block at %s %i\n", file, mem_lines[index]);
+      printf("unreleased block %i at %s %i %s %i desc : ", index, mem_infos[index].file, mem_infos[index].line, mem_infos[index].file1, mem_infos[index].line1);
+      mem_describe(mem_infos[index].ptr, 0);
+      printf("\n");
       count++;
     }
   }
-  printf("total unreleased blocks : %i\n", count);
+  printf("total unreleased blocks : %u\n", count);
 }
 
 #endif

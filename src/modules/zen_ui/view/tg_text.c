@@ -65,9 +65,14 @@ void tg_text_del(void* p)
   if (gen->text) REL(gen->text);
 }
 
+void tg_text_desc(void* p, int level)
+{
+  printf("tg_text\n");
+}
+
 void tg_text_add(view_t* view)
 {
-  tg_text_t* gen = CAL(sizeof(tg_text_t), tg_text_del, NULL);
+  tg_text_t* gen = CAL(sizeof(tg_text_t), tg_text_del, tg_text_desc);
 
   view->tex_gen_data = gen;
   view->tex_gen      = tg_text_gen;

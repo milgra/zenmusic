@@ -16,9 +16,14 @@ cb_t* cb_new(void (*fp)(void*, void*), void* userdata);
 
 #if __INCLUDE_LEVEL__ == 0
 
+void cb_describe(void* p, int level)
+{
+  printf("callback\n");
+}
+
 cb_t* cb_new(void (*fp)(void*, void*), void* userdata)
 {
-  cb_t* cb     = CAL(sizeof(cb_t), NULL, NULL);
+  cb_t* cb     = CAL(sizeof(cb_t), NULL, cb_describe);
   cb->fp       = fp;
   cb->userdata = userdata;
 

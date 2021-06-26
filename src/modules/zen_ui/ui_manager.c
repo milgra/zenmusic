@@ -53,9 +53,9 @@ void ui_manager_destroy()
   REL(uim.implqueue);
   REL(uim.explqueue);
 
-  views_destroy();
-
   ui_generator_destroy(); // destroy
+
+  views_destroy();
 }
 
 void ui_manager_event(ev_t ev)

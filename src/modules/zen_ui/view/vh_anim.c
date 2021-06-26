@@ -265,9 +265,14 @@ void vh_anim_finish(view_t* view)
   vh->anim_alpha  = 0;
 }
 
+void vh_anim_desc(void* p, int level)
+{
+  printf("vh_anim\n");
+}
+
 void vh_anim_add(view_t* view)
 {
-  vh_anim_t* vh = CAL(sizeof(vh_anim_t), NULL, NULL);
+  vh_anim_t* vh = CAL(sizeof(vh_anim_t), NULL, vh_anim_desc);
 
   view->handler      = vh_anim_evt;
   view->handler_data = vh;

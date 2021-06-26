@@ -44,9 +44,14 @@ void vh_picker_del(void* p)
   if (vh->on_press) REL(vh->on_press);
 }
 
+void vh_picker_desc(void* p, int level)
+{
+  printf("vh_picker\n");
+}
+
 void vh_picker_add(view_t* view, cb_t* on_press)
 {
-  vh_picker_t* vh = CAL(sizeof(vh_picker_t), NULL, NULL);
+  vh_picker_t* vh = CAL(sizeof(vh_picker_t), vh_picker_del, vh_picker_desc);
 
   vh->on_press = on_press;
 

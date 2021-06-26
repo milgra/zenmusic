@@ -57,8 +57,6 @@ void ui_init(float width, float height)
   view_list = view_gen_load(config_get("html_path"), config_get("css_path"), config_get("res_path"), callbacks_get_data()); // REL 0
   view_base = vec_head(view_list);
 
-  view_desc(view_base, 0);
-
   // initial layout of views
 
   view_set_frame(view_base, (r2_t){0.0, 0.0, (float)width, (float)height});

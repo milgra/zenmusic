@@ -148,9 +148,14 @@ void tg_knob_del(void* p)
   if (tg->fore) REL(tg->fore);
 }
 
+void tg_knob_desc(void* p, int level)
+{
+  printf("tg_knob\n");
+}
+
 void tg_knob_add(view_t* view)
 {
-  tg_knob_t* tg = CAL(sizeof(tg_knob_t), tg_knob_del, NULL);
+  tg_knob_t* tg = CAL(sizeof(tg_knob_t), tg_knob_del, tg_knob_desc);
   tg->angle     = 3 * 3.14 / 2;
 
   view->tex_gen_data = tg;

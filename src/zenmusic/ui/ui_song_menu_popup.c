@@ -33,7 +33,7 @@ struct ui_song_menu_popup_t
 } slp = {0};
 
 view_t* ui_song_menu_popup_item_for_index(int index, void* userdata, view_t* listview, int* item_count);
-view_t* ui_song_menu_popupitem_create(int index, char* text);
+view_t* ui_song_menu_popupitem_new(int index, char* text);
 
 void ui_song_menu_popup_attach(view_t* baseview)
 {
@@ -49,12 +49,12 @@ void ui_song_menu_popup_attach(view_t* baseview)
 
   // create items
 
-  VADD(slp.items, ui_song_menu_popupitem_create(0, "Select song"));
-  VADD(slp.items, ui_song_menu_popupitem_create(1, "Select range"));
-  VADD(slp.items, ui_song_menu_popupitem_create(2, "Select all"));
-  VADD(slp.items, ui_song_menu_popupitem_create(3, "Jump to current song"));
-  VADD(slp.items, ui_song_menu_popupitem_create(4, "Edit selected songs"));
-  VADD(slp.items, ui_song_menu_popupitem_create(5, "Delete selected songs"));
+  VADDR(slp.items, ui_song_menu_popupitem_new(0, "Select song"));
+  VADDR(slp.items, ui_song_menu_popupitem_new(1, "Select range"));
+  VADDR(slp.items, ui_song_menu_popupitem_new(2, "Select all"));
+  VADDR(slp.items, ui_song_menu_popupitem_new(3, "Jump to current song"));
+  VADDR(slp.items, ui_song_menu_popupitem_new(4, "Edit selected songs"));
+  VADDR(slp.items, ui_song_menu_popupitem_new(5, "Delete selected songs"));
 
   // add list handler to view
 
@@ -110,7 +110,7 @@ void ui_song_menu_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* 
   }
 }
 
-view_t* ui_song_menu_popupitem_create(int index, char* text)
+view_t* ui_song_menu_popupitem_new(int index, char* text)
 {
   char*   rowid    = cstr_new_format(100, "smlist_item%i", index); // REL 0
   char*   cellid   = cstr_new_format(100, "%s%s", rowid, "field"); // REL 1
