@@ -50,8 +50,6 @@ struct mem_info
 {
   char* file;
   int   line;
-  char* file1;
-  int   line1;
   void* ptr;
 };
 
@@ -152,9 +150,6 @@ void* mem_retain(void* pointer, char* file, int line)
   // check memory range id
   assert(head->id[0] == 'z' && head->id[1] == 'c');
 
-  mem_infos[head->index].file1 = file;
-  mem_infos[head->index].line1 = line;
-
   head->retaincount += 1;
   if (head->retaincount == SIZE_MAX) mem_exit("Maximum retain count reached \\(o)_/ for", "", 0);
 
@@ -187,11 +182,6 @@ char mem_release(void* pointer, char* file, int line)
     free(bytes);
 
     return 1;
-  }
-  else if (head->retaincount == 1)
-  {
-    mem_infos[head->index].file1 = NULL;
-    mem_infos[head->index].line1 = 0;
   }
 
   return 0;
@@ -271,7 +261,7 @@ void mem_stat(void* pointer)
   // check memory range id
   assert(head->id[0] == 'z' && head->id[1] == 'c');
 
-  printf("mem stat %s %i %s %i", mem_infos[head->index].file, mem_infos[head->index].line, mem_infos[head->index].file1, mem_infos[head->index].line1);
+  printf("mem stat %s %i", mem_infos[head->index].file, mem_infos[head->index].line);
 }
 
 void mem_stats()
@@ -283,7 +273,7 @@ void mem_stats()
     char* file = mem_infos[index].file;
     if (file != NULL)
     {
-      printf("unreleased block %i at %s %i %s %i desc : ", index, mem_infos[index].file, mem_infos[index].line, mem_infos[index].file1, mem_infos[index].line1);
+      printf("unreleased block %i at %s %i desc : ", index, mem_infos[index].file, mem_infos[index].line);
       mem_describe(mem_infos[index].ptr, 0);
       printf("\n");
       count++;

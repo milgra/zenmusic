@@ -50,7 +50,9 @@ void ui_init(float width, float height)
 
   // callbacks setup for simple buttons
 
-  callbacks_set("on_button_press", cb_new(ui_on_button_down, NULL));
+  cb_t* button_down = cb_new(ui_on_button_down, NULL); // REL 0
+  callbacks_set("on_button_press", buttion_down);
+  REL(button_down); // REL 0
 
   // view setup with existing callbacks
 

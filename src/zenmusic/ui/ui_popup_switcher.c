@@ -54,7 +54,10 @@ void ui_popup_switcher_attach(view_t* baseview)
 
     vh_anim_add(page_view);
     vh_anim_set_event(page_view, page_view, ui_popup_switcher_remove);
-    vh_touch_add(btn_view, cb_new(ui_popup_switcher_on_button_down, NULL));
+
+    cb_t* button_down = cb_new(ui_popup_switcher_on_button_down, NULL); // REL 0
+    vh_touch_add(btn_view, button_down);
+    REL(button_down); // REL 0
 
     view_remove_from_parent(page_view);
 

@@ -19,8 +19,9 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
 
 void view_gen_apply_style(view_t* view, map_t* style, char* respath)
 {
-  vec_t* keys = VNEW();
+  vec_t* keys = VNEW(); // REL 0
   map_keys(style, keys);
+
   for (int index = 0; index < keys->length; index++)
   {
     char* key = keys->data[index];
@@ -213,6 +214,8 @@ void view_gen_apply_style(view_t* view, map_t* style, char* respath)
   /* printf("layout for %s: ", view->id); */
   /* view_desc_layout(view->layout); */
   /* printf("\n"); */
+
+  REL(keys);
 }
 
 vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callbacks)
