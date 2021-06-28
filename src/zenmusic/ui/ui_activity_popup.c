@@ -75,7 +75,7 @@ void ui_activity_popup_attach(view_t* baseview)
   ts.multiline   = 1;
 
   act.style = ts;
-  act.list  = textlist_new(listview, ts, ui_activity_popup_select);
+  act.list  = textlist_new(listview, ts, ui_activity_popup_select); // REL 1
   act.info  = infoview;
 
   act.style.align = TA_CENTER;
@@ -86,7 +86,8 @@ void ui_activity_popup_attach(view_t* baseview)
 void ui_activity_popup_detach()
 {
   log_set_proxy(NULL);
-  REL(act.logs); // REL G0
+  REL(act.logs); // REL 0
+  REL(act.list); // REL 1
 }
 
 #endif

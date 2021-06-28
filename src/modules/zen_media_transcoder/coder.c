@@ -386,7 +386,7 @@ int coder_load_metadata_into(const char* path, map_t* map)
       else
       {
         printf("coder_get_metadata no stream information found!!!\n");
-        MPUT(map, "file/duration", cstr_new_cstring("0"));
+        MPUTR(map, "file/duration", cstr_new_cstring("0"));
       }
 
       for (unsigned i = 0; i < pFormatCtx->nb_streams; i++)

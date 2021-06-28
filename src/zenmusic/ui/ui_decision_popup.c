@@ -58,7 +58,7 @@ void ui_decision_popup_attach(view_t* baseview)
   udp.ts       = ts;
   udp.tf       = tf;
   udp.attached = 1;
-  udp.requests = VNEW();
+  udp.requests = VNEW(); // REL 2
 
   REL(acc_cb); // REL 0
   REL(rej_cb); // REl 1
@@ -66,6 +66,7 @@ void ui_decision_popup_attach(view_t* baseview)
 
 void ui_decision_popup_detach()
 {
+  REL(udp.requests);
 }
 
 void ui_decision_popup_shownext()
@@ -83,7 +84,9 @@ void ui_decision_popup_shownext()
 void ui_decision_popup_show(char* text, cb_t* acc_cb, cb_t* rej_cb)
 {
   map_t* request = MNEW(); // REL 0
+
   MPUTR(request, "text", cstr_new_cstring(text));
+
   if (acc_cb) MPUT(request, "acc_cb", acc_cb);
   if (rej_cb) MPUT(request, "rej_cb", rej_cb);
 

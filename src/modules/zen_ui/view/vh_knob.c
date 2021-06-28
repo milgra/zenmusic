@@ -65,13 +65,15 @@ void vh_knob_evt(view_t* view, ev_t ev)
 
 void vh_knob_desc(void* p, int level)
 {
-  printf("vh_knob\n");
+  printf("vh_knob");
 }
 
 void vh_knob_add(view_t* view,
                  void (*ratio_changed)(view_t* view, float ratio),
                  void (*button_pushed)(view_t* view))
 {
+  assert(view->handler == NULL && view->handler_data == NULL);
+
   vh_knob_t* vh = CAL(sizeof(vh_knob_t), NULL, vh_knob_desc);
 
   vh->ratio_changed = ratio_changed;

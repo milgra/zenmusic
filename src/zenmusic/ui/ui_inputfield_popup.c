@@ -79,7 +79,7 @@ void ui_inputfield_popup_attach(view_t* baseview)
   uip.attached  = 1;
   uip.requests  = VNEW(); // REL 1
 
-  REL(cb_btn_press);
+  REL(cb_btn_press); // REL 0
 }
 
 void ui_inputfield_popup_detach()
@@ -112,6 +112,7 @@ void ui_inputfield_popup_show(char* text, cb_t* acc_cb, cb_t* rej_cb)
   map_t* request = MNEW(); // REL 0
 
   MPUTR(request, "text", cstr_new_cstring(text));
+
   if (acc_cb) MPUT(request, "acc_cb", acc_cb);
   if (rej_cb) MPUT(request, "rej_cb", rej_cb);
 

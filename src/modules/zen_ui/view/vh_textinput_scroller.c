@@ -42,7 +42,7 @@ void vh_textinput_scroller_del(void* p)
 
 void vh_textinput_scroller_desc(void* p, int level)
 {
-  printf("vh_textinput_scroller\n");
+  printf("vh_textinput_scroller");
 }
 
 void vh_textinput_scroller_add(view_t*     view,
@@ -51,6 +51,8 @@ void vh_textinput_scroller_add(view_t*     view,
                                textstyle_t textstyle,
                                void*       userdata)
 {
+  assert(view->handler == NULL && view->handler_data == NULL);
+
   vh_textinput_scroller_t* data = CAL(sizeof(vh_textinput_scroller_t), vh_textinput_scroller_del, vh_textinput_scroller_desc);
 
   assert(view->views->length == 3);
@@ -74,7 +76,7 @@ void vh_textinput_scroller_add(view_t*     view,
 
   view->handler_data = data;
 
-  REL(cb_btn_press);
+  REL(cb_btn_press); // REL 0
 }
 
 view_t* vh_textinput_scroller_item_for_index(int index, void* userdata, view_t* listview, int* item_count)

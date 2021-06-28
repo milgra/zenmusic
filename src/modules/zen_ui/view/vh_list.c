@@ -493,7 +493,7 @@ void vh_list_del(void* p)
 
 void vh_list_desc(void* p, int level)
 {
-  printf("vh_list\n");
+  printf("vh_list");
 }
 
 void vh_list_add(view_t*         view,
@@ -502,6 +502,8 @@ void vh_list_add(view_t*         view,
                  void (*item_recycle)(view_t* item),
                  void* userdata)
 {
+  assert(view->handler == NULL && view->handler_data == NULL);
+
   vh_list_t* vh      = CAL(sizeof(vh_list_t), vh_list_del, vh_list_desc);
   vh->userdata       = userdata;
   vh->items          = VNEW(); // REL 0

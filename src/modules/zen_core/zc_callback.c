@@ -18,7 +18,7 @@ cb_t* cb_new(void (*fp)(void*, void*), void* userdata);
 
 void cb_describe(void* p, int level)
 {
-  printf("callback\n");
+  printf("callback");
 }
 
 cb_t* cb_new(void (*fp)(void*, void*), void* userdata)

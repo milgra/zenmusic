@@ -579,7 +579,6 @@ void crect_desc(void* p, int level)
     if (index % 5 == 0) printf("\n");
     printf("%f ", r->data[index]);
   }
-  printf("\n");
 }
 
 #endif

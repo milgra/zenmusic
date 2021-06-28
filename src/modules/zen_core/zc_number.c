@@ -23,7 +23,7 @@ num_t* num_new_uint32(uint32_t val);
 void num_describe(void* p, int level)
 {
   num_t* num = p;
-  printf("num %f %i %u\n", num->floatv, num->intv, num->uint32v);
+  printf("num %f %i %u", num->floatv, num->intv, num->uint32v);
 }
 
 num_t* num_new_float(float val)

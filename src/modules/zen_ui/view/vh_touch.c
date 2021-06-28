@@ -34,11 +34,13 @@ void vh_touch_del(void* p)
 
 void vh_touch_desc(void* p, int level)
 {
-  printf("vh_touch\n");
+  printf("vh_touch");
 }
 
 void vh_touch_add(view_t* view, cb_t* event)
 {
+  assert(view->handler == NULL && view->handler_data == NULL);
+
   vh_touch_t* vh = CAL(sizeof(vh_touch_t), vh_touch_del, vh_touch_desc);
   vh->event      = event;
 

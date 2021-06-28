@@ -30,7 +30,7 @@ view_t* textlist_item_for_index(int index, void* data, view_t* listview, int* it
 
 void textlist_desc(void* p, int level)
 {
-  printf("textlist\n");
+  printf("textlist");
 }
 
 textlist_t* textlist_new(view_t* view, textstyle_t textstyle, void (*on_select)(int))

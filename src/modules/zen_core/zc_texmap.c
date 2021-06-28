@@ -45,7 +45,7 @@ int         tm_put(tm_t* tm, char* id, int w, int h);
 void tm_desc(void* p, int level)
 {
   tm_t* tm = p;
-  printf("tm w %i h %i\n", tm->width, tm->height);
+  printf("tm w %i h %i", tm->width, tm->height);
 }
 
 void tm_desc_blocks(void* p, int level)

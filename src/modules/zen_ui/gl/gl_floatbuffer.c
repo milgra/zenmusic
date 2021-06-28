@@ -26,12 +26,12 @@ void  fb_add(fb_t* fb, GLfloat* data, size_t count);
 
 void fb_desc(void* p, int level)
 {
-  printf("fb\n");
+  printf("fb");
 }
 
 void fb_desc_data(void* p, int level)
 {
-  printf("fb data\n");
+  printf("fb data");
 }
 
 fb_t* fb_new()

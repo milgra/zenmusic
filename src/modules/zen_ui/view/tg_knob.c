@@ -150,11 +150,13 @@ void tg_knob_del(void* p)
 
 void tg_knob_desc(void* p, int level)
 {
-  printf("tg_knob\n");
+  printf("tg_knob");
 }
 
 void tg_knob_add(view_t* view)
 {
+  assert(view->tex_gen == NULL);
+
   tg_knob_t* tg = CAL(sizeof(tg_knob_t), tg_knob_del, tg_knob_desc);
   tg->angle     = 3 * 3.14 / 2;
 

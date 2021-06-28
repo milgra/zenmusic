@@ -226,7 +226,7 @@ void ui_editor_popup_on_button_down(void* userdata, void* data)
     cb_t* acc_cb = cb_new(ui_editor_popup_on_accept, NULL); // REL 1
     ui_decision_popup_show(message, acc_cb, NULL);
     REL(message); // REL 0
-    REL(acc_cb);
+    REL(acc_cb);  // REL 1
   }
   if (strcmp(view->id, "editor_popup_reject_btn") == 0)
   {
@@ -578,7 +578,7 @@ void ui_editor_popup_set_songs(vec_t* vec)
         }
         else
         {
-          if (strcmp(curr, value) != 0) MPUT(ep.attributes, field, cstr_new_cstring("MULTIPLE"));
+          if (strcmp(curr, value) != 0) MPUTR(ep.attributes, field, cstr_new_cstring("MULTIPLE"));
         }
       }
     }

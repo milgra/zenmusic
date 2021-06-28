@@ -46,11 +46,13 @@ void vh_picker_del(void* p)
 
 void vh_picker_desc(void* p, int level)
 {
-  printf("vh_picker\n");
+  printf("vh_picker");
 }
 
 void vh_picker_add(view_t* view, cb_t* on_press)
 {
+  assert(view->handler == NULL && view->handler_data == NULL);
+
   vh_picker_t* vh = CAL(sizeof(vh_picker_t), vh_picker_del, vh_picker_desc);
 
   vh->on_press = on_press;

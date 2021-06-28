@@ -25,7 +25,7 @@ void col_del(void* p)
 
 void col_desc(void* p, int level)
 {
-  printf("col\n");
+  printf("col");
 }
 
 col_t* col_new(char* id, int size, int index)

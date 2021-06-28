@@ -65,11 +65,13 @@ void vh_roll_del(void* p)
 
 void vh_roll_desc(void* p, int level)
 {
-  printf("vh_roll\n");
+  printf("vh_roll");
 }
 
 void vh_roll_add(view_t* view, cb_t* roll_in, cb_t* roll_out)
 {
+  assert(view->handler == NULL && view->handler_data == NULL);
+
   vh_roll_t* vh = CAL(sizeof(vh_roll_t), vh_roll_del, vh_roll_desc);
   vh->roll_in   = roll_in;
   vh->roll_out  = roll_out;

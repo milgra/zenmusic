@@ -67,11 +67,13 @@ void tg_text_del(void* p)
 
 void tg_text_desc(void* p, int level)
 {
-  printf("tg_text\n");
+  printf("tg_text");
 }
 
 void tg_text_add(view_t* view)
 {
+  assert(view->tex_gen == NULL);
+
   tg_text_t* gen = CAL(sizeof(tg_text_t), tg_text_del, tg_text_desc);
 
   view->tex_gen_data = gen;

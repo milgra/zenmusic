@@ -458,7 +458,7 @@ void view_gen_texture(view_t* view)
 void view_desc(void* pointer, int level)
 {
   view_t* view = (view_t*)pointer;
-  printf("%*.sid %s frame %.1f %.1f %.1f %.1f tex %i ret %zx\n", level, " ",
+  printf("%*.sid %s frame %.1f %.1f %.1f %.1f tex %i ret %zx", level, " ",
          view->id,
          view->frame.local.x,
          view->frame.local.y,

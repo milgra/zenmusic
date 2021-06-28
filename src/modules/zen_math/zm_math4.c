@@ -556,7 +556,7 @@ m4_t m4_transpose(m4_t matrix)
 void m4_describe(m4_t matrix)
 {
   printf("%.2f %.2f %.2f %.2f | %.2f %.2f %.2f %.2f | %.2f %.2f %.2f %.2f | "
-         "%.2f %.2f %.2f %.2f\n",
+         "%.2f %.2f %.2f %.2f",
          matrix.m00,
          matrix.m01,
          matrix.m02,

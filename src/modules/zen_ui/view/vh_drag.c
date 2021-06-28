@@ -23,6 +23,8 @@ void vh_drag_evt(view_t* view, ev_t ev)
 
 void vh_drag_add(view_t* view)
 {
+  assert(view->handler == NULL && view->handler_data == NULL);
+
   view->handler_data = vh_drag_evt;
 }
 

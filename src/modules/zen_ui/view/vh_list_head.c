@@ -50,11 +50,13 @@ void vh_lhead_resize(view_t* view);
 
 void vh_lhead_desc(void* p, int level)
 {
-  printf("vh_lhead\n");
+  printf("vh_lhead");
 }
 
 void vh_lhead_add(view_t* view)
 {
+  assert(view->handler == NULL && view->handler_data == NULL);
+
   vh_lhead_t* vh = CAL(sizeof(vh_lhead_t), vh_lhead_del, vh_lhead_desc);
   vh->cells      = VNEW();
 
@@ -196,7 +198,7 @@ void vh_lhead_resize(view_t* view)
 void vh_lhead_add_cell(view_t* view, char* id, int size, view_t* cellview)
 {
   vh_lhead_t* vh   = view->handler_data;
-  vh_lcell_t* cell = vh_lcell_new(id, size, cellview, vh->cells->length);
+  vh_lcell_t* cell = vh_lcell_new(id, size, cellview, vh->cells->length); // REL 0
 
   // disable touch to enable mouse events
   cellview->needs_touch = 0;
@@ -210,6 +212,8 @@ void vh_lhead_add_cell(view_t* view, char* id, int size, view_t* cellview)
   // arrange and resize
   vh_lcell_arrange(vh->cells);
   vh_lhead_resize(view);
+
+  REL(cell);
 }
 
 view_t* vh_lhead_get_cell(view_t* view, char* id)

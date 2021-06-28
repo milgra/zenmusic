@@ -39,7 +39,7 @@ void ui_alert_popup_attach(view_t* baseview)
   cb_t*   acc_cb  = cb_new(ui_alert_popup_accept, NULL); // REL 1
   vh_button_add(acc_btn, VH_BUTTON_NORMAL, acc_cb);
 
-  REL(acc_cb);
+  REL(acc_cb); // REL 1
 }
 
 void ui_alert_popup_detach()

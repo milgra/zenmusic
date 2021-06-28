@@ -103,8 +103,8 @@ void init(int width, int height, char* path)
 {
   srand((unsigned int)time(NULL));
 
-  zm.lib_ch = ch_new(100); // comm channel for library entries
-  zm.rem_ch = ch_new(10);  // remote channel
+  zm.lib_ch = ch_new(100); // REL -1 // comm channel for library entries
+  zm.rem_ch = ch_new(10);  // REL -2 // remote channel
 
   db_init();        // destroy 1
   config_init();    // destroy 2
@@ -114,9 +114,17 @@ void init(int width, int height, char* path)
 
   // init callbacks
 
-  callbacks_set("on_change_remote", cb_new(on_change_remote, NULL));
-  callbacks_set("on_change_library", cb_new(on_change_library, NULL));
-  callbacks_set("on_change_organize", cb_new(on_change_organize, NULL));
+  cb_t* change_remote   = cb_new(on_change_remote, NULL);
+  cb_t* change_library  = cb_new(on_change_library, NULL);
+  cb_t* change_organize = cb_new(on_change_organize, NULL);
+
+  callbacks_set("on_change_remote", change_remote);
+  callbacks_set("on_change_library", change_library);
+  callbacks_set("on_change_organize", change_organize);
+
+  REL(change_remote);
+  REL(change_library);
+  REL(change_organize);
 
   // init paths
 
@@ -196,10 +204,15 @@ void init(int width, int height, char* path)
 
   // cleanup
 
+  REL(wrk_path);
   REL(res_path);
+  REL(cfgdir_path);
   REL(css_path);
   REL(html_path);
   REL(font_path);
+  REL(cfg_path);
+  if (rec_path) REL(rec_path);
+  if (rep_path) REL(rep_path);
 }
 
 void update(ev_t ev)
@@ -248,7 +261,6 @@ void destroy()
 {
   remote_close(); // CLOSE 0
 
-  ui_destroy();                    // destroy 8
   if (zm.rep_par) evrec_destroy(); // destroy 7
   if (zm.rec_par) evrec_destroy(); // destroy 6
   callbacks_destroy();             // destroy 5
@@ -258,10 +270,15 @@ void destroy()
   db_destroy();                    // destroy 1
   wm_destroy();                    // destroy 0
 
+  ui_destroy(); // destroy 8
+
   if (zm.cfg_par) REL(zm.cfg_par); // REL 0
   if (zm.res_par) REL(zm.res_par); // REL 1
   if (zm.rec_par) REL(zm.rec_par); // REL 2
   if (zm.rep_par) REL(zm.rep_par); // REL 3
+
+  REL(zm.lib_ch); // REL -1
+  REL(zm.rem_ch); // REL -2
 
   mem_stats();
 }

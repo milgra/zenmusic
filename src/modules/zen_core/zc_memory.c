@@ -45,6 +45,9 @@ void     mem_stats();
 /*******DEBUGGING********/
 
 #define ZC_MAX_BLOCKS 100000
+#define ZC_TRACEROUTE_ALLOC 0
+#define ZC_TRACEROUTE_CALLOC 0
+#define ZC_TRACEROUTE_RETAIN 0
 
 struct mem_info
 {
@@ -54,7 +57,7 @@ struct mem_info
 };
 
 struct mem_info mem_infos[ZC_MAX_BLOCKS] = {0};
-uint32_t        mem_index                = 0; /* live object counter for debugging */
+uint32_t        mem_index                = 1; /* live object counter for debugging */
 
 /************************/
 
@@ -81,6 +84,10 @@ void* mem_alloc(size_t size,                    /* size of data to store */
   mem_infos[mem_index].file = file;
   mem_infos[mem_index].line = line;
   mem_infos[mem_index].ptr  = bytes + sizeof(struct mem_head);
+
+  // debug
+  if (mem_index == ZC_TRACEROUTE_ALLOC) abort();
+
   mem_index++;
 
   return bytes + sizeof(struct mem_head);
@@ -109,6 +116,10 @@ void* mem_calloc(size_t size,                    /* size of data to store */
   mem_infos[mem_index].file = file;
   mem_infos[mem_index].line = line;
   mem_infos[mem_index].ptr  = bytes + sizeof(struct mem_head);
+
+  // debug
+  if (mem_index == ZC_TRACEROUTE_CALLOC) abort();
+
   mem_index++;
 
   return bytes + sizeof(struct mem_head);
@@ -149,6 +160,9 @@ void* mem_retain(void* pointer, char* file, int line)
 
   // check memory range id
   assert(head->id[0] == 'z' && head->id[1] == 'c');
+
+  // debug
+  if (head->index == ZC_TRACEROUTE_RETAIN) abort();
 
   head->retaincount += 1;
   if (head->retaincount == SIZE_MAX) mem_exit("Maximum retain count reached \\(o)_/ for", "", 0);

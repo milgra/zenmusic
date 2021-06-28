@@ -62,9 +62,6 @@ void ui_play_controls_attach(view_t* baseview)
 
   cb_t* cb_btn_press = cb_new(ui_play_on_button_down, NULL); // REL 0
 
-  vh_button_add(uipc.playbtn, VH_BUTTON_NORMAL, cb_btn_press);
-  vh_button_add(uipc.mutebtn, VH_BUTTON_NORMAL, cb_btn_press);
-
   vh_button_add(view_get_subview(baseview, "nextbtn"), VH_BUTTON_NORMAL, cb_btn_press);
   vh_button_add(view_get_subview(baseview, "prevbtn"), VH_BUTTON_NORMAL, cb_btn_press);
   vh_button_add(view_get_subview(baseview, "shufflebtn"), VH_BUTTON_TOGGLE, cb_btn_press);

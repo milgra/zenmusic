@@ -35,7 +35,7 @@ typedef struct _prop_t
   range_t value;
 } prop_t;
 
-char*   html_read(char* path);
+char*   html_new_read(char* path);
 tag_t*  html_new_parse_html(char* path);
 prop_t* html_new_parse_css(char* path);
 
@@ -43,7 +43,7 @@ prop_t* html_new_parse_css(char* path);
 
 #if __INCLUDE_LEVEL__ == 0
 
-char* html_read(char* path)
+char* html_new_read(char* path)
 {
   FILE* f = fopen(path, "rb"); // CLOSE 0
 
@@ -54,7 +54,7 @@ char* html_read(char* path)
     long fsize = ftell(f);
     fseek(f, 0, SEEK_SET);
 
-    char* string = CAL(fsize + 1, NULL, cstr_describe);
+    char* string = CAL(fsize + 1, NULL, cstr_describe); // REL 0
 
     fread(string, 1, fsize, f);
     fclose(f); // CLOSE 0
@@ -175,7 +175,7 @@ void analyze_tags(char* html, tag_t* tags, uint32_t count)
 
 void tag_describe(void* p, int level)
 {
-  printf("html tag_t\n");
+  printf("html tag_t");
 }
 
 tag_t* html_new_parse_html(char* html)
@@ -251,7 +251,7 @@ void analyze_classes(char* css, prop_t* props)
 
 void prop_desc(void* p, int level)
 {
-  printf("html prop_t\n");
+  printf("html prop_t");
 }
 
 prop_t* html_new_parse_css(char* css)

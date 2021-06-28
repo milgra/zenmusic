@@ -75,7 +75,7 @@ void ui_lib_init_popup_attach(view_t* baseview)
 
   view_remove_from_parent(ulip.view);
 
-  REL(cb_btn_press);
+  REL(cb_btn_press); // REL 0
 }
 
 void ui_lib_init_popup_detach()

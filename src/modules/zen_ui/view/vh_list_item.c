@@ -39,11 +39,13 @@ void vh_litem_del(void* p);
 
 void vh_litem_desc(void* p, int level)
 {
-  printf("vh_litem\n");
+  printf("vh_litem");
 }
 
 void vh_litem_add(view_t* view, void* userdata)
 {
+  assert(view->handler == NULL && view->handler_data == NULL);
+
   vh_litem_t* vh = CAL(sizeof(vh_litem_t), vh_litem_del, vh_litem_desc);
   vh->cells      = VNEW();
   vh->userdata   = userdata;
@@ -106,7 +108,7 @@ void vh_litem_resize(view_t* view)
 void vh_litem_add_cell(view_t* view, char* id, int size, view_t* cellview)
 {
   vh_litem_t* vh   = view->handler_data;
-  vh_lcell_t* cell = vh_lcell_new(id, size, cellview, vh->cells->length);
+  vh_lcell_t* cell = vh_lcell_new(id, size, cellview, vh->cells->length); // REL 0
 
   view_set_block_touch(cellview, 0, 1);
 
@@ -119,6 +121,8 @@ void vh_litem_add_cell(view_t* view, char* id, int size, view_t* cellview)
   // arrange and resize
   vh_lcell_arrange(vh->cells);
   vh_litem_resize(view);
+
+  REL(cell);
 }
 
 view_t* vh_litem_get_cell(view_t* view, char* id)

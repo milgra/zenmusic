@@ -91,6 +91,8 @@ void tg_css_gen(view_t* view)
 
 void tg_css_add(view_t* view)
 {
+  assert(view->tex_gen == NULL);
+
   view->tex_gen = tg_css_gen;
   view->exclude = 0;
 }

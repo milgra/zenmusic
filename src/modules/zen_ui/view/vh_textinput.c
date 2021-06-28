@@ -361,7 +361,7 @@ void vh_textinput_del(void* p)
 
 void vh_textinput_desc(void* p, int level)
 {
-  printf("vh_textinput\n");
+  printf("vh_textinput");
 }
 
 void vh_textinput_add(view_t*     view,
@@ -370,6 +370,8 @@ void vh_textinput_add(view_t*     view,
                       textstyle_t textstyle,
                       void*       userdata)
 {
+  assert(view->handler == NULL && view->handler_data == NULL);
+
   char* id_c = cstr_new_format(100, "%s%s", view->id, "crsr");   // REL 0
   char* id_h = cstr_new_format(100, "%s%s", view->id, "holder"); // REL 1
 

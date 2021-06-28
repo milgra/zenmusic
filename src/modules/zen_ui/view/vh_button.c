@@ -147,11 +147,13 @@ void vh_button_del(void* p)
 
 void vh_button_desc(void* p, int level)
 {
-  printf("vh_button\n");
+  printf("vh_button");
 }
 
 void vh_button_add(view_t* view, vh_button_type_t type, cb_t* event)
 {
+  assert(view->handler == NULL && view->handler_data == NULL);
+
   vh_button_t* vh = CAL(sizeof(vh_button_t), vh_button_del, vh_button_desc);
   vh->event       = event;
   vh->type        = type;

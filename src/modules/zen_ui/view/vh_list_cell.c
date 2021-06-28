@@ -32,11 +32,13 @@ void vh_lcell_del(void* p)
 
 void vh_lcell_desc(void* p, int level)
 {
-  printf("vh_lcell\n");
+  printf("vh_lcell");
 }
 
 vh_lcell_t* vh_lcell_new(char* id, int size, view_t* view, int index)
 {
+  assert(view->handler == NULL && view->handler_data == NULL);
+
   vh_lcell_t* cell = CAL(sizeof(vh_lcell_t), vh_lcell_del, vh_lcell_desc);
   cell->id         = cstr_new_cstring(id); // REL 0
   cell->size       = size;

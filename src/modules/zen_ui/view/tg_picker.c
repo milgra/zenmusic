@@ -99,6 +99,8 @@ void tg_picker_gen(view_t* view)
 
 void tg_picker_add(view_t* view)
 {
+  assert(view->tex_gen == NULL);
+
   view->tex_gen = tg_picker_gen;
   view->exclude = 0;
 }
