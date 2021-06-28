@@ -261,13 +261,9 @@ void* vec_tail(vec_t* vector)
 
 uint32_t vec_index_of_data(vec_t* vector, void* data)
 {
-  void**   actual = vector->data;
-  uint32_t index  = 0;
-  while (index < vector->length)
+  for (int index = 0; index < vector->length; index++)
   {
-    if (*actual == data) return index;
-    index++;
-    actual += 1;
+    if (vector->data[index] == data) return index;
   }
   return UINT32_MAX;
 }

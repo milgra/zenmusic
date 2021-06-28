@@ -143,8 +143,8 @@ int analyzer_thread(void* chptr)
       MPUT(song, "file/added", time_str);
       MPUT(song, "file/last_played", time_str);
       MPUT(song, "file/last_skipped", time_str);
-      MPUT(song, "file/play_count", cstr_new_cstring("0"));
-      MPUT(song, "file/skip_count", cstr_new_cstring("0"));
+      MPUTR(song, "file/play_count", cstr_new_cstring("0"));
+      MPUTR(song, "file/skip_count", cstr_new_cstring("0"));
 
       char* real = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s", lib.path, path); // REL 1
 
@@ -194,9 +194,9 @@ int analyzer_thread(void* chptr)
   }
 
   // send empty song to initiaite finish
-  song = MNEW();                                       // REL 2
-  MPUT(song, "file/path", cstr_new_cstring("//////")); // impossible path
-  ch_send(channel, song);                              // send finishing entry
+  song = MNEW();                                        // REL 2
+  MPUTR(song, "file/path", cstr_new_cstring("//////")); // impossible path
+  ch_send(channel, song);                               // send finishing entry
 
   REL(lib.files); // REL 0
   REL(lib.paths); // REL 1

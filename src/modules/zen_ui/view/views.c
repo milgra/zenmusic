@@ -31,13 +31,19 @@ void views_init()
 
 void views_describe()
 {
+  int count = 0;
   for (int index = 0; index < views.list->length; index++)
   {
     view_t* view = views.list->data[index];
-    printf("view %s retc %zu ", view->id, mem_retaincount(view));
-    mem_stat(view);
-    printf("\n");
+    if (mem_retaincount(view) > 1)
+    {
+      printf("view %s retc %zu ", view->id, mem_retaincount(view));
+      mem_stat(view);
+      printf("\n");
+      ++count;
+    }
   }
+  printf("total unreleased views : %i\n", count);
 }
 
 void views_destroy()
@@ -53,7 +59,7 @@ void views_destroy()
     view->tex_gen_data = NULL;
   }
 
-  // views_describe();
+  views_describe();
 
   // release list
   REL(views.list);

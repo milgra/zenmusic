@@ -354,14 +354,16 @@ view_t* ui_editor_popup_new_item()
   for (int i = 0; i < ep.cols->length; i++)
   {
     col_t*  col     = ep.cols->data[i];
-    char*   id      = cstr_new_format(100, "%s%s", rowview->id, col->id);
-    view_t* colview = view_new(id, (r2_t){0, 0, col->size, 35});
-    REL(id);
+    char*   id1     = cstr_new_format(100, "%s%s", rowview->id, col->id); // REL 2
+    view_t* colview = view_new(id1, (r2_t){0, 0, col->size, 35});         // REL 3
+    REL(id1);                                                             // REL 2
 
     tg_text_add(colview);
     tg_text_set(colview, col->id, ep.textstyle);
 
     vh_litem_add_cell(rowview, col->id, col->size, colview);
+
+    REL(colview); // REL 3
   }
 
   REL(id); // REL 0
@@ -481,6 +483,9 @@ void ui_editor_popup_create_items()
   vec_reset(ep.fields);
   vec_reset(ep.items);
 
+  // reset list handler
+  vh_list_reset(ep.list_view);
+
   // add mandatory fields and remaining fields
 
   // store song and extract fields
@@ -514,14 +519,13 @@ void ui_editor_popup_create_items()
   REL(tmpfields); // REL 0
   REL(tmpmap);    // REL 1
 
-  // reset list handler
-  vh_list_reset(ep.list_view);
-
   // create items
 
   for (int index = 0; index < ep.fields->length; index++)
   {
     view_t* item = ui_editor_popup_new_item(); // REL 4
+
+    printf("CREATE %s\n", item->id);
 
     vh_litem_upd_index(item, index);
 

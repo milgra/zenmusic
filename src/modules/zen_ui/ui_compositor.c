@@ -498,6 +498,7 @@ void crect_del(void* pointer)
 
 void crect_set_id(crect_t* r, char* id)
 {
+  if (r->id) REL(r->id);
   r->id = RET(id);
 }
 

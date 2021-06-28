@@ -44,6 +44,7 @@ void    ui_songlist_item_recycle(view_t* item);
 struct ui_songlist_t
 {
   view_t*     view;    // table view
+  vec_t*      items;   // all items
   vec_t*      cache;   // item cache
   vec_t*      columns; // fileds in table
   vec_t*      fields;  // real field names
@@ -60,6 +61,7 @@ void ui_songlist_attach(view_t* base)
   assert(base != NULL);
 
   sl.view    = view_get_subview(base, "songlist");
+  sl.items   = VNEW(); // REL -1
   sl.cache   = VNEW(); // REL 0
   sl.columns = VNEW(); // REL 1
   sl.fields  = VNEW(); // REL 2
@@ -170,6 +172,7 @@ void ui_songlist_detach()
 {
   vh_list_reset(sl.view);
 
+  REL(sl.items);   // REL -1
   REL(sl.cache);   // REL 0
   REL(sl.columns); // REL 1
   REL(sl.fields);  // REL 2
@@ -416,7 +419,14 @@ void songitem_update_row(view_t* rowview, int index, map_t* file, uint32_t color
 
 void ui_songlist_item_recycle(view_t* item)
 {
-  VADD(sl.cache, item);
+  uint32_t index = vec_index_of_data(sl.cache, item);
+
+  if (index == UINT32_MAX)
+  {
+    VADD(sl.cache, item);
+  }
+  else
+    printf("item exists in sl.cache %s\n", item->id);
 }
 
 view_t* ui_songlist_item_for_index(int index, void* userdata, view_t* listview, int* item_count)
@@ -430,7 +440,11 @@ view_t* ui_songlist_item_for_index(int index, void* userdata, view_t* listview, 
   if (sl.cache->length > 0)
     item = sl.cache->data[0];
   else
+  {
     item = songitem_new();
+    VADD(sl.items, item);
+    REL(item);
+  }
 
   VREM(sl.cache, item);
 

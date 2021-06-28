@@ -12,8 +12,7 @@
 
 typedef struct _vh_lhead_t
 {
-  vec_t*  cells;
-  view_t* view;
+  vec_t* cells;
 
   vh_lcell_t* dragged_cell;
   int         dragged_pos;

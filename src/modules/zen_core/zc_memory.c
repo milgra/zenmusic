@@ -280,7 +280,6 @@ void mem_stat(void* pointer)
 
 void mem_stats()
 {
-  printf("MEM STATS\n");
   uint32_t count = 0;
   for (int index = 0; index < mem_index; index++)
   {

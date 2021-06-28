@@ -172,9 +172,14 @@ void vh_list_evt(view_t* view, ev_t ev)
 
         if (item)
         {
-          VADD(vh->items, item);
-
-          view_insert_subview(view, item, 0);
+          uint32_t index = vec_index_of_data(vh->items, item);
+          if (index == UINT32_MAX)
+          {
+            VADD(vh->items, item);
+            view_insert_subview(view, item, 0);
+          }
+          else
+            printf("VH LIST EMPTY : ITEM ALREADY IN ITEMS %s %i\n", item->id, vh->head_index);
 
           view_set_frame(item, (r2_t){0, vh->head_pos, item->frame.local.w, item->frame.local.h});
 
@@ -196,9 +201,15 @@ void vh_list_evt(view_t* view, ev_t ev)
 
           if (item)
           {
-            vec_ins(vh->items, item, 0);
+            uint32_t index = vec_index_of_data(vh->items, item);
 
-            view_insert_subview(view, item, 0);
+            if (index == UINT32_MAX)
+            {
+              vec_ins(vh->items, item, 0);
+              view_insert_subview(view, item, 0);
+            }
+            else
+              printf("VH LIST TOP : ITEM ALREADY IN ITEMS %s index %i\n", item->id, vh->head_index - 1);
 
             vh->full     = 0;                    // there is probably more to come
             vh->item_wth = item->frame.global.w; // store maximum width
@@ -222,9 +233,15 @@ void vh_list_evt(view_t* view, ev_t ev)
 
           if (item)
           {
-            VADD(vh->items, item);
+            uint32_t index = vec_index_of_data(vh->items, item);
 
-            view_insert_subview(view, item, 0);
+            if (index == UINT32_MAX)
+            {
+              VADD(vh->items, item);
+              view_insert_subview(view, item, 0);
+            }
+            else
+              printf("VH LIST BOTTOM : ITEM ALREADY IN ITEMS %s index %i\n", item->id, vh->tail_index + 1);
 
             vh->full     = 0;                    // there is probably more to come
             vh->item_wth = item->frame.global.w; // store maximum width

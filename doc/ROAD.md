@@ -10,6 +10,7 @@
 
 **near future**
 
+ - editor popup creates new list views with every open
  - multiple texture full on drag scroll
  - glyph grey out when texture reset
  - id editor textinput mask problem

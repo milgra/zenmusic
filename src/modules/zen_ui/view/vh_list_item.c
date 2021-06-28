@@ -49,6 +49,7 @@ void vh_litem_add(view_t* view, void* userdata)
   vh_litem_t* vh = CAL(sizeof(vh_litem_t), vh_litem_del, vh_litem_desc);
   vh->cells      = VNEW();
   vh->userdata   = userdata;
+  vh->view       = view;
 
   view->handler_data = vh;
   view->handler      = vh_litem_evt;
