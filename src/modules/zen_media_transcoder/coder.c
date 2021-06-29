@@ -191,10 +191,12 @@ void coder_load_image_into(const char* path, bm_t* bitmap)
                           0,
                           0);
 
+          free(scaledpixels[0]);
           sws_freeContext(img_convert_ctx); // FREE 4
         }
 
-        av_frame_free(&frame);   // FREE 2
+        av_frame_free(&frame); // FREE 2
+        av_packet_unref(packet);
         av_packet_free(&packet); // FREE 3
 
         avcodec_free_context(&codecContext); // FREE 1

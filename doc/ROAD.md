@@ -2,7 +2,7 @@
 
 **before release**
 
- - fix leaks
+ - scroll eats up memory - new items are created not recycled
  - manual test
  - automated tests
  - youtube video
@@ -10,6 +10,7 @@
 
 **near future**
 
+ - join pthreads to avoid memory leak report
  - editor popup creates new list views with every open
  - multiple texture full on drag scroll
  - glyph grey out when texture reset

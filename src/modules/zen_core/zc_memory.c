@@ -44,7 +44,7 @@ void     mem_stats();
 
 /*******DEBUGGING********/
 
-#define ZC_MAX_BLOCKS 100000
+#define ZC_MAX_BLOCKS 10000000
 #define ZC_TRACEROUTE_ALLOC 0
 #define ZC_TRACEROUTE_CALLOC 0
 #define ZC_TRACEROUTE_RETAIN 0
@@ -90,6 +90,8 @@ void* mem_alloc(size_t size,                    /* size of data to store */
 
   mem_index++;
 
+  if (mem_index == ZC_MAX_BLOCKS) printf("INCREASE ZC_MAX_BLOCKS COUNT IN ZC_MEMORY\n");
+
   return bytes + sizeof(struct mem_head);
 }
 
@@ -121,6 +123,8 @@ void* mem_calloc(size_t size,                    /* size of data to store */
   if (mem_index == ZC_TRACEROUTE_CALLOC) abort();
 
   mem_index++;
+
+  if (mem_index == ZC_MAX_BLOCKS) printf("INCREASE ZC_MAX_BLOCKS COUNT IN ZC_MEMORY\n");
 
   return bytes + sizeof(struct mem_head);
 }
