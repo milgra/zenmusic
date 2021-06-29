@@ -429,7 +429,7 @@ void map_printkeys(map_t* map)
 void map_describe(void* p, int level)
 {
   map_t* map  = p;
-  vec_t* keys = VNEW();
+  vec_t* keys = VNEW(); // REL 0
   map_keys(map, keys);
   printf("{");
   for (int index = 0; index < keys->length; index++)
@@ -439,6 +439,7 @@ void map_describe(void* p, int level)
     mem_describe(map_get(map, key), level + 1);
   }
   printf("\n%*s}", level, " ");
+  REL(keys);
 }
 
 // tests map

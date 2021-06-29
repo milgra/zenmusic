@@ -147,15 +147,13 @@ void ui_play_index(int index)
     vec_t* songs   = visible_get_songs();
     map_t* songmap = songs->data[uipc.lastindex];
 
-    if (uipc.current_path) REL(uipc.current_path);
     uipc.current_path = MGET(songmap, "file/path");
-    RET(uipc.current_path);
 
     char* path = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s", config_get("lib_path"), uipc.current_path); // REL 0
 
     player_play(path);
     player_set_volume(0.9);
-    REL(path);
+    REL(path); // REL 0
 
     vh_button_set_state(uipc.playbtn, VH_BUTTON_DOWN);
   }

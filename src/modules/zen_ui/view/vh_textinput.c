@@ -497,16 +497,17 @@ void vh_textinput_set_text(view_t* view, char* text)
 
     for (int i = 0; i < data->text_s->length; i++)
     {
-      str_t* charstr = str_new();
+      str_t* charstr = str_new(); // REL 0
       str_add_codepoint(charstr, data->text_s->codepoints[i]);
       char view_id[100];
       snprintf(view_id, 100, "%sglyph%i", view->id, data->glyph_index++);
-      view_t* glyph_view = view_new(view_id, (r2_t){0, 0, 0, 0});
+      view_t* glyph_view = view_new(view_id, (r2_t){0, 0, 0, 0}); // REL 1
       vh_anim_add(glyph_view);
 
       VADD(data->glyph_v, glyph_view);
 
-      REL(charstr);
+      REL(charstr);    // REL 0
+      REL(glyph_view); // REL 1
     }
   }
 

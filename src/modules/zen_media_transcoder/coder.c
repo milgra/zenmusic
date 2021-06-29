@@ -592,7 +592,7 @@ int coder_write_metadata(char* libpath, char* path, char* cover_path, map_t* dat
             av_dict_copy(&enc_ctx->metadata, dec_ctx->metadata, 0);
 
             AVDictionaryEntry* tag    = NULL;
-            vec_t*             fields = VNEW();
+            vec_t*             fields = VNEW(); // REL 0
 
             printf("Existing tags:\n");
             while ((tag = av_dict_get(enc_ctx->metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) printf("%s : %s\n", tag->key, tag->value);
@@ -606,6 +606,8 @@ int coder_write_metadata(char* libpath, char* path, char* cover_path, map_t* dat
               av_dict_set(&enc_ctx->metadata, field + 5, value, 0);
               printf("added/updated %s to %s\n", field + 5, value);
             }
+
+            REL(fields);
 
             for (int fi = 0; fi < drop->length; fi++)
             {

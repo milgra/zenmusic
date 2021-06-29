@@ -115,8 +115,6 @@ void ui_editor_popup_attach(view_t* view)
   ep.cover      = NULL;   // REL 5
   ep.cols       = VNEW(); // REL 6
 
-  RET(ep.textinput); // REL 7
-
   r2_t frame = textinput->frame.local;
   frame.x    = 0;
   frame.y    = 0;
@@ -164,7 +162,6 @@ void ui_editor_popup_detach()
   REL(ep.removed);
   if (ep.cover) REL(ep.cover);
   REL(ep.cols);
-  REL(ep.textinput);
 }
 
 void ui_editor_popup_show()
@@ -449,9 +446,9 @@ void ui_editor_popup_input_cell_edit_finished(view_t* inputview)
 
   textcell->blocks_touch = 0;
 
-  REL(id);
-  REL(textcell);
-  REL(text);
+  REL(id);       // REL 1
+  REL(textcell); // REL 2
+  REL(text);     // REL 0
 
   vh_textinput_set_text(vh_textinput_scroller_get_input_view(ep.textinput), "");
 }
@@ -624,8 +621,8 @@ void ui_editor_popup_on_accept()
   vec_t* songs = VNEW(); // REL 0
   ui_songlist_get_selected(songs);
 
-  /* printf("SELECTED\n"); */
-  /* mem_describe(selected, 0); */
+  /* /\* printf("SELECTED\n"); *\/ */
+  /* /\* mem_describe(selected, 0); *\/ */
   /* printf("CHANGED\n"); */
   /* mem_describe(ep.changed, 0); */
   /* printf("REMOVED\n"); */
