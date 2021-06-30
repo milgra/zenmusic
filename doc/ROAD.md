@@ -2,20 +2,15 @@
 
 **before release**
 
- - scroll eats up memory - new items are created not recycled
+ - youtube video
  - manual test
  - automated tests
- - youtube video
- - activity crash
 
 **near future**
 
- - release all bitmaps after adding to texmap, re-render them on texture reset
+ - release all bitmaps after adding to texmap, re-render them on texture reset to save 300M memory
  - join pthreads to avoid memory leak report
- - editor popup creates new list views with every open
- - multiple texture full on drag scroll
  - glyph grey out when texture reset
- - id editor textinput mask problem
  - show scrollbar on mouse over, fade in/out
  - use zen_callback in all view handlers
  - set window dimensions with command line parameters

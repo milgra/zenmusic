@@ -74,6 +74,7 @@ typedef enum _texst_t // texture loading state
   TS_BLANK,   /* texture is empty */
   TS_PENDING, /* texture is under generation */
   TS_READY,   /* texture is generated */
+  TS_STORED,  /* texture is stored in texmap */
 } texst_t;
 
 typedef enum _textype_t
