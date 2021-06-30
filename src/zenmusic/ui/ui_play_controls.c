@@ -138,9 +138,6 @@ void ui_play_index(int index)
       db_write(config_get("lib_path"));
 
       REL(time_str); // REL 0
-
-      printf("play/skip count increased\n");
-      mem_describe(entry, 0);
     }
 
     ui_song_infos_show(uipc.lastindex);

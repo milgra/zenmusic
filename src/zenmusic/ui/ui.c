@@ -123,8 +123,6 @@ void ui_init(float width, float height)
 
 void ui_destroy()
 {
-  printf("ui destroy\n");
-
   ui_songlist_detach();         // DETACH 0
   ui_song_infos_detach();       // DETACH 1
   ui_visualizer_detach();       // DETACH 2

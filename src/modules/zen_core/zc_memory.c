@@ -14,27 +14,29 @@
 
 struct mem_head
 {
-  char     id[2]; // starting bytes for zc_memory managed memory ranges to detect invalid object during retain/release
-  uint32_t index; // allocation index for debugging/safety checks
-
+  char id[2]; // starting bytes for zc_memory managed memory ranges to detect invalid object during retain/release
+#ifdef DEBUG
+  uint32_t index; // allocation index for debugging/statistics
+#endif
   void (*destructor)(void*);
   void (*descriptor)(void*, int);
   size_t retaincount;
 };
 
-void*    mem_alloc(size_t size, void (*destructor)(void*), void (*descriptor)(void*, int), char* file, int line);
-void*    mem_calloc(size_t size, void (*destructor)(void*), void (*descriptor)(void*, int), char* file, int line);
-void*    mem_realloc(void* pointer, size_t size);
-void*    mem_retain(void* pointer, char* file, int line);
-char     mem_release(void* pointer, char* file, int line);
-char     mem_release_each(void* first, ...);
-size_t   mem_retaincount(void* pointer);
-void*    mem_stack_to_heap(size_t size, void (*destructor)(void*), void (*descriptor)(void*, int), uint8_t* data, char* file, int line);
-uint32_t mem_index_value(void* pointer);
-void     mem_describe(void* pointer, int level);
-void     mem_exit(char* text, char* file, int line);
-void     mem_stat(void* pointer);
-void     mem_stats();
+void*  mem_alloc(size_t size, void (*destructor)(void*), void (*descriptor)(void*, int), char* file, int line);
+void*  mem_calloc(size_t size, void (*destructor)(void*), void (*descriptor)(void*, int), char* file, int line);
+void*  mem_realloc(void* pointer, size_t size);
+void*  mem_retain(void* pointer, char* file, int line);
+char   mem_release(void* pointer, char* file, int line);
+char   mem_release_each(void* first, ...);
+size_t mem_retaincount(void* pointer);
+void*  mem_stack_to_heap(size_t size, void (*destructor)(void*), void (*descriptor)(void*, int), uint8_t* data, char* file, int line);
+void   mem_describe(void* pointer, int level);
+void   mem_exit(char* text, char* file, int line);
+#ifdef DEBUG
+void mem_stat(void* pointer);
+void mem_stats();
+#endif
 
 #endif
 
@@ -42,24 +44,26 @@ void     mem_stats();
 
 #include <string.h>
 
-/*******DEBUGGING********/
+#ifdef DEBUG
 
-#define ZC_MAX_BLOCKS 10000000
-#define ZC_TRACEROUTE_ALLOC 0
-#define ZC_TRACEROUTE_CALLOC 0
-#define ZC_TRACEROUTE_RETAIN 0
+  #define ZC_MAX_BLOCKS 10000000
+  #define ZC_TRACEROUTE_ALLOC 0
+  #define ZC_TRACEROUTE_CALLOC 0
+  #define ZC_TRACEROUTE_RETAIN 0
 
 struct mem_info
 {
+  char  live;
+  char  stat;
   char* file;
   int   line;
   void* ptr;
 };
 
-struct mem_info mem_infos[ZC_MAX_BLOCKS] = {0};
-uint32_t        mem_index                = 1; /* live object counter for debugging */
+struct mem_info mem_infos[ZC_MAX_BLOCKS + 1] = {0};
+uint32_t        mem_index                    = 1; /* live object counter for debugging */
 
-/************************/
+#endif
 
 void* mem_alloc(size_t size,                    /* size of data to store */
                 void (*destructor)(void*),      /* optional destructor */
@@ -75,22 +79,20 @@ void* mem_alloc(size_t size,                    /* size of data to store */
 
   head->id[0]       = 'z';
   head->id[1]       = 'c';
-  head->index       = mem_index;
   head->destructor  = destructor;
   head->descriptor  = descriptor;
   head->retaincount = 1;
 
-  // for leak checking
+#ifdef DEBUG
+  head->index               = mem_index;
+  mem_infos[mem_index].live = 1;
   mem_infos[mem_index].file = file;
   mem_infos[mem_index].line = line;
   mem_infos[mem_index].ptr  = bytes + sizeof(struct mem_head);
-
-  // debug
   if (mem_index == ZC_TRACEROUTE_ALLOC) abort();
-
-  mem_index++;
-
   if (mem_index == ZC_MAX_BLOCKS) printf("INCREASE ZC_MAX_BLOCKS COUNT IN ZC_MEMORY\n");
+  mem_index++;
+#endif
 
   return bytes + sizeof(struct mem_head);
 }
@@ -109,22 +111,20 @@ void* mem_calloc(size_t size,                    /* size of data to store */
 
   head->id[0]       = 'z';
   head->id[1]       = 'c';
-  head->index       = mem_index;
   head->destructor  = destructor;
   head->descriptor  = descriptor;
   head->retaincount = 1;
 
-  // for leak checking
+#ifdef DEBUG
+  head->index               = mem_index;
+  mem_infos[mem_index].live = 1;
   mem_infos[mem_index].file = file;
   mem_infos[mem_index].line = line;
   mem_infos[mem_index].ptr  = bytes + sizeof(struct mem_head);
-
-  // debug
   if (mem_index == ZC_TRACEROUTE_CALLOC) abort();
-
-  mem_index++;
-
   if (mem_index == ZC_MAX_BLOCKS) printf("INCREASE ZC_MAX_BLOCKS COUNT IN ZC_MEMORY\n");
+  mem_index++;
+#endif
 
   return bytes + sizeof(struct mem_head);
 }
@@ -151,6 +151,8 @@ void* mem_realloc(void* pointer, size_t size)
   bytes = realloc(bytes, sizeof(struct mem_head) + size);
   if (bytes == NULL) mem_exit("Out of RAM \\_(o)_/ when realloc", "", 0);
 
+  struct mem_head* head = (struct mem_head*)bytes;
+
   return bytes + sizeof(struct mem_head);
 }
 
@@ -165,8 +167,9 @@ void* mem_retain(void* pointer, char* file, int line)
   // check memory range id
   assert(head->id[0] == 'z' && head->id[1] == 'c');
 
-  // debug
+#ifdef DEBUG
   if (head->index == ZC_TRACEROUTE_RETAIN) abort();
+#endif
 
   head->retaincount += 1;
   if (head->retaincount == SIZE_MAX) mem_exit("Maximum retain count reached \\(o)_/ for", "", 0);
@@ -191,8 +194,9 @@ char mem_release(void* pointer, char* file, int line)
 
   if (head->retaincount == 0)
   {
-    mem_infos[head->index].file = NULL;
-    mem_infos[head->index].line = 0;
+#ifdef DEBUG
+    mem_infos[head->index].live = 0;
+#endif
 
     if (head->destructor != NULL) head->destructor(pointer);
     // zero out bytes that will be deallocated so it will be easier to detect re-using of released zc_memory areas
@@ -233,14 +237,6 @@ size_t mem_retaincount(void* pointer)
   return head->retaincount;
 }
 
-uint32_t mem_index_value(void* pointer)
-{
-  uint8_t* bytes = (uint8_t*)pointer;
-  bytes -= sizeof(struct mem_head);
-  struct mem_head* head = (struct mem_head*)bytes;
-  return head->index;
-}
-
 void mem_describe(void* pointer, int level)
 {
   assert(pointer != NULL);
@@ -258,7 +254,7 @@ void mem_describe(void* pointer, int level)
   }
   else
   {
-    printf("no descriptor, index %u", head->index);
+    printf("no descriptor");
   }
 }
 
@@ -267,6 +263,8 @@ void mem_exit(char* text, char* file, int line)
   printf("%s %s %i\n", text, file, line);
   exit(EXIT_FAILURE);
 }
+
+#ifdef DEBUG
 
 void mem_stat(void* pointer)
 {
@@ -284,11 +282,35 @@ void mem_stat(void* pointer)
 
 void mem_stats()
 {
-  uint32_t count = 0;
-  for (int index = 0; index < mem_index; index++)
+  printf("***MEM STATS***");
+
+  // print block statistics
+
+  for (int index = 1; index < mem_index; index++)
   {
-    char* file = mem_infos[index].file;
-    if (file != NULL)
+    if (mem_infos[index].stat == 0)
+    {
+      char* file  = mem_infos[index].file;
+      int   line  = mem_infos[index].line;
+      int   count = 0;
+      for (int i = 0; i < mem_index; i++)
+      {
+        if (mem_infos[i].stat == 0 && mem_infos[i].file == file && mem_infos[i].line == line)
+        {
+          mem_infos[i].stat = 1;
+          count++;
+        }
+      }
+      printf("%s %i block count : %i\n", file, line, count);
+    }
+  }
+
+  // print leak statistics
+
+  uint32_t count = 0;
+  for (int index = 1; index < mem_index; index++)
+  {
+    if (mem_infos[index].live)
     {
       printf("unreleased block %i at %s %i desc : ", index, mem_infos[index].file, mem_infos[index].line);
       mem_describe(mem_infos[index].ptr, 0);
@@ -296,7 +318,10 @@ void mem_stats()
       count++;
     }
   }
+
   printf("total unreleased blocks : %u\n", count);
 }
+
+#endif
 
 #endif

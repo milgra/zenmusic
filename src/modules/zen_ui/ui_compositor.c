@@ -109,32 +109,27 @@ void ui_compositor_destroy()
 
 void ui_compositor_rewind()
 {
-  // printf("ui_compositor_rewind\n");
   uic.cache_ind = 0;
 }
 
 void ui_compositor_reset_texmap(int size)
 {
-  printf("ui_compositor_new_texmap %i\n", size);
   if (uic.tm) REL(uic.tm);
   uic.tm = tm_new(size, size); // REL 2
 }
 
 void ui_compositor_new_texture(int page, int width, int height)
 {
-  printf("ui_compositor_new_texture %i %i %i\n", page, width, height);
   gl_new_texture(page, width, height);
 }
 
 void ui_compositor_rel_texture(int page)
 {
-  printf("ui_compositor_rel_texture %i\n", page);
   gl_rel_texture(page);
 }
 
 void ui_compositor_resize_texture(int page, int width, int height)
 {
-  printf("ui_compositor_resize_texture %i %i %i\n", page, width, height);
   gl_rel_texture(page);
   gl_new_texture(page, width, height);
 }

@@ -963,7 +963,6 @@ int subtitle_thread(void* arg)
 /* open a given stream. Return 0 if OK */
 int stream_component_open(VideoState* is, int stream_index)
 {
-  printf("stream component open %i\n", stream_index);
   AVFormatContext*   ic = is->ic;
   AVCodecContext*    avctx;
   AVCodec*           codec;
@@ -1191,9 +1190,9 @@ int read_thread(void* arg)
   }
   is->ic = ic;
 
-  AVDictionaryEntry* tag = NULL;
-  while ((tag = av_dict_get(ic->metadata, "", tag, AV_DICT_IGNORE_SUFFIX)))
-    printf("%s=%s\n", tag->key, tag->value);
+  /* AVDictionaryEntry* tag = NULL; */
+  /* while ((tag = av_dict_get(ic->metadata, "", tag, AV_DICT_IGNORE_SUFFIX))) */
+  /*   printf("%s=%s\n", tag->key, tag->value); */
 
   if (genpts)
     ic->flags |= AVFMT_FLAG_GENPTS;
@@ -1252,8 +1251,8 @@ int read_thread(void* arg)
 
   is->realtime = is_realtime(ic);
 
-  if (show_status)
-    av_dump_format(ic, 0, is->filename, 0);
+  /* if (show_status) */
+  /*   av_dump_format(ic, 0, is->filename, 0); */
 
   for (i = 0; i < ic->nb_streams; i++)
   {

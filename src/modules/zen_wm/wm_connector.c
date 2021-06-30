@@ -272,7 +272,6 @@ void wm_close()
 
 void wm_destroy()
 {
-  printf("wm_destroy\n");
 }
 
 void wm_toggle_fullscreen()

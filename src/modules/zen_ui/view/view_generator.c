@@ -336,10 +336,13 @@ vec_t* view_gen_load(char* htmlpath, char* csspath, char* respath, map_t* callba
     }
     else
     {
+      static int divcnt = 0;
+      char*      divid  = cstr_new_format(10, "div%i", divcnt++);
       // idless view, probably </div>
-      view_t* view = view_new("div", (r2_t){0});
+      view_t* view = view_new(divid, (r2_t){0});
       VADD(views, view);
       REL(view);
+      REL(divid);
     }
     tags += 1;
   }

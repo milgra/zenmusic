@@ -34,7 +34,6 @@ void config_init()
 
 void config_destroy()
 {
-  printf("config destroy\n");
   REL(confmap); // REL 0
 }
 

@@ -6,6 +6,7 @@
 typedef struct _views_t
 {
   vec_t* list;
+  map_t* names;
   int    arrange;
 } views_t;
 
@@ -26,6 +27,7 @@ views_t views = {0};
 void views_init()
 {
   views.list    = VNEW();
+  views.names   = MNEW();
   views.arrange = 0;
 }
 
@@ -35,11 +37,9 @@ void views_describe()
   for (int index = 0; index < views.list->length; index++)
   {
     view_t* view = views.list->data[index];
-    if (mem_retaincount(view) > 1)
+    if (mem_retaincount(view) > 2)
     {
-      printf("view %s retc %zu ", view->id, mem_retaincount(view));
-      mem_stat(view);
-      printf("\n");
+      printf("view %s retc %zu\n", view->id, mem_retaincount(view));
       ++count;
     }
   }
@@ -48,6 +48,10 @@ void views_describe()
 
 void views_destroy()
 {
+#ifdef DEBUG
+  printf("***VIEW STATS***\n");
+  printf("VIEW COUNT %i\n", views.list->length);
+#endif
   // flatten view
   for (int index = 0; index < views.list->length; index++)
   {
@@ -63,7 +67,9 @@ void views_destroy()
 
   // release list
   REL(views.list);
-  views.list = NULL;
+  REL(views.names);
+  views.list  = NULL;
+  views.names = NULL;
 }
 
 #endif

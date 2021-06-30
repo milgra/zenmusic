@@ -33,7 +33,9 @@ void log_log(char* fmt, ...)
   vsnprintf(str, LOG_SIZE, fmt, arglist);
   va_end(arglist);
 
+#ifdef DEBUG
   printf("LOG %s\n", str);
+#endif
 
   if (zc_log.proxy != NULL) (*zc_log.proxy)(str);
 

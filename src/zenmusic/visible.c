@@ -55,7 +55,6 @@ void visible_init()
 
 void visible_destroy()
 {
-  printf("visible destroy\n");
   REL(vis.songs);   // REL 0
   REL(vis.genres);  // REL 1
   REL(vis.artists); // REL 2

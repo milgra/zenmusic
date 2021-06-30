@@ -167,16 +167,12 @@ void ui_generator_use(vec_t* views)
 
 void ui_generator_resize_texmap(int size)
 {
-  printf("ui_generator_resize_texamp %i\n", size);
-
   ui_compositor_reset_texmap(size);
   ui_compositor_resize_texture(0, size, size);
 }
 
 void ui_generator_resize_framebuffers(int w, int h)
 {
-  printf("ui_generator_resize_framebuffers %i %i\n", w, h);
-
   for (int index = 1; index < uig.texpage; index++)
   {
     ui_compositor_resize_texture(index, w, h);

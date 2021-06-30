@@ -59,7 +59,6 @@ void player_init()
 
 void player_destroy()
 {
-  printf("player destroy\n");
   if (is != NULL) stream_close(is);
 }
 

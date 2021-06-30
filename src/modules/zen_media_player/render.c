@@ -352,7 +352,7 @@ static int upload_texture(SDL_Texture** tex, AVFrame* frame, SDL_Rect rect, stru
                                           frame->format,
                                           w,
                                           h,
-                                          AV_PIX_FMT_RGBA,
+                                          AV_PIX_FMT_BGR32,
                                           sws_flags,
                                           NULL,
                                           NULL,
@@ -547,8 +547,6 @@ void video_show(void* opaque, int index, int w, int h, bm_t* bitmap, int edge)
   {
     if (is->width != w)
     {
-      printf("resetting is width and height for video");
-
       is->width  = w;
       is->height = h;
 

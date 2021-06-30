@@ -8,16 +8,17 @@
 
 #include "text.c"
 #include "view.c"
+#include "zc_string.c"
 
 typedef struct _tg_text_t
 {
-  char*       text;
+  str_t*      text;
   textstyle_t style;
 } tg_text_t;
 
-void  tg_text_add(view_t* view);
-void  tg_text_set(view_t* view, char* text, textstyle_t style);
-char* tg_text_get(view_t* view);
+void   tg_text_add(view_t* view);
+void   tg_text_set(view_t* view, char* text, textstyle_t style);
+str_t* tg_text_get(view_t* view);
 
 #endif
 
@@ -27,7 +28,6 @@ char* tg_text_get(view_t* view);
 #include "zc_bitmap.c"
 #include "zc_cstring.c"
 #include "zc_graphics.c"
-#include "zc_string.c"
 
 int tg_text_index = 0;
 
@@ -39,14 +39,9 @@ void tg_text_gen(view_t* view)
     bm_t*       fontmap = bm_new((int)view->frame.local.w, (int)view->frame.local.h); // REL 0
     textstyle_t style   = gen->style;
 
-    if (gen->text)
+    if (gen->text->length > 0)
     {
-      str_t* str = str_new(); // REL 1
-      str_add_bytearray(str, gen->text);
-
-      text_render(str, style, fontmap);
-
-      REL(str); // REL 1
+      text_render(gen->text, style, fontmap);
     }
     else
     {
@@ -76,6 +71,8 @@ void tg_text_add(view_t* view)
 
   tg_text_t* gen = CAL(sizeof(tg_text_t), tg_text_del, tg_text_desc);
 
+  gen->text = str_new(); // REL 1
+
   view->tex_gen_data = gen;
   view->tex_gen      = tg_text_gen;
   view->exclude      = 0;
@@ -85,13 +82,13 @@ void tg_text_set(view_t* view, char* text, textstyle_t style)
 {
   tg_text_t* gen = view->tex_gen_data;
 
-  if (gen->text) REL(gen->text);
-  gen->text           = cstr_new_cstring(text);
+  str_reset(gen->text);
+  str_add_bytearray(gen->text, text);
   gen->style          = style;
   view->texture.state = TS_BLANK;
 }
 
-char* tg_text_get(view_t* view)
+str_t* tg_text_get(view_t* view)
 {
   tg_text_t* gen = view->tex_gen_data;
   return gen->text;

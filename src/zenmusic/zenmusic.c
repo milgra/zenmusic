@@ -280,7 +280,9 @@ void destroy()
   REL(zm.lib_ch); // REL -1
   REL(zm.rem_ch); // REL -2
 
+#ifdef DEBUG
   mem_stats();
+#endif
 }
 
 void load_library()

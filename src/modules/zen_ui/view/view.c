@@ -167,8 +167,6 @@ void view_desc(void* pointer, int level);
 void view_desc_layout(vlayout_t l);
 void view_calc_global(view_t* view);
 
-extern char resend;
-
 #endif
 
 #if __INCLUDE_LEVEL__ == 0
@@ -189,13 +187,20 @@ void view_del(void* pointer)
   if (view->handler_data) REL(view->handler_data);
   if (view->tex_gen_data) REL(view->tex_gen_data);
 
-  REL(view->id);
   if (view->texture.bitmap) REL(view->texture.bitmap); // not all views has texture
+
+  REL(view->id);
   REL(view->views);
 }
 
 view_t* view_new(char* id, r2_t frame)
 {
+  if (MGET(views.names, id))
+  {
+    printf("VIEW NAMES MUST BE UNIQUE!!! : %s\n", id);
+    abort();
+  }
+
   view_t* view            = CAL(sizeof(view_t), view_del, view_desc);
   view->id                = cstr_new_cstring(id);
   view->nth               = view_cnt++;
@@ -224,6 +229,7 @@ view_t* view_new(char* id, r2_t frame)
   // store and release
 
   VADD(views.list, view);
+  MPUT(views.names, id, view);
 
   return view;
 }
@@ -467,6 +473,7 @@ void view_desc(void* pointer, int level)
 
   for (int i = 0; i < view->views->length; i++)
   {
+    printf("\n");
     view_desc(view->views->data[i], level + 1);
   }
 }

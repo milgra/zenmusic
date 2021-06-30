@@ -133,8 +133,9 @@ void ui_songlist_attach(view_t* base)
   {
     col_t*  cell     = sl.columns->data[i];
     char*   id       = cstr_new_format(100, "%s%s", header->id, cell->id); // REL 4
-    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});         // REL 5
-    view_t* dragview = view_new(id, (r2_t){cell->size - 5, 10, 5, 10});    // REL 6
+    char*   dragid   = cstr_new_format(100, "%sdrag", id);
+    view_t* cellview = view_new(id, (r2_t){0, 0, cell->size, 30});          // REL 5
+    view_t* dragview = view_new(dragid, (r2_t){cell->size - 5, 10, 5, 10}); // REL 6
 
     tg_text_add(cellview);
     tg_text_set(cellview, cell->id, sl.textstyle);
@@ -147,7 +148,8 @@ void ui_songlist_attach(view_t* base)
 
     vh_lhead_add_cell(header, cell->id, cell->size, cellview);
 
-    REL(id);       // REL 4
+    REL(id); // REL 4
+    REL(dragid);
     REL(cellview); // REL 5
     REL(dragview); // REL 6
   }
@@ -336,7 +338,6 @@ void ui_songlist_on_item_select(view_t* itemview, int index, vh_lcell_t* cell, e
       selection_add(index);
     }
 
-    printf("%i %i\n", index, ev.dclick);
     if (ev.dclick)
     {
       ui_play_index(index);
