@@ -61,7 +61,8 @@ struct _ui_editor_popup_t
   view_t* head_view;  // header veiw
   view_t* cover_view; // cover view
 
-  view_t* textinput;
+  view_t* textinput; // text editing cell that will be attached to edited row
+  view_t* textvalue; // actual value cell that will be rattached after edit
 
   map_t* attributes; // current attributes in table
 
@@ -393,6 +394,8 @@ void ui_editor_popup_select_item(view_t* itemview, int index, vh_lcell_t* cell, 
 
       ep.editor_key = key;
 
+      ep.textvalue = vh_litem_get_cell(itemview, "value");
+
       vh_textinput_scroller_activate(ep.textinput, 1); // activate text input
 
       vh_list_lock_scroll(ep.list_view, 1);               // lock scrolling of list to avoid going out screen
@@ -433,22 +436,22 @@ void ui_editor_popup_input_cell_edit_finished(view_t* inputview)
 
   // replace textinput cell with simple text cell
 
-  char*   id       = cstr_new_format(100, "%s%s", ep.sel_item->id, "value"); // REL 1
-  view_t* textcell = view_new(id, inputview->frame.local);                   // REL 2
+  //char*   id       = cstr_new_format(100, "%s%s", ep.sel_item->id, "value"); // REL 1
+  //view_t* textcell = view_new(id, inputview->frame.local);                   // REL 2
 
   ep.textstyle.backcolor = ep.editor_col;
 
-  tg_text_add(textcell);
-  tg_text_set(textcell, text, ep.textstyle);
+  //tg_text_add(textcell);
+  tg_text_set(ep.textvalue, text, ep.textstyle);
 
   vh_list_lock_scroll(ep.list_view, 0);
-  vh_litem_rpl_cell(ep.sel_item, "value", textcell);
+  vh_litem_rpl_cell(ep.sel_item, "value", ep.textvalue);
 
-  textcell->blocks_touch = 0;
+  // textcell->blocks_touch = 0;
 
-  REL(id);       // REL 1
-  REL(textcell); // REL 2
-  REL(text);     // REL 0
+  // REL(id);       // REL 1
+  // REL(textcell); // REL 2
+  REL(text); // REL 0
 
   vh_textinput_set_text(vh_textinput_scroller_get_input_view(ep.textinput), "");
 }

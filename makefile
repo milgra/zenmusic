@@ -90,3 +90,7 @@ install: rel
 	/usr/bin/install -c -s -m 755 bin/zenmusic /usr/local/bin
 	/usr/bin/install -d -m 755 /usr/local/share/zenmusic
 	cp res/* /usr/local/share/zenmusic/
+
+remove:
+	rm /bin/zenmusic
+	rm -r /usr/local/share/zenmusic
