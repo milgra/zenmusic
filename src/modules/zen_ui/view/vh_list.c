@@ -45,13 +45,13 @@ typedef struct _vh_list_t
   uint32_t htimeout; // horizontal scroller timeout
 
   view_t* (*item_for_index)(int index, void* userdata, view_t* listview, int* item_count);
-  void (*item_recycle)(view_t* item);
+  void (*item_recycle)(view_t* item, void* userdata, view_t* listview);
 } vh_list_t;
 
 void    vh_list_add(view_t*         view,
                     vh_list_inset_t inset,
                     view_t* (*item_for_index)(int index, void* userdata, view_t* listview, int* item_count),
-                    void (*item_recycle)(view_t* item),
+                    void (*item_recycle)(view_t* item, void* userdata, view_t* listview),
                     void* userdata);
 void    vh_list_set_header(view_t* view, view_t* headerview);
 vec_t*  vh_list_items(view_t* view);
@@ -268,14 +268,14 @@ void vh_list_evt(view_t* view, ev_t ev)
             VREM(vh->items, head);
             vh->head_index += 1;
             view_remove_from_parent(head);
-            if (vh->item_recycle) (*vh->item_recycle)(head);
+            if (vh->item_recycle) (*vh->item_recycle)(head, vh->userdata, view);
           }
           if (tail->frame.local.y > view->frame.local.h + PRELOAD_DISTANCE && vh->items->length > 1)
           {
             VREM(vh->items, tail);
             vh->tail_index -= 1;
             view_remove_from_parent(tail);
-            if (vh->item_recycle) (*vh->item_recycle)(tail);
+            if (vh->item_recycle) (*vh->item_recycle)(tail, vh->userdata, view);
           }
         }
       }
@@ -473,7 +473,7 @@ void vh_list_reset(view_t* view)
   {
     view_t* item = vh->items->data[index];
     view_remove_from_parent(item);
-    if (vh->item_recycle) (*vh->item_recycle)(item);
+    if (vh->item_recycle) (*vh->item_recycle)(item, vh->userdata, view);
   }
 
   vec_reset(vh->items);
@@ -493,7 +493,7 @@ void vh_list_refresh(view_t* view)
     view_t* item = vh->items->data[index];
     if (index == 0) vh->head_pos = item->frame.local.y;
     view_remove_from_parent(item);
-    if (vh->item_recycle) (*vh->item_recycle)(item);
+    if (vh->item_recycle) (*vh->item_recycle)(item, vh->userdata, view);
   }
 
   vec_reset(vh->items);
@@ -516,7 +516,7 @@ void vh_list_desc(void* p, int level)
 void vh_list_add(view_t*         view,
                  vh_list_inset_t inset,
                  view_t* (*item_for_index)(int index, void* userdata, view_t* listview, int* item_count),
-                 void (*item_recycle)(view_t* item),
+                 void (*item_recycle)(view_t* item, void* userdata, view_t* listview),
                  void* userdata)
 {
   assert(view->handler == NULL && view->handler_data == NULL);

@@ -478,7 +478,7 @@ void ui_editor_popup_create_items()
 {
   // reset temporary fields containers
   vec_reset(ep.fields);
-  vec_reset(ep.items);
+  // vec_reset(ep.items);
 
   // reset list handler
   vh_list_reset(ep.list_view);
@@ -520,14 +520,23 @@ void ui_editor_popup_create_items()
 
   for (int index = 0; index < ep.fields->length; index++)
   {
-    view_t* item = ui_editor_popup_new_item(); // REL 4
-
-    printf("CREATE %s\n", item->id);
+    view_t* item;
+    if (index < ep.items->length)
+    {
+      item = ep.items->data[index];
+    }
+    else
+    {
+      item = ui_editor_popup_new_item(); // REL 4
+      VADD(ep.items, item);
+    }
 
     vh_litem_upd_index(item, index);
 
     char* key   = ep.fields->data[index];
     char* value = MGET(ep.attributes, key);
+
+    if (value == NULL) value = "";
 
     uint32_t color1 = (index % 2 == 0) ? 0xFEFEFEFF : 0xEFEFEFFF;
     uint32_t color2 = (index % 2 == 0) ? 0xF8F8F8FF : 0xE8E8E8FF;
@@ -542,8 +551,6 @@ void ui_editor_popup_create_items()
     tg_text_set(vh_litem_get_cell(item, "value"), value, ep.textstyle);
 
     // if (key[0] != 'f') tg_text_set(vh_litem_get_cell(item, "delete"), "Delete", ep.textstyle);
-
-    VADD(ep.items, item);
 
     REL(item);
   }

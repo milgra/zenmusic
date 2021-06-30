@@ -39,7 +39,7 @@ void on_header_field_insert(view_t* view, int src, int tgt);
 void on_header_field_resize(view_t* view, char* id, int size);
 
 view_t* ui_songlist_item_for_index(int index, void* userdata, view_t* listview, int* item_count);
-void    ui_songlist_item_recycle(view_t* item);
+void    ui_songlist_item_recycle(view_t* item, void* userdata, view_t* listview);
 
 struct ui_songlist_t
 {
@@ -418,7 +418,7 @@ void songitem_update_row(view_t* rowview, int index, map_t* file, uint32_t color
   tg_text_set(vh_litem_get_cell(rowview, "ind"), indbuffer, sl.textstyle);
 }
 
-void ui_songlist_item_recycle(view_t* item)
+void ui_songlist_item_recycle(view_t* item, void* userdata, view_t* listview)
 {
   uint32_t index = vec_index_of_data(sl.cache, item);
 

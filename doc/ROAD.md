@@ -10,6 +10,7 @@
 
 **near future**
 
+ - release all bitmaps after adding to texmap, re-render them on texture reset
  - join pthreads to avoid memory leak report
  - editor popup creates new list views with every open
  - multiple texture full on drag scroll

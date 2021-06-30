@@ -181,6 +181,8 @@ void str_add_buffer(str_t* string, char* buffer, char length)
 
 void str_add_bytearray(str_t* string, char* bytearray)
 {
+  assert(bytearray != NULL);
+
   char buffer[4]       = {0};
   char buffer_position = 0;
   while (*bytearray != 0)
