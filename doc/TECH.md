@@ -81,7 +81,7 @@ The following packages are needed for development :
 sdl2 ffmpeg glew gmake clang-format
 ```
 
-Use your preferred IDE. It's adviced that you hook clang-format to file save.
+Use your preferred IDE. It's advised that you hook clang-format to file save.
 
 Please follow these guidelines :
 
