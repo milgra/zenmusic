@@ -58,6 +58,8 @@ struct
   char* rec_par; // record parameter
   char* rep_par; // replay parameter
 
+  char* frm_par; // frame parameter
+
   view_t* rep_cur; // replay cursor
 } zm = {0};
 
@@ -78,13 +80,14 @@ int main(int argc, char* argv[])
   int option       = 0;
   int option_index = 0;
 
-  while ((option = getopt_long(argc, argv, "c:l:r:s:p:", long_options, &option_index)) != -1)
+  while ((option = getopt_long(argc, argv, "r:s:p:c:f:", long_options, &option_index)) != -1)
   {
     if (option != '?') printf("parsing option %c value: %s\n", option, optarg);
     if (option == 'c') zm.cfg_par = cstr_new_cstring(optarg); // REL 0
     if (option == 'r') zm.res_par = cstr_new_cstring(optarg); // REL 1
     if (option == 's') zm.rec_par = cstr_new_cstring(optarg); // REL 2
     if (option == 'p') zm.rep_par = cstr_new_cstring(optarg); // REL 3
+    if (option == 'f') zm.frm_par = cstr_new_cstring(optarg); // REL 4
     if (option == '?')
     {
       printf("-c --config= [config file] \t use config file for session\n");
@@ -95,7 +98,7 @@ int main(int argc, char* argv[])
     }
   }
 
-  wm_init(init, update, render, destroy); // destroy 0
+  wm_init(init, update, render, destroy, zm.frm_par); // destroy 0
   return 0;
 }
 
@@ -276,6 +279,7 @@ void destroy()
   if (zm.res_par) REL(zm.res_par); // REL 1
   if (zm.rec_par) REL(zm.rec_par); // REL 2
   if (zm.rep_par) REL(zm.rep_par); // REL 3
+  if (zm.frm_par) REL(zm.frm_par); // REL 4
 
   REL(zm.lib_ch); // REL -1
   REL(zm.rem_ch); // REL -2

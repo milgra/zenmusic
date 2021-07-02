@@ -92,5 +92,5 @@ install: rel
 	cp res/* /usr/local/share/zenmusic/
 
 remove:
-	rm /bin/zenmusic
+	rm /usr/local/bin/zenmusic
 	rm -r /usr/local/share/zenmusic

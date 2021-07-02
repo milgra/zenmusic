@@ -8,7 +8,7 @@
 
 #include "wm_event.c"
 
-void wm_init(void (*init)(int, int, char*), void (*update)(ev_t), void (*render)(uint32_t), void (*destroy)());
+void wm_init(void (*init)(int, int, char*), void (*update)(ev_t), void (*render)(uint32_t), void (*destroy)(), char* frame);
 void wm_close();
 void wm_destroy();
 void wm_toggle_fullscreen();
@@ -35,7 +35,8 @@ SDL_Window* wm_window;
 void wm_init(void (*init)(int, int, char*),
              void (*update)(ev_t),
              void (*render)(uint32_t),
-             void (*destroy)())
+             void (*destroy)(),
+             char* frame)
 {
   SDL_SetHint(SDL_HINT_VIDEO_HIGHDPI_DISABLED, "0");
 
@@ -56,11 +57,15 @@ void wm_init(void (*init)(int, int, char*),
     SDL_DisplayMode displaymode;
     SDL_GetCurrentDisplayMode(0, &displaymode);
 
-    int32_t width  = displaymode.w;
-    int32_t height = displaymode.h;
+    int32_t width  = displaymode.w * 0.6;
+    int32_t height = displaymode.h * 0.6;
 
-    width  = 953;
-    height = 1042;
+    if (frame != NULL)
+    {
+      width      = atoi(frame);
+      char* next = strstr(frame, "x");
+      height     = atoi(next + 1);
+    }
 
     wm_window = SDL_CreateWindow("Zen Music",
                                  SDL_WINDOWPOS_UNDEFINED,

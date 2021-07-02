@@ -141,8 +141,8 @@ int analyzer_thread(void* chptr)
       MPUT(song, "file/path", path);
       MPUT(song, "file/size", size);
       MPUT(song, "file/added", time_str);
-      MPUT(song, "file/last_played", time_str);
-      MPUT(song, "file/last_skipped", time_str);
+      MPUT(song, "file/last_played", cstr_new_cstring("0"));
+      MPUT(song, "file/last_skipped", cstr_new_cstring("0"));
       MPUTR(song, "file/play_count", cstr_new_cstring("0"));
       MPUTR(song, "file/skip_count", cstr_new_cstring("0"));
 

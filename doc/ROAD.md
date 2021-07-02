@@ -2,18 +2,22 @@
 
 **before release**
 
- - youtube video
- - manual test
- - automated tests
+ - automated test record & replay in openbox fix window size
 
 **near future**
 
+ - filter popup/bar in the intro video
+ - the whole list empties after song deletion
+ - date/time to log entries
+ - column sort problem when horizontally scrolled ( plays )
+ - if you sort a filtered list it falls back to full list
+ - song editor field resize, reopen - wrong sizes in edited fields
+ - filter, play song, unfilter, jump to current song - wrong song
  - release all bitmaps after adding to texmap, re-render them on texture reset to save 300M memory
  - join pthreads to avoid memory leak report
  - glyph grey out when texture reset
  - show scrollbar on mouse over, fade in/out
  - use zen_callback in all view handlers
- - set window dimensions with command line parameters
  - filters popup : genre select should filter artists, "none" item is needed
  - ui scaling should be settable by command line parameters
  - moving mouse during inertia scroll causes scroll to stuck in some cases
@@ -35,7 +39,8 @@
  - select/copy/paste in textfields
  - prev button in shuffle mode should jump to previously played song
  - zc_callback instead of custom function pointers
- - jobb/bal gomb prev/next
+ -jobb/bal gomb prev/next
+ - replace test songs to copyleft songs
 
 **inbetween future**
 
