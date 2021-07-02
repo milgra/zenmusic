@@ -19,11 +19,12 @@ while true; do
     cfg_path="../tst/test/cfg"
     ses_path="../tst/session$cnt.rec"
     abs_path="tst/session$cnt.rec"
+    frm_size="1000x900"
 
     ((cnt+=1))
 
     if test -f $abs_path; then
-	bin/zenmusic -r $res_path -c $cfg_path -p $ses_path
+	bin/zenmusic -r $res_path -c $cfg_path -p $ses_path -f $frm_size
     else
 	break
     fi
