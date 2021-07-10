@@ -182,6 +182,9 @@ void ui_manager_add(view_t* view)
     view_insert_subview(uim.root, view, uim.root->views->length - 1);
   else
     view_add_subview(uim.root, view);
+
+  // layout, window could be resized since
+  view_layout(uim.root);
 }
 
 void ui_manager_add_to_top(view_t* view)

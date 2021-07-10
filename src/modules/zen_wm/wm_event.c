@@ -31,7 +31,7 @@ typedef struct _ev_t
   int         w;
   int         h;
   char        text[32];
-  char        drag;
+  int         drag;
   uint32_t    time;
   uint32_t    dtime;
   int         button;

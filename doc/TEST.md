@@ -13,7 +13,7 @@ gmake/make rectest
 
 or
 
-bin/zenmusic -r ../res -c ../tst/test/cfg -s ../tst/session.rec  
+bin/zenmusic -r ../res -c ../tst/test/cfg -s ../tst/session.rec
 
 How to run a test session :
 
@@ -23,13 +23,17 @@ or
 
 bin/zenmusic -r ../res -c ../tst/test/cfg -p ../tst/session.rec  
 
+How to debug session recording :
+
+lldb -- bin/zenmusicdev -f 800x600 -r ../res -c ../tst/test/cfg -s ../tst/session1.rec
+
 How to check for memory leaks :
 
-valgrind ( freebsd/linux )
+A dev build will auto-check zc managed memory blocks for leaks, reports it in the last stdout line.
+
+For non-zc managed memory use valgrind :
 
 valgrind --leak-check=full --show-leak-kinds=all --suppressions=tst/valgrind.supp bin/zenmusicdev
-
-address sanitizer ( linux )
 
 TODO
 

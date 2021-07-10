@@ -2,9 +2,6 @@
 
 **before release**
 
- - init lib utan visualizer nincs lent
- - nit lib popup, felrekattint, kurzor eltunik, rakattint, kurzor nem jelenik meg
- - genre filterkor meg mindig bemegy header ala a felso elem - ha mar fel van scrollozva. reset head 
  - automated test record & replay in openbox fix window size
 
 **near future**

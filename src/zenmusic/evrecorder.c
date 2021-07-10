@@ -59,7 +59,7 @@ void evrec_init_player(char* path)
       }
       else
       {
-        if (strcmp(type, "mmove") == 0) sscanf(line, "%i %i %f %f %c\n", &ev.x, &ev.y, &ev.dx, &ev.dy, &ev.drag);
+        if (strcmp(type, "mmove") == 0) sscanf(line, "%i %i %f %f %i\n", &ev.x, &ev.y, &ev.dx, &ev.dy, &ev.drag);
         if (strcmp(type, "mdown") == 0) sscanf(line, "%i %i %i %i %i %i\n", &ev.x, &ev.y, &ev.button, &ev.dclick, &ev.ctrl_down, &ev.shift_down);
         if (strcmp(type, "mup") == 0) sscanf(line, "%i %i %i %i %i %i\n", &ev.x, &ev.y, &ev.button, &ev.dclick, &ev.ctrl_down, &ev.shift_down);
         if (strcmp(type, "scroll") == 0) sscanf(line, "%f %f\n", &ev.dx, &ev.dy);

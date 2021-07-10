@@ -175,6 +175,8 @@ void vh_sbar_add(view_t* view, sbartype_t type, int steps, int thickness, void (
 
   view->handler_data = vh;
   view->handler      = vh_sbar_evt;
+
+  view->blocks_touch = 0;
 }
 
 void vh_sbar_open(view_t* view)

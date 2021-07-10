@@ -126,12 +126,10 @@ void wm_init(void (*init)(int, int, char*),
 
         while (!wm_quit)
         {
-          ev.type = EV_EMPTY;
           ev.time = SDL_GetTicks();
 
           while (SDL_PollEvent(&event) != 0)
           {
-            ev.type = EV_EMPTY;
             ev.time = SDL_GetTicks();
 
             if (event.type == SDL_MOUSEBUTTONDOWN ||
@@ -154,18 +152,21 @@ void wm_init(void (*init)(int, int, char*),
                 uint32_t delta = ev.time - lastclick;
                 lastclick      = ev.time;
                 if (delta < 500) ev.dclick = 1;
+                (*update)(ev);
               }
               else if (event.type == SDL_MOUSEBUTTONUP)
               {
                 ev.type   = EV_MUP;
                 ev.button = event.button.button;
                 ev.drag   = 0;
+                (*update)(ev);
               }
               else if (event.type == SDL_MOUSEMOTION)
               {
                 ev.dx   = event.motion.xrel;
                 ev.dy   = event.motion.yrel;
                 ev.type = EV_MMOVE;
+                (*update)(ev);
               }
             }
             else if (event.type == SDL_MOUSEWHEEL)
@@ -192,6 +193,7 @@ void wm_init(void (*init)(int, int, char*),
                 ev.type = EV_RESIZE;
                 ev.w    = event.window.data1;
                 ev.h    = event.window.data2;
+                (*update)(ev);
               }
             }
             else if (event.type == SDL_KEYDOWN)
@@ -200,6 +202,7 @@ void wm_init(void (*init)(int, int, char*),
               //printf(", Name: %s\n", SDL_GetKeyName(event.key.keysym.sym));
               ev.type    = EV_KDOWN;
               ev.keycode = event.key.keysym.sym;
+              (*update)(ev);
             }
             else if (event.type == SDL_KEYUP)
             {
@@ -207,19 +210,22 @@ void wm_init(void (*init)(int, int, char*),
               //printf(", Name: %s\n", SDL_GetKeyName(event.key.keysym.sym));
               ev.type    = EV_KUP;
               ev.keycode = event.key.keysym.sym;
+              (*update)(ev);
             }
             else if (event.type == SDL_TEXTINPUT)
             {
               ev.type = EV_TEXT;
               strcpy(ev.text, event.text.text);
+              (*update)(ev);
             }
             else if (event.type == SDL_TEXTEDITING)
             {
               ev.type = EV_TEXT;
               strcpy(ev.text, event.text.text);
+              (*update)(ev);
             }
-
-            (*update)(ev);
+            else
+              printf("unknown event, sdl type %i\n", event.type);
           }
 
           if (scroll.active)
