@@ -416,23 +416,26 @@ void get_remote_events()
 
 void save_screenshot()
 {
-  static int cnt    = 0;
-  view_t*    root   = ui_manager_get_root();
-  r2_t       frame  = root->frame.local;
-  bm_t*      screen = bm_new(frame.w, frame.h); // REL 0
+  if (config_get("lib_path"))
+  {
+    static int cnt    = 0;
+    view_t*    root   = ui_manager_get_root();
+    r2_t       frame  = root->frame.local;
+    bm_t*      screen = bm_new(frame.w, frame.h); // REL 0
 
-  ui_compositor_render_to_bmp(screen);
+    ui_compositor_render_to_bmp(screen);
 
-  char* name    = cstr_new_format(20, "screenshot%.3i.png", cnt++);   // REL 1
-  char* path    = cstr_new_path_append(config_get("lib_path"), name); // REL 2
-  bm_t* flipped = bm_new_flip_y(screen);                              // REL 3
+    char* name    = cstr_new_format(20, "screenshot%.3i.png", cnt++);   // REL 1
+    char* path    = cstr_new_path_append(config_get("lib_path"), name); // REL 2
+    bm_t* flipped = bm_new_flip_y(screen);                              // REL 3
 
-  coder_write_png(path, flipped);
+    coder_write_png(path, flipped);
 
-  REL(flipped); // REL 3
-  REL(name);    // REL 2
-  REL(path);    // REL 1
-  REL(screen);  // REL 0
+    REL(flipped); // REL 3
+    REL(name);    // REL 2
+    REL(path);    // REL 1
+    REL(screen);  // REL 0
 
-  if (zm.rep_par) view_set_frame(zm.rep_cur, frame); // full screen cursor to indicate screenshot
+    if (zm.rep_par) view_set_frame(zm.rep_cur, frame); // full screen cursor to indicate screenshot
+  }
 }

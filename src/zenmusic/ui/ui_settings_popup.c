@@ -262,6 +262,7 @@ void ui_settings_popup_on_item_select(view_t* itemview, int index, vh_lcell_t* c
                                            "Would you like to enable it?",
                                       config_get("remote_port"));
       ui_decision_popup_show(message, acc_cb, NULL);
+      REL(message);
     }
     REL(acc_cb); // REL 0
     break;

@@ -86,8 +86,8 @@ view_t* textlist_new_item(textlist_t* tl)
 {
   static int item_cnt = 0;
 
-  char* item_id = cstr_new_format(100, "tetlist_item%i", item_cnt++); // REL 0
-  char* cell_id = cstr_new_format(100, "%s%s", item_id, "cell");      // REL 1
+  char* item_id = cstr_new_format(100, "textlist_item%i", item_cnt++); // REL 0
+  char* cell_id = cstr_new_format(100, "%s%s", item_id, "cell");       // REL 1
 
   view_t* item_view = view_new(item_id, (r2_t){0, 0, 0, 35});                       // REL 2
   view_t* cell_view = view_new(cell_id, (r2_t){0, 0, tl->view->frame.local.w, 35}); // REL 3
@@ -100,7 +100,6 @@ view_t* textlist_new_item(textlist_t* tl)
 
   REL(item_id);   // REL 0
   REL(cell_id);   // REL 1
-  REL(item_view); // REL 2
   REL(cell_view); // REL 3
 
   return item_view;

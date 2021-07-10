@@ -172,7 +172,7 @@ int db_organize_entry(char* libpath, map_t* db, map_t* entry)
 
   // get extension
 
-  char* ext = cstr_new_path_extension(path);
+  char* ext = cstr_new_path_extension(path); // REL -1
 
   char* old_path     = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s", libpath, path);              // REL 0
   char* new_dirs     = cstr_new_format(PATH_MAX + NAME_MAX, "%s/%s/%s/", libpath, artist, album); // REL 1
@@ -204,6 +204,7 @@ int db_organize_entry(char* libpath, map_t* db, map_t* entry)
     }
   }
 
+  REL(ext);          // REL -1
   REL(old_path);     // REL 0
   REL(new_dirs);     // REL 1
   REL(new_path);     // REL 2

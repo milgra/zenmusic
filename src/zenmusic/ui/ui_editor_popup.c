@@ -532,6 +532,7 @@ void ui_editor_popup_create_items()
     {
       item = ui_editor_popup_new_item(); // REL 4
       VADD(ep.items, item);
+      REL(item);
     }
 
     vh_litem_upd_index(item, index);
@@ -554,8 +555,6 @@ void ui_editor_popup_create_items()
     tg_text_set(vh_litem_get_cell(item, "value"), value, ep.textstyle);
 
     // if (key[0] != 'f') tg_text_set(vh_litem_get_cell(item, "delete"), "Delete", ep.textstyle);
-
-    REL(item);
   }
 }
 
