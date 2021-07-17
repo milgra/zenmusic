@@ -2,11 +2,13 @@
 
 # first copy start folder structure to result folder
 
+if [ $1 == 0 ];
+then
 echo "COPYING start TO test"
-
 rm -r tst/test
 rm -r tst/result
 cp -r tst/start tst/test
+fi
 
 # execute record session on result folder
 

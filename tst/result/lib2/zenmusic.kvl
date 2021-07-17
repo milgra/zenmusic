@@ -5,17 +5,17 @@ MOTHER nocover nometa.opus
 file/container
 ogg
 file/added
-2021-06-11 15:45
+2021-07-17 22:38
 file/bit_rate
 0
 file/last_skipped
-2021-06-11 15:45
+0
 meta/album
 Unknown
 file/sample_rate
 48000
 file/last_played
-2021-06-11 15:45
+0
 file/skip_count
 0
 file/media_type
@@ -40,11 +40,11 @@ Alcest
 meta/encoder
 Lavf58.45.100
 file/added
-2021-06-11 15:45
+2021-07-17 22:38
 file/bit_rate
 128000
 file/last_skipped
-2021-06-11 15:45
+0
 file/sample_rate
 44100
 file/skip_count
@@ -66,7 +66,7 @@ meta/track
 meta/album
 Kodama (Deluxe edition)
 file/last_played
-2021-06-11 15:45
+0
 meta/disc
 1/1
 meta/date
@@ -85,11 +85,11 @@ ROYKSOPP nocover nometa.mp4
 meta/encoder
 Lavf58.45.100
 file/added
-2021-06-11 15:45
+2021-07-17 22:38
 file/bit_rate
 127946
 file/last_skipped
-2021-06-11 15:45
+0
 file/sample_rate
 44100
 file/skip_count
@@ -113,7 +113,7 @@ mp4
 meta/album
 Unknown
 file/last_played
-2021-06-11 15:45
+0
 file/duration
 0:06
 file/size
@@ -126,11 +126,11 @@ ACE cover meta.mp3
 meta/encoder
 Lavf58.45.100
 file/added
-2021-06-11 15:45
+2021-07-17 22:38
 file/bit_rate
 128000
 file/last_skipped
-2021-06-11 15:45
+0
 file/sample_rate
 44100
 file/skip_count
@@ -150,7 +150,7 @@ meta/track
 meta/album
 Collection
 file/last_played
-2021-06-11 15:45
+0
 meta/disc
 0/0
 meta/date
@@ -169,11 +169,11 @@ NOTINLOVE cover meta.mp3
 meta/encoder
 Lavf58.45.100
 file/added
-2021-06-11 15:45
+2021-07-17 22:38
 file/bit_rate
 128000
 file/last_skipped
-2021-06-11 15:45
+0
 file/sample_rate
 44100
 file/skip_count
@@ -193,7 +193,7 @@ meta/track
 meta/album
 Unknown
 file/last_played
-2021-06-11 15:45
+0
 meta/disc
 0/0
 file/duration
@@ -212,11 +212,11 @@ ANIMALS nocover nometa.mp4
 meta/encoder
 Lavf58.45.100
 file/added
-2021-06-11 15:45
+2021-07-17 22:38
 file/bit_rate
 127691
 file/last_skipped
-2021-06-11 15:45
+0
 file/sample_rate
 44100
 file/skip_count
@@ -240,7 +240,7 @@ mp4
 meta/album
 Unknown
 file/last_played
-2021-06-11 15:45
+0
 file/duration
 0:06
 meta/genre

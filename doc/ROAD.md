@@ -7,6 +7,7 @@
 
 **near future**
 
+ - mute state doesn't stay between songs
  - activity log item height problem
  - when recording detect remote control events and send udp packet in case of replay
  - filter popup/bar in the intro video
