@@ -45,7 +45,7 @@ void on_change_organize(void* userdata, void* data);
 void get_analyzed_songs();
 void get_remote_events();
 void update_player();
-void save_screenshot();
+void save_screenshot(uint32_t time);
 
 struct
 {
@@ -236,7 +236,7 @@ void update(ev_t ev)
 
         view_set_frame(zm.rep_cur, (r2_t){recev->x, recev->y, 10, 10});
 
-        if (recev->type == EV_KDOWN && recev->keycode == SDLK_PRINTSCREEN) save_screenshot();
+        if (recev->type == EV_KDOWN && recev->keycode == SDLK_PRINTSCREEN) save_screenshot(ev.time);
       }
     }
   }
@@ -245,7 +245,7 @@ void update(ev_t ev)
     if (zm.rec_par)
     {
       evrec_record(ev);
-      if (ev.type == EV_KDOWN && ev.keycode == SDLK_PRINTSCREEN) save_screenshot();
+      if (ev.type == EV_KDOWN && ev.keycode == SDLK_PRINTSCREEN) save_screenshot(ev.time);
     }
   }
 
@@ -414,7 +414,7 @@ void get_remote_events()
   }
 }
 
-void save_screenshot()
+void save_screenshot(uint32_t time)
 {
   if (config_get("lib_path"))
   {
@@ -422,6 +422,15 @@ void save_screenshot()
     view_t*    root   = ui_manager_get_root();
     r2_t       frame  = root->frame.local;
     bm_t*      screen = bm_new(frame.w, frame.h); // REL 0
+
+    // remove cursor for screenshot to remain identical
+
+    if (zm.rep_par)
+    {
+      ui_manager_remove(zm.rep_cur);
+      ui_manager_render(time);
+      ui_manager_add_to_top(zm.rep_cur);
+    }
 
     ui_compositor_render_to_bmp(screen);
 
