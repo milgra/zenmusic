@@ -2,10 +2,13 @@
 
 **before release**
 
+ - invalid location in change library popup
  - automated test record & replay in openbox fix window size
 
 **near future**
 
+ - activity log item height problem
+ - when recording detect remote control events and send udp packet in case of replay
  - filter popup/bar in the intro video
  - the whole list empties after song deletion
  - date/time to log entries

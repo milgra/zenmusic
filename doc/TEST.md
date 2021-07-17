@@ -1,19 +1,12 @@
 # Zen Music test protocol
 
-Before creating a pull request first check for leaks around your modification with valgrind(freebsd) or valgrind/address sanitizer(linux)
+Before creating a pull request first check for leaks around your modification first with the built-in leak checker ( automatically executed on exit in dev mode ) and with valgrind(freebsd) or valgrind/address sanitizer(linux)
 Then create a release build with gmake/make rel.
 Then run all test sessions with gmake/make runtest.
-Check the diff log after test session finished. Only the dates in zemusic.kvl should differ, media files, library structure and screenshots shouldn't differ.
+Note : test sessions should be run under a floating window manager because of fixed window dimensions.
+Check the diff log after all test sessions finished. Only the dates in zemusic.kvl should differ, media files, library structure and screenshots shouldn't differ.
 
 ---
-
-How to record a test session :
-
-gmake/make rectest
-
-or
-
-bin/zenmusic -r ../res -c ../tst/test/cfg -s ../tst/session.rec
 
 How to run a test session :
 
@@ -22,6 +15,18 @@ gmake/make runtest
 or
 
 bin/zenmusic -r ../res -c ../tst/test/cfg -p ../tst/session.rec  
+
+How to record a test session :
+
+gmake/make rectest
+
+or
+
+tst/test_run.sh 0
+
+or
+
+bin/zenmusic -r ../res -c ../tst/test/cfg -s ../tst/session.rec
 
 How to debug session recording :
 
@@ -43,145 +48,164 @@ If you are re-recording the main test session, follow this protocol.
 If you add a new feature please add it to a proper place in the protocol.
 If you see SCREENSHOT take a screenshot by pressing PRTINSCREEN button
 
-SESSION 0
+SESSION 0 - clean start, invalid library path, cancel library
 
-1. start with no config file
+  start with no config file
 
- - start app with valid res_path and cfg_path, cfg_path shouldn't contain any config file
- - library popup should show up SCREENSHOT
- - press reject button, app should close
- - answer "y" in terminal to "Record another session?"
+   - start app with valid res_path and cfg_path, cfg_path shouldn't contain any config file
+   - library popup should show up
+   - press accept
+   - enter invalid path, press accept
+   - press reject button
 
-SESSION 1
+  expectations :
 
-2. start with no config file ( cfg_path shouldn't contain any config file )
+   - in case of invalid path popup should show "Location doesn't exists" warning message
+   - in case of reject button app should close
+ 
+SESSION 1 - valid library path, changing library, organizing library, deleting files
 
- - start app with valid res_path and cfg_path, cfg_path shouldn't contain any config file
- - library popup should who up
- - enter "invalid", library popup should show error in case of invalid library SCREENSHOT
- - enter "../tst/test/lib1", library popup should disappear in case of valid library, library should be read, songs should be analyzed
- - last log message should be visible in main display - SCREENSHOT
- - click on main display, activity log popup should appear, should show logs - SCREENSHOT
- - click outside activity log popup
+  start with no config file ( cfg_path shouldn't contain any config file )
 
-3. library browser
+   - start app with valid res_path and cfg_path, cfg_path shouldn't contain any config file
+   - library popup should show up
+   - enter "../tst/test/lib1", press accept
+   - click on main display, check activity logs
+   - SCREENSHOT
+   - press settings
+   - click on library path
+   - press reject
+   - click on library path
+   - enter "../tst/test/lib2", press accept
+   - click on main display, check activity logs
+   - SCREENSHOT
+   - click on library path
+   - enter "../tst/test/lib1", press accept
+   - click on main display, check activity logs
+   - SCREENSHOT
+   - press settings
+   - click on "organize library"
+   - press reject
+   - click on "organize library"
+   - press accept
+   - click on main display, check activity logs
+   - SCREENSHOT
+   - right click on Alphaville - Forever Young - in the mood
+   - select delete song
+   - accept
+   - press close app
 
- - song list should show valid values SCREENSHOT
- - song list should be scrollable
- - scroll to top
- - columns should be resizable/rearrangable SCREENSHOT
- - scroll song list next to bottom visualizer rectangles, over right and bottom scroller to see if they don't block events
+  expectations
 
-4. filtering
+   - library popup should disappear in case of valid library, library should be read, songs should be analyzed
+   - last log message should be visible in main display
+   - activity log should show read progress and read files
+   - library path should be valid in settings popup
+   - library should change
+   - library should change back
+   - library should be orgranized after accepting organize
+   - song should be deleted
 
- - filters button should pop up filters popup SCREENSHOT
- - gerne/altist can be selected, it should show up in filter bar SCREENSHOT
- - filter bar should be selectable, editable, it should filter library browser
- - clean filter bar button should work
+SESSION 2 - library browsing, filtering, selection
 
-5. settings
+   - start app
+   - SCREENSHOT
+   - scroll with scrollwheel / touchpad
+   - scroll over visualization rects/next to rects
+   - scroll with scroll bar
+   - resize column
+   - replace column
+   - select songs with CTRL and SHIFT pressed
+   - select songs with right click - select song, select range
+   - click on filters icon
+   - SCREENSHOT
+   - click on genres and artists
+   - click on clear filter bar
+   - filter for artist
+   - filter for genre
+   - filter for tag
+   - press close app
 
- - click on settings icon ( vertical bars ), settings popup should show up, it should show correct values SCREENSHOT
- - click on library path, cancel popup
- - click on library path, switch to lib2 at ../tst/test/lib2 ( library gets read in the background, will be checked after session )
- - click on library path, switch to lib1 at ../tst/test/lib1  ( library gets read in the background, will be checked after session )
- - library browser' content should change SCREENSHOT
- - click on organize library, cancel popup
- - click on organize library, accept popup ( library gets re-organized in the background, will be checked after session )
- - click on remote control, cancel popup
- - click on remote control, accept popup ( TODO - test somehow!!! )
- - click on config path, popup should show up SCREENSHOT
- - cancel popup, click outside settings popup
- - click on close app icon
- - answer "y" in terminal to "Record another session?"
+   expectations
 
-SESSION 2
+   - song list shows valid songs
+   - songs get selected
+   - songs get filtered properly
+   - song list should be scrollable by scrollwheel / touchpad
+   - song list should be scrollable by scroll bar
+   - columns should be resizable/rearrangable
+   - scroll song list next to bottom visualizer rectangles, over right and bottom scroller to see if they don't block events
 
-6. start with existing cfg file and existing organized library
+SESSION 3 - metadata editing
 
- - start app with valid res_path and cfg_path and existing, organized library
+   - start app
+   - click on metadata editor icon
+   - click outside
+   - right click on 10cc - I'm not in love
+   - click on date field, add 1974
+   - click on comments field, add "best song"
+   - click on "add new image", enter "../tst/vader.jpeg"
+   - click on accept
+   - click on accept
+   - clock on main info, check activity logs
+   - SCREENSHOT
 
-7. about popup
+   - right click on songlist, click on "select all"
+   - right click, select metadata editor
+   - enter "best songs" in tag field
+   - click on accept, click on accept
+   - open activity logs
+   - SCREENSHOT
+   - click on close app
 
- - click on about icon ( heart ), about popup should show up SCREENSHOT
- - click on support on patrean, popup should pop up SCREENSHOT
- - accept popup, click outside about popup
+   expectations
 
-8. metadata editor
+   - metadata writes are visible in activity window
+   - metadata changes in the files
 
- - click on tag editor button ( horizontal bars ), popup should show up, it should show correct values SCREENSHOT
- - check path, it should be relative path after organized enabled SCREENSHOT
- - click on cancel button, popup should disappear
- - click on tag editor button again
- - click on date field, add 1974
- - click on comments field, add "best song"
- - click on accept button ( media file is updated in the background )
+SESSION 4 - playback, controls, remote control
 
- - in library browser, select second song, click on tag editor
- - click on "add new image"
- - click on cancel
- - click on "add new image"
- - enter ../tst/vader.jpeg
- - click on accept, image shoudl show up in cover view SCREENSHOT
- - click on accept, text should fit in warning popup SCREENSHOT
- - click on reject warning popup
- - click on accept, accept warning popup
- - tag editor popup should disappear
+   - start app
+   - press play
+   - scroll over seek bar
+   - drag seek bar
+   - press pause
+   - double click on adele sil
+   - pause
+   - SCREENSHOT
+   - press next
+   - press prev
+   - press shuffle
+   - press next
+   - press mute
+   - scroll over volume bar
+   - drag volume bar
+   - double click on royksopp
+   - close app
 
- - in library browser, select ADELE nocover metadata
- - in Artist field, type in "Adele"
- - accept edit, library browser row should be updated, SCREENSHOT ( song gets reorganized in the background, will be checked after session )
+   expectations
 
-9. library context popup
+   - songs are playing as expected
+   - volume changes as expected
+   - royksopp video plays in album viewer
+   - visualizer works
+   - play/skip counters should work, last player/last skipped should work
 
- - right click on fourth song
- - click select all SCREENSHOT
- - right click on selection
- - click edit song info
- - editor popup with multiple items should appear, album art should be blank, SCREENSHOT
- - click cancel
- - click on last song
- - click on delete
- - click on reject
- - click on last song
- - click on delete
- - click on accept ( shong gets deleted from library ,will be checked after session )
- - song should disappear from list, log should be visible in main display SCREENSHOT
->
-10. ui renderer
+SESSION 5 - misc, fullscreen, about popup
 
- - switch to full screen and back with keys ( CMD+F ) SCREENSHOT when in normal size ( texture map gets reset in background )
- - switch to full screen and back with full screen button SCREENSHOT when in normal size ( texture map gets reset in background )
+   - start app
+   - open about popup
+   - SCREENSHOT
+   - toggle fullscreen 5 times
 
-11. play controls
+   expectations
 
- - double click on ADELE_SIL in library, move mouse continuously to avoid inactiveness skipping in recorder, after 2 seconds, pause with SPACE, time displays should work, main display should show song info SCREENSHOT
- - press play and press play again after 2 seconds SCREENSHOT
+   - about popup should look okay, buttons should work
+   - texture map should re-fill itself without problem
 
- *THE FOLLOWING CANT BE CONFIRMED AUTOMATICALLY*
-
- - double click on ROYKSOPP, video should be visible in cover art view
- - double click on Odyssey, song should be hearable, visualizer active
- - move mouse over visualizer rects, switch visualization
- - seek forward and backward over play button with scroll
- - seek forward and backward by pressing on seek ring around play btn
- - seek forward and backward by dragging on seek ring aroung play button
- - press mute button, press again - audio should disappear and re-appear
- - set volume by scrolling over volume knob
- - set volume by pressing on volume ring
- - set volume by dragging on volume ring
- - press prev/next button, songs should start playing
- - press shuffle button, press prev/next button, songs should be played randomly
- - play count/skin count/last played/last skkipped should be updated in library browser
-
-Post-test checks
+Automatic post-test checks
 
  - config file should be present under config directory, should contain correct values
- - library structure should mirror what you did under the session
+ - library structure should mirror what you did under the sessions
  - database file should contain correct values
-
-What should be ensured after recording a new session
-
- - lib 1 should be organized, artist - album folders should be created
- - metadata should reflex what was done in the session
- - play/skip counters should work, last player/last skipped should work
+ - metadata should reflex what was done in the sessions

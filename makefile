@@ -81,7 +81,7 @@ vjump:
 	$(shell ./version.sh "$$(cat version.num)" > version.num)
 
 rectest:
-	tst/test_rec.sh
+	tst/test_rec.sh 0
 
 runtest:
 	tst/test_run.sh

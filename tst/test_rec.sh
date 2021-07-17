@@ -10,9 +10,9 @@ cp -r tst/start tst/test
 
 # execute record session on result folder
 
-echo "STARTING RECORDING SESSION"
+echo "STARTING RECORDING SESSION" $1
 
-cnt=0
+cnt=$1
 res="y"
 
 while [ $res = "y" ]; do
