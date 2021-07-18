@@ -22,9 +22,9 @@ Read the user guide for further information : [Open User Guide](doc/USER.md)
 ```
 git clone https://github.com/milgra/zenmusic.git
 cd zenmusic
-sudo gmake deps
-gmake rel
-sudo gmake install
+sudo make deps
+make build
+sudo make install
 ```
 
 ### Linux ###

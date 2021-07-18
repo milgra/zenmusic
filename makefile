@@ -53,7 +53,7 @@ LDFLAGS = \
 OBJECTS := ${SOURCES:.c=.o}
 
 build: ${OBJECTS}
-	${CC} ${OBJECTS} -o bin/zenmusicdev ${LDFLAGS}
+	${CC} ${OBJECTS} -o bin/zenmusic ${LDFLAGS}
 
 .c.o:
 	${CC} ${CFLAGS} -c ${.IMPSRC} -o ${.TARGET} -O3 -DVERSION=${VERSION} -DBUILD=${BUILDVER}
