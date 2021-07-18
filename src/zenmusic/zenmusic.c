@@ -131,8 +131,12 @@ void init(int width, int height, char* path)
 
   // init paths
 
-  char* wrk_path    = cstr_new_path_normalize(path, NULL);                                                                                        // REL 0
-  char* res_path    = zm.res_par ? cstr_new_path_normalize(zm.res_par, wrk_path) : cstr_new_cstring("/usr/local/share/zenmusic");                 // REL 1
+  char* wrk_path = cstr_new_path_normalize(path, NULL); // REL 0
+#ifdef __linux__
+  char* res_path = zm.res_par ? cstr_new_path_normalize(zm.res_par, wrk_path) : cstr_new_cstring("/usr/share/zenmusic"); // REL 1
+#else
+  char* res_path = zm.res_par ? cstr_new_path_normalize(zm.res_par, wrk_path) : cstr_new_cstring("/usr/local/share/zenmusic"); // REL 1
+#endif
   char* cfgdir_path = zm.cfg_par ? cstr_new_path_normalize(zm.cfg_par, wrk_path) : cstr_new_path_normalize("~/.config/zenmusic", getenv("HOME")); // REL 2
   char* css_path    = cstr_new_path_append(res_path, "main.css");                                                                                 // REL 3
   char* html_path   = cstr_new_path_append(res_path, "main.html");                                                                                // REL 4

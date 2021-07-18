@@ -34,7 +34,7 @@ sudo pacman -Syyu
 sudo pacman -S make clang ffmpeg sdl2 glew
 git clone https://github.com/milgra/zenmusic.git
 cd zenmusic
-make -f makefileARCH rel
+make -f makefileARCH build
 sudo make -f makefileARCH install
 ```
 

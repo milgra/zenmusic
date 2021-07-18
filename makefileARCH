@@ -65,10 +65,10 @@ clean:
 	rm -f $(OBJECTSREL) zenmusic
 
 install: build
-	/usr/bin/install -c -s -m 755 bin/zenmusic /usr/local/bin
-	/usr/bin/install -d -m 755 /usr/local/share/zenmusic
-	cp res/* /usr/local/share/zenmusic/
+	/usr/bin/install -c -s -m 755 bin/zenmusic /usr/bin
+	/usr/bin/install -d -m 755 /usr/share/zenmusic
+	cp res/* /usr/share/zenmusic/
 
 remove:
-	rm /usr/local/bin/zenmusic
-	rm -r /usr/local/share/zenmusic
+	rm /usr/bin/zenmusic
+	rm -r /usr/share/zenmusic
