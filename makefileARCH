@@ -1,4 +1,5 @@
 CC = clang
+OBJDIRREL = bin/obj/rel
 VERSION = 1
 
 SOURCES = \
