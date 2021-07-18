@@ -31,7 +31,7 @@ sudo make install
 
 ```
 sudo pacman -Syyu
-sudo pacman -S make ffmpeg sdl2 glew
+sudo pacman -S make clang ffmpeg sdl2 glew
 git clone https://github.com/milgra/zenmusic.git
 cd zenmusic
 make -f makefileARCH rel
