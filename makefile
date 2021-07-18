@@ -53,6 +53,7 @@ LDFLAGS = \
 OBJECTS := ${SOURCES:.c=.o}
 
 build: ${OBJECTS}
+	mkdir -p bin
 	${CC} ${OBJECTS} -o bin/zenmusic ${LDFLAGS}
 
 .c.o:
