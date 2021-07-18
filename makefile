@@ -1,23 +1,20 @@
 CC = clang
-OBJDIRDEV = bin/obj/dev
-OBJDIRREL = bin/obj/rel
 VERSION = 1
+BUILDVER != cat version.num
 
 SOURCES = \
-	$(wildcard src/modules/*.c) \
-	$(wildcard src/modules/zen_core/*.c) \
-	$(wildcard src/modules/zen_math/*.c) \
-	$(wildcard src/modules/zen_wm/*.c) \
-	$(wildcard src/modules/image/*.c) \
-	$(wildcard src/modules/zen_media_player/*.c) \
-	$(wildcard src/modules/zen_media_transcoder/*.c) \
-	$(wildcard src/modules/zen_ui/*.c) \
-	$(wildcard src/modules/zen_ui/gl/*.c) \
-	$(wildcard src/modules/zen_ui/view/*.c) \
-	$(wildcard src/modules/zen_ui/text/*.c) \
-	$(wildcard src/modules/zen_ui/html/*.c) \
-	$(wildcard src/zenmusic/*.c) \
-	$(wildcard src/zenmusic/ui/*.c)
+	${:!ls src/modules/zen_core/*.c!} \
+	${:!ls src/modules/zen_math/*.c!} \
+	${:!ls src/modules/zen_wm/*.c!} \
+	${:!ls src/modules/zen_media_player/*.c!} \
+	${:!ls src/modules/zen_media_transcoder/*.c!} \
+	${:!ls src/modules/zen_ui/*.c!} \
+	${:!ls src/modules/zen_ui/gl/*.c!} \
+	${:!ls src/modules/zen_ui/view/*.c!} \
+	${:!ls src/modules/zen_ui/text/*.c!} \
+	${:!ls src/modules/zen_ui/html/*.c!} \
+	${:!ls src/zenmusic/*.c!} \
+	${:!ls src/zenmusic/ui/*.c!}
 
 CFLAGS = \
 	-I/usr/local/include \
@@ -53,26 +50,16 @@ LDFLAGS = \
 	-lswscale \
 	-lpthread
 
-OBJECTSDEV := $(addprefix $(OBJDIRDEV)/,$(SOURCES:.c=.o))
-OBJECTSREL := $(addprefix $(OBJDIRREL)/,$(SOURCES:.c=.o))
+OBJECTS := ${SOURCES:.c=.o}
 
-rel: $(OBJECTSREL)
-	$(CC) $^ -o bin/zenmusic $(LDFLAGS)
+build: ${OBJECTS}
+	${CC} ${OBJECTS} -o bin/zenmusicdev ${LDFLAGS}
 
-dev: $(OBJECTSDEV)
-	$(CC) $^ -o bin/zenmusicdev $(LDFLAGS)
-
-$(OBJECTSDEV): $(OBJDIRDEV)/%.o: %.c
-	mkdir -p $(@D)
-	$(CC) -c $< -o $@ $(CFLAGS) -g -DDEBUG -DVERSION=0 -DBUILD=0
-
-$(OBJECTSREL): $(OBJDIRREL)/%.o: %.c
-	mkdir -p $(@D)
-	$(CC) -c $< -o $@ $(CFLAGS) -O3 -DVERSION=$(VERSION) -DBUILD=$(shell cat version.num)
+.c.o:
+	${CC} ${CFLAGS} -c ${.IMPSRC} -o ${.TARGET} -O3 -DVERSION=${VERSION} -DBUILD=${BUILDVER}
 
 clean:
-	rm -f $(OBJECTSDEV) zenmusic
-	rm -f $(OBJECTSREL) zenmusic
+	rm -f ${OBJECTS} zenmusic
 
 deps:
 	@sudo pkg install ffmpeg sdl2 glew
@@ -86,7 +73,7 @@ rectest:
 runtest:
 	tst/test_run.sh
 
-install: rel
+install: build
 	/usr/bin/install -c -s -m 755 bin/zenmusic /usr/local/bin
 	/usr/bin/install -d -m 755 /usr/local/share/zenmusic
 	cp res/* /usr/local/share/zenmusic/
