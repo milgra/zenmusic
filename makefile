@@ -62,7 +62,7 @@ clean:
 	rm -f ${OBJECTS} zenmusic
 
 deps:
-	@sudo pkg install ffmpeg sdl2 glew
+	pkg install ffmpeg sdl2 glew
 
 vjump: 
 	$(shell ./version.sh "$$(cat version.num)" > version.num)
