@@ -41,7 +41,7 @@ sudo make -f makefileLINUX install
 ### Debian based Linuxes ###
 
 ```
-sudo apt install make clang git ffmpeg libsdl2-dev libglew-dev
+sudo apt install make clang git ffmpeg libsdl2-dev libglew-dev libavcodec-dev libavfilter-dev libavdevice-dev
 git clone https://github.com/milgra/zenmusic.git
 cd zenmusic
 make -f makefileLINUX build
