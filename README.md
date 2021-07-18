@@ -27,18 +27,26 @@ make build
 sudo make install
 ```
 
-### Linux ###
-
-install the following packages :
-
-ffmpeg sdl2 glew
-
+### Arch based Linuxes ###
 
 ```
+sudo pacman -Syyu
+sudo pacman -S make ffmpeg sdl2 glew
 git clone https://github.com/milgra/zenmusic.git
 cd zenmusic
-make rel
-sudo make install
+make -f makefileARCH rel
+sudo make -f makefileARCH install
+```
+
+### Debian based Linuxes ###
+
+```
+sudo apt update && upgrader
+sudo apt install -S make ffmpeg sdl2 glew
+git clone https://github.com/milgra/zenmusic.git
+cd zenmusic
+make -f makefileARCH rel
+sudo make -f makefileARCH install
 ```
 
 ## User Guide ##
