@@ -75,6 +75,7 @@ void    vh_list_set_item_width(view_t* view, float width);
 #include "vh_sbar.c"
 #include "zc_cstring.c"
 #include "zc_string.c"
+#include <float.h>
 #include <limits.h>
 #include <math.h>
 
