@@ -39,6 +39,7 @@ sudo make -f makefileLINUX install
 ```
 
 ### Debian based Linuxes ###
+(Note: zenmusic needs OpenGL 4.0 compatible gpu drivers)
 
 ```
 sudo apt install make clang git ffmpeg libsdl2-dev libglew-dev libavcodec-dev libavfilter-dev libavdevice-dev
