@@ -31,22 +31,21 @@ sudo make install
 
 ```
 sudo pacman -Syyu
-sudo pacman -S make clang ffmpeg sdl2 glew
+sudo pacman -S make clang git ffmpeg sdl2 glew
 git clone https://github.com/milgra/zenmusic.git
 cd zenmusic
-make -f makefileARCH build
-sudo make -f makefileARCH install
+make -f makefileLINUX build
+sudo make -f makefileLINUX install
 ```
 
 ### Debian based Linuxes ###
 
 ```
-sudo apt update && upgrader
-sudo apt install -S make ffmpeg sdl2 glew
+sudo apt install make clang git ffmpeg libsdl2-dev libglew-dev
 git clone https://github.com/milgra/zenmusic.git
 cd zenmusic
-make -f makefileARCH rel
-sudo make -f makefileARCH install
+make -f makefileLINUX build
+sudo make -f makefileLINUX install
 ```
 
 ## User Guide ##
