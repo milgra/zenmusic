@@ -30,7 +30,6 @@ sudo make install
 ### Arch based Linuxes ###
 
 ```
-sudo pacman -Syyu
 sudo pacman -S make clang git ffmpeg sdl2 glew
 git clone https://github.com/milgra/zenmusic.git
 cd zenmusic
