@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# first copy start folder structure to result folder
+# first copy start folder structure to test folder
 
 if [ $1 == 0 ];
 then
@@ -10,7 +10,7 @@ rm -r tst/result
 cp -r tst/start tst/test
 fi
 
-# execute record session on result folder
+# execute record session on test folder
 
 echo "STARTING RECORDING SESSION" $1
 
