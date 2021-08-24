@@ -22,9 +22,9 @@ Read the user guide for further information : [Open User Guide](doc/USER.md)
 ```
 git clone https://github.com/milgra/zenmusic.git
 cd zenmusic
-sudo make deps
-make build
-sudo make install
+sudo gmake deps
+gmake build
+sudo gmake install
 ```
 
 ### Arch based Linuxes ###
@@ -34,8 +34,8 @@ sudo pacman -Syyu
 sudo pacman -S make clang git ffmpeg sdl2 glew
 git clone https://github.com/milgra/zenmusic.git
 cd zenmusic
-make -f makefileLINUX build
-sudo make -f makefileLINUX install
+make build
+sudo make install
 ```
 
 ### Debian based Linuxes ###
@@ -45,8 +45,8 @@ sudo make -f makefileLINUX install
 sudo apt install make clang git ffmpeg libsdl2-dev libglew-dev libavcodec-dev libavfilter-dev libavdevice-dev
 git clone https://github.com/milgra/zenmusic.git
 cd zenmusic
-make -f makefileLINUX build
-sudo make -f makefileLINUX install
+make build
+sudo make install
 ```
 
 ## User Guide ##

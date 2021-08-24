@@ -1,12 +1,13 @@
 # Zen Music development roadmap
 
-**before release**
-
- - invalid location in change library popup
- - automated test record & replay in openbox fix window size
 
 **near future**
 
+ - release all bitmaps after adding to texmap, re-render them on texture reset to save 300M memory
+ - highlight active row
+ - jump to current song misbehaves when column sort is set differently
+ - column sort ui error on left scrolled songlist
+ - invalid location in change library popup
  - mute state doesn't stay between songs
  - activity log item height problem
  - when recording detect remote control events and send udp packet in case of replay
@@ -17,7 +18,6 @@
  - if you sort a filtered list it falls back to full list
  - song editor field resize, reopen - wrong sizes in edited fields
  - filter, play song, unfilter, jump to current song - wrong song
- - release all bitmaps after adding to texmap, re-render them on texture reset to save 300M memory
  - join pthreads to avoid memory leak report
  - glyph grey out when texture reset
  - show scrollbar on mouse over, fade in/out
