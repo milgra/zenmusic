@@ -3,9 +3,15 @@
 
 **near future**
 
- - release all bitmaps after adding to texmap, re-render them on texture reset to save 300M memory
- - highlight active row
+ - switch to freetype for speedup
+ - metadata editor problems, doesn't jump to beginning after long edit
  - jump to current song misbehaves when column sort is set differently
+ - full screen visualizer
+ - release all bitmaps after adding to texmap, re-render them on texture reset to save 300M memory
+
+- CFG_PATH, RES_PATH legyen makefileba deklaralva os alapjan vagy legalabbis main.c tetejen makrokkal
+
+ - highlight active row
  - column sort ui error on left scrolled songlist
  - invalid location in change library popup
  - mute state doesn't stay between songs

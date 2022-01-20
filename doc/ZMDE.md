@@ -61,3 +61,9 @@ Zen Video
 - replacement for adobe premier with wine
 - replacement for photoshop with wine
 - new ui around shotcut?
+
+Zen Paint
+
+ZenSwarm
+Zenflow
+ZenBrawl

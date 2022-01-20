@@ -97,10 +97,23 @@ runtest:
 	tst/test_run.sh
 
 install: rel
+ifeq ($(UNAME),FreeBSD)
 	/usr/bin/install -c -s -m 755 bin/zenmusic /usr/local/bin
 	/usr/bin/install -d -m 755 /usr/local/share/zenmusic
 	cp res/* /usr/local/share/zenmusic/
+endif		
+ifeq ($(UNAME),Linux)
+	/usr/bin/install -c -s -m 755 bin/zenmusic /usr/bin
+	/usr/bin/install -d -m 755 /usr/share/zenmusic
+	cp res/* /usr/share/zenmusic/
+endif		
 
 remove:
+ifeq ($(UNAME),FreeBSD)
 	rm /usr/local/bin/zenmusic
 	rm -r /usr/local/share/zenmusic
+endif
+ifeq ($(UNAME),Linux)
+	rm /usr/lbin/zenmusic
+	rm -r /usr/share/zenmusic
+endif
